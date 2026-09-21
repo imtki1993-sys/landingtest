@@ -11,6 +11,6 @@ export async function GET(){try{
   ]);
   return {...o,lead,product};
  }));
- return NextResponse.json({orders:rows});
+ return NextResponse.json({orders:rows,diagnostic:{supabaseHost:new URL(process.env.NEXT_PUBLIC_SUPABASE_URL!).host,keyType:(process.env.SUPABASE_SECRET_KEY||"").startsWith("sb_secret_")?"secret":(process.env.SUPABASE_SECRET_KEY||"").startsWith("eyJ")?"legacy-jwt":"unknown"}});
 }catch(e:any){return NextResponse.json({error:e.message,orders:[]},{status:500})}}
 export async function POST(req:Request){try{const b=await req.json();if(!b.slug||!b.name||!b.phone)return NextResponse.json({error:"Champs requis manquants"},{status:400});const {data,error}=await db().rpc("capture_public_order",{p_slug:b.slug,p_full_name:b.name,p_phone:b.phone,p_city:b.city||null,p_quantity:Number(b.quantity||1)});if(error)throw error;return NextResponse.json(data,{status:201})}catch(e:any){return NextResponse.json({error:e.message},{status:500})}}
