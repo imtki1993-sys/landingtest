@@ -4,8 +4,15 @@ function slugify(s:string){return s.toLowerCase().normalize("NFD").replace(/[\u0
 function parseJson(s:string){return JSON.parse(s.replace(/```json|```/g,"").trim())}
 export async function POST(req:Request){try{const p=await req.json();if(!p.name||!p.price)return NextResponse.json({error:"Nom et prix requis"},{status:400});if(!process.env.OPENAI_API_KEY)return NextResponse.json({error:"OPENAI_API_KEY manquante dans Vercel"},{status:500});
 const language=p.language||"Darija Maroc",client=new OpenAI({apiKey:process.env.OPENAI_API_KEY});
-const prompt=`Tu es expert landing pages COD Maroc. Produit: ${p.name}. Prix: ${p.price} MAD. Ancien prix: ${p.oldPrice||"non fourni"}. Description: ${p.description||"non fournie"}. Langue: ${language}. Écris une page persuasive mais factuelle, sans inventer de caractéristiques. En Darija utilise alphabet arabe naturel. Retourne UNIQUEMENT JSON valide: {"headline":"","subheadline":"","description":"","benefits":["","","",""],"cta":"","delivery":"","guarantee":"","faq":[{"question":"","answer":""},{"question":"","answer":""},{"question":"","answer":""}]}`;
+const prompt=`Tu es directeur artistique et expert landing pages COD Maroc. Analyse d'abord le TYPE DE PRODUIT principalement depuis son NOM.
+Produit: ${p.name}
+Prix: ${p.price} MAD. Ancien prix: ${p.oldPrice||"non fourni"}. Description: ${p.description||"non fournie"}. Langue: ${language}.
+Choisis exactement un design_profile parmi: automotive-tech, beauty, fashion-luxury, health-wellness, sport-fitness, home-lifestyle, electronics-tech, kids-family, general.
+Exemples: support/chargeur voiture ou moto => automotive-tech; montre/sac/lunettes mode => fashion-luxury; genouillère => sport-fitness ou health-wellness selon le nom.
+Écris une page persuasive mais factuelle sans inventer de caractéristiques. En Darija, alphabet arabe naturel.
+Retourne UNIQUEMENT JSON valide avec: {"design_profile":"","product_category":"","headline":"","subheadline":"","description":"","benefits":["","","",""],"cta":"","delivery":"","guarantee":"","faq":[{"question":"","answer":""},{"question":"","answer":""},{"question":"","answer":""}]}`;
 const ai=await client.responses.create({model:"gpt-5.6-luna",input:prompt,reasoning:{effort:"low"},store:false});const content=parseJson(ai.output_text);
+const allowed=["automotive-tech","beauty","fashion-luxury","health-wellness","sport-fitness","home-lifestyle","electronics-tech","kids-family","general"];if(!allowed.includes(content.design_profile))content.design_profile="general";
 const slug=slugify(p.name)+"-"+Date.now().toString().slice(-5),lang=language==="Français"?"fr-MA":language==="English"?"en":"ar-MA",supabase=db();
 const {data,error}=await supabase.rpc("create_landing_product",{p_name:p.name,p_slug:slug,p_price:Number(p.price),p_old_price:p.oldPrice?Number(p.oldPrice):null,p_description:content.description||p.description||null,p_language:lang});if(error)throw error;
 const {error:saveError}=await supabase.from("landing_pages").update({seo:{ai_content:content,source_url:p.sourceUrl||null,images:Array.isArray(p.imageUrls)?p.imageUrls:[]}}).eq("id",data.landing_page_id);if(saveError)throw saveError;
