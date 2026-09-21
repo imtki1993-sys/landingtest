@@ -1,44 +1,10 @@
 "use client";
-
-import {useParams} from "next/navigation";
-import {useState} from "react";
-
-export default function Landing(){
-  const params=useParams<{slug:string}>();
-  const slug=typeof params?.slug==="string"?params.slug:"";
-  const [sent,setSent]=useState(false);
-  const [error,setError]=useState("");
-
-  async function submit(e:React.FormEvent<HTMLFormElement>){
-    e.preventDefault();
-    setError("");
-    const f=new FormData(e.currentTarget);
-    const r=await fetch("/api/orders",{
-      method:"POST",
-      headers:{"content-type":"application/json"},
-      body:JSON.stringify({
-        slug,
-        name:f.get("name"),
-        phone:f.get("phone"),
-        city:f.get("city"),
-        quantity:1
-      })
-    });
-    if(r.ok)setSent(true);
-    else setError("تعذر تسجيل الطلب. حاول مرة أخرى.");
-  }
-
-  return <div style={{maxWidth:620,margin:"auto",padding:24,textAlign:"center"}} dir="rtl">
-    <h1>عرض خاص</h1>
-    <h2>{slug.replaceAll("-"," ")}</h2>
-    <p>التوصيل مجاني والدفع عند الاستلام</p>
-    {sent?<h3>✅ تم تسجيل طلبك بنجاح</h3>:
-      <form onSubmit={submit}>
-        <input name="name" required minLength={2} placeholder="الاسم الكامل"/>
-        <input name="phone" required inputMode="tel" minLength={8} placeholder="رقم الهاتف"/>
-        <input name="city" required placeholder="المدينة"/>
-        {error&&<p>{error}</p>}
-        <button className="primary">تأكيد الطلب</button>
-      </form>}
-  </div>
-}
+import {useParams} from "next/navigation";import {useEffect,useState} from "react";
+export default function Landing(){const params=useParams<{slug:string}>(),slug=typeof params?.slug==="string"?params.slug:"";const [data,setData]=useState<any>(null),[sent,setSent]=useState(false),[error,setError]=useState("");
+useEffect(()=>{if(slug)fetch("/api/landing/"+slug).then(r=>r.json()).then(setData)},[slug]);
+async function submit(e:React.FormEvent<HTMLFormElement>){e.preventDefault();setError("");const f=new FormData(e.currentTarget),r=await fetch("/api/orders",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({slug,name:f.get("name"),phone:f.get("phone"),city:f.get("city"),quantity:1})});if(r.ok)setSent(true);else setError("تعذر تسجيل الطلب. حاول مرة أخرى.")}
+if(!data)return <div className="lp-loading">Chargement...</div>;if(data.error)return <div className="lp-loading">Page introuvable</div>;const c=data.content||{};
+return <div className="lp" dir={data.locale?.startsWith("ar")?"rtl":"ltr"}><section className="lp-hero"><div className="lp-wrap"><span className="lp-badge">الدفع عند الاستلام</span><h1>{c.headline||data.name}</h1><p className="lp-sub">{c.subheadline||c.description}</p><div className="lp-price"><b>{data.price} DH</b>{data.oldPrice&&<s>{data.oldPrice} DH</s>}</div><a className="lp-cta" href="#order">{c.cta||"اطلب الآن"}</a><p>{c.delivery}</p></div></section>
+<section className="lp-section"><div className="lp-wrap"><h2>علاش تختار هاد المنتج؟</h2><div className="lp-benefits">{(c.benefits||[]).map((x:string,i:number)=><div className="lp-benefit" key={i}>✓ {x}</div>)}</div><p className="lp-desc">{c.description}</p></div></section>
+<section className="lp-order" id="order"><div className="lp-wrap"><div className="lp-form"><h2>أكد الطلب ديالك</h2><p>{c.delivery}</p>{sent?<div className="lp-success">✅ تم تسجيل طلبك بنجاح</div>:<form onSubmit={submit}><input name="name" required minLength={2} placeholder="الاسم الكامل"/><input name="phone" required inputMode="tel" minLength={8} placeholder="رقم الهاتف"/><input name="city" required placeholder="المدينة"/>{error&&<p>{error}</p>}<button className="lp-cta">{c.cta||"تأكيد الطلب"}</button></form>}</div></div></section>
+{c.faq?.length>0&&<section className="lp-section"><div className="lp-wrap"><h2>الأسئلة الشائعة</h2>{c.faq.map((f:any,i:number)=><div className="lp-faq" key={i}><b>{f.question}</b><p>{f.answer}</p></div>)}</div></section>}<div className="lp-sticky"><a href="#order">{c.cta||"اطلب الآن"} — {data.price} DH</a></div></div>}
