@@ -8,5 +8,5 @@ const prompt=`Tu es expert landing pages COD Maroc. Produit: ${p.name}. Prix: ${
 const ai=await client.responses.create({model:"gpt-5.6-luna",input:prompt,reasoning:{effort:"low"},store:false});const content=parseJson(ai.output_text);
 const slug=slugify(p.name)+"-"+Date.now().toString().slice(-5),lang=language==="Français"?"fr-MA":language==="English"?"en":"ar-MA",supabase=db();
 const {data,error}=await supabase.rpc("create_landing_product",{p_name:p.name,p_slug:slug,p_price:Number(p.price),p_old_price:p.oldPrice?Number(p.oldPrice):null,p_description:content.description||p.description||null,p_language:lang});if(error)throw error;
-const {error:saveError}=await supabase.from("landing_pages").update({seo:{ai_content:content,source_url:p.sourceUrl||null}}).eq("id",data.landing_page_id);if(saveError)throw saveError;
-return NextResponse.json({page:{...content,price:p.price,oldPrice:p.oldPrice||"",slug:data.slug,url:"/landing/"+data.slug},record:data});}catch(e:any){return NextResponse.json({error:e?.message||"Erreur génération IA"},{status:500})}}
+const {error:saveError}=await supabase.from("landing_pages").update({seo:{ai_content:content,source_url:p.sourceUrl||null,images:Array.isArray(p.imageUrls)?p.imageUrls:[]}}).eq("id",data.landing_page_id);if(saveError)throw saveError;
+return NextResponse.json({page:{...content,price:p.price,oldPrice:p.oldPrice||"",slug:data.slug,url:"/landing/"+data.slug,images:Array.isArray(p.imageUrls)?p.imageUrls:[]},record:data});}catch(e:any){return NextResponse.json({error:e?.message||"Erreur génération IA"},{status:500})}}
