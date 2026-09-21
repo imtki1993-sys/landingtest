@@ -1,0 +1,3 @@
+import {NextResponse} from "next/server";import {createClient} from "@supabase/supabase-js";
+function db(){const u=process.env.NEXT_PUBLIC_SUPABASE_URL,k=process.env.SUPABASE_SECRET_KEY;if(!u||!k)throw new Error("Supabase env missing");return createClient(u,k,{auth:{persistSession:false}})}
+export async function GET(){try{const {data,error}=await db().from("landing_pages").select("id,name,slug,status,locale,created_at,published_at,seo").order("created_at",{ascending:false}).limit(100);if(error)throw error;return NextResponse.json({pages:data||[]})}catch(e:any){return NextResponse.json({error:e.message,pages:[]},{status:500})}}
