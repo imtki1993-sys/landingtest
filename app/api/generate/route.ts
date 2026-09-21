@@ -1,0 +1,2 @@
+import {NextResponse} from "next/server";
+export async function POST(req:Request){const p=await req.json();if(!p.name||!p.price)return NextResponse.json({error:"Nom et prix requis"},{status:400});return NextResponse.json({page:{headline:p.name,price:p.price,oldPrice:p.oldPrice||"",description:p.description||"Produit pratique avec paiement à la livraison.",cta:"اطلب الآن",delivery:"التوصيل مجاني والدفع عند الاستلام"}})}
