@@ -1,0 +1,3 @@
+"use client";
+import {useEffect,useState} from "react";
+export default function Orders(){const [orders,setOrders]=useState<any[]>([]);useEffect(()=>{fetch("/api/orders").then(r=>r.json()).then(x=>setOrders(x.orders||[]))},[]);return <div style={{padding:40}}><h1>Commandes COD</h1><p>Les nouvelles commandes de tes landing pages apparaissent ici.</p><div className="card">{orders.length?orders.map(o=><div key={o.id} style={{padding:12,borderBottom:"1px solid #eee"}}><b>{o.name}</b> — {o.phone} — {o.city} — {o.product}</div>):"Aucune commande pour le moment."}</div></div>}
