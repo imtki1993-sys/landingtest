@@ -39,3 +39,14 @@
 .premium-dark-warm .lp-scroll-hint{text-align:center;font-size:12px;opacity:.62;margin-top:9px}
 .premium-dark-warm .lp-order-after-hero{margin-top:0;padding-top:34px;padding-bottom:34px}
 @media(max-width:760px){.premium-dark-warm .lp-hero-slide .lp-hero-img{max-height:460px}.premium-dark-warm .lp-order-after-hero{padding-top:22px;padding-bottom:28px}}
+
+/* High-contrast light COD order block */
+.premium-dark-warm .lp-order-after-hero{background:#f7f1e8!important;color:#2b2119!important;border-top:1px solid rgba(181,133,75,.25);border-bottom:1px solid rgba(181,133,75,.25)}
+.premium-dark-warm .lp-order-after-hero .lp-form{background:#fffdf9!important;color:#2b2119!important;border:1px solid #eadbc8!important;box-shadow:0 18px 55px rgba(0,0,0,.18)!important}
+.premium-dark-warm .lp-order-after-hero h2{color:#241a13!important}
+.premium-dark-warm .lp-order-after-hero p{color:#756454!important}
+.premium-dark-warm .lp-order-after-hero input{background:#fff!important;color:#241a13!important;border:1px solid #d9c7b2!important}
+.premium-dark-warm .lp-order-after-hero input::placeholder{color:#9a8979!important}
+.premium-dark-warm .lp-order-after-hero input:focus{border-color:#b78349!important;box-shadow:0 0 0 3px rgba(183,131,73,.13)!important;outline:none}
+.premium-dark-warm .lp-order-after-hero .lp-cta{background:#9b622f!important;color:#fff!important;box-shadow:0 10px 24px rgba(109,65,30,.22)!important}
+.premium-dark-warm .lp-order-after-hero .lp-success{background:#eef8ef!important;color:#245d31!important;border:1px solid #cce7d0!important}
