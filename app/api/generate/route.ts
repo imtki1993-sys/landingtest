@@ -53,7 +53,7 @@ Retourne UNIQUEMENT un JSON valide avec exactement ces clés:
     const images = Array.isArray(p.imageUrls) ? p.imageUrls : [];
     const customHost = `${data.slug}.landpro.online`;
     const { data: ws } = await supabase.from("workspaces").select("id").limit(1).single();
-    if (ws?.id) await supabase.from("domains").upsert({workspace_id:ws.id,landing_page_id:data.landing_page_id,hostname:customHost,type:"SUBDOMAIN",verification_status:"VERIFIED",ssl_status:"ISSUED",last_checked_at:new Date().toISOString(),last_error:null},{onConflict:"hostname"});
+    if (ws?.id) { const {error:domainError}=await supabase.from("domains").upsert({workspace_id:ws.id,landing_page_id:data.landing_page_id,hostname:customHost,type:"SUBDOMAIN",verification_status:"VERIFIED",ssl_status:"ISSUED",last_checked_at:new Date().toISOString(),last_error:null},{onConflict:"hostname"}); if(domainError) console.error("Domain mapping failed:",domainError.message); }
     const { error: saveError } = await supabase.from("landing_pages").update({
       seo: { ai_content: content, source_url: p.sourceUrl || null, images, visual_theme: theme }
     }).eq("id", data.landing_page_id);
