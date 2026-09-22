@@ -54,3 +54,39 @@
 /* Orange conversion CTA inside COD order form */
 .premium-dark-warm .lp-order-after-hero form .lp-cta{background:#ff7a00!important;color:#fff!important;border-color:#ff7a00!important;box-shadow:0 10px 26px rgba(255,122,0,.30)!important}
 .premium-dark-warm .lp-order-after-hero form .lp-cta:hover{background:#e96f00!important;border-color:#e96f00!important;transform:translateY(-1px)}
+
+/* Multi-theme landing engine */
+.landing-themed{--bg:#17120f;--surface:#211914;--card:#2b211a;--text:#fff8ef;--muted:#cbb9a5;--accent:#c98745;--accent2:#ff7a00;--line:rgba(255,255,255,.10);background:var(--bg);color:var(--text)}
+.landing-themed .lp-hero,.landing-themed .lp-section,.landing-themed .lp-story,.landing-themed .lp-how,.landing-themed .lp-trust{background:var(--bg)!important;color:var(--text)!important}
+.landing-themed .lp-feature-card,.landing-themed .lp-benefit,.landing-themed .lp-faq,.landing-themed .lp-steps>div,.landing-themed .lp-trust-grid>div{background:var(--card)!important;color:var(--text)!important;border-color:var(--line)!important}
+.landing-themed .lp-sub,.landing-themed .lp-desc,.landing-themed .lp-feature-card p,.landing-themed .lp-faq p,.landing-themed .lp-story p,.landing-themed .lp-steps p{color:var(--muted)!important}
+.landing-themed .lp-price b,.landing-themed .lp-category{color:var(--accent)!important}
+.landing-themed .lp-cta,.landing-themed .lp-sticky a{background:var(--accent)!important;color:#fff!important}
+.landing-themed .lp-order-after-hero{background:#f7f1e8!important;color:#2b2119!important}
+.landing-themed .lp-order-after-hero .lp-form{background:#fffdf9!important;color:#2b2119!important;border:1px solid #eadbc8!important}
+.landing-themed .lp-order-after-hero form .lp-cta{background:#ff7a00!important;color:#fff!important}
+.landing-themed .lp-hero-scroll{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;gap:14px;scrollbar-width:none}.landing-themed .lp-hero-scroll::-webkit-scrollbar{display:none}.landing-themed .lp-hero-slide{flex:0 0 100%;scroll-snap-align:center}.landing-themed .lp-hero-slide img{width:100%;height:auto;object-fit:contain}
+.theme-dark-premium{--bg:#15100d;--surface:#201813;--card:#2a2019;--text:#fff8ef;--muted:#cdbba8;--accent:#c68a4b}
+.theme-orange-cod{--bg:#fff8f0;--surface:#fff;--card:#fff;--text:#302116;--muted:#786554;--accent:#ff7900;--line:#f1d8bd}
+.theme-clean-white{--bg:#fff;--surface:#fff;--card:#f8f9fb;--text:#18202a;--muted:#66717e;--accent:#202b38;--line:#e5e8ec}
+.theme-luxury-gold{--bg:#0e0d0b;--surface:#171510;--card:#211e16;--text:#fff9e8;--muted:#c9bea0;--accent:#d7b45d}
+.theme-tech-blue{--bg:#071523;--surface:#0b2035;--card:#102a45;--text:#eff8ff;--muted:#9db8cf;--accent:#268cff}
+.theme-nature-green{--bg:#f4f8f1;--surface:#fff;--card:#fff;--text:#1d3021;--muted:#627565;--accent:#438a50;--line:#dce9dc}
+.theme-beauty-pink{--bg:#fff6f8;--surface:#fff;--card:#fff;--text:#3c242d;--muted:#80636e;--accent:#d9658a;--line:#f0d7df}
+.theme-auto-red{--bg:#130d0d;--surface:#211313;--card:#2c1818;--text:#fff5f3;--muted:#caa8a3;--accent:#e54235}
+.theme-midnight-blue{--bg:#080d1b;--surface:#10172a;--card:#151f36;--text:#f3f6ff;--muted:#a7b0c7;--accent:#688cff}
+.theme-minimal-beige{--bg:#f4efe7;--surface:#fbf8f3;--card:#fffdf9;--text:#332c25;--muted:#7b7065;--accent:#9b7652;--line:#ded2c3}
+.theme-emerald-premium{--bg:#071713;--surface:#0c241d;--card:#123128;--text:#f0fff9;--muted:#9cc4b5;--accent:#38b889}
+.theme-purple-modern{--bg:#160f25;--surface:#211636;--card:#2c1e46;--text:#fbf6ff;--muted:#c0acd2;--accent:#9b6cff}
+.theme-sport-black{--bg:#080808;--surface:#111;--card:#1b1b1b;--text:#fff;--muted:#b7b7b7;--accent:#ff5a1f}
+.theme-kids-colorful{--bg:#fffaf0;--surface:#fff;--card:#fff;--text:#30334a;--muted:#70738b;--accent:#7559e8;--line:#eadff8}
+.theme-medical-clean{--bg:#f3fbfc;--surface:#fff;--card:#fff;--text:#16343a;--muted:#617b80;--accent:#1696a7;--line:#d4eaed}
+/* AI category fallback themes */
+.theme-automotive-tech,.theme-electronics-tech{--bg:#071523;--surface:#0b2035;--card:#102a45;--text:#eff8ff;--muted:#9db8cf;--accent:#268cff}
+.theme-beauty{--bg:#fff6f8;--surface:#fff;--card:#fff;--text:#3c242d;--muted:#80636e;--accent:#d9658a;--line:#f0d7df}
+.theme-fashion-luxury{--bg:#0e0d0b;--surface:#171510;--card:#211e16;--text:#fff9e8;--muted:#c9bea0;--accent:#d7b45d}
+.theme-health-wellness{--bg:#f3fbfc;--surface:#fff;--card:#fff;--text:#16343a;--muted:#617b80;--accent:#1696a7;--line:#d4eaed}
+.theme-sport-fitness{--bg:#080808;--surface:#111;--card:#1b1b1b;--text:#fff;--muted:#b7b7b7;--accent:#ff5a1f}
+.theme-home-lifestyle{--bg:#f4efe7;--surface:#fbf8f3;--card:#fffdf9;--text:#332c25;--muted:#7b7065;--accent:#9b7652;--line:#ded2c3}
+.theme-kids-family{--bg:#fffaf0;--surface:#fff;--card:#fff;--text:#30334a;--muted:#70738b;--accent:#7559e8;--line:#eadff8}
+.theme-general{--bg:#15100d;--surface:#201813;--card:#2a2019;--text:#fff8ef;--muted:#cdbba8;--accent:#c68a4b}
