@@ -50,3 +50,7 @@
 .premium-dark-warm .lp-order-after-hero input:focus{border-color:#b78349!important;box-shadow:0 0 0 3px rgba(183,131,73,.13)!important;outline:none}
 .premium-dark-warm .lp-order-after-hero .lp-cta{background:#9b622f!important;color:#fff!important;box-shadow:0 10px 24px rgba(109,65,30,.22)!important}
 .premium-dark-warm .lp-order-after-hero .lp-success{background:#eef8ef!important;color:#245d31!important;border:1px solid #cce7d0!important}
+
+/* Orange conversion CTA inside COD order form */
+.premium-dark-warm .lp-order-after-hero form .lp-cta{background:#ff7a00!important;color:#fff!important;border-color:#ff7a00!important;box-shadow:0 10px 26px rgba(255,122,0,.30)!important}
+.premium-dark-warm .lp-order-after-hero form .lp-cta:hover{background:#e96f00!important;border-color:#e96f00!important;transform:translateY(-1px)}
