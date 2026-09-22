@@ -22,11 +22,12 @@ export async function POST(req: Request) {
     if (!process.env.OPENAI_API_KEY) return NextResponse.json({ error: "OPENAI_API_KEY manquante dans Vercel" }, { status: 500 });
 
     const language = p.language || "Darija Maroc";
+    const requestedTheme = p.theme || "auto";
     const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
     const prompt = `Tu es directeur artistique et expert landing pages COD Maroc.
 Produit: ${p.name}
 Prix: ${p.price} MAD. Ancien prix: ${p.oldPrice || "non fourni"}.
-Description: ${p.description || "non fournie"}. Langue: ${language}.
+Description: ${p.description || "non fournie"}. Langue: ${language}.\nThème visuel demandé: ${requestedTheme}. Si auto, choisis design_profile selon le produit.
 Choisis design_profile parmi automotive-tech, beauty, fashion-luxury, health-wellness, sport-fitness, home-lifestyle, electronics-tech, kids-family, general.
 Adapte le contenu au type de produit. N'invente aucune caractéristique, certification, statistique, avis client ni résultat. Pour santé/sport, aucune promesse médicale non prouvée. En Darija, utilise un alphabet arabe naturel.
 Retourne UNIQUEMENT un JSON valide avec exactement ces clés:
@@ -36,6 +37,8 @@ Retourne UNIQUEMENT un JSON valide avec exactement ces clés:
     const content = parseJson(ai.output_text);
     const allowed = ["automotive-tech","beauty","fashion-luxury","health-wellness","sport-fitness","home-lifestyle","electronics-tech","kids-family","general"];
     if (!allowed.includes(content.design_profile)) content.design_profile = "general";
+    const theme = requestedTheme === "auto" ? content.design_profile : requestedTheme;
+    content.visual_theme = theme;
 
     const slug = slugify(p.name) + "-" + Date.now().toString().slice(-5);
     const lang = language === "Français" ? "fr-MA" : language === "English" ? "en" : "ar-MA";
@@ -49,12 +52,12 @@ Retourne UNIQUEMENT un JSON valide avec exactement ces clés:
 
     const images = Array.isArray(p.imageUrls) ? p.imageUrls : [];
     const { error: saveError } = await supabase.from("landing_pages").update({
-      seo: { ai_content: content, source_url: p.sourceUrl || null, images }
+      seo: { ai_content: content, source_url: p.sourceUrl || null, images, visual_theme: theme }
     }).eq("id", data.landing_page_id);
     if (saveError) throw saveError;
 
     return NextResponse.json({
-      page: { ...content, price: p.price, oldPrice: p.oldPrice || "", slug: data.slug, url: "/landing/" + data.slug, images },
+      page: { ...content, visual_theme: theme, price: p.price, oldPrice: p.oldPrice || "", slug: data.slug, url: "/landing/" + data.slug, images },
       record: data
     });
   } catch (e: any) {
