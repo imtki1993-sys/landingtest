@@ -51,13 +51,16 @@ Retourne UNIQUEMENT un JSON valide avec exactement ces clés:
     if (error) throw error;
 
     const images = Array.isArray(p.imageUrls) ? p.imageUrls : [];
+    const customHost = `${data.slug}.landpro.online`;
+    const { data: ws } = await supabase.from("workspaces").select("id").limit(1).single();
+    if (ws?.id) await supabase.from("domains").upsert({workspace_id:ws.id,landing_page_id:data.landing_page_id,hostname:customHost,type:"SUBDOMAIN",verification_status:"VERIFIED",ssl_status:"ISSUED",last_checked_at:new Date().toISOString(),last_error:null},{onConflict:"hostname"});
     const { error: saveError } = await supabase.from("landing_pages").update({
       seo: { ai_content: content, source_url: p.sourceUrl || null, images, visual_theme: theme }
     }).eq("id", data.landing_page_id);
     if (saveError) throw saveError;
 
     return NextResponse.json({
-      page: { ...content, visual_theme: theme, price: p.price, oldPrice: p.oldPrice || "", slug: data.slug, url: "/landing/" + data.slug, images },
+      page: { ...content, visual_theme: theme, price: p.price, oldPrice: p.oldPrice || "", slug: data.slug, url: "https://" + customHost, fallbackUrl: "/landing/" + data.slug, hostname: customHost, images },
       record: data
     });
   } catch (e: any) {
