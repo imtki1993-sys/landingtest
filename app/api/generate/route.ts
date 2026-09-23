@@ -1,13 +1,7 @@
 import { NextResponse } from "next/server";
-import { createClient } from "@supabase/supabase-js";
+import { authContext } from "../../../lib/server-auth";
 import OpenAI from "openai";
 
-function db() {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const key = process.env.SUPABASE_SECRET_KEY;
-  if (!url || !key) throw new Error("Supabase env missing");
-  return createClient(url, key, { auth: { persistSession: false } });
-}
 function slugify(s: string) {
   return s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 70);
 }
@@ -42,8 +36,8 @@ Retourne UNIQUEMENT un JSON valide avec exactement ces clés:
 
     const slug = slugify(p.name) + "-" + Date.now().toString().slice(-5);
     const lang = language === "Français" ? "fr-MA" : language === "English" ? "en" : "ar-MA";
-    const supabase = db();
-    const { data, error } = await supabase.rpc("create_landing_product", {
+    const {s:supabase,workspaceId}=await authContext(req);
+    const { data, error } = await supabase.rpc("create_landing_product_for_workspace", {\n      p_workspace_id: workspaceId,
       p_name: p.name, p_slug: slug, p_price: Number(p.price),
       p_old_price: p.oldPrice ? Number(p.oldPrice) : null,
       p_description: content.description || p.description || null, p_language: lang
@@ -52,8 +46,7 @@ Retourne UNIQUEMENT un JSON valide avec exactement ces clés:
 
     const images = Array.isArray(p.imageUrls) ? p.imageUrls : [];
     const customHost = `${data.slug}.landpro.online`;
-    const { data: ws } = await supabase.from("workspaces").select("id").limit(1).single();
-    if (ws?.id) { const {error:domainError}=await supabase.from("domains").upsert({workspace_id:ws.id,landing_page_id:data.landing_page_id,hostname:customHost,type:"SUBDOMAIN",verification_status:"VERIFIED",ssl_status:"ISSUED",last_checked_at:new Date().toISOString(),last_error:null},{onConflict:"hostname"}); if(domainError) console.error("Domain mapping failed:",domainError.message); }
+    if (workspaceId) { const {error:domainError}=await supabase.from("domains").upsert({workspace_id:workspaceId,landing_page_id:data.landing_page_id,hostname:customHost,type:"SUBDOMAIN",verification_status:"VERIFIED",ssl_status:"ISSUED",last_checked_at:new Date().toISOString(),last_error:null},{onConflict:"hostname"}); if(domainError) console.error("Domain mapping failed:",domainError.message); }
     const { error: saveError } = await supabase.from("landing_pages").update({
       seo: { ai_content: content, source_url: p.sourceUrl || null, images, visual_theme: theme }
     }).eq("id", data.landing_page_id);
