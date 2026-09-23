@@ -17,7 +17,11 @@ export async function POST(req: Request) {
 
     const language = p.language || "Darija Maroc";
     const requestedTheme = p.theme || "auto";
-    const {s:supabase,workspaceId}=await authContext(req);\n    const {data:integration}=await supabase.rpc("get_workspace_integration_secrets",{p_workspace_id:workspaceId});\n    const openaiKey=integration?.[0]?.openai_api_key||process.env.OPENAI_API_KEY;\n    if(!openaiKey)return NextResponse.json({error:"Ajoute ton OPENAI_API_KEY dans Paramètres > Intégrations"},{status:503});\n    const client = new OpenAI({ apiKey: openaiKey });
+    const {s:supabase,workspaceId}=await authContext(req);
+    const {data:integration}=await supabase.rpc("get_workspace_integration_secrets",{p_workspace_id:workspaceId});
+    const openaiKey=integration?.[0]?.openai_api_key||process.env.OPENAI_API_KEY;
+    if(!openaiKey)return NextResponse.json({error:"Ajoute ton OPENAI_API_KEY dans Paramètres > Intégrations"},{status:503});
+    const client = new OpenAI({ apiKey: openaiKey });
     const prompt = `Tu es directeur artistique et expert landing pages COD Maroc.
 Produit: ${p.name}
 Prix: ${p.price} MAD. Ancien prix: ${p.oldPrice || "non fourni"}.
