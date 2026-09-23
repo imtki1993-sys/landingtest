@@ -19,9 +19,9 @@ export async function POST(req: Request) {
     const requestedTheme = p.theme || "auto";
     const {s:supabase,workspaceId}=await authContext(req);
     const {data:integration}=await supabase.rpc("get_workspace_integration_secrets",{p_workspace_id:workspaceId});
-    const openaiKey=integration?.[0]?.openai_api_key||process.env.OPENAI_API_KEY;
-    if(!openaiKey)return NextResponse.json({error:"Ajoute ton OPENAI_API_KEY dans Paramètres > Intégrations"},{status:503});
-    const client = new OpenAI({ apiKey: openaiKey });
+    const metaKey=integration?.[0]?.openai_api_key||process.env.MODEL_API_KEY;
+    if(!metaKey)return NextResponse.json({error:"Ajoute ta MODEL_API_KEY Meta dans Paramètres > Intégrations"},{status:503});
+    const client = new OpenAI({ baseURL: "https://api.meta.ai/v1", apiKey: metaKey });
     const prompt = `Tu es directeur artistique et expert landing pages COD Maroc.
 Produit: ${p.name}
 Prix: ${p.price} MAD. Ancien prix: ${p.oldPrice || "non fourni"}.
@@ -31,7 +31,7 @@ Adapte le contenu au type de produit. N'invente aucune caractéristique, certifi
 Retourne UNIQUEMENT un JSON valide avec exactement ces clés:
 {"design_profile":"","product_category":"","headline":"","subheadline":"","description":"","benefits":["","","",""],"cta":"","delivery":"","problem_title":"","problem_text":"","features_title":"","features":[{"title":"","text":""},{"title":"","text":""},{"title":"","text":""}],"how_title":"","how_steps":["","",""],"trust_title":"","trust_points":["","",""],"guarantee":"","faq":[{"question":"","answer":""},{"question":"","answer":""},{"question":"","answer":""}]}`;
 
-    const ai = await client.responses.create({ model: "gpt-5.6-luna", input: prompt, reasoning: { effort: "low" }, store: false });
+    const ai = await client.responses.create({ model: "muse-spark-1.3", input: prompt, reasoning: { effort: "low" }, store: false });
     const content = parseJson(ai.output_text);
     const allowed = ["automotive-tech","beauty","fashion-luxury","health-wellness","sport-fitness","home-lifestyle","electronics-tech","kids-family","general"];
     if (!allowed.includes(content.design_profile)) content.design_profile = "general";
