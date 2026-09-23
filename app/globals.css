@@ -194,3 +194,13 @@
 .editor-live.builder-preview-mobile .editor-live-hero{padding:28px 18px}.editor-live.builder-preview-mobile .editor-live-hero h1{font-size:28px}.editor-live.builder-preview-mobile .editor-live-hero img{height:220px}.editor-live.builder-preview-mobile .editor-benefits{grid-template-columns:1fr}
 @media(max-width:1100px){.editor-grid{grid-template-columns:210px minmax(420px,1fr) 320px}}
 @media(max-width:850px){.visual-editor{height:100vh}.editor-grid{display:flex;flex-direction:column;overflow:auto}.builder-left{order:1;overflow:visible}.editor-live{order:2;min-height:560px}.editor-controls{order:3;overflow:visible;height:auto}.builder-blocks{display:grid;grid-template-columns:1fr 1fr}.editor-live.builder-preview-mobile{min-height:650px}.editor-toolbar{flex-wrap:wrap;gap:10px}}
+
+
+/* Builder V2 selected-block UX */
+.selected-actions{display:flex;gap:6px;padding-bottom:12px;border-bottom:1px solid #ece7e1;margin-bottom:12px}.selected-actions button{flex:1;padding:8px 6px;font-size:11px}
+.builder-selectable{position:relative;cursor:pointer;outline:2px solid transparent;outline-offset:-2px;transition:outline-color .15s ease}.builder-selectable:hover{outline-color:#93c5fd}.builder-selectable.selected{outline-color:#2563eb}.builder-selectable.selected:before{content:"Section sélectionnée";position:absolute;z-index:20;top:8px;left:8px;background:#2563eb;color:#fff;font:700 10px/1 Arial;padding:6px 8px;border-radius:6px}
+.builder-order-preview{max-width:620px;margin:32px auto;padding:28px;background:#fff;border-radius:18px;box-shadow:0 12px 36px rgba(15,23,42,.1);text-align:center}.builder-order-preview>small{font-weight:800;color:#64748b}.builder-order-preview h3{margin:8px 0 16px}.builder-fake-input{padding:12px 14px;margin:8px 0;border:1px solid #d9dee7;border-radius:9px;text-align:right;color:#8a94a3}.builder-order-preview>button{width:100%;margin-top:10px;background:var(--accent);color:#fff}
+.editor-controls.settings-for-order .template-picker,.editor-controls.settings-for-order>label:not(:last-child){opacity:.42}
+.editor-controls.settings-for-hero .form-style-picker,.editor-controls.settings-for-hero .quantity-editor{display:none}
+.editor-controls.settings-for-benefits .form-style-picker,.editor-controls.settings-for-benefits .quantity-editor,.editor-controls.settings-for-benefits .editor-price-grid{display:none}
+@media(max-width:850px){.builder-selectable.selected:before{font-size:9px}.builder-order-preview{margin:18px 12px;padding:18px}}
