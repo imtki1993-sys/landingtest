@@ -1,6 +1,7 @@
 import {NextResponse} from "next/server"; import {createClient} from "@supabase/supabase-js";import {authContext} from "../../../lib/server-auth";
 function db(){const u=process.env.NEXT_PUBLIC_SUPABASE_URL,k=process.env.SUPABASE_SECRET_KEY;if(!u||!k)throw new Error("Supabase env missing");return createClient(u,k,{auth:{persistSession:false}})}
-export async function GET(req:Request){try{\n const {s:supabase,workspaceId}=await authContext(req);
+export async function GET(req:Request){try{
+ const {s:supabase,workspaceId}=await authContext(req);
  const {data:orders,error}=await supabase.from("orders").select("id,order_number,lead_id,product_id,quantity,total,currency,shipment_status,created_at").eq("workspace_id",workspaceId).order("created_at",{ascending:false}).limit(100);
  if(error)throw error;
  const rows=await Promise.all((orders||[]).map(async(o:any)=>{
