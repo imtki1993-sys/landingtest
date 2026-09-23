@@ -28,8 +28,8 @@ export function builderToLegacy(doc:BuilderDocument,c:any={}){
 export function syncBuilderFromLegacy(c:any={}):BuilderDocument{
  const existing=c?.builder_v2;
  if(existing?.version===2&&Array.isArray(existing.blocks)){
-  const legacy=legacyToBuilder(c),byId=new Map(existing.blocks.map((b:BuilderBlock)=>[b.id,b]));
-  return {...existing,theme:c.visual_theme||existing.theme,blocks:legacy.blocks.map(b=>({...b,...(byId.get(b.id)||{}),visible:b.visible,props:b.type==="text"?b.props:(byId.get(b.id)?.props||{})}))};
+  const legacy=legacyToBuilder(c),byId=new Map<string,BuilderBlock>((existing.blocks as BuilderBlock[]).map((b:BuilderBlock)=>[b.id,b]));
+  return {...existing,theme:c.visual_theme||existing.theme,blocks:legacy.blocks.map((b:BuilderBlock)=>{const previous=byId.get(b.id);return {...b,...(previous??{}),visible:b.visible,props:b.type==="text"?b.props:(previous?.props??{})};})};
  }
  return legacyToBuilder(c);
 }
