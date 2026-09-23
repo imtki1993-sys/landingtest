@@ -13,4 +13,4 @@ export async function GET(req:Request){try{
  }));
  return NextResponse.json({orders:rows});
 }catch(e:any){return NextResponse.json({error:e.message,orders:[]},{status:500})}}
-export async function POST(req:Request){try{const b=await req.json();if(!b.slug||!b.name||!b.phone)return NextResponse.json({error:"Champs requis manquants"},{status:400});const {data,error}=await db().rpc("capture_public_order",{p_slug:b.slug,p_full_name:b.name,p_phone:b.phone,p_city:b.city||null,p_quantity:Number(b.quantity||1)});if(error)throw error;return NextResponse.json(data,{status:201})}catch(e:any){return NextResponse.json({error:e.message},{status:500})}}
+export async function POST(req:Request){try{const b=await req.json();if(!b.slug||!b.name||!b.phone)return NextResponse.json({error:"Champs requis manquants"},{status:400});const {data,error}=await db().rpc("capture_public_order",{p_slug:b.slug,p_full_name:b.name,p_phone:b.phone,p_city:b.city||null,p_quantity:Number(b.quantity||1),p_address:b.address||null});if(error)throw error;return NextResponse.json(data,{status:201})}catch(e:any){return NextResponse.json({error:e.message},{status:500})}}
