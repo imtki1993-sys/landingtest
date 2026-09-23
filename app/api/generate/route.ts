@@ -37,7 +37,8 @@ Retourne UNIQUEMENT un JSON valide avec exactement ces clés:
     const slug = slugify(p.name) + "-" + Date.now().toString().slice(-5);
     const lang = language === "Français" ? "fr-MA" : language === "English" ? "en" : "ar-MA";
     const {s:supabase,workspaceId}=await authContext(req);
-    const { data, error } = await supabase.rpc("create_landing_product_for_workspace", {\n      p_workspace_id: workspaceId,
+    const { data, error } = await supabase.rpc("create_landing_product_for_workspace", {
+      p_workspace_id: workspaceId,
       p_name: p.name, p_slug: slug, p_price: Number(p.price),
       p_old_price: p.oldPrice ? Number(p.oldPrice) : null,
       p_description: content.description || p.description || null, p_language: lang
