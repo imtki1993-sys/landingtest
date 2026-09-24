@@ -383,3 +383,9 @@
 .landing-themed .lp-gallery-thumbs img{display:block;width:100%;height:100%;object-fit:cover}
 .theme-cod-s11 .lp-visual{transform:none!important}
 @media(max-width:700px){.landing-themed .lp-hero-slide .lp-hero-img{max-height:480px!important}.landing-themed .lp-slider-btn{display:grid!important}.landing-themed .lp-gallery-thumbs{grid-auto-columns:72px}.landing-themed .lp-gallery-mosaic{min-height:340px}.landing-themed .lp-gallery-editorial{height:430px}.landing-themed .lp-gallery-home>img{min-height:320px}}
+
+/* Transparent main product gallery: preserve PNG transparency */
+.landing-themed .lp-gallery-main,
+.editor-live.landing-themed .lp-gallery-main{background:transparent!important;background-color:transparent!important;box-shadow:none}
+.landing-themed .lp-gallery-main img,
+.editor-live.landing-themed .lp-gallery-main img{background:transparent!important;background-color:transparent!important}
