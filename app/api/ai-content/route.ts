@@ -31,11 +31,11 @@ export async function POST(req:Request){
    hero:'{"headline":"","subheadline":"","cta":"","delivery":""}',
    benefits:'{"description":"","benefits":["","","",""]}',
    problem:'{"problem":"","solution":"","problem_title":"","problem_text":""}',
-   features:'{"features_title":"","features":[{"title":"","text":""},{"title":"","text":""},{"title":"","text":""}]}',
+   features:'{"features_title":"","features":["","",""]}',
    how:'{"how_title":"","how_steps":["","",""]}',
    trust:'{"trust_title":"","trust_points":["","",""]}',
    faq:'{"faq":[{"question":"","answer":""},{"question":"","answer":""},{"question":"","answer":""}]}',
-   all:'{"headline":"","subheadline":"","description":"","benefits":["","","",""],"cta":"","delivery":"","problem":"","solution":"","problem_title":"","problem_text":"","features_title":"","features":[{"title":"","text":""},{"title":"","text":""},{"title":"","text":""}],"how_title":"","how_steps":["","",""],"trust_title":"","trust_points":["","",""],"faq":[{"question":"","answer":""},{"question":"","answer":""},{"question":"","answer":""}]}'
+   all:'{"headline":"","subheadline":"","description":"","benefits":["","","",""],"cta":"","delivery":"","problem":"","solution":"","problem_title":"","problem_text":"","features_title":"","features":["","",""],"how_title":"","how_steps":["","",""],"trust_title":"","trust_points":["","",""],"faq":[{"question":"","answer":""},{"question":"","answer":""},{"question":"","answer":""}]}'
   };
   const prompt=`Tu écris le contenu d'une landing page COD Maroc déjà dessinée. Ne génère ni HTML, ni CSS, ni thème. Respecte exactement les faits produit. N'invente jamais caractéristiques, matériaux, compatibilités, certifications, statistiques, témoignages, garantie, résultats ou urgence. Pour santé/sport, aucune promesse médicale. En Darija Maroc, écris naturellement en alphabet arabe. Adapte le ton au thème sans changer le design. ${facts} Génère seulement la section "${section}". Retourne UNIQUEMENT un JSON valide conforme exactement à ce schéma: ${schemas[section]||schemas.all}`;
   const ai=await client.responses.create({model:"muse-spark-1.3-contributor",input:prompt,reasoning:{effort:"low"},store:false});
