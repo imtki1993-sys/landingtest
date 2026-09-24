@@ -355,3 +355,13 @@
 .editor-live.landing-themed .builder-order-shell .lp-form input:focus,
 .editor-live.landing-themed .builder-order-shell .lp-form select:focus,
 .editor-live.landing-themed .builder-order-shell .lp-form textarea:focus{background:#fff!important;color:#111827!important;border-color:var(--accent,#2563eb)!important;outline:3px solid color-mix(in srgb,var(--accent,#2563eb) 18%,transparent)!important}
+
+/* COD total: guaranteed contrast on every theme */
+.landing-themed .lp-order.lp-order-after-hero .lp-order-total,
+.editor-live.landing-themed .builder-order-shell .lp-order-total{background:#fff!important;color:#111827!important;border:1.5px solid #e5e7eb!important;box-shadow:0 1px 3px rgba(0,0,0,.06)!important}
+.landing-themed .lp-order.lp-order-after-hero .lp-order-total span,
+.landing-themed .lp-order.lp-order-after-hero .lp-order-total b,
+.editor-live.landing-themed .builder-order-shell .lp-order-total span,
+.editor-live.landing-themed .builder-order-shell .lp-order-total b{color:#111827!important;opacity:1!important}
+.landing-themed .lp-order.lp-order-after-hero .lp-order-total small,
+.editor-live.landing-themed .builder-order-shell .lp-order-total small{color:#4b5563!important;opacity:1!important}
