@@ -8,7 +8,7 @@ export function legacyToBuilder(c:any={}):BuilderDocument{
  const hidden=new Set(Array.isArray(c.hidden_sections)?c.hidden_sections:[]);
  const custom=c.custom_sections&&typeof c.custom_sections==="object"?c.custom_sections:{};
  return {version:2,theme:c.visual_theme||"general",blocks:order.map((id:string)=>({
-  id,type:id.startsWith("custom-")?"text":id,visible:!hidden.has(id),
+  id,type:id.startsWith("custom-")?(custom[id]?.type||"text"):id,visible:!hidden.has(id),
   props:id.startsWith("custom-")?{...(custom[id]||{})}:{}
  }))};
 }
@@ -16,7 +16,7 @@ export function legacyToBuilder(c:any={}):BuilderDocument{
 export function builderToLegacy(doc:BuilderDocument,c:any={}){
  const blocks=Array.isArray(doc?.blocks)?doc.blocks:[];
  const custom:any={};
- blocks.filter(b=>b.type==="text").forEach(b=>custom[b.id]={...(b.props||{})});
+ blocks.filter(b=>b.id.startsWith("custom-")).forEach(b=>custom[b.id]={...(b.props||{}),type:b.type||b.props?.type||"text"});
  return {...c,visual_theme:doc.theme||c.visual_theme||"general",
   section_order:blocks.map(b=>b.id),
   hidden_sections:blocks.filter(b=>!b.visible).map(b=>b.id),
@@ -29,7 +29,7 @@ export function syncBuilderFromLegacy(c:any={}):BuilderDocument{
  const existing=c?.builder_v2;
  if(existing?.version===2&&Array.isArray(existing.blocks)){
   const legacy=legacyToBuilder(c),byId=new Map<string,BuilderBlock>((existing.blocks as BuilderBlock[]).map((b:BuilderBlock)=>[b.id,b]));
-  return {...existing,theme:c.visual_theme||existing.theme,blocks:legacy.blocks.map((b:BuilderBlock)=>{const previous=byId.get(b.id);return {...b,...(previous??{}),visible:b.visible,props:b.type==="text"?b.props:(previous?.props??{})};})};
+  return {...existing,theme:c.visual_theme||existing.theme,blocks:legacy.blocks.map((b:BuilderBlock)=>{const previous=byId.get(b.id);return {...b,...(previous??{}),visible:b.visible,props:b.id.startsWith("custom-")?b.props:(previous?.props??{})};})};
  }
  return legacyToBuilder(c);
 }
