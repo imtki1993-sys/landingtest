@@ -398,3 +398,6 @@
 
 /* Meta AI usage meter */
 .ai-usage-card{display:flex;flex-direction:column;gap:4px;margin:0 0 12px;padding:12px 13px;border:1px solid #ddd6fe;border-radius:14px;background:#faf8ff}.ai-usage-card b{font-size:12px;color:#4c1d95}.ai-usage-card span{font-size:12px;font-weight:700;color:#111827}.ai-usage-card small{font-size:10px;color:#64748b}
+
+/* Supplier product import */
+.supplier-import{margin:0 0 12px;padding:13px;border:1px solid #bfdbfe;border-radius:14px;background:#f8fbff}.supplier-import textarea{width:100%;min-height:130px;margin:9px 0;padding:10px 11px;border:1px solid #cbd5e1;border-radius:10px;background:#fff;color:#111827;resize:vertical}.supplier-import button{width:100%;padding:10px 12px;border:0;border-radius:10px;background:#111827;color:#fff;font-weight:800;cursor:pointer}.supplier-import small{display:block;margin-top:7px;color:#64748b;font-size:10px}
