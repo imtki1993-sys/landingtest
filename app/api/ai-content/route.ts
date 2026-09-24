@@ -26,7 +26,7 @@ export async function POST(req:Request){
   const key=integration?.[0]?.openai_api_key||process.env.MODEL_API_KEY;
   if(!key)return NextResponse.json({error:"MODEL_API_KEY Meta manquante"},{status:503});
   const client=new OpenAI({baseURL:"https://api.meta.ai/v1",apiKey:key});
-  const facts=`Produit: ${p.name}. Prix: ${p.price??"non fourni"} MAD. Ancien prix: ${p.oldPrice||"non fourni"}. Description/faits fournis: ${p.description||"aucun"}. Thème: ${theme} (${themeRules[theme]||"COD ecommerce"}). Langue: ${language}.`;
+  const brief=String(p.description||"aucun").trim().slice(0,3500);\n  const facts=`Produit: ${p.name}. Prix: ${p.price??"non fourni"} MAD. Ancien prix: ${p.oldPrice||"non fourni"}. Faits produit: ${brief}. Thème: ${theme} (${themeRules[theme]||"COD ecommerce"}). Langue: ${language}.`;
   const schemas:Record<string,string>={
    hero:'{"headline":"","subheadline":"","cta":"","delivery":""}',
    benefits:'{"description":"","benefits":["","","",""]}',
@@ -37,7 +37,7 @@ export async function POST(req:Request){
    faq:'{"faq":[{"question":"","answer":""},{"question":"","answer":""},{"question":"","answer":""}]}',
    all:'{"headline":"","subheadline":"","description":"","benefits":["","","",""],"cta":"","delivery":"","problem":"","solution":"","problem_title":"","problem_text":"","features_title":"","features":["","",""],"how_title":"","how_steps":["","",""],"trust_title":"","trust_points":["","",""],"faq":[{"question":"","answer":""},{"question":"","answer":""},{"question":"","answer":""}]}'
   };
-  const prompt=`Tu écris le contenu d'une landing page COD Maroc déjà dessinée. Ne génère ni HTML, ni CSS, ni thème. Respecte exactement les faits produit. N'invente jamais caractéristiques, matériaux, compatibilités, certifications, statistiques, témoignages, garantie, résultats ou urgence. Pour santé/sport, aucune promesse médicale. En Darija Maroc, écris naturellement en alphabet arabe. Adapte le ton au thème sans changer le design. ${facts} Génère seulement la section "${section}". Retourne UNIQUEMENT un JSON valide conforme exactement à ce schéma: ${schemas[section]||schemas.all}`;
+  const prompt=`Landing COD Maroc. Écris uniquement le contenu demandé, sans HTML/CSS. Utilise seulement les faits fournis; n’invente aucune caractéristique, certification, statistique, témoignage, garantie, résultat ou urgence. Santé/sport: aucune promesse médicale. Darija: alphabet arabe naturel. Ton adapté au thème. ${facts} Section: "${section}". Réponds UNIQUEMENT avec ce JSON valide: ${schemas[section]||schemas.all}`;
   const ai=await client.responses.create({model:"muse-spark-1.3-contributor",input:prompt,reasoning:{effort:"low"},store:false});
   const content=parseJson(ai.output_text);
   return NextResponse.json({content,section});
