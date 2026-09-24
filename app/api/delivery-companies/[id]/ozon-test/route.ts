@@ -1,6 +1,6 @@
 import {NextResponse} from "next/server";import {authContext} from "../../../../../lib/server-auth";
 
-const pick=(v:any):any[]=>{if(Array.isArray(v))return v;if(!v||typeof v!=="object")return[];for(const k of ["cities","CITIES","data","DATA","city","CITY","result","RESULT"]){const a=pick(v[k]);if(a.length)return a}for(const v2 of Object.values(v)){const a=pick(v2);if(a.length)return a}return[]};
+const pick=(v:any):any[]=>{if(Array.isArray(v))return v;if(!v||typeof v!=="object")return[];for(const k of ["cities","CITIES"]){const x=v[k];if(Array.isArray(x))return x;if(x&&typeof x==="object"){const vals=Object.values(x);if(vals.length&&vals.every((z:any)=>z&&typeof z==="object"&&("ID" in z||"NAME" in z)))return vals as any[]}}for(const k of ["data","DATA","city","CITY","result","RESULT"]){const a=pick(v[k]);if(a.length)return a}for(const v2 of Object.values(v)){const a=pick(v2);if(a.length)return a}return[]};
 
 async function fetchCities(clientId:string,apiKey:string){
  const urls=[
