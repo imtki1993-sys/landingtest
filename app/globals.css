@@ -389,3 +389,6 @@
 .editor-live.landing-themed .lp-gallery-main{background:transparent!important;background-color:transparent!important;box-shadow:none}
 .landing-themed .lp-gallery-main img,
 .editor-live.landing-themed .lp-gallery-main img{background:transparent!important;background-color:transparent!important}
+
+/* Builder AI content generator */
+.ai-content-tools{margin:0 0 14px;padding:12px;border:1px solid #ded5cc;border-radius:14px;background:#fffaf4;display:grid;gap:8px}.ai-content-tools button{width:100%;border:0;border-radius:10px;padding:11px 12px;background:#1f1814;color:#fff;font-weight:800;cursor:pointer}.ai-content-tools .ai-section-btn{background:#fff;color:#70451f;border:1px solid #d8c2aa}.ai-content-tools button:disabled{opacity:.55;cursor:wait}.ai-content-tools small{font-size:10px;line-height:1.45;color:#78685c}
