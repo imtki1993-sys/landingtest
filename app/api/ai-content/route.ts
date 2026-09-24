@@ -26,7 +26,8 @@ export async function POST(req:Request){
   const key=integration?.[0]?.openai_api_key||process.env.MODEL_API_KEY;
   if(!key)return NextResponse.json({error:"MODEL_API_KEY Meta manquante"},{status:503});
   const client=new OpenAI({baseURL:"https://api.meta.ai/v1",apiKey:key});
-  const brief=String(p.description||"aucun").trim().slice(0,3500);\n  const facts=`Produit: ${p.name}. Prix: ${p.price??"non fourni"} MAD. Ancien prix: ${p.oldPrice||"non fourni"}. Faits produit: ${brief}. Thème: ${theme} (${themeRules[theme]||"COD ecommerce"}). Langue: ${language}.`;
+  const brief=String(p.description||"aucun").trim().slice(0,3500);
+  const facts=`Produit: ${p.name}. Prix: ${p.price??"non fourni"} MAD. Ancien prix: ${p.oldPrice||"non fourni"}. Faits produit: ${brief}. Thème: ${theme} (${themeRules[theme]||"COD ecommerce"}). Langue: ${language}.`;
   const schemas:Record<string,string>={
    hero:'{"headline":"","subheadline":"","cta":"","delivery":""}',
    benefits:'{"description":"","benefits":["","","",""]}',
