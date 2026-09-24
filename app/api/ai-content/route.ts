@@ -40,6 +40,6 @@ export async function POST(req:Request){
   const prompt=`Landing COD Maroc. Écris uniquement le contenu demandé, sans HTML/CSS. Utilise seulement les faits fournis; n’invente aucune caractéristique, certification, statistique, témoignage, garantie, résultat ou urgence. Santé/sport: aucune promesse médicale. Darija: alphabet arabe naturel. Ton adapté au thème. ${facts} Section: "${section}". Réponds UNIQUEMENT avec ce JSON valide: ${schemas[section]||schemas.all}`;
   const ai=await client.responses.create({model:"muse-spark-1.3-contributor",input:prompt,reasoning:{effort:"low"},store:false});
   const content=parseJson(ai.output_text);
-  return NextResponse.json({content,section});
+  const usage=(ai as any).usage||null;\n  return NextResponse.json({content,section,usage});
  }catch(e:any){return NextResponse.json({error:e?.message||"Erreur génération contenu"},{status:500})}
 }
