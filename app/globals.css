@@ -322,3 +322,18 @@
 
 /* Builder image manager V2 */
 .editor-image-item{position:relative;cursor:grab;transition:.18s ease}.editor-image-item.is-dragging{opacity:.45;transform:scale(.98)}.editor-image-item.is-main{outline:2px solid #2563eb;outline-offset:2px}.image-drag-handle{position:absolute;z-index:2;top:6px;left:6px;padding:3px 6px;border-radius:6px;background:rgba(0,0,0,.65);color:#fff;font-weight:900;cursor:grab}.image-thumb-wrap{position:relative}.image-thumb-wrap>span{position:absolute;left:6px;bottom:6px;background:#2563eb;color:#fff;border-radius:999px;padding:4px 7px;font-size:9px;font-weight:900;letter-spacing:.05em}.image-alt-input{width:100%;box-sizing:border-box;margin:7px 0;padding:7px 9px;border:1px solid #dbe3ee;border-radius:7px;font-size:11px}.image-manager-actions{display:flex!important;flex-wrap:wrap;gap:5px}.image-manager-actions button,.image-replace{font-size:10px!important}.image-replace{display:inline-flex;align-items:center;padding:5px 7px;border:1px solid #dbe3ee;border-radius:6px;cursor:pointer;background:#fff}.image-replace input{display:none}@media(max-width:700px){.image-manager-actions{display:grid!important;grid-template-columns:1fr 1fr}.image-alt-input{font-size:12px}}
+
+/* Order background always matches the Hero background */
+.landing-themed .lp-order.lp-order-after-hero,.editor-live.landing-themed .builder-order-shell{background:var(--hero-bg,var(--bg))!important}
+.landing-themed.theme-cod-s11{--hero-bg:linear-gradient(135deg,#07111f,#102b46)}
+.landing-themed.theme-cod-auto-moto{--hero-bg:linear-gradient(135deg,#101820,#2a3945)}
+.landing-themed.theme-cod-electronics{--hero-bg:linear-gradient(135deg,#06152f,#0d2d5f)}
+.landing-themed.theme-cod-beauty{--hero-bg:linear-gradient(135deg,#fff7fa,#ffe6f0)}
+.landing-themed.theme-cod-health{--hero-bg:linear-gradient(135deg,#f3fff9,#dff8ee)}
+.landing-themed.theme-cod-home{--hero-bg:linear-gradient(135deg,#fffaf4,#ffead1)}
+.landing-themed.theme-cod-fashion{--hero-bg:linear-gradient(135deg,#0b0b0b,#252525)}
+.landing-themed.theme-cod-sport{--hero-bg:linear-gradient(135deg,#06150e,#123520)}
+.landing-themed.theme-cod-kids{--hero-bg:linear-gradient(135deg,#fffafd,#eee8ff)}
+.landing-themed.theme-cod-luxury{--hero-bg:linear-gradient(135deg,#080808,#252018)}
+.landing-themed.theme-cod-decor{--hero-bg:linear-gradient(135deg,#6b3f2a,#b8784e)}
+.landing-themed[class*="theme-cod-"] .lp-hero,.editor-live.landing-themed[class*="theme-cod-"] .editor-live-hero{background:var(--hero-bg)!important}
