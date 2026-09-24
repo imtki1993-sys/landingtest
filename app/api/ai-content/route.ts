@@ -21,7 +21,7 @@ export async function POST(req:Request){
  try{
   const p=await req.json(),section=p.section||"all",theme=p.theme||"cod-s11",language=p.language||"Darija Maroc";
   if(!p.name)return NextResponse.json({error:"Nom du produit requis"},{status:400});
-  const {s,workspaceId}=await authContext(req);
+  const {s,workspaceId,user}=await authContext(req);
   const {data:integration}=await s.rpc("get_workspace_integration_secrets",{p_workspace_id:workspaceId});
   const key=integration?.[0]?.openai_api_key||process.env.MODEL_API_KEY;
   if(!key)return NextResponse.json({error:"MODEL_API_KEY Meta manquante"},{status:503});
