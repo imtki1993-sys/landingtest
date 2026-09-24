@@ -365,3 +365,21 @@
 .editor-live.landing-themed .builder-order-shell .lp-order-total b{color:#111827!important;opacity:1!important}
 .landing-themed .lp-order.lp-order-after-hero .lp-order-total small,
 .editor-live.landing-themed .builder-order-shell .lp-order-total small{color:#4b5563!important;opacity:1!important}
+
+/* Hero gallery hardening — consistent navigation and image surfaces for every theme */
+.landing-themed .lp-visual.lp-gallery{min-width:0;max-width:100%;overflow:visible;transform:none!important}
+.landing-themed .lp-carousel,.landing-themed .lp-gallery-main,.landing-themed .lp-gallery-mosaic,.landing-themed .lp-gallery-editorial,.landing-themed .lp-gallery-home{box-sizing:border-box;max-width:100%}
+.landing-themed .lp-carousel{isolation:isolate;overflow:hidden!important;background:color-mix(in srgb,var(--card) 78%,white 22%)}
+.landing-themed .lp-hero-scroll{position:relative;z-index:1;overflow-x:auto!important;overflow-y:hidden!important;scroll-snap-type:x mandatory!important;scroll-behavior:smooth!important;scrollbar-width:none!important;-ms-overflow-style:none;overscroll-behavior-x:contain;touch-action:pan-x pan-y}
+.landing-themed .lp-hero-scroll::-webkit-scrollbar{display:none!important}
+.landing-themed .lp-hero-slide{box-sizing:border-box;flex:0 0 100%!important;width:100%!important;min-width:100%!important;scroll-snap-align:center!important;scroll-snap-stop:always;background:transparent}
+.landing-themed .lp-hero-slide .lp-hero-img{display:block;width:100%!important;height:auto!important;max-height:620px!important;object-fit:contain!important;object-position:center;background:transparent}
+.landing-themed .lp-slider-btn{z-index:20!important;border:1px solid rgba(255,255,255,.35)!important;background:rgba(10,15,20,.72)!important;color:#fff!important;opacity:1!important;visibility:visible!important;pointer-events:auto!important}
+.landing-themed .lp-slider-dots{z-index:20!important;pointer-events:auto}
+.landing-themed .lp-gallery-main{background:color-mix(in srgb,var(--card) 72%,white 28%);overflow:hidden}
+.landing-themed .lp-gallery-main img{display:block;width:100%;height:100%;object-fit:contain;background:transparent}
+.landing-themed .lp-gallery-thumbs{position:relative;z-index:4;overflow-x:auto;grid-auto-flow:column;grid-auto-columns:minmax(72px,1fr);grid-template-columns:none!important;scrollbar-width:thin;padding-bottom:4px}
+.landing-themed .lp-gallery-thumbs button{min-width:72px;overflow:hidden;background:color-mix(in srgb,var(--card) 72%,white 28%)}
+.landing-themed .lp-gallery-thumbs img{display:block;width:100%;height:100%;object-fit:cover}
+.theme-cod-s11 .lp-visual{transform:none!important}
+@media(max-width:700px){.landing-themed .lp-hero-slide .lp-hero-img{max-height:480px!important}.landing-themed .lp-slider-btn{display:grid!important}.landing-themed .lp-gallery-thumbs{grid-auto-columns:72px}.landing-themed .lp-gallery-mosaic{min-height:340px}.landing-themed .lp-gallery-editorial{height:430px}.landing-themed .lp-gallery-home>img{min-height:320px}}
