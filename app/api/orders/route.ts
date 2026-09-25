@@ -2,7 +2,7 @@ import {NextResponse} from "next/server"; import {createClient} from "@supabase/
 function db(){const u=process.env.NEXT_PUBLIC_SUPABASE_URL,k=process.env.SUPABASE_SECRET_KEY;if(!u||!k)throw new Error("Supabase env missing");return createClient(u,k,{auth:{persistSession:false}})}
 export async function GET(req:Request){try{
  const {s:supabase,workspaceId}=await authContext(req);
- const {data:orders,error}=await supabase.from("orders").select("id,order_number,lead_id,landing_page_id,product_id,quantity,unit_price,subtotal,shipping_price,discount,total,currency,shipment_status,tracking_number,delivery_company_id,shipped_at,delivered_at,returned_at,created_at").eq("workspace_id",workspaceId).order("created_at",{ascending:false}).limit(100);
+ const {data:orders,error}=await supabase.from("orders").select("id,order_number,lead_id,landing_page_id,product_id,quantity,unit_price,subtotal,shipping_price,discount,total,currency,shipment_status,tracking_number,delivery_company_id,carrier_city_id,carrier_city_name,shipped_at,delivered_at,returned_at,created_at").eq("workspace_id",workspaceId).order("created_at",{ascending:false}).limit(100);
  if(error)throw error;
  const base=orders||[],leadIds=[...new Set(base.map((o:any)=>o.lead_id).filter(Boolean))],productIds=[...new Set(base.map((o:any)=>o.product_id).filter(Boolean))],landingIds=[...new Set(base.map((o:any)=>o.landing_page_id).filter(Boolean))],carrierIds=[...new Set(base.map((o:any)=>o.delivery_company_id).filter(Boolean))];
  const [leadsQ,productsQ,landingsQ,carriersQ]=await Promise.all([
