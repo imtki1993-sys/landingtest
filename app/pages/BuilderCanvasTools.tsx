@@ -1,0 +1,3 @@
+"use client";
+type Props={index:number,total:number,isCustom:boolean,onMove:(direction:number)=>void,onDuplicate:()=>void,onToggle:()=>void,onRemove:()=>void};
+export default function BuilderCanvasTools({index,total,isCustom,onMove,onDuplicate,onToggle,onRemove}:Props){return <div className="builder-canvas-tools" onClick={e=>e.stopPropagation()}><button type="button" disabled={index<=0} onClick={()=>onMove(-1)}>↑</button><button type="button" disabled={index<0||index>=total-1} onClick={()=>onMove(1)}>↓</button>{isCustom&&<button type="button" onClick={onDuplicate}>⧉</button>}<button type="button" onClick={onToggle}>◉</button>{isCustom&&<button type="button" className="danger-action" onClick={onRemove}>×</button>}</div>}
