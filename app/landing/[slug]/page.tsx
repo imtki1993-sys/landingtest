@@ -1,19 +1,16 @@
-import {headers} from "next/headers";
 import LandingClient from "./LandingClient";
+import {getPublicLanding} from "../../../lib/public-landing";
 
 export const revalidate=300;
 
 export default async function LandingPage({params,searchParams}:{params:Promise<{slug:string}>,searchParams:Promise<{preview?:string}>}){
  const {slug}=await params,{preview}=await searchParams;
  if(preview==="1")return <LandingClient initialSlug={slug}/>;
- const h=await headers(),host=h.get("host")||"localhost",proto=h.get("x-forwarded-proto")||"https";
- const canonicalHost=host.endsWith(".landpro.online")?"landpro.online":host;
  try{
-  const r=await fetch(proto+"://"+canonicalHost+"/api/landing/"+encodeURIComponent(slug),{next:{revalidate:300,tags:["landing:"+slug]}});
-  if(!r.ok)return <div className="lp-loading">Page introuvable</div>;
-  const data=await r.json();
+  const data=await getPublicLanding(slug);
+  if(!data)return <div className="lp-loading">Page introuvable</div>;
   return <LandingClient initialSlug={slug} initialData={data}/>;
  }catch{
-  return <LandingClient initialSlug={slug}/>;
+  return <div className="lp-loading">Page indisponible</div>;
  }
 }
