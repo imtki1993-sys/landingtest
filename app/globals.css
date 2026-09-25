@@ -451,3 +451,11 @@
 
 /* Unified visual builder: disabled sections stay editable but are clearly marked. */
 .builder-canvas-core{display:contents}.builder-canvas-block.builder-disabled{position:relative;opacity:.52;filter:saturate(.55);outline:2px dashed #94a3b8!important;outline-offset:-2px}.builder-canvas-block.builder-disabled:after{content:"DÉSACTIVÉE — masquée après publication";position:absolute;top:8px;right:8px;z-index:8;padding:5px 8px;border-radius:999px;background:#334155;color:#fff;font-size:10px;font-weight:800;pointer-events:none}.builder-custom-preview h2[contenteditable],.builder-custom-preview p[contenteditable],.builder-canvas-block [contenteditable]{cursor:text}.builder-custom-preview .lp-image-text-grid{display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr);gap:18px;align-items:center}.builder-custom-image{width:100%;max-height:320px;object-fit:cover;border-radius:14px}.builder-custom-gallery{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}.builder-custom-gallery img{width:100%;aspect-ratio:1/1;object-fit:cover;border-radius:12px}@media(max-width:700px){.builder-custom-preview .lp-image-text-grid{grid-template-columns:1fr}.builder-custom-gallery{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+/* Visual editor readability: keep editable list cards legible on dark section themes. */
+.builder-canvas-block .builder-inline-row{background:rgba(255,255,255,.96);color:#0f172a!important;border:1px solid rgba(148,163,184,.28);border-radius:12px;padding:12px 14px}
+.builder-canvas-block .builder-inline-row>[contenteditable="true"],.builder-canvas-block .builder-inline-row>span{color:#0f172a!important;-webkit-text-fill-color:#0f172a;opacity:1}
+.builder-canvas-block .builder-inline-row>span:first-child{color:#16a34a!important;-webkit-text-fill-color:#16a34a;font-weight:900}
+.builder-canvas-block .editor-benefits{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.builder-canvas-block .editor-benefits .builder-inline-add{grid-column:1/-1;color:#334155!important;-webkit-text-fill-color:#334155;background:#fff}
+.builder-preview-mobile .builder-canvas-block .editor-benefits{grid-template-columns:1fr}
