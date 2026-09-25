@@ -59,8 +59,8 @@ export async function POST(req:Request){
 
   u.search="";
   const canonical=u.toString();
-  const r=await fetch(canonical,{headers:{"user-agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/131 Safari/537.36","accept":"text/html,application/xhtml+xml","accept-language":"en-US,en;q=0.9,fr;q=0.8"},redirect:"follow",signal:AbortSignal.timeout(15000)});
-  if(!r.ok)throw new Error("Le fournisseur a refusé l’accès à la fiche produit ("+r.status+").");
+  const candidates=[canonical,url];let r:Response|null=null;for(const target of candidates){try{const attempt=await fetch(target,{headers:{"user-agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131 Safari/537.36","accept":"text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8","accept-language":"en-US,en;q=0.9,fr;q=0.8","cache-control":"no-cache","pragma":"no-cache"},redirect:"follow",signal:AbortSignal.timeout(15000)});if(attempt.ok){r=attempt;break}}catch{}}if(!r)throw new Error("Alibaba/AliExpress bloque actuellement l’import automatique depuis le serveur. Réessaie plus tard ou ajoute les informations et images du produit manuellement.");
+  
 
   const finalUrl=new URL(r.url);
   if(!allowed.includes(finalUrl.hostname.toLowerCase()))throw new Error("Redirection fournisseur non autorisée.");
@@ -76,7 +76,7 @@ export async function POST(req:Request){
   const images=imageCandidates(html,finalUrl);
   const supplier_price=priceFrom(html);
 
-  if(!title&&!description)return NextResponse.json({error:"Alibaba bloque l’extraction serveur de cette fiche.",blocked:true,source_url:canonical},{status:422});
+  if(!title&&!description)return NextResponse.json({error:"Alibaba/AliExpress n’a fourni aucune donnée exploitable. L’import automatique ne peut pas contourner la protection du fournisseur. Ajoute les informations et images du produit manuellement.",blocked:true,source_url:canonical},{status:422});
   const brief=[title,description,supplier_price?"Prix fournisseur détecté : "+supplier_price:""].filter(Boolean).join("\n\n").slice(0,3500);
   return NextResponse.json({title,description,brief,images,supplier_price,source_url:canonical,image_count:images.length,partial:blocked||(!description&&images.length===0),warning:blocked?"Alibaba a protégé la fiche : import partiel depuis l’URL produit.":undefined});
  }catch(e:any){
