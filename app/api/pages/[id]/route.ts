@@ -18,6 +18,9 @@ export async function PATCH(req:Request,{params}:{params:Promise<{id:string}>}){
   if(ce)throw ce;if(!current)return NextResponse.json({error:"Page introuvable"},{status:404});
 
   if(b.status==="PUBLISHED"){
+   // Publication is always built atomically from the exact builder payload sent by the editor.
+   // Never publish a previously saved snapshot/version by reference.
+   if(!b.content||typeof b.content!=="object")return NextResponse.json({error:"Contenu du builder requis pour publier"},{status:400});
    const changes:any={};
    for(const key of ["name","content","price","oldPrice","metaPixelId","images"])if(Object.prototype.hasOwnProperty.call(b,key))changes[key]=b[key];
    if(Array.isArray(changes.images))changes.images=changes.images.filter((x:any)=>typeof x==="string"&&/^https?:\/\//.test(x)).slice(0,10);
