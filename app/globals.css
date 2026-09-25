@@ -465,3 +465,10 @@
 .builder-order-preview .builder-order-offers>div b,.builder-order-preview .builder-order-offers>div span{color:#0f172a!important;-webkit-text-fill-color:#0f172a!important;opacity:1!important}
 .builder-order-preview .builder-order-total{background:#fff!important;color:#0f172a!important;border:1px solid #cbd5e1!important}
 .builder-order-preview .builder-order-total span,.builder-order-preview .builder-order-total b{color:#0f172a!important;-webkit-text-fill-color:#0f172a!important;opacity:1!important}
+
+/* Orders: tighter operational columns (Confirmation 11, Livraison 12, Tracking 13). */
+.orders-table th:nth-child(11),.orders-table td:nth-child(11){width:104px!important;min-width:104px!important;max-width:104px!important;padding-left:5px!important;padding-right:5px!important}
+.orders-table th:nth-child(12),.orders-table td:nth-child(12){width:104px!important;min-width:104px!important;max-width:104px!important;padding-left:5px!important;padding-right:5px!important}
+.orders-table th:nth-child(13),.orders-table td:nth-child(13){width:82px!important;min-width:82px!important;max-width:82px!important;padding-left:4px!important;padding-right:4px!important}
+.orders-table th:nth-child(11) .order-select,.orders-table td:nth-child(11) .order-select,.orders-table th:nth-child(12) .order-select,.orders-table td:nth-child(12) .order-select{font-size:10px;padding:6px 5px}
+.orders-table .tracking-code{max-width:52px}
