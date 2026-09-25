@@ -41,11 +41,11 @@ function priceFrom(html:string){
 }
 export async function POST(req:Request){try{
  await authContext(req);
- const body=await req.json(),url=body.url;
+ const body=await req.json();let url=String(body.url||"").trim();\n const md=url.match(/^\\[?https?:\\/\\/[^\\]\\s]+/i);if(md)url=md[0].replace(/^\\[/,"");
  if(!url)return NextResponse.json({error:"URL manquante"},{status:400});
  let u:URL;try{u=new URL(url)}catch{return NextResponse.json({error:"URL invalide"},{status:400})}
  if(u.protocol!=="https:"||!allowed.includes(u.hostname.toLowerCase()))return NextResponse.json({error:"Seules les URLs Alibaba et AliExpress HTTPS sont acceptées."},{status:400});
- const r=await fetch(u.toString(),{headers:{"user-agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/131 Safari/537.36","accept-language":"fr-FR,fr;q=0.9,en;q=0.8"},redirect:"follow",signal:AbortSignal.timeout(15000)});
+ u.search="";const canonical=u.toString();\n const r=await fetch(canonical,{headers:{"user-agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/131 Safari/537.36","accept":"text/html,application/xhtml+xml","accept-language":"en-US,en;q=0.9,fr;q=0.8"},redirect:"follow",signal:AbortSignal.timeout(15000)});
  if(!r.ok)throw new Error("Le fournisseur a refusé l’accès à la fiche produit ("+r.status+").");
  const finalUrl=new URL(r.url);
  if(!allowed.includes(finalUrl.hostname.toLowerCase()))throw new Error("Redirection fournisseur non autorisée.");
@@ -55,5 +55,5 @@ export async function POST(req:Request){try{
  const images=imageCandidates(html,finalUrl),supplier_price=priceFrom(html);
  if(!title&&!description)return NextResponse.json({error:"Impossible d’extraire cette fiche automatiquement. Colle les informations dans Import produit."},{status:422});
  const brief=[title,description,supplier_price?"Prix fournisseur détecté : "+supplier_price:""].filter(Boolean).join("\n\n").slice(0,3500);
- return NextResponse.json({title,description,brief,images,supplier_price,source_url:finalUrl.toString(),image_count:images.length});
+ return NextResponse.json({title,description,brief,images,supplier_price,source_url:canonical,image_count:images.length,partial:blocked||(!description&&images.length===0),warning:blocked?"Alibaba a protégé la fiche : import partiel depuis l’URL produit.":undefined});
 }catch(e:any){return NextResponse.json({error:e?.message||"Import fournisseur impossible"},{status:500})}}
