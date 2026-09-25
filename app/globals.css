@@ -472,3 +472,6 @@
 .orders-table th:nth-child(13),.orders-table td:nth-child(13){width:82px!important;min-width:82px!important;max-width:82px!important;padding-left:4px!important;padding-right:4px!important}
 .orders-table th:nth-child(11) .order-select,.orders-table td:nth-child(11) .order-select,.orders-table th:nth-child(12) .order-select,.orders-table td:nth-child(12) .order-select{font-size:10px;padding:6px 5px}
 .orders-table .tracking-code{max-width:52px}
+
+/* Orders dashboard: use more of the available desktop width. */
+.orders-dashboard .orders-panel{max-width:1680px;width:100%;box-sizing:border-box}
