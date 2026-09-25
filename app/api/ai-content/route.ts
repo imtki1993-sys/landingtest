@@ -39,7 +39,16 @@ export async function POST(req:Request){
    all:'{"headline":"","subheadline":"","description":"","benefits":["","","",""],"cta":"","delivery":"","problem":"","solution":"","problem_title":"","problem_text":"","features_title":"","features":["","",""],"how_title":"","how_steps":["","",""],"trust_title":"","trust_points":["","",""],"faq":[{"question":"","answer":""},{"question":"","answer":""},{"question":"","answer":""}]}'
   };
   const prompt=`Landing COD Maroc. Écris uniquement le contenu demandé, sans HTML/CSS. Utilise seulement les faits fournis; n’invente aucune caractéristique, certification, statistique, témoignage, garantie, résultat ou urgence. Santé/sport: aucune promesse médicale. Darija: alphabet arabe naturel. Ton adapté au thème. ${facts} Section: "${section}". Réponds UNIQUEMENT avec ce JSON valide: ${schemas[section]||schemas.all}`;
-  const ai=await client.responses.create({model:"muse-spark-1.3-contributor",input:prompt,reasoning:{effort:"low"},store:false});
+  const images=Array.isArray(p.images)?p.images.filter((x:any)=>typeof x==="string"&&/^https?:\/\//.test(x)).slice(0,5):[];
+  let ai:any;
+  if(images.length){
+   try{
+    const input:any=[{role:"user",content:[{type:"input_text",text:prompt+" Analyse aussi les photos produit fournies uniquement pour les détails visuellement vérifiables; n’invente rien."},...images.map((image_url:string)=>({type:"input_image",image_url}))]}];
+    ai=await client.responses.create({model:"muse-spark-1.3-contributor",input,reasoning:{effort:"low"},store:false});
+   }catch{
+    ai=await client.responses.create({model:"muse-spark-1.3-contributor",input:prompt,reasoning:{effort:"low"},store:false});
+   }
+  }else ai=await client.responses.create({model:"muse-spark-1.3-contributor",input:prompt,reasoning:{effort:"low"},store:false});
   const content=parseJson(ai.output_text);
   const usage=(ai as any).usage||null;
   return NextResponse.json({content,section,usage});
