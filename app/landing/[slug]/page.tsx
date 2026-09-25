@@ -7,8 +7,9 @@ export default async function LandingPage({params,searchParams}:{params:Promise<
  const {slug}=await params,{preview}=await searchParams;
  if(preview==="1")return <LandingClient initialSlug={slug}/>;
  const h=await headers(),host=h.get("host")||"localhost",proto=h.get("x-forwarded-proto")||"https";
+ const canonicalHost=host.endsWith(".landpro.online")?"landpro.online":host;
  try{
-  const r=await fetch(proto+"://"+host+"/api/landing/"+encodeURIComponent(slug),{next:{revalidate:300,tags:["landing:"+slug]}});
+  const r=await fetch(proto+"://"+canonicalHost+"/api/landing/"+encodeURIComponent(slug),{next:{revalidate:300,tags:["landing:"+slug]}});
   if(!r.ok)return <div className="lp-loading">Page introuvable</div>;
   const data=await r.json();
   return <LandingClient initialSlug={slug} initialData={data}/>;
