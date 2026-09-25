@@ -457,3 +457,8 @@
 .editor-live .lp-how,.editor-live .lp-trust,.editor-live .lp-section{color:#17233d}
 .editor-live .lp-how h2,.editor-live .lp-trust h2,.editor-live .lp-section h2{opacity:1!important}
 .editor-live .lp-story,.editor-live .lp-story *{color:#fff}
+
+/* Editor modal must stay sharp; only the page behind it is dimmed */
+.editor-overlay{backdrop-filter:none!important;-webkit-backdrop-filter:none!important;background:rgba(15,12,9,.62)!important}
+.editor-overlay>.visual-editor,.editor-overlay>.visual-editor *{filter:none!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
+.editor-overlay>.visual-editor{opacity:1!important;position:relative;z-index:1}
