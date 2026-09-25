@@ -6,6 +6,8 @@ async function refresh(req:NextRequest){const rt=req.cookies.get("lm_refresh")?.
 export async function middleware(req:NextRequest){const host=(req.headers.get("host")||"").split(":")[0].toLowerCase(),path=req.nextUrl.pathname;
 if(path.startsWith("/_next/")||path.includes("."))return NextResponse.next();
 const own=[process.env.VERCEL_PROJECT_PRODUCTION_URL,"landpro.online","www.landpro.online","localhost"].filter(Boolean).map(x=>String(x).replace(/^https?:\/\//,""));
+const isLandingSubdomain=host.endsWith(".landpro.online")&&host!=="www.landpro.online";
+if(isLandingSubdomain){const subdomain=host.slice(0,-".landpro.online".length);if(subdomain&&subdomain!=="www"){const url=req.nextUrl.clone();url.pathname="/landing/"+subdomain;return NextResponse.rewrite(url)}}
 const adminHost=own.includes(host)||host.endsWith(".vercel.app");
 if(!adminHost){try{const resolveUrl=new URL("/api/domain-resolve",req.url);resolveUrl.hostname="landpro.online";resolveUrl.protocol="https:";resolveUrl.searchParams.set("hostname",host);const r=await fetch(resolveUrl,{headers:{"x-domain-resolve":"1"},cache:"no-store"}),x=await r.json();if(x.slug){const url=req.nextUrl.clone();url.pathname="/landing/"+x.slug;return NextResponse.rewrite(url)}}catch{}}
 if(isPublic(req))return NextResponse.next();
