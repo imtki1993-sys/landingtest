@@ -1,6 +1,7 @@
+import {unstable_cache} from "next/cache";
 import {adminDb} from "./server-auth";
 
-export async function getPublicLanding(slug:string){
+async function loadPublicLanding(slug:string){
  const s=adminDb();
  const {data:lp,error}=await s.from("landing_pages").select("id,workspace_id,name,slug,locale,seo,product_id,status,archived_at,published_version_id").eq("slug",slug).is("archived_at",null).maybeSingle();
  if(error)throw error;
@@ -18,4 +19,8 @@ export async function getPublicLanding(slug:string){
  const activeSeo=publishedConfig?.seo||lp.seo||{},activeProduct=publishedConfig?.product||p||{};
  const whatsapp=(w?.settings as any)?.whatsapp_phone||(activeSeo as any)?.whatsapp_phone||"212673833237";
  return {id:lp.id,name:activeProduct?.name||lp.name,price:activeProduct?.price,oldPrice:activeProduct?.compare_at_price,description:activeProduct?.description,locale:lp.locale,content:(activeSeo as any)?.ai_content||{},images:(activeSeo as any)?.images||activeProduct?.image_urls||[],whatsappPhone:String(whatsapp).replace(/\D/g,""),metaPixelId:(activeSeo as any)?.meta_pixel_id||(px?.is_enabled?px.pixel_id:null)};
+}
+
+export function getPublicLanding(slug:string){
+ return unstable_cache(()=>loadPublicLanding(slug),["public-landing",slug],{revalidate:3600,tags:["landing:"+slug]})();
 }
