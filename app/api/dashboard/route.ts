@@ -6,7 +6,8 @@ export async function GET(req:Request){try{
   s.from("products").select("id",{count:"exact",head:true}).eq("workspace_id",workspaceId),
   s.from("orders").select("id,order_number,total,currency,shipment_status,tracking_number,created_at,lead_id,product_id,landing_page_id").eq("workspace_id",workspaceId).order("created_at",{ascending:false}),
   s.from("leads").select("id,status").eq("workspace_id",workspaceId),
-  s.rpc("analytics_dashboard_aggregate",{p_workspace_id:workspaceId,p_from:new Date(Date.now()-29*86400000).toISOString()}),\n  s.rpc("workspace_plan_usage",{p_workspace_id:workspaceId})
+  s.rpc("analytics_dashboard_aggregate",{p_workspace_id:workspaceId,p_from:new Date(Date.now()-29*86400000).toISOString()}),
+  s.rpc("workspace_plan_usage",{p_workspace_id:workspaceId})
  ]);
  if(landingsQ.error)throw landingsQ.error;if(productsQ.error)throw productsQ.error;if(ordersQ.error)throw ordersQ.error;if(leadsQ.error)throw leadsQ.error;
  const allOrders:any[]=ordersQ.data||[],orders=allOrders.slice(0,6),leadIds=[...new Set(allOrders.map(o=>o.lead_id).filter(Boolean))],productIds=[...new Set(allOrders.map(o=>o.product_id).filter(Boolean))],landingIds=[...new Set(allOrders.map(o=>o.landing_page_id).filter(Boolean))];
