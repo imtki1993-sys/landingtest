@@ -1,18 +1,17 @@
 import {createHash} from "crypto";
 import {adminDb} from "./server-auth";
+import {resolvePublishedMetaPixel} from "./meta-pixel";
 
 const hash=(v:string)=>createHash("sha256").update(v.trim().toLowerCase()).digest("hex");
 export async function sendMetaPurchase(input:{workspaceId:string;landingPageId:string;orderId:string;value:number;currency:string;phone:string;name:string;eventSourceUrl?:string;clientIp?:string;userAgent?:string}){
  try{
   const s=adminDb();
-  const [{data:px},{data:lp},{data:secret,error:secretError}]=await Promise.all([
-   s.from("pixels").select("pixel_id,is_enabled").eq("workspace_id",input.workspaceId).eq("landing_page_id",input.landingPageId).eq("provider","META").maybeSingle(),
-   s.from("landing_pages").select("seo").eq("id",input.landingPageId).eq("workspace_id",input.workspaceId).single(),
-   s.rpc("get_workspace_integration_secrets",{p_workspace_id:input.workspaceId})
+  const [{data:secret,error:secretError},pixelId]=await Promise.all([
+   s.rpc("get_workspace_integration_secrets",{p_workspace_id:input.workspaceId}),
+   resolvePublishedMetaPixel(input.workspaceId,input.landingPageId)
   ]);
   if(secretError)return;
   const sec=Array.isArray(secret)?secret[0]:secret,token=sec?.meta_capi_token;
-  const pixelId=(lp?.seo as any)?.meta_pixel_id||(px?.is_enabled?px.pixel_id:null);
   if(!token||!pixelId)return;
   const digits=input.phone.replace(/\D/g,""),normalized=digits.startsWith("212")?digits:digits.startsWith("0")?"212"+digits.slice(1):digits;
   const names=input.name.trim().toLowerCase().split(/\s+/).filter(Boolean);
