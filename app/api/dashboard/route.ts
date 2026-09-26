@@ -1,6 +1,6 @@
 import {NextResponse} from "next/server";import {authContext} from "../../../lib/server-auth";
 export async function GET(req:Request){try{
- const {s,workspaceId}=await authContext(req);
+ const {s,workspaceId,isPlatformAdmin}=await authContext(req);
  const [landingsQ,productsQ,ordersQ,leadsQ,analyticsQ]=await Promise.all([
   s.from("landing_pages").select("id,status").eq("workspace_id",workspaceId).is("archived_at",null),
   s.from("products").select("id",{count:"exact",head:true}).eq("workspace_id",workspaceId),
@@ -17,5 +17,5 @@ export async function GET(req:Request){try{
  ]);
  const by=(rows:any[]=[])=>new Map(rows.map(x=>[x.id,x])),lm=by(lq.data||[]),pm=by(pq.data||[]),pgm=by(pgq.data||[]);
  const leads:any[]=leadsQ.data||[],landings:any[]=landingsQ.data||[],a:any=analyticsQ.data||{},t:any=a.totals||{},totalOrders=allOrders.length,confirmed=allOrders.filter(o=>lm.get(o.lead_id)?.status==="CONFIRMED"&&!o.tracking_number).length,shipped=allOrders.filter(o=>!!o.tracking_number).length,delivered=allOrders.filter(o=>o.shipment_status==="DELIVERED").length,views=Number(t.views||0),revenue=allOrders.reduce((sum,o)=>sum+Number(o.total||0),0),deliveredRevenue=allOrders.filter(o=>o.shipment_status==="DELIVERED").reduce((sum,o)=>sum+Number(o.total||0),0);
- return NextResponse.json({totals:{landings:landings.length,published:landings.filter(x=>x.status==="PUBLISHED").length,products:productsQ.count||0,orders:totalOrders,revenue,deliveredRevenue,views,conversion:views?totalOrders/views*100:0,confirmationRate:totalOrders?confirmed/totalOrders*100:0,deliveryRate:shipped?delivered/shipped*100:0,newLeads:allOrders.filter(o=>lm.get(o.lead_id)?.status==="NEW").length,confirmed,periodDays:null},recentOrders:orders.map(o=>({...o,lead:lm.get(o.lead_id)||null,product:pm.get(o.product_id)||null,landing:pgm.get(o.landing_page_id)||null})),topLandings:(Array.isArray(a.landings)?a.landings:[]).slice(0,5)});
+ return NextResponse.json({isPlatformAdmin,totals:{landings:landings.length,published:landings.filter(x=>x.status==="PUBLISHED").length,products:productsQ.count||0,orders:totalOrders,revenue,deliveredRevenue,views,conversion:views?totalOrders/views*100:0,confirmationRate:totalOrders?confirmed/totalOrders*100:0,deliveryRate:shipped?delivered/shipped*100:0,newLeads:allOrders.filter(o=>lm.get(o.lead_id)?.status==="NEW").length,confirmed,periodDays:null},recentOrders:orders.map(o=>({...o,lead:lm.get(o.lead_id)||null,product:pm.get(o.product_id)||null,landing:pgm.get(o.landing_page_id)||null})),topLandings:(Array.isArray(a.landings)?a.landings:[]).slice(0,5)});
 }catch(e:any){return NextResponse.json({error:e.message},{status:e.message==="Non autorisé"?401:500})}}
