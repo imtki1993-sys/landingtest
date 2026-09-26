@@ -25,7 +25,7 @@ export async function GET(req:Request,{params}:{params:Promise<{slug:string}>}){
   const activeSeo=preview?(lp.seo||{}):(publishedConfig?.seo||lp.seo||{});
   const activeProduct=preview?(p||{}):(publishedConfig?.product||p||{});
   const whatsapp=(w?.settings as any)?.whatsapp_phone||(activeSeo as any)?.whatsapp_phone||"";
-  const payload={id:lp.id,name:activeProduct?.name||lp.name,price:activeProduct?.price,oldPrice:activeProduct?.compare_at_price,description:activeProduct?.description,locale:lp.locale,content:(activeSeo as any)?.ai_content||{},images:(activeSeo as any)?.images||activeProduct?.image_urls||[],whatsappPhone:String(whatsapp).replace(/\D/g,""),metaPixelId:px?.is_enabled?px.pixel_id:null};
+  const payload={id:lp.id,name:activeProduct?.name||lp.name,price:activeProduct?.price,oldPrice:activeProduct?.compare_at_price,description:activeProduct?.description,locale:lp.locale,content:(activeSeo as any)?.ai_content||{},images:(activeSeo as any)?.images||activeProduct?.image_urls||[],whatsappPhone:String(whatsapp).replace(/\D/g,""),metaPixelId:(activeSeo as any)?.meta_pixel_id||(px?.is_enabled?px.pixel_id:null)};
   return NextResponse.json(payload,{headers:preview?{"Cache-Control":"private, no-store"}:{"Cache-Control":"public, s-maxage=300, stale-while-revalidate=3600"}});
  }catch(e:any){return NextResponse.json({error:e.message},{status:500})}
 }
