@@ -1,17 +1,18 @@
 import {createHash} from "crypto";
 import {adminDb} from "./server-auth";
 import {resolvePublishedMetaPixel} from "./meta-pixel";
+import {decryptIntegrationSecret} from "./integration-secrets";
 
 const hash=(v:string)=>createHash("sha256").update(v.trim().toLowerCase()).digest("hex");
 export async function sendMetaPurchase(input:{workspaceId:string;landingPageId:string;orderId:string;value:number;currency:string;phone:string;name:string;eventSourceUrl?:string;clientIp?:string;userAgent?:string}){
  try{
   const s=adminDb();
   const [{data:secret,error:secretError},pixelId]=await Promise.all([
-   s.rpc("get_workspace_integration_secrets",{p_workspace_id:input.workspaceId}),
+   s.from("workspace_integrations").select("meta_capi_token_enc").eq("workspace_id",input.workspaceId).maybeSingle(),
    resolvePublishedMetaPixel(input.workspaceId,input.landingPageId)
   ]);
   if(secretError)return;
-  const sec=Array.isArray(secret)?secret[0]:secret,token=sec?.meta_capi_token;
+  const token=decryptIntegrationSecret(secret?.meta_capi_token_enc);
   if(!token||!pixelId)return;
   const digits=input.phone.replace(/\D/g,""),normalized=digits.startsWith("212")?digits:digits.startsWith("0")?"212"+digits.slice(1):digits;
   const names=input.name.trim().toLowerCase().split(/\s+/).filter(Boolean);
