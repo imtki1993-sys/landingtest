@@ -1,6 +1,7 @@
 import {NextResponse} from "next/server";
 import {authContext} from "../../../lib/server-auth";
 import OpenAI from "openai";
+import {decryptIntegrationSecret} from "../../../lib/integration-secrets";
 
 function parseJson(s:string){return JSON.parse(s.replace(/```json|```/g,"").trim())}
 const themeRules:Record<string,string>={
@@ -22,8 +23,9 @@ export async function POST(req:Request){
   const p=await req.json(),section=p.section||"all",theme=p.theme||"cod-s11",language=p.language||"Darija Maroc";
   if(!p.name)return NextResponse.json({error:"Nom du produit requis"},{status:400});
   const {s,workspaceId,user}=await authContext(req);
-  const {data:integration}=await s.rpc("get_workspace_integration_secrets",{p_workspace_id:workspaceId});
-  const key=integration?.[0]?.openai_api_key;
+  const {data:integration,error:integrationError}=await s.from("workspace_integrations").select("openai_api_key_enc").eq("workspace_id",workspaceId).maybeSingle();
+  if(integrationError)throw integrationError;
+  const key=decryptIntegrationSecret(integration?.openai_api_key_enc);
   if(!key)return NextResponse.json({error:"Configure ta propre clé Meta Model API dans Paramètres > Intégrations."},{status:503});
   const client=new OpenAI({baseURL:"https://api.meta.ai/v1",apiKey:key});
   const brief=String(p.description||"aucun").trim().slice(0,3500);
