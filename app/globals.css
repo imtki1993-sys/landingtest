@@ -533,3 +533,6 @@
 .premium-theme-demo{height:105px!important;padding:9px!important}.premium-theme-demo>strong{font-size:15px!important;margin-top:7px!important}.pt-demo-lines{margin:6px 0!important}.premium-theme-meta{padding:8px!important}.premium-theme-meta p{display:none}.theme-swatches{margin-top:5px!important}
 .template-mini{min-height:105px!important;transform-origin:top center}.template-preview-info{padding:8px!important}.template-preview-info small{display:none!important}
 @media(max-width:650px){.premium-theme-library,.template-picker{max-height:300px}.premium-theme-library:focus-within,.premium-theme-library:hover,.template-picker:focus-within,.template-picker:hover{max-height:460px}}
+
+/* Builder: selected section settings navigation */
+.builder-settings-anchor{scroll-margin-top:92px;height:1px;width:100%}
