@@ -553,3 +553,6 @@
 
 /* Section visibility now lives directly in Blocks */
 .builder-block-visibility{display:grid;place-items:center;width:24px;height:24px;border-radius:7px;font-size:15px;font-weight:900;color:#86efac;background:rgba(34,197,94,.12);cursor:pointer;transition:.15s}.builder-blocks button.hidden .builder-block-visibility{color:#94a3b8;background:rgba(148,163,184,.1)}.builder-block-visibility:hover{background:rgba(59,130,246,.22);color:#bfdbfe}.builder-blocks button>i{display:none}
+
+/* Block sidebar actions: visibility + delete */
+.builder-blocks button{grid-template-columns:20px minmax(0,1fr) 52px!important}.builder-block-actions{display:flex;align-items:center;justify-content:flex-end;gap:3px}.builder-block-visibility,.builder-block-delete{width:24px;height:24px;flex:0 0 24px}.builder-block-delete{display:grid;place-items:center;border-radius:7px;background:transparent;color:#94a3b8;font-size:18px;font-weight:700;cursor:pointer;transition:.15s}.builder-block-delete:hover{background:#7f1d1d;color:#fecaca}.builder-blocks button.active .builder-block-delete{color:#dbeafe}.builder-blocks button.active .builder-block-delete:hover{background:#991b1b;color:#fff}
