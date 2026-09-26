@@ -23,8 +23,8 @@ export async function POST(req:Request){
   if(!p.name)return NextResponse.json({error:"Nom du produit requis"},{status:400});
   const {s,workspaceId,user}=await authContext(req);
   const {data:integration}=await s.rpc("get_workspace_integration_secrets",{p_workspace_id:workspaceId});
-  const key=integration?.[0]?.openai_api_key||process.env.MODEL_API_KEY;
-  if(!key)return NextResponse.json({error:"MODEL_API_KEY Meta manquante"},{status:503});
+  const key=integration?.[0]?.openai_api_key;
+  if(!key)return NextResponse.json({error:"Configure ta propre clé Meta Model API dans Paramètres > Intégrations."},{status:503});
   const client=new OpenAI({baseURL:"https://api.meta.ai/v1",apiKey:key});
   const brief=String(p.description||"aucun").trim().slice(0,3500);
   const facts=`Produit: ${p.name}. Prix: ${p.price??"non fourni"} MAD. Ancien prix: ${p.oldPrice||"non fourni"}. Faits produit: ${brief}. Thème: ${theme} (${themeRules[theme]||"COD ecommerce"}). Langue: ${language}.`;
