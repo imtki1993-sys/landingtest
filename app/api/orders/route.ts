@@ -1,7 +1,7 @@
 import {NextResponse} from "next/server"; import {createClient} from "@supabase/supabase-js";import {authContext,adminDb} from "../../../lib/server-auth";
 function db(){const u=process.env.NEXT_PUBLIC_SUPABASE_URL,k=process.env.SUPABASE_SECRET_KEY;if(!u||!k)throw new Error("Supabase env missing");return createClient(u,k,{auth:{persistSession:false}})}
 export async function GET(req:Request){try{
- const {s:supabase,workspaceId}=await authContext(req),url=new URL(req.url),requested=Number(url.searchParams.get("limit")||50),limit=Math.min(100,Math.max(1,Number.isFinite(requested)?requested:50)),cursor=url.searchParams.get("cursor");
+ const {s:supabase,workspaceId}=await authContext(req),url=new URL(req.url),requested=Number(url.searchParams.get("limit")||50),limit=Math.min(100,Math.max(1,Number.isFinite(requested)?requested:50)),cursor=url.searchParams.get("cursor"),dateFrom=url.searchParams.get("dateFrom"),dateTo=url.searchParams.get("dateTo");
  let ordersQuery=supabase.from("orders").select("id,order_number,lead_id,landing_page_id,product_id,quantity,unit_price,subtotal,shipping_price,discount,total,currency,shipment_status,tracking_number,delivery_company_id,carrier_city_id,carrier_city_name,shipped_at,delivered_at,returned_at,created_at").eq("workspace_id",workspaceId).order("created_at",{ascending:false}).limit(limit+1);
  if(cursor)ordersQuery=ordersQuery.lt("created_at",cursor);
  const {data:orders,error}=await ordersQuery;
@@ -15,7 +15,7 @@ export async function GET(req:Request){try{
  ]);
  const by=(rows:any[]=[])=>new Map(rows.map((x:any)=>[x.id,x])),leads=by(leadsQ.data||[]),products=by(productsQ.data||[]),landings=by(landingsQ.data||[]),carriers=by(carriersQ.data||[]);
  const rows=base.map((o:any)=>({...o,lead:leads.get(o.lead_id)||null,product:products.get(o.product_id)||null,landing:landings.get(o.landing_page_id)||null,delivery_company:carriers.get(o.delivery_company_id)||null}));
- const {data:kpiOrders,error:kpiError}=await supabase.from("orders").select("total,shipment_status,tracking_number,lead_id").eq("workspace_id",workspaceId);
+ let kpiQuery=supabase.from("orders").select("total,shipment_status,tracking_number,lead_id,created_at").eq("workspace_id",workspaceId);if(dateFrom)kpiQuery=kpiQuery.gte("created_at",dateFrom+"T00:00:00");if(dateTo)kpiQuery=kpiQuery.lt("created_at",new Date(new Date(dateTo+"T00:00:00").getTime()+86400000).toISOString());const {data:kpiOrders,error:kpiError}=await kpiQuery;
  if(kpiError)throw kpiError;
  const all:any[]=kpiOrders||[],allLeadIds=[...new Set(all.map((o:any)=>o.lead_id).filter(Boolean))];
  const {data:kpiLeads,error:kpiLeadsError}=allLeadIds.length?await supabase.from("leads").select("id,status").eq("workspace_id",workspaceId).in("id",allLeadIds):{data:[],error:null};
