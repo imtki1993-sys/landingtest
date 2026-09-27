@@ -1214,3 +1214,13 @@
 @media(prefers-reduced-motion:reduce){
  .lp-whatsapp-float,.lp-form-whatsapp,.lp-whatsapp{animation:none!important}
 }
+
+
+/* Hero WhatsApp button — same visual language as form */
+.lp-hero .lp-whatsapp{
+ display:inline-flex!important;align-items:center!important;justify-content:center!important;gap:8px!important;
+ min-height:44px!important;box-sizing:border-box!important;padding:9px 18px!important;
+ border:0!important;border-radius:12px!important;background:#25D366!important;color:#fff!important;
+ font-weight:800!important;text-decoration:none!important;box-shadow:0 5px 14px rgba(37,211,102,.24)!important;
+}
+.lp-hero .lp-whatsapp svg{width:25px!important;height:25px!important;display:block!important;flex:0 0 25px!important}
