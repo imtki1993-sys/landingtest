@@ -597,3 +597,10 @@
 .analytics-dashboard .analytics-table{min-width:1060px}
 .analytics-dashboard .analytics-table th:nth-child(1),.analytics-dashboard .analytics-table td:nth-child(1){width:290px;min-width:290px;max-width:290px}
 .analytics-dashboard .analytics-table td:nth-child(1) b{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+
+/* Analytics: center metric headers and values */
+.analytics-dashboard .analytics-table th:nth-child(n+2),
+.analytics-dashboard .analytics-table td:nth-child(n+2){text-align:center}
+.analytics-dashboard .analytics-table th:first-child,
+.analytics-dashboard .analytics-table td:first-child{text-align:left}
