@@ -1000,3 +1000,28 @@
  .orders-dashboard .orders-bulk-select,
  .orders-dashboard .orders-bulk-actions{gap:6px!important}
 }
+
+
+/* Orders sticky v13 — lock the compact command toolbar during page scroll */
+@media(min-width:801px){
+ html,body{overflow-x:hidden}
+ .orders-dashboard .orders-panel{overflow:visible!important;position:relative!important}
+ .orders-dashboard .orders-sticky-command{
+   position:-webkit-sticky!important;
+   position:sticky!important;
+   top:0!important;
+   z-index:1000!important;
+   margin:0!important;
+   padding:0!important;
+   background:#f7f5f2!important;
+ }
+ .orders-dashboard .orders-sticky-command .orders-toolbar,
+ .orders-dashboard .orders-sticky-command .orders-bulkbar{
+   position:relative!important;
+   top:auto!important;
+   z-index:auto!important;
+ }
+ .orders-dashboard .orders-sticky-command:after{
+   content:"";position:absolute;left:0;right:0;bottom:-1px;height:1px;background:#e6ddd4;
+ }
+}
