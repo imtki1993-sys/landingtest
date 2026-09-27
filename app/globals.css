@@ -1080,3 +1080,62 @@
 @media(min-width:801px) and (max-width:1500px){
  .orders-dashboard .orders-sticky-command .orders-bulkbar{top:128px!important}
 }
+
+
+/* Orders scroll v16 — Analytics behavior: page fixed, only orders table scrolls */
+@media(min-width:801px){
+ .orders-dashboard{
+   height:100vh!important;
+   max-height:100vh!important;
+   overflow:hidden!important;
+   display:flex!important;
+   flex-direction:column!important;
+   box-sizing:border-box!important;
+ }
+ .orders-dashboard .dash-header,
+ .orders-dashboard .order-kpis{
+   flex:0 0 auto!important;
+ }
+ .orders-dashboard .orders-panel{
+   flex:1 1 auto!important;
+   min-height:0!important;
+   overflow:hidden!important;
+   display:flex!important;
+   flex-direction:column!important;
+ }
+ .orders-dashboard .orders-sticky-command{
+   flex:0 0 auto!important;
+   position:static!important;
+   overflow:visible!important;
+ }
+ .orders-dashboard .orders-sticky-command .orders-toolbar,
+ .orders-dashboard .orders-sticky-command .orders-bulkbar{
+   position:static!important;
+   top:auto!important;
+ }
+ .orders-dashboard .orders-table-wrap{
+   flex:1 1 auto!important;
+   min-height:0!important;
+   max-height:none!important;
+   overflow:auto!important;
+   position:relative!important;
+   -webkit-overflow-scrolling:touch;
+ }
+ .orders-dashboard .orders-table thead{position:static!important}
+ .orders-dashboard .orders-table thead th{
+   position:sticky!important;
+   top:0!important;
+   z-index:60!important;
+   background:#fbfcfd!important;
+   box-shadow:0 1px 0 #dfe5eb!important;
+ }
+ .orders-dashboard .orders-pagination{
+   flex:0 0 auto!important;
+ }
+}
+@media(max-width:800px){
+ .orders-dashboard{height:auto!important;max-height:none!important;overflow:visible!important;display:block!important}
+ .orders-dashboard .orders-panel{overflow:visible!important;display:block!important}
+ .orders-dashboard .orders-table-wrap{max-height:none!important;overflow-x:auto!important;overflow-y:visible!important}
+ .orders-dashboard .orders-table thead th{position:static!important}
+}
