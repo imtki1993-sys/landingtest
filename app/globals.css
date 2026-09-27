@@ -800,3 +800,46 @@
  .orders-dashboard .orders-table{background:#fff;border-radius:14px}
  .orders-dashboard .orders-table thead th{background:#fbfcfd!important;color:#596b80!important;font-size:10px!important;font-weight:800!important}
 }
+
+
+/* Orders layout v5 — stable sticky stack and no overlapping controls */
+@media(min-width:801px){
+ .orders-dashboard{--orders-sticky-h:246px;overflow:visible!important}
+ .orders-dashboard .orders-sticky-command{position:sticky!important;top:0!important;z-index:80!important;box-sizing:border-box;margin:0 0 12px!important;padding:6px 0 10px!important;background:#f7f5f2!important;backdrop-filter:none!important}
+ .orders-dashboard .order-kpis{grid-template-columns:repeat(8,minmax(118px,1fr))!important;gap:8px!important;margin:0 0 10px!important}
+ .orders-dashboard .orders-panel{overflow:visible!important}
+ .orders-dashboard .orders-toolbar{display:grid!important;grid-template-columns:minmax(430px,.78fr) minmax(760px,1.22fr)!important;gap:12px!important;align-items:center!important;padding:10px 12px!important;min-height:64px!important}
+ .orders-dashboard .orders-toolbar>div:first-child{display:grid!important;grid-template-columns:minmax(150px,1fr) auto auto!important;align-items:center!important;gap:9px!important;min-width:0}
+ .orders-dashboard .orders-toolbar>div:first-child>span{white-space:nowrap}
+ .orders-dashboard .orders-toolbar label{white-space:nowrap!important;margin-left:0!important}
+ .orders-dashboard .orders-view-toggle{white-space:nowrap;display:flex!important}
+ .orders-dashboard .orders-filters{display:grid!important;grid-template-columns:minmax(210px,1.35fr) minmax(145px,.8fr) minmax(150px,.85fr) minmax(145px,.8fr) minmax(140px,.75fr) minmax(170px,.95fr)!important;gap:7px!important;align-items:center!important;min-width:0}
+ .orders-dashboard .orders-search{position:relative;min-width:0}
+ .orders-dashboard .orders-search>span{position:absolute;left:11px;top:50%;transform:translateY(-50%);z-index:2;color:#65778a;font-size:17px}
+ .orders-dashboard .orders-search input{width:100%!important;box-sizing:border-box;padding-left:31px!important}
+ .orders-dashboard .orders-filters>select{width:100%!important;min-width:0!important}
+ .orders-dashboard .orders-date-range{display:grid;grid-template-columns:1fr 1fr;gap:6px;grid-column:1 / span 2;max-width:360px}
+ .orders-dashboard .orders-date-range input{width:100%!important;box-sizing:border-box}
+ .orders-dashboard .orders-bulkbar{min-height:54px!important;padding:9px 12px!important}
+ .orders-dashboard .orders-bulk-actions{margin-left:auto}
+ .orders-dashboard .orders-table-wrap{position:relative!important;max-height:none!important;overflow-x:auto!important;overflow-y:visible!important}
+ .orders-dashboard .orders-table{border-collapse:separate!important;border-spacing:0!important}
+ .orders-dashboard .orders-table thead{position:static!important}
+ .orders-dashboard .orders-table thead th{position:sticky!important;top:var(--orders-sticky-h)!important;z-index:65!important;background:#fbfcfd!important;box-shadow:0 1px 0 #dfe5eb,0 -1px 0 #edf0f3!important}
+}
+@media(min-width:801px) and (max-width:1500px){
+ .orders-dashboard{--orders-sticky-h:344px}
+ .orders-dashboard .order-kpis{grid-template-columns:repeat(4,minmax(0,1fr))!important}
+ .orders-dashboard .orders-toolbar{grid-template-columns:1fr!important}
+ .orders-dashboard .orders-filters{grid-template-columns:minmax(220px,1.4fr) repeat(4,minmax(135px,1fr))!important}
+ .orders-dashboard .orders-date-range{grid-column:1 / span 2}
+}
+@media(max-width:800px){
+ .orders-dashboard{--orders-sticky-h:0px}
+ .orders-dashboard .orders-sticky-command{position:static!important}
+ .orders-dashboard .orders-toolbar{display:block!important}
+ .orders-dashboard .orders-toolbar>div:first-child{display:flex!important}
+ .orders-dashboard .orders-filters{display:grid!important;grid-template-columns:1fr!important;margin-top:10px}
+ .orders-dashboard .orders-date-range{display:grid;grid-template-columns:1fr;grid-column:auto;max-width:none}
+ .orders-dashboard .orders-table thead th{position:static!important;top:auto!important}
+}
