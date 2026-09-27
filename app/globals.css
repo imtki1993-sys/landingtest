@@ -937,3 +937,33 @@
  .orders-dashboard .dash-header .primary{min-height:40px!important;height:40px!important;padding:0 18px!important}
  .orders-dashboard .dash-avatar{width:40px!important;height:40px!important}
 }
+
+
+/* Orders toolbar v11 — keep page-size and city filter fully visible */
+@media(min-width:801px){
+ .orders-dashboard .orders-toolbar{
+   grid-template-columns:minmax(560px,.9fr) minmax(0,1.6fr)!important;
+ }
+ .orders-dashboard .orders-toolbar>div:first-child{
+   grid-template-columns:minmax(185px,1fr) auto 88px auto!important;
+   overflow:visible!important;
+ }
+ .orders-dashboard .orders-toolbar>div:first-child select{
+   width:88px!important;min-width:88px!important;padding-right:26px!important;
+ }
+ .orders-dashboard .orders-filters{
+   grid-template-columns:minmax(220px,1.35fr) minmax(145px,.8fr) minmax(150px,.9fr) minmax(145px,.85fr) minmax(150px,.85fr)!important;
+   overflow:visible!important;
+ }
+ .orders-dashboard .orders-filters>select:last-of-type{
+   display:block!important;visibility:visible!important;min-width:150px!important;
+ }
+ .orders-dashboard .orders-date-range{
+   grid-column:1 / span 2!important;
+ }
+}
+@media(min-width:801px) and (max-width:1500px){
+ .orders-dashboard .orders-toolbar{grid-template-columns:1fr!important}
+ .orders-dashboard .orders-toolbar>div:first-child{grid-template-columns:minmax(190px,1fr) auto 88px auto!important}
+ .orders-dashboard .orders-filters{grid-template-columns:minmax(220px,1.3fr) repeat(4,minmax(145px,1fr))!important}
+}
