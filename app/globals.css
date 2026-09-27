@@ -640,34 +640,14 @@
 @media(max-width:600px){.analytics-dashboard .analytics-kpis{grid-template-columns:1fr}.analytics-dashboard .analytics-kpis article{min-height:72px}}
 
 
-/* Analytics summary stays visible while scrolling the performance table */
+/* Analytics sticky stack — desktop page scroll, no nested vertical table scroll */
 @media(min-width:801px){
- .analytics-dashboard .dash-header{position:sticky;top:0;z-index:35;background:#f7f5f2;padding-top:8px;padding-bottom:8px;margin-bottom:8px}
- .analytics-dashboard .analytics-kpis{position:sticky;top:92px;z-index:34;background:#f7f5f2;padding:6px 0 10px;margin-bottom:8px}
+ .analytics-dashboard .dash-header{position:relative!important;top:auto!important;z-index:auto!important;padding-top:0;padding-bottom:0;margin-bottom:17px}
+ .analytics-dashboard .analytics-kpis{position:sticky;top:0;z-index:50;background:#f7f5f2;padding:6px 0 10px;margin-bottom:8px}
  .analytics-dashboard .analytics-kpis article{box-shadow:0 4px 14px rgba(43,31,21,.055)}
-}
-
-
-/* Analytics performance table header stays visible below sticky KPI summary */
-@media(min-width:801px){
- .analytics-dashboard .pages-panel .pages-toolbar{position:sticky;top:286px;z-index:33;background:#fff;padding:12px 4px 10px;margin:0}
- .analytics-dashboard .analytics-table thead{position:sticky;top:337px;z-index:32}
- .analytics-dashboard .analytics-table th{background:#f8f5f1;box-shadow:0 1px 0 #e6ddd4}
-}
-
-
-/* Fix analytics sticky table header: sticky TH cells, not THEAD */
-@media(min-width:801px){
- .analytics-dashboard .pages-panel .pages-toolbar{position:relative!important;top:auto!important;z-index:auto!important;padding:4px 4px 12px!important;margin:0!important}
+ .analytics-dashboard .pages-panel{overflow:visible}
+ .analytics-dashboard .pages-panel .pages-toolbar{position:sticky;top:189px;z-index:49;background:#fff;padding:12px 4px 10px;margin:0;border-bottom:1px solid #eee7e0}
+ .analytics-dashboard .analytics-table-wrap{max-height:none!important;overflow:visible!important;position:static!important}
  .analytics-dashboard .analytics-table thead{position:static!important}
- .analytics-dashboard .analytics-table thead th{position:sticky!important;top:286px!important;z-index:40!important;background:#f8f5f1!important;box-shadow:0 1px 0 #e6ddd4,0 -1px 0 #e6ddd4}
-}
-
-
-/* FIX: sticky must be applied to TH cells, not THEAD inside overflow wrapper */
-@media(min-width:801px){
- .analytics-dashboard .analytics-table thead{position:static!important}
- .analytics-dashboard .analytics-table thead th{position:sticky!important;top:0!important;z-index:45!important;background:#f8f5f1!important;box-shadow:0 1px 0 #e6ddd4}
- .analytics-dashboard .analytics-table-wrap{max-height:440px;overflow:auto;position:relative}
- .analytics-dashboard .pages-panel .pages-toolbar{position:static!important;margin:0;padding:4px 4px 18px}
+ .analytics-dashboard .analytics-table thead th{position:sticky!important;top:239px!important;z-index:48!important;background:#f8f5f1!important;box-shadow:0 1px 0 #e6ddd4,0 -1px 0 #e6ddd4}
 }
