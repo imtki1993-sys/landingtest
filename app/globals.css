@@ -1240,3 +1240,10 @@
 .block-media-upload .editor-add-image{display:flex!important;align-items:center;justify-content:center;min-height:42px;margin:0!important;padding:9px 12px!important;border:1px dashed #94a3b8!important;border-radius:10px!important;background:#fff!important;color:#172033!important;font-weight:800!important;cursor:pointer!important}
 .block-media-upload .editor-add-image input{position:absolute!important;width:1px!important;height:1px!important;opacity:0!important;pointer-events:none!important}
 .block-media-upload small{color:#64748b;font-size:11px;line-height:1.4}
+
+/* Section settings: separate content, themes and COD templates */
+.section-settings-switch{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;margin:0 0 12px;padding:5px;border:1px solid #e2e8f0;border-radius:12px;background:#f8fafc}
+.section-settings-switch button{min-height:38px;padding:6px 7px;border:0;border-radius:9px;background:transparent;color:#64748b;font-size:11px;font-weight:800;cursor:pointer}
+.section-settings-switch button.active{background:#fff;color:#111827;box-shadow:0 1px 5px rgba(15,23,42,.12)}
+.section-subpanel{display:none}
+.section-subpanel.active{display:block}
