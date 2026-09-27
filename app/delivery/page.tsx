@@ -1,4 +1,5 @@
 "use client";
+import Link from "next/link";
 import {useEffect,useState} from "react";
 const carriers=[["Ozon Express","OZON_EXPRESS"],["Sendit","SENDIT"],["Cathedis","CATHEDIS"],["Ameex","AMEEX"],["DigyLog","DIGYLOG"],["ForceLog","FORCELOG"],["Olivraison","OLIVRAISON"],["Onessta","ONESSTA"],["Kargo Express","KARGO_EXPRESS"],["Speedaf Express","SPEEDAF"],["Livo","LIVO"],["Express Coursier","EXPRESS_COURSIER"]];
 export default function Delivery(){
