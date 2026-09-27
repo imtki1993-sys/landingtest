@@ -873,3 +873,32 @@
 @media(max-width:800px){
  .orders-dashboard .orders-sticky-command{position:static!important}
 }
+
+
+/* Orders sticky v8 — sticky must not be trapped by panel overflow */
+@media(min-width:801px){
+ .orders-dashboard,
+ .orders-dashboard .dash-main,
+ .orders-dashboard .orders-panel{
+   overflow:visible!important;
+ }
+ .orders-dashboard .orders-panel{
+   position:static!important;
+   transform:none!important;
+   contain:none!important;
+   filter:none!important;
+ }
+ .orders-dashboard .orders-sticky-command{
+   position:-webkit-sticky!important;
+   position:sticky!important;
+   top:0!important;
+   z-index:999!important;
+   width:100%!important;
+   box-sizing:border-box!important;
+   background:#f7f5f2!important;
+   isolation:isolate;
+ }
+ .orders-dashboard .orders-sticky-command:before{
+   content:"";position:absolute;inset:-8px 0 0;z-index:-1;background:#f7f5f2;
+ }
+}
