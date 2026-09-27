@@ -671,3 +671,55 @@
  .analytics-dashboard .analytics-table-wrap{max-height:440px;overflow:auto;position:relative}
  .analytics-dashboard .pages-panel .pages-toolbar{position:static!important;margin:0;padding:4px 4px 18px}
 }
+
+
+/* Dashboard sidebar v2 — premium compact navigation */
+@media(min-width:801px){
+ .dash-shell{grid-template-columns:264px minmax(0,1fr)}
+ .dash-side{width:auto;box-sizing:border-box;padding:18px 14px 16px;background:linear-gradient(180deg,#15110e 0%,#0d0b09 100%);border-right:1px solid rgba(255,255,255,.055);box-shadow:10px 0 32px rgba(30,20,12,.055);overflow-y:auto;scrollbar-width:none}
+ .dash-side::-webkit-scrollbar{display:none}
+ .dash-brand{min-height:58px;box-sizing:border-box;gap:11px;padding:6px 8px 16px;margin:0 2px 12px;border-bottom:1px solid rgba(255,255,255,.075)}
+ .brand-mark{width:38px;height:38px;flex:0 0 38px;border-radius:11px;background:linear-gradient(145deg,#f1b86e,#b96d2d);box-shadow:0 7px 20px rgba(185,109,45,.22),inset 0 1px 0 rgba(255,255,255,.25);font-size:18px;color:#1a1008}
+ .dash-brand b{font-size:15px;line-height:1.1;letter-spacing:-.15px;color:#fff8ef}
+ .dash-brand small{margin-top:5px;color:#9f8d7b;font-size:8px;font-weight:800;letter-spacing:1.55px}
+ .dash-side>h1,.dash-side>p{display:none}
+ .dash-nav{gap:3px;margin:4px 0 0;padding:0 2px}
+ .dash-nav a,.dash-side-bottom>a{position:relative;min-height:42px;box-sizing:border-box;display:flex;align-items:center;gap:11px;padding:10px 11px;border:1px solid transparent;border-radius:10px;color:#a99e94;font-size:13px;font-weight:600;letter-spacing:-.05px;transition:background .16s ease,color .16s ease,border-color .16s ease,transform .16s ease}
+ .dash-nav a:hover,.dash-side-bottom>a:hover{background:rgba(255,255,255,.045);border-color:rgba(255,255,255,.045);color:#f7eadb;transform:translateX(2px)}
+ .dash-nav a.active{background:linear-gradient(90deg,rgba(217,150,77,.17),rgba(217,150,77,.075));border-color:rgba(229,164,94,.16);color:#f2bd7b;box-shadow:inset 3px 0 0 #d9964d}
+ .dash-nav a.active:after{content:"";position:absolute;right:11px;width:5px;height:5px;border-radius:50%;background:#dda05b;box-shadow:0 0 0 4px rgba(221,160,91,.08)}
+ .dash-icon{width:22px;height:22px;flex:0 0 22px;display:grid;place-items:center;border-radius:6px;font-size:16px;line-height:1;color:inherit}
+ .dash-side-bottom{margin-top:auto;padding:13px 2px 0;border-top:1px solid rgba(255,255,255,.075)}
+ .dash-side-bottom>a{margin-bottom:10px}
+ .dash-plan{position:relative;overflow:hidden;margin:8px 0 0;padding:13px 14px;background:linear-gradient(145deg,rgba(217,150,77,.11),rgba(255,255,255,.025));border:1px solid rgba(217,150,77,.16);border-radius:12px;box-shadow:none}
+ .dash-plan:after{content:"";position:absolute;width:74px;height:74px;right:-28px;top:-35px;border-radius:50%;background:rgba(217,150,77,.08)}
+ .dash-plan small{color:#c78b4e;font-size:8px;font-weight:900;letter-spacing:1.35px}
+ .dash-plan b{margin:6px 0 3px;color:#f5eadf;font-size:13px}
+ .dash-plan span{color:#8f8277;font-size:10px}
+}
+@media(max-width:800px){
+ .dash-side{display:none}
+}
+
+
+/* Orders sticky command center v3 */
+@media(min-width:801px){
+ .orders-dashboard .dash-header{position:relative;top:auto;z-index:auto}
+ .orders-dashboard .order-kpis{position:sticky;top:0;z-index:60;background:rgba(247,245,242,.97);backdrop-filter:blur(12px);padding:8px 0 10px;margin-bottom:8px}
+ .orders-dashboard .orders-panel{overflow:visible}
+ .orders-dashboard .orders-toolbar{position:sticky;top:126px;z-index:59;background:rgba(255,255,255,.98);backdrop-filter:blur(12px);padding:14px 14px 12px;margin:0 -1px;border:1px solid #eadfd4;border-bottom:0;border-radius:16px 16px 0 0;box-shadow:0 8px 24px rgba(46,31,18,.06)}
+ .orders-dashboard .orders-bulkbar{position:sticky;top:218px;z-index:58;background:#fbfaf8;border-color:#e8ddd1;box-shadow:0 8px 20px rgba(46,31,18,.045)}
+ .orders-dashboard .orders-table-wrap{max-height:none;overflow-x:auto;overflow-y:visible}
+ .orders-dashboard .orders-table thead th{position:sticky;top:284px;z-index:57;background:#f8f5f1;box-shadow:0 1px 0 #e7ddd3}
+ .orders-dashboard .orders-toolbar input,.orders-dashboard .orders-toolbar select{border-color:#ddd4cb;background:#fff;box-shadow:0 1px 2px rgba(30,20,12,.025)}
+ .orders-dashboard .orders-view-toggle{background:#f0ece7;border-radius:10px;padding:3px}
+ .orders-dashboard .orders-view-toggle button.active{background:linear-gradient(135deg,#d9964d,#b96d2d);color:#fff;border-color:transparent;box-shadow:0 5px 14px rgba(185,109,45,.2)}
+ .orders-dashboard .orders-bulk-actions .primary{background:linear-gradient(135deg,#d9964d,#bd702d);border-color:#bd702d;color:#fff;box-shadow:0 6px 16px rgba(185,109,45,.18)}
+ .orders-dashboard .orders-bulk-actions button:not(.primary),.orders-dashboard .orders-bulk-select button{background:#fff;border-color:#ded4ca;color:#2c2119}
+ .orders-dashboard .orders-bulk-actions button:hover,.orders-dashboard .orders-bulk-select button:hover{transform:translateY(-1px);border-color:#d49a61;box-shadow:0 5px 14px rgba(46,31,18,.06)}
+ .orders-dashboard .orders-bulk-actions button,.orders-dashboard .orders-bulk-select button{transition:.16s ease}
+}
+@media(max-width:800px){
+ .orders-dashboard .order-kpis,.orders-dashboard .orders-toolbar,.orders-dashboard .orders-bulkbar,.orders-dashboard .orders-table thead th{position:static!important;top:auto!important}
+ .orders-dashboard .orders-table-wrap{overflow-x:auto!important;overflow-y:hidden!important}
+}
