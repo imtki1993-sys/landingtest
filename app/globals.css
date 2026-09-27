@@ -638,3 +638,11 @@
 .analytics-dashboard .analytics-filters select,.analytics-dashboard .analytics-filters input{height:34px;padding:6px 9px}
 @media(max-width:1050px){.analytics-dashboard .analytics-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:600px){.analytics-dashboard .analytics-kpis{grid-template-columns:1fr}.analytics-dashboard .analytics-kpis article{min-height:72px}}
+
+
+/* Analytics summary stays visible while scrolling the performance table */
+@media(min-width:801px){
+ .analytics-dashboard .dash-header{position:sticky;top:0;z-index:35;background:#f7f5f2;padding-top:8px;padding-bottom:8px;margin-bottom:8px}
+ .analytics-dashboard .analytics-kpis{position:sticky;top:92px;z-index:34;background:#f7f5f2;padding:6px 0 10px;margin-bottom:8px}
+ .analytics-dashboard .analytics-kpis article{box-shadow:0 4px 14px rgba(43,31,21,.055)}
+}
