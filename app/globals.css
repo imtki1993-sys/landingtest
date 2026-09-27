@@ -612,3 +612,29 @@
 .analytics-pagination button{width:32px;height:32px;padding:0;border:1px solid #ded5cc;background:#fff;color:#5b4b3e}
 .analytics-pagination button:disabled{opacity:.35;cursor:not-allowed}
 @media(max-width:600px){.analytics-pagination{align-items:flex-start;flex-direction:column}}
+
+
+/* Analytics KPI redesign: compact, colored, operational */
+.analytics-dashboard .analytics-kpis{grid-template-columns:repeat(4,minmax(0,1fr));gap:9px;margin-bottom:18px}
+.analytics-dashboard .analytics-kpis article{position:relative;display:flex;align-items:center;gap:11px;min-height:82px;padding:11px 13px;border-radius:11px;border:1px solid #e8e2dc;box-shadow:0 3px 12px rgba(43,31,21,.035);overflow:hidden}
+.analytics-dashboard .analytics-kpis article:after{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--kpi)}
+.analytics-dashboard .analytics-kpis article>i{flex:0 0 34px;width:34px;height:34px;display:grid;place-items:center;border-radius:9px;background:var(--kpi-soft);color:var(--kpi);font-style:normal;font-size:15px;font-weight:900}
+.analytics-dashboard .analytics-kpis article>div{min-width:0}
+.analytics-dashboard .analytics-kpis small{font-size:8px;line-height:1;color:#7f746a;letter-spacing:.55px}
+.analytics-dashboard .analytics-kpis b{font-size:20px;line-height:1;margin:5px 0 4px;color:#201812;white-space:nowrap}
+.analytics-dashboard .analytics-kpis b em{font-size:9px;font-style:normal;font-weight:800;color:#82776d}
+.analytics-dashboard .analytics-kpis span{font-size:9px;line-height:1.15;color:#94877c;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.analytics-dashboard .kpi-views{--kpi:#2563eb;--kpi-soft:#eef4ff}
+.analytics-dashboard .kpi-forms{--kpi:#7c3aed;--kpi-soft:#f4efff}
+.analytics-dashboard .kpi-orders{--kpi:#d97706;--kpi-soft:#fff5e8}
+.analytics-dashboard .kpi-confirmed{--kpi:#059669;--kpi-soft:#eaf9f3}
+.analytics-dashboard .kpi-shipped{--kpi:#0284c7;--kpi-soft:#eaf7fd}
+.analytics-dashboard .kpi-delivered{--kpi:#16a34a;--kpi-soft:#edf9f0}
+.analytics-dashboard .kpi-returns{--kpi:#dc2626;--kpi-soft:#fff0f0}
+.analytics-dashboard .kpi-revenue{--kpi:#b7791f;--kpi-soft:#fff7e7}
+.analytics-dashboard .dash-header{margin-bottom:17px}
+.analytics-dashboard .dash-header h1{font-size:28px;margin:5px 0 3px}
+.analytics-dashboard .dash-header p{font-size:13px}
+.analytics-dashboard .analytics-filters select,.analytics-dashboard .analytics-filters input{height:34px;padding:6px 9px}
+@media(max-width:1050px){.analytics-dashboard .analytics-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:600px){.analytics-dashboard .analytics-kpis{grid-template-columns:1fr}.analytics-dashboard .analytics-kpis article{min-height:72px}}
