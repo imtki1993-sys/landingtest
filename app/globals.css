@@ -902,3 +902,21 @@
    content:"";position:absolute;inset:-8px 0 0;z-index:-1;background:#f7f5f2;
  }
 }
+
+
+/* Orders KPI compact v9 */
+@media(min-width:801px){
+ .orders-dashboard .order-kpis{gap:8px!important;margin-bottom:8px!important}
+ .orders-dashboard .order-kpis button{
+   min-height:68px!important;height:68px!important;
+   grid-template-columns:36px minmax(0,1fr)!important;
+   gap:8px!important;padding:7px 10px!important;border-radius:11px!important;
+ }
+ .orders-dashboard .kpi-icon{
+   width:34px!important;height:34px!important;font-size:16px!important;
+ }
+ .orders-dashboard .kpi-copy small{font-size:9px!important;line-height:1.05!important}
+ .orders-dashboard .kpi-copy b{font-size:18px!important;line-height:1.05!important;margin:2px 0!important}
+ .orders-dashboard .kpi-copy em{font-size:8px!important;line-height:1.05!important}
+ .orders-dashboard .order-kpis button:after{height:25px!important;bottom:-16px!important}
+}
