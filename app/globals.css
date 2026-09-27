@@ -1233,3 +1233,10 @@
 .ai-photo-prompt-preview{max-height:104px;overflow:auto;padding:10px 11px;border-radius:10px;background:#f1f5f9;color:#475569;font-size:12px;line-height:1.45}
 .ai-photo-generate{width:100%;min-height:44px;border:0;border-radius:11px;background:#111827;color:#fff;font-weight:800;cursor:pointer;box-shadow:0 5px 14px rgba(15,23,42,.14)}
 .ai-photo-generate:hover{transform:translateY(-1px)}
+
+/* Dedicated media upload controls for custom builder blocks */
+.block-media-upload{display:grid;gap:8px;margin:12px 0;padding:12px;border:1px solid #dbe3ec;border-radius:12px;background:#f8fafc}
+.block-media-upload>b{font-size:13px;color:#172033}
+.block-media-upload .editor-add-image{display:flex!important;align-items:center;justify-content:center;min-height:42px;margin:0!important;padding:9px 12px!important;border:1px dashed #94a3b8!important;border-radius:10px!important;background:#fff!important;color:#172033!important;font-weight:800!important;cursor:pointer!important}
+.block-media-upload .editor-add-image input{position:absolute!important;width:1px!important;height:1px!important;opacity:0!important;pointer-events:none!important}
+.block-media-upload small{color:#64748b;font-size:11px;line-height:1.4}
