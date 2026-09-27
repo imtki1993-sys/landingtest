@@ -920,3 +920,20 @@
  .orders-dashboard .kpi-copy em{font-size:8px!important;line-height:1.05!important}
  .orders-dashboard .order-kpis button:after{height:25px!important;bottom:-16px!important}
 }
+
+
+/* Orders page header compact v10 */
+@media(min-width:801px){
+ .orders-dashboard .dash-header{
+   min-height:auto!important;
+   padding-top:0!important;
+   padding-bottom:0!important;
+   margin-bottom:10px!important;
+ }
+ .orders-dashboard .dash-header>div:first-child{padding:0!important}
+ .orders-dashboard .dash-header .eyebrow{margin-bottom:5px!important;font-size:10px!important;line-height:1!important}
+ .orders-dashboard .dash-header h1{font-size:31px!important;line-height:1.05!important;margin:0 0 5px!important}
+ .orders-dashboard .dash-header p{font-size:14px!important;line-height:1.15!important;margin:0!important}
+ .orders-dashboard .dash-header .primary{min-height:40px!important;height:40px!important;padding:0 18px!important}
+ .orders-dashboard .dash-avatar{width:40px!important;height:40px!important}
+}
