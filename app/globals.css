@@ -1025,3 +1025,15 @@
    content:"";position:absolute;left:0;right:0;bottom:-1px;height:1px;background:#e6ddd4;
  }
 }
+
+
+/* Orders sticky v14 — restore normal page scroll; only command controls are sticky */
+@media(min-width:801px){
+ html,body{overflow-y:auto!important;height:auto!important}
+ .orders-dashboard,.orders-dashboard .dash-main{height:auto!important;max-height:none!important;overflow:visible!important}
+ .orders-dashboard .orders-panel{height:auto!important;max-height:none!important;overflow:visible!important}
+ .orders-dashboard .order-kpis{position:relative!important;top:auto!important}
+ .orders-dashboard .orders-sticky-command{position:sticky!important;top:0!important;z-index:1000!important;max-height:none!important;overflow:visible!important}
+ .orders-dashboard .orders-table-wrap{max-height:none!important;overflow-x:auto!important;overflow-y:visible!important}
+ .orders-dashboard .orders-table thead th{position:static!important;top:auto!important}
+}
