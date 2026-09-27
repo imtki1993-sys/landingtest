@@ -654,3 +654,11 @@
  .analytics-dashboard .analytics-table thead{position:sticky;top:337px;z-index:32}
  .analytics-dashboard .analytics-table th{background:#f8f5f1;box-shadow:0 1px 0 #e6ddd4}
 }
+
+
+/* Fix analytics sticky table header: sticky TH cells, not THEAD */
+@media(min-width:801px){
+ .analytics-dashboard .pages-panel .pages-toolbar{position:relative!important;top:auto!important;z-index:auto!important;padding:4px 4px 12px!important;margin:0!important}
+ .analytics-dashboard .analytics-table thead{position:static!important}
+ .analytics-dashboard .analytics-table thead th{position:sticky!important;top:286px!important;z-index:40!important;background:#f8f5f1!important;box-shadow:0 1px 0 #e6ddd4,0 -1px 0 #e6ddd4}
+}
