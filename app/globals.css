@@ -556,3 +556,30 @@
 
 /* Block sidebar actions: visibility + delete */
 .builder-blocks button{grid-template-columns:20px minmax(0,1fr) 52px!important}.builder-block-actions{display:flex;align-items:center;justify-content:flex-end;gap:3px}.builder-block-visibility,.builder-block-delete{width:24px;height:24px;flex:0 0 24px}.builder-block-delete{display:grid;place-items:center;border-radius:7px;background:transparent;color:#94a3b8;font-size:18px;font-weight:700;cursor:pointer;transition:.15s}.builder-block-delete:hover{background:#7f1d1d;color:#fecaca}.builder-blocks button.active .builder-block-delete{color:#dbeafe}.builder-blocks button.active .builder-block-delete:hover{background:#991b1b;color:#fff}
+
+
+/* Analytics dashboard - compact operational table */
+.analytics-dashboard .analytics-kpis{max-width:1400px;margin:0 auto 22px;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.analytics-dashboard .analytics-kpis article{min-width:0;background:#fff;border:1px solid #e9e2da;border-radius:12px;padding:13px 15px}
+.analytics-dashboard .analytics-kpis small,.analytics-dashboard .analytics-kpis b,.analytics-dashboard .analytics-kpis span{display:block}
+.analytics-dashboard .analytics-kpis small{font-size:9px;color:#8d7865;font-weight:800;text-transform:uppercase;letter-spacing:.45px}
+.analytics-dashboard .analytics-kpis b{font-size:19px;line-height:1.15;margin:5px 0 3px;color:#211811}
+.analytics-dashboard .analytics-kpis span{font-size:10px;color:#91867c}
+.analytics-dashboard .analytics-table-wrap{overflow-x:auto}
+.analytics-dashboard .analytics-table{table-layout:fixed;min-width:960px;font-size:11px}
+.analytics-dashboard .analytics-table th{height:34px;padding:7px 8px;white-space:nowrap;font-size:8px;letter-spacing:.35px}
+.analytics-dashboard .analytics-table td{height:40px;padding:6px 8px;line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.analytics-dashboard .analytics-table th:nth-child(1),.analytics-dashboard .analytics-table td:nth-child(1){width:190px}
+.analytics-dashboard .analytics-table th:nth-child(2),.analytics-dashboard .analytics-table td:nth-child(2){width:72px}
+.analytics-dashboard .analytics-table th:nth-child(3),.analytics-dashboard .analytics-table td:nth-child(3){width:78px}
+.analytics-dashboard .analytics-table th:nth-child(4),.analytics-dashboard .analytics-table td:nth-child(4){width:76px}
+.analytics-dashboard .analytics-table th:nth-child(5),.analytics-dashboard .analytics-table td:nth-child(5){width:78px}
+.analytics-dashboard .analytics-table th:nth-child(6),.analytics-dashboard .analytics-table td:nth-child(6){width:82px}
+.analytics-dashboard .analytics-table th:nth-child(7),.analytics-dashboard .analytics-table td:nth-child(7){width:72px}
+.analytics-dashboard .analytics-table th:nth-child(8),.analytics-dashboard .analytics-table td:nth-child(8){width:72px}
+.analytics-dashboard .analytics-table th:nth-child(9),.analytics-dashboard .analytics-table td:nth-child(9){width:68px;text-align:center}
+.analytics-dashboard .analytics-table th:nth-child(10),.analytics-dashboard .analytics-table td:nth-child(10){width:105px}
+.analytics-dashboard .analytics-table td small{display:block;margin-top:2px;font-size:8px;color:#91867c;overflow:hidden;text-overflow:ellipsis}
+.analytics-dashboard .analytics-table tbody tr{height:40px}
+@media(max-width:1000px){.analytics-dashboard .analytics-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:600px){.analytics-dashboard .analytics-kpis{grid-template-columns:1fr 1fr;gap:8px}.analytics-dashboard .analytics-kpis article{padding:11px}.analytics-dashboard .analytics-table{min-width:900px}}
