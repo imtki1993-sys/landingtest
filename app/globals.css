@@ -640,14 +640,22 @@
 @media(max-width:600px){.analytics-dashboard .analytics-kpis{grid-template-columns:1fr}.analytics-dashboard .analytics-kpis article{min-height:72px}}
 
 
-/* Analytics sticky stack — desktop page scroll, no nested vertical table scroll */
+/* Analytics sticky stack — one page scroll, breakpoint-safe offsets */
+.analytics-dashboard{--analytics-kpi-stack:189px}
+@media(min-width:801px) and (max-width:1050px){.analytics-dashboard{--analytics-kpi-stack:371px}}
 @media(min-width:801px){
  .analytics-dashboard .dash-header{position:relative!important;top:auto!important;z-index:auto!important;padding-top:0;padding-bottom:0;margin-bottom:17px}
  .analytics-dashboard .analytics-kpis{position:sticky;top:0;z-index:50;background:#f7f5f2;padding:6px 0 10px;margin-bottom:8px}
  .analytics-dashboard .analytics-kpis article{box-shadow:0 4px 14px rgba(43,31,21,.055)}
- .analytics-dashboard .pages-panel{overflow:visible}
- .analytics-dashboard .pages-panel .pages-toolbar{position:sticky;top:189px;z-index:49;background:#fff;padding:12px 4px 10px;margin:0;border-bottom:1px solid #eee7e0}
+ .analytics-dashboard .pages-panel{overflow:visible!important}
+ .analytics-dashboard .pages-panel .pages-toolbar{position:sticky;top:var(--analytics-kpi-stack);z-index:49;background:#fff;padding:12px 4px 10px;margin:0;border-bottom:1px solid #eee7e0}
  .analytics-dashboard .analytics-table-wrap{max-height:none!important;overflow:visible!important;position:static!important}
  .analytics-dashboard .analytics-table thead{position:static!important}
- .analytics-dashboard .analytics-table thead th{position:sticky!important;top:239px!important;z-index:48!important;background:#f8f5f1!important;box-shadow:0 1px 0 #e6ddd4,0 -1px 0 #e6ddd4}
+ .analytics-dashboard .analytics-table thead th{position:sticky!important;top:calc(var(--analytics-kpi-stack) + 50px)!important;z-index:48!important;background:#f8f5f1!important;box-shadow:0 1px 0 #e6ddd4,0 -1px 0 #e6ddd4}
+}
+@media(max-width:800px){
+ .analytics-dashboard .analytics-kpis,
+ .analytics-dashboard .pages-panel .pages-toolbar,
+ .analytics-dashboard .analytics-table thead th{position:static!important;top:auto!important}
+ .analytics-dashboard .analytics-table-wrap{max-height:none!important;overflow-x:auto!important;overflow-y:hidden!important;-webkit-overflow-scrolling:touch}
 }
