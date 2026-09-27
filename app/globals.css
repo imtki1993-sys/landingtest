@@ -1037,3 +1037,46 @@
  .orders-dashboard .orders-table-wrap{max-height:none!important;overflow-x:auto!important;overflow-y:visible!important}
  .orders-dashboard .orders-table thead th{position:static!important;top:auto!important}
 }
+
+
+/* Orders sticky v15 — same proven pattern as Analytics */
+@media(min-width:801px){
+ .orders-dashboard .orders-panel{overflow:visible!important}
+ .orders-dashboard .orders-sticky-command{
+   position:static!important;
+   top:auto!important;
+   z-index:auto!important;
+   background:transparent!important;
+   box-shadow:none!important;
+ }
+ .orders-dashboard .orders-sticky-command .orders-toolbar{
+   position:sticky!important;
+   top:0!important;
+   z-index:70!important;
+   background:#fff!important;
+   border-radius:14px 14px 0 0!important;
+   box-shadow:0 4px 14px rgba(43,31,21,.055)!important;
+ }
+ .orders-dashboard .orders-sticky-command .orders-bulkbar{
+   position:sticky!important;
+   top:96px!important;
+   z-index:69!important;
+   background:#fbfcfd!important;
+   border-radius:0 0 14px 14px!important;
+   box-shadow:0 5px 14px rgba(43,31,21,.045)!important;
+ }
+ .orders-dashboard .orders-table-wrap{
+   max-height:none!important;
+   overflow-x:auto!important;
+   overflow-y:visible!important;
+   position:relative!important;
+ }
+ .orders-dashboard .orders-table thead,
+ .orders-dashboard .orders-table thead th{
+   position:static!important;
+   top:auto!important;
+ }
+}
+@media(min-width:801px) and (max-width:1500px){
+ .orders-dashboard .orders-sticky-command .orders-bulkbar{top:128px!important}
+}
