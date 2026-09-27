@@ -591,3 +591,9 @@
 .analytics-filters span{font-size:11px;color:#9b8f84}
 .analytics-filters button{height:36px;padding:7px 11px;background:#f1ebe5;color:#6d5d50;font-size:10px}
 @media(max-width:800px){.analytics-dashboard .dash-header{align-items:flex-start;gap:14px;flex-direction:column}.analytics-filters{justify-content:flex-start}.analytics-filters select,.analytics-filters input{min-width:130px}}
+
+
+/* Analytics: keep only the landing name column wide */
+.analytics-dashboard .analytics-table{min-width:1060px}
+.analytics-dashboard .analytics-table th:nth-child(1),.analytics-dashboard .analytics-table td:nth-child(1){width:290px;min-width:290px;max-width:290px}
+.analytics-dashboard .analytics-table td:nth-child(1) b{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
