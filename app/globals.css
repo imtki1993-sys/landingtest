@@ -967,3 +967,36 @@
  .orders-dashboard .orders-toolbar>div:first-child{grid-template-columns:minmax(190px,1fr) auto 88px auto!important}
  .orders-dashboard .orders-filters{grid-template-columns:minmax(220px,1.3fr) repeat(4,minmax(145px,1fr))!important}
 }
+
+
+/* Orders controls compact v12 */
+@media(min-width:801px){
+ .orders-dashboard .orders-sticky-command .orders-toolbar{
+   min-height:0!important;
+   padding:7px 10px 6px!important;
+   gap:7px!important;
+ }
+ .orders-dashboard .orders-toolbar>div:first-child{gap:6px!important}
+ .orders-dashboard .orders-filters{gap:6px!important}
+ .orders-dashboard .orders-filters input,
+ .orders-dashboard .orders-filters select,
+ .orders-dashboard .orders-toolbar select{
+   height:32px!important;
+ }
+ .orders-dashboard .orders-date-range{gap:6px!important}
+ .orders-dashboard .orders-view-toggle{padding:2px!important}
+ .orders-dashboard .orders-view-toggle button{
+   height:27px!important;
+   padding:0 10px!important;
+ }
+ .orders-dashboard .orders-sticky-command .orders-bulkbar{
+   min-height:42px!important;
+   padding:6px 10px!important;
+ }
+ .orders-dashboard .orders-bulkbar button{
+   height:31px!important;
+   padding:0 10px!important;
+ }
+ .orders-dashboard .orders-bulk-select,
+ .orders-dashboard .orders-bulk-actions{gap:6px!important}
+}
