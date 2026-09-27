@@ -843,3 +843,18 @@
  .orders-dashboard .orders-date-range{display:grid;grid-template-columns:1fr;grid-column:auto;max-width:none}
  .orders-dashboard .orders-table thead th{position:static!important;top:auto!important}
 }
+
+
+/* Orders sticky v6 — single sticky header, table header stays at table top */
+@media(min-width:801px){
+ .orders-dashboard{--orders-command-h:0px!important;overflow:visible!important}
+ .orders-dashboard .orders-sticky-command{position:sticky!important;top:0!important;z-index:90!important;margin:0 0 12px!important;padding:6px 0 8px!important;background:#f7f5f2!important;box-shadow:0 10px 18px -18px rgba(25,20,15,.45)!important}
+ .orders-dashboard .orders-sticky-command .order-kpis,
+ .orders-dashboard .orders-sticky-command .orders-toolbar,
+ .orders-dashboard .orders-sticky-command .orders-bulkbar{position:relative!important;top:auto!important}
+ .orders-dashboard .orders-table-wrap{position:relative!important;overflow-x:auto!important;overflow-y:visible!important;max-height:none!important}
+ .orders-dashboard .orders-table thead,
+ .orders-dashboard .orders-table thead tr,
+ .orders-dashboard .orders-table thead th{position:static!important;top:auto!important;z-index:auto!important}
+ .orders-dashboard .orders-table thead th{background:#fbfcfd!important;box-shadow:0 1px 0 #dfe5eb!important}
+}
