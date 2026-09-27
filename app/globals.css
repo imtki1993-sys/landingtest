@@ -767,3 +767,36 @@
  .orders-dashboard .orders-sticky-command{position:static}
  .orders-dashboard .order-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
+
+
+/* Orders approved visual — match confirmed mockup */
+@media(min-width:801px){
+ .orders-dashboard .dash-header{margin-bottom:18px}
+ .orders-dashboard .dash-header .primary{background:linear-gradient(120deg,#d98300,#d83b18)!important;border:0!important;border-radius:11px!important;box-shadow:0 7px 18px rgba(205,83,15,.18)!important}
+ .orders-dashboard .orders-sticky-command{padding-top:4px}
+ .orders-dashboard .order-kpis{gap:10px}
+ .orders-dashboard .order-kpis button{position:relative;overflow:hidden;display:grid;grid-template-columns:48px minmax(0,1fr);align-items:center;gap:10px;min-height:92px;padding:12px 13px;border:1px solid #dfe5eb;border-radius:13px;background:#fff!important}
+ .orders-dashboard .order-kpis button:after{content:"";position:absolute;left:0;right:0;bottom:-20px;height:35px;border-radius:50% 50% 0 0;background:linear-gradient(90deg,rgba(77,137,255,.06),rgba(77,137,255,.17));pointer-events:none}
+ .orders-dashboard .order-kpis button:nth-child(2):after,.orders-dashboard .order-kpis button:nth-child(5):after{background:linear-gradient(90deg,rgba(246,172,55,.04),rgba(246,172,55,.18))}
+ .orders-dashboard .order-kpis button:nth-child(3):after,.orders-dashboard .order-kpis button:nth-child(6):after{background:linear-gradient(90deg,rgba(42,190,105,.04),rgba(42,190,105,.16))}
+ .orders-dashboard .order-kpis button:nth-child(4):after,.orders-dashboard .order-kpis button:nth-child(8):after{background:linear-gradient(90deg,rgba(132,75,236,.04),rgba(132,75,236,.16))}
+ .orders-dashboard .order-kpis button:nth-child(7):after{background:linear-gradient(90deg,rgba(237,76,76,.04),rgba(237,76,76,.16))}
+ .orders-dashboard .kpi-icon{width:43px;height:43px;border-radius:50%;display:grid;place-items:center;font-style:normal;font-size:19px;font-weight:900;background:#e8f0ff;color:#1764e8;z-index:1}
+ .orders-dashboard .kpi-call,.orders-dashboard .kpi-out{background:#fff0d8;color:#e18a00}
+ .orders-dashboard .kpi-confirmed,.orders-dashboard .kpi-delivered{background:#dcf7e6;color:#08a543}
+ .orders-dashboard .kpi-sent,.orders-dashboard .kpi-revenue{background:#eee4ff;color:#7326d8}
+ .orders-dashboard .kpi-return{background:#ffe3e3;color:#db3030}
+ .orders-dashboard .kpi-copy{display:flex!important;flex-direction:column;align-items:flex-start;position:relative;z-index:1}
+ .orders-dashboard .kpi-copy small{font-size:10px;color:#5f7085}
+ .orders-dashboard .kpi-copy b{margin:3px 0 1px;font-size:20px;color:#101b2d}
+ .orders-dashboard .kpi-copy em{font-size:9px;font-style:normal;color:#63758a}
+ .orders-dashboard .order-kpis button.active{border-color:#6ba0ff!important;box-shadow:inset 0 3px 0 #4f8cff,0 5px 14px rgba(42,93,170,.08)!important}
+ .orders-dashboard .orders-toolbar{padding:12px 14px 10px;border-color:#e5d8ca;background:#fff}
+ .orders-dashboard .orders-toolbar>div:first-child>b{font-size:14px;color:#111827}
+ .orders-dashboard .orders-view-toggle button.active{background:linear-gradient(120deg,#dc8b0a,#d84c19)!important}
+ .orders-dashboard .orders-filters input,.orders-dashboard .orders-filters select,.orders-dashboard .orders-toolbar select{height:37px;background:#fff;border-color:#d7e0e9;color:#182234}
+ .orders-dashboard .orders-bulkbar{min-height:56px;background:#fbfcfd;border-color:#e2e8ef}
+ .orders-dashboard .orders-bulkbar button.primary{background:linear-gradient(120deg,#df8c08,#d84917)!important;border:0!important}
+ .orders-dashboard .orders-table{background:#fff;border-radius:14px}
+ .orders-dashboard .orders-table thead th{background:#fbfcfd!important;color:#596b80!important;font-size:10px!important;font-weight:800!important}
+}
