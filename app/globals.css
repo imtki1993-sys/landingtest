@@ -1139,3 +1139,22 @@
  .orders-dashboard .orders-table-wrap{max-height:none!important;overflow-x:auto!important;overflow-y:visible!important}
  .orders-dashboard .orders-table thead th{position:static!important}
 }
+
+
+/* Orders table viewport v17 — use more of the available screen height */
+@media(min-width:801px){
+ .orders-dashboard .orders-panel{min-height:0!important}
+ .orders-dashboard .orders-table-wrap{
+   flex:1 1 auto!important;
+   min-height:420px!important;
+   height:auto!important;
+   max-height:none!important;
+   overflow:auto!important;
+ }
+}
+@media(min-width:1200px) and (min-height:800px){
+ .orders-dashboard .orders-table-wrap{min-height:500px!important}
+}
+@media(min-width:1200px) and (min-height:950px){
+ .orders-dashboard .orders-table-wrap{min-height:590px!important}
+}
