@@ -604,3 +604,11 @@
 .analytics-dashboard .analytics-table td:nth-child(n+2){text-align:center}
 .analytics-dashboard .analytics-table th:first-child,
 .analytics-dashboard .analytics-table td:first-child{text-align:left}
+
+
+.analytics-pagination{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:13px 3px 0;color:#776a5f;font-size:11px}
+.analytics-pagination>div{display:flex;align-items:center;gap:8px}
+.analytics-pagination select{width:62px;height:32px;padding:5px 8px;font-size:11px}
+.analytics-pagination button{width:32px;height:32px;padding:0;border:1px solid #ded5cc;background:#fff;color:#5b4b3e}
+.analytics-pagination button:disabled{opacity:.35;cursor:not-allowed}
+@media(max-width:600px){.analytics-pagination{align-items:flex-start;flex-direction:column}}
