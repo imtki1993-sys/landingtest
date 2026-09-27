@@ -700,3 +700,26 @@
 @media(max-width:800px){
  .dash-side{display:none}
 }
+
+
+/* Orders sticky command center v3 */
+@media(min-width:801px){
+ .orders-dashboard .dash-header{position:relative;top:auto;z-index:auto}
+ .orders-dashboard .order-kpis{position:sticky;top:0;z-index:60;background:rgba(247,245,242,.97);backdrop-filter:blur(12px);padding:8px 0 10px;margin-bottom:8px}
+ .orders-dashboard .orders-panel{overflow:visible}
+ .orders-dashboard .orders-toolbar{position:sticky;top:126px;z-index:59;background:rgba(255,255,255,.98);backdrop-filter:blur(12px);padding:14px 14px 12px;margin:0 -1px;border:1px solid #eadfd4;border-bottom:0;border-radius:16px 16px 0 0;box-shadow:0 8px 24px rgba(46,31,18,.06)}
+ .orders-dashboard .orders-bulkbar{position:sticky;top:218px;z-index:58;background:#fbfaf8;border-color:#e8ddd1;box-shadow:0 8px 20px rgba(46,31,18,.045)}
+ .orders-dashboard .orders-table-wrap{max-height:none;overflow-x:auto;overflow-y:visible}
+ .orders-dashboard .orders-table thead th{position:sticky;top:284px;z-index:57;background:#f8f5f1;box-shadow:0 1px 0 #e7ddd3}
+ .orders-dashboard .orders-toolbar input,.orders-dashboard .orders-toolbar select{border-color:#ddd4cb;background:#fff;box-shadow:0 1px 2px rgba(30,20,12,.025)}
+ .orders-dashboard .orders-view-toggle{background:#f0ece7;border-radius:10px;padding:3px}
+ .orders-dashboard .orders-view-toggle button.active{background:linear-gradient(135deg,#d9964d,#b96d2d);color:#fff;border-color:transparent;box-shadow:0 5px 14px rgba(185,109,45,.2)}
+ .orders-dashboard .orders-bulk-actions .primary{background:linear-gradient(135deg,#d9964d,#bd702d);border-color:#bd702d;color:#fff;box-shadow:0 6px 16px rgba(185,109,45,.18)}
+ .orders-dashboard .orders-bulk-actions button:not(.primary),.orders-dashboard .orders-bulk-select button{background:#fff;border-color:#ded4ca;color:#2c2119}
+ .orders-dashboard .orders-bulk-actions button:hover,.orders-dashboard .orders-bulk-select button:hover{transform:translateY(-1px);border-color:#d49a61;box-shadow:0 5px 14px rgba(46,31,18,.06)}
+ .orders-dashboard .orders-bulk-actions button,.orders-dashboard .orders-bulk-select button{transition:.16s ease}
+}
+@media(max-width:800px){
+ .orders-dashboard .order-kpis,.orders-dashboard .orders-toolbar,.orders-dashboard .orders-bulkbar,.orders-dashboard .orders-table thead th{position:static!important;top:auto!important}
+ .orders-dashboard .orders-table-wrap{overflow-x:auto!important;overflow-y:hidden!important}
+}
