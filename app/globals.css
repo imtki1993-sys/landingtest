@@ -858,3 +858,18 @@
  .orders-dashboard .orders-table thead th{position:static!important;top:auto!important;z-index:auto!important}
  .orders-dashboard .orders-table thead th{background:#fbfcfd!important;box-shadow:0 1px 0 #dfe5eb!important}
 }
+
+
+/* Orders sticky v7 — pin the requested controls block */
+@media(min-width:801px){
+ .orders-dashboard .order-kpis{position:relative!important;top:auto!important;z-index:auto!important}
+ .orders-dashboard .orders-panel{overflow:visible!important}
+ .orders-dashboard .orders-sticky-command{position:sticky!important;top:0!important;z-index:100!important;margin:0!important;padding:0!important;background:#f7f5f2!important;box-shadow:0 12px 20px -20px rgba(25,20,15,.5)!important}
+ .orders-dashboard .orders-sticky-command .orders-toolbar{border-radius:14px 14px 0 0!important}
+ .orders-dashboard .orders-sticky-command .orders-bulkbar{border-radius:0 0 14px 14px!important}
+ .orders-dashboard .orders-table-wrap{overflow-x:auto!important;overflow-y:visible!important;max-height:none!important}
+ .orders-dashboard .orders-table thead th{position:static!important;top:auto!important}
+}
+@media(max-width:800px){
+ .orders-dashboard .orders-sticky-command{position:static!important}
+}
