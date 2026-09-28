@@ -11,13 +11,13 @@ const TEMPLATES=[
 ["One Product","One product","🎯"],["Flash Deals","Promotions","🔥"],["Social Shop","Social","♥"],["Premium Black","Premium","◆"],["Marketplace","Multi-produit","▦"]
 ].map((x,i)=>({id:"free-"+String(i+1).padStart(2,"0"),name:x[0],category:x[1],icon:x[2]}));
 
-type Store={id:string;name:string;templateId:string;language:string;createdAt:string};
+type Store={id:string;name:string;templateId:string;language:string;createdAt:string;slug?:string;status?:string};
 export default function Stores(){
  const [stores,setStores]=useState<Store[]>([]),[selected,setSelected]=useState(TEMPLATES[0].id),[name,setName]=useState(""),[language,setLanguage]=useState("darija"),[filter,setFilter]=useState("Tous");
- useEffect(()=>{try{setStores(JSON.parse(localStorage.getItem("landpro_stores")||"[]"))}catch{}},[]);
+ useEffect(()=>{fetch("/api/stores",{cache:"no-store"}).then(async r=>{const x=await r.json();if(!r.ok)throw new Error(x.error||"Stores indisponibles");setStores((x.stores||[]).map((v:any)=>({id:v.id,name:v.name,templateId:v.template_id,language:v.locale,createdAt:v.created_at,slug:v.slug,status:v.status}))) }).catch(e=>console.error(e))},[]);
  const cats=["Tous",...Array.from(new Set(TEMPLATES.map(t=>t.category)))];
  const visible=useMemo(()=>filter==="Tous"?TEMPLATES:TEMPLATES.filter(t=>t.category===filter),[filter]);
- function createStore(){const n=name.trim();if(!n)return alert("Entre le nom de la boutique.");const store={id:"store-"+Date.now(),name:n,templateId:selected,language,createdAt:new Date().toISOString()};const next=[store,...stores];setStores(next);localStorage.setItem("landpro_stores",JSON.stringify(next));setName("");alert("Boutique créée en brouillon. Tu peux maintenant continuer sa configuration.");}
+ async function createStore(){const n=name.trim();if(!n)return alert("Entre le nom de la boutique.");const r=await fetch("/api/stores",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({name:n,templateId:selected,locale:language})}),x=await r.json();if(!r.ok)return alert(x.error||"Erreur lors de la création");const v=x.store;setStores(cur=>[{id:v.id,name:v.name,templateId:v.template_id,language:v.locale,createdAt:v.created_at,slug:v.slug,status:v.status},...cur]);setName("");alert("Boutique créée en brouillon et enregistrée dans ton espace LandPro.");}
  const current=TEMPLATES.find(t=>t.id===selected)!;
  return <main className="dash-shell"><aside className="dash-side"><div className="dash-brand"><div className="brand-mark">M</div><div><b>Landing Motor</b><small>AI COD BUILDER</small></div></div><nav className="dash-nav"><Link href="/">⌂ Dashboard</Link><Link href="/pages">▣ Landing Pages</Link><Link className="active" href="/stores">▦ Stores</Link><Link href="/orders">◎ Commandes</Link><Link href="/delivery">🚚 Livraison</Link><Link href="/products">◇ Mes produits</Link><Link href="/domains">⌁ Domaines</Link><Link href="/analytics">↗ Analytics</Link><Link href="/settings">⚙ Paramètres</Link></nav></aside>
  <section className="dash-content stores-dashboard"><header className="dash-header"><div><span className="eyebrow">STORE BUILDER</span><h1>Générateur de boutiques</h1><p>Crée une boutique COD Maroc à partir de 30 templates gratuits.</p></div><span className="stores-free-badge">30 TEMPLATES GRATUITS</span></header>
