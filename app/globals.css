@@ -1473,3 +1473,27 @@
  .public-store .ps-grid{grid-template-columns:repeat(3,minmax(0,1fr))!important}
  .public-store.theme-free-30 .ps-grid{grid-template-columns:repeat(4,minmax(0,1fr))!important}
 }
+
+/* CRITICAL: public storefront must not inherit dashboard main grid */
+main.public-store{
+ display:block!important;
+ grid-template-columns:none!important;
+ width:100%!important;
+ max-width:none!important;
+ min-height:100vh!important;
+ margin:0!important;
+ padding:0!important;
+ overflow-x:hidden!important;
+}
+main.public-store>.ps-announcement,
+main.public-store>.ps-header,
+main.public-store>.ps-hero,
+main.public-store>.ps-catalog,
+main.public-store>.ps-trust,
+main.public-store>.ps-footer{
+ grid-column:auto!important;
+ max-width:none;
+}
+main.public-store>.ps-catalog{max-width:1224px!important;margin-left:auto!important;margin-right:auto!important}
+main.public-store>.ps-trust{margin:0!important;max-width:none!important}
+main.public-store>.ps-footer{margin:0!important;max-width:none!important}
