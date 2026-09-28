@@ -1279,3 +1279,21 @@
 @media(max-width:700px) and (prefers-reduced-motion:reduce){
  .lp-hero .lp-cta{animation:none!important}
 }
+
+
+/* Landing page multilingual footer */
+.lp-footer{margin-top:42px;padding:34px 16px 96px;background:#111827;color:#f9fafb;text-align:center}
+.lp-footer .lp-wrap{max-width:1100px;margin:0 auto}
+.lp-footer-brand{display:block;font-size:20px;margin-bottom:18px}
+.lp-footer-trust{display:flex;justify-content:center;gap:12px 26px;flex-wrap:wrap;margin-bottom:20px;font-size:14px;font-weight:700}
+.lp-footer-trust span{display:inline-flex;align-items:center;gap:6px}
+.lp-footer-links{display:flex;justify-content:center;gap:10px 22px;flex-wrap:wrap;padding:18px 0;border-top:1px solid rgba(255,255,255,.12);border-bottom:1px solid rgba(255,255,255,.12);margin-bottom:17px}
+.lp-footer-links a{color:#e5e7eb!important;text-decoration:none;font-size:13px}
+.lp-footer-links a:hover{text-decoration:underline}
+.lp-footer small{color:#9ca3af;font-size:12px}
+@media(max-width:700px){
+ .lp-footer{margin-top:28px;padding:28px 14px 104px}
+ .lp-footer-brand{font-size:18px}
+ .lp-footer-trust{flex-direction:column;align-items:center;gap:8px}
+ .lp-footer-links{gap:10px 16px}
+}
