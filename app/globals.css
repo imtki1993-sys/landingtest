@@ -1556,3 +1556,6 @@ main.public-store>.ps-header{order:-19!important}
 
 /* Keep Store footer at viewport bottom on short pages */
 .public-store{min-height:100vh;display:flex;flex-direction:column}.public-store>.ps-footer{margin-top:auto;width:100%;box-sizing:border-box}.public-store>.ps-info-page,.public-store>.ps-faq-page,.public-store>.ps-legal{flex:1;width:100%;box-sizing:border-box}
+
+/* Store contact form */
+.ps-contact-card{max-width:760px}.ps-contact-form{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:26px 0 16px;text-align:start}.ps-contact-form h2,.ps-contact-form textarea,.ps-contact-form button,.ps-contact-form small{grid-column:1/-1}.ps-contact-form h2{text-align:center;margin:0 0 6px}.ps-contact-form input,.ps-contact-form textarea{width:100%;box-sizing:border-box;border:1px solid #dbe3ee;border-radius:10px;padding:13px 14px;font:inherit;background:#fff}.ps-contact-form textarea{min-height:130px;resize:vertical}.ps-contact-form button{border:0;border-radius:10px;padding:14px;background:var(--ps-accent);color:#fff;font-weight:900;cursor:pointer}.ps-contact-form small{text-align:center;color:#64748b}@media(max-width:650px){.ps-contact-form{grid-template-columns:1fr}.ps-contact-form>*{grid-column:1!important}}
