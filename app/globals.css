@@ -1524,3 +1524,8 @@ main.public-store>.ps-footer{margin:0!important;max-width:none!important}
 main.public-store{display:flex!important;flex-direction:column!important}
 main.public-store>.ps-announcement{order:-20!important}
 main.public-store>.ps-header{order:-19!important}
+
+/* Builder preview follows homepage block order */
+.store-live{display:flex!important;flex-direction:column!important}
+.store-live>.store-live-announcement{order:-20!important}
+.store-live>header{order:-19!important}
