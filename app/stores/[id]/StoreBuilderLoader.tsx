@@ -1,0 +1,1 @@
+"use client";import dynamic from "next/dynamic";const StoreBuilderClient=dynamic(()=>import("./StoreBuilderClient"),{ssr:false,loading:()=><main className="store-builder-loading">Chargement du Store Builder…</main>});export default function StoreBuilderLoader({storeId}:{storeId:string}){return <StoreBuilderClient storeId={storeId}/>}
