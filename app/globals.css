@@ -1297,3 +1297,32 @@
  .lp-footer-trust{flex-direction:column;align-items:center;gap:8px}
  .lp-footer-links{gap:10px 16px}
 }
+
+
+/* Landing footer — professional commerce treatment */
+.lp-footer{
+ position:relative;overflow:hidden;margin-top:48px;
+ padding:44px 20px 110px;
+ background:linear-gradient(145deg,#0b1220 0%,#111827 58%,#0f172a 100%);
+ color:#f8fafc;text-align:center;
+ border-top:1px solid rgba(255,255,255,.08);
+}
+.lp-footer:before{content:"";position:absolute;left:50%;top:-90px;transform:translateX(-50%);width:520px;height:180px;background:radial-gradient(ellipse,rgba(255,255,255,.07),transparent 68%);pointer-events:none}
+.lp-footer .lp-wrap{position:relative;max-width:1080px;margin:0 auto}
+.lp-footer-brand{display:block;font-size:23px;line-height:1.25;font-weight:900;letter-spacing:-.02em;margin:0 0 22px}
+.lp-footer-trust{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;max-width:650px;margin:0 auto 28px}
+.lp-footer-trust span{min-height:52px;display:flex;align-items:center;justify-content:center;gap:9px;padding:10px 14px;border:1px solid rgba(255,255,255,.10);border-radius:14px;background:rgba(255,255,255,.055);box-shadow:inset 0 1px rgba(255,255,255,.05);font-size:13px;font-weight:800}
+.lp-footer-links{display:flex;align-items:center;justify-content:center;gap:8px 26px;flex-wrap:wrap;margin:0;padding:22px 0;border-top:1px solid rgba(255,255,255,.10);border-bottom:1px solid rgba(255,255,255,.10)}
+.lp-footer-links a{position:relative;color:#cbd5e1!important;text-decoration:none!important;font-size:13px;font-weight:650;transition:color .18s ease,transform .18s ease}
+.lp-footer-links a:hover{color:#fff!important;transform:translateY(-1px)}
+.lp-footer small{display:block;margin-top:20px;color:#94a3b8;font-size:12px;line-height:1.6}
+@media(max-width:700px){
+ .lp-footer{margin-top:32px;padding:34px 16px 112px}
+ .lp-footer-brand{font-size:20px;margin-bottom:18px}
+ .lp-footer-trust{grid-template-columns:1fr;gap:9px;margin-bottom:22px}
+ .lp-footer-trust span{min-height:48px;border-radius:12px}
+ .lp-footer-links{display:grid;grid-template-columns:1fr 1fr;gap:0;padding:8px 0}
+ .lp-footer-links a{display:flex;align-items:center;justify-content:center;min-height:44px;padding:7px 8px}
+ .lp-footer-links a:last-child:nth-child(odd){grid-column:1/-1}
+ .lp-footer small{margin-top:17px;padding:0 8px}
+}
