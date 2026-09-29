@@ -1611,3 +1611,22 @@ main.public-store>.ps-header{order:-19!important}
 .store-section-settings[open]{border-color:#cbd5e1;background:#fff}
 .ps-custom{border:var(--ps-border-width,0) solid var(--ps-border-color,#e5e7eb);box-shadow:var(--ps-shadow,none);opacity:var(--ps-opacity,1)}
 .ps-custom-gallery,.ps-component-benefits>div,.ps-component-reviews>div{gap:var(--ps-gap,18px)}
+
+/* Product Card + Badge Studio */
+.store-product-studio{margin:18px 0;padding:16px;border:1px solid #e2e8f0;border-radius:14px;background:#f8fafc}
+.store-product-studio h3{margin:0 0 4px}
+.ps-product-card{position:relative;overflow:hidden}
+.ps-product-media{position:relative;overflow:hidden}
+.ps-product-media img{width:100%;aspect-ratio:var(--ps-product-ratio,1/1);object-fit:cover;display:block}
+.ps-product-badge{position:absolute;z-index:3;font-size:12px;font-weight:800;line-height:1;padding:8px 10px;box-shadow:0 5px 15px rgba(15,23,42,.12)}
+.ps-badge-pill{border-radius:999px}.ps-badge-rounded{border-radius:8px}.ps-badge-square{border-radius:2px}.ps-badge-ribbon{border-radius:0 4px 4px 0;padding-inline:14px}
+.ps-badge-top-left{top:10px;left:10px}.ps-badge-top-right{top:10px;right:10px}.ps-badge-bottom-left{bottom:10px;left:10px}.ps-badge-bottom-right{bottom:10px;right:10px}
+.ps-card-style-minimal .ps-product-card{box-shadow:none!important;border:0!important;background:transparent!important}
+.ps-card-style-modern .ps-product-card{border-radius:16px}
+.ps-card-style-premium .ps-product-card{border-radius:20px;box-shadow:0 14px 38px rgba(15,23,42,.12)}
+.ps-card-style-fashion .ps-product-card{border-radius:0}
+.ps-card-style-marketplace .ps-product-card{border-radius:10px;border:1px solid #e5e7eb}
+.ps-card-style-cod .ps-product-card{border:2px solid var(--ps-accent);border-radius:16px}
+.ps-card-style-image-focus .ps-product-card>div:last-child p{display:none}.ps-card-style-image-focus .ps-product-media img{min-height:300px}
+.ps-card-style-compact .ps-product-card{display:grid;grid-template-columns:110px 1fr}.ps-card-style-compact .ps-product-media img{height:100%;min-height:130px}
+@media(max-width:520px){.ps-product-badge{font-size:11px;padding:7px 9px}.ps-card-style-compact .ps-product-card{grid-template-columns:90px 1fr}}
