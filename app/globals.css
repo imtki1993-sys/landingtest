@@ -2071,3 +2071,9 @@ main.public-store>.ps-header{order:-19!important}
  .public-store .ps-hero-effect-zoom .ps-hero-bg,
  .public-store .ps-hero-effect-float .ps-hero-bg{animation:none!important}
 }
+
+
+/* Store template background follows the active Builder template */
+.public-store[class*="theme-free-"]{
+ background:var(--ps-store-bg,var(--tpl-bg,#fff))!important;
+}
