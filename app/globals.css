@@ -1594,3 +1594,13 @@ main.public-store>.ps-header{order:-19!important}
 .ps-custom-gallery img,.ps-custom-image>img,.ps-custom-imageText img,.ps-custom-hero img{aspect-ratio:var(--ps-image-ratio,1/1);object-fit:var(--ps-section-fit,contain)}
 @media(max-width:800px){.ps-custom{padding-top:var(--ps-mobile-py,24px)!important;padding-bottom:var(--ps-mobile-py,24px)!important}.ps-custom-gallery,.ps-component-benefits>div,.ps-component-reviews>div{grid-template-columns:repeat(var(--ps-mobile-cols,2),minmax(0,1fr))!important}}
 @media(max-width:520px){.ps-custom-gallery,.ps-component-benefits>div,.ps-component-reviews>div{grid-template-columns:repeat(var(--ps-mobile-cols,1),minmax(0,1fr))!important}}
+
+/* Store Design Studio - typography foundation */
+.store-font-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:10px}
+.store-font-grid label{min-width:0}
+.store-font-grid select,.store-font-grid input{width:100%}
+.store-font-grid small{display:block;margin-top:4px;opacity:.65}
+.public-store{font-family:var(--ps-body-font,Arial,sans-serif);line-height:var(--ps-body-line,1.6)}
+.public-store h1,.public-store h2,.public-store h3,.public-store h4,.public-store .ps-brand{font-family:var(--ps-heading-font,var(--ps-body-font,Arial,sans-serif));font-weight:var(--ps-heading-weight,700)}
+.public-store .ps-hero h1{font-size:clamp(30px,var(--ps-heading-size,44px),72px)}
+@media(max-width:700px){.store-font-grid{grid-template-columns:1fr}}
