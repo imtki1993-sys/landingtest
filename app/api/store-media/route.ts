@@ -1,5 +1,5 @@
 import {NextResponse} from "next/server";
-import {authContext} from "../../../../lib/server-auth";
+import {authContext} from "../../../lib/server-auth";
 
 const BUCKET="media";
 const allowed=new Set(["image/jpeg","image/png","image/webp","image/avif","image/gif"]);
