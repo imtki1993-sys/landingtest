@@ -1983,3 +1983,40 @@ main.public-store>.ps-header{order:-19!important}
   color:var(--ps-header-menu-text,var(--ps-text,#111827))!important;
  }
 }
+
+
+/* Storefront mobile catalog title — prevent title/CTA overlap */
+@media(max-width:767px){
+ .public-store .ps-title{
+  position:relative!important;
+  display:flex!important;
+  flex-direction:column!important;
+  align-items:center!important;
+  justify-content:center!important;
+  gap:14px!important;
+  text-align:center!important;
+  margin-bottom:24px!important;
+ }
+ .public-store .ps-title h2{
+  width:100%!important;
+  margin:0!important;
+  padding:0!important;
+  font-size:24px!important;
+  line-height:1.2!important;
+  overflow-wrap:anywhere;
+ }
+ .public-store .ps-title>a{
+  position:static!important;
+  inset:auto!important;
+  display:inline-flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  align-self:center!important;
+  width:auto!important;
+  max-width:100%!important;
+  min-height:42px;
+  margin:0!important;
+  padding:10px 16px!important;
+  white-space:nowrap;
+ }
+}
