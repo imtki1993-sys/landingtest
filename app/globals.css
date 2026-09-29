@@ -2342,3 +2342,22 @@ main.public-store>.ps-header{order:-19!important}
 .public-store.arch-catalog-editorial .ps-grid{gap:34px 22px}.public-store.arch-catalog-editorial .ps-product-card:nth-child(3n+1){transform:translateY(18px)}.public-store.arch-catalog-dense .ps-grid{gap:14px}.public-store.arch-catalog-dense .ps-product-card h3{font-size:14px}.public-store.arch-catalog-marketplace .ps-catalog{max-width:1500px}.public-store.arch-catalog-marketplace .ps-grid{gap:14px}.public-store.arch-catalog-marketplace .ps-product-card{border:1px solid var(--ps-border);padding:8px}
 .public-store.arch-footer-minimal .ps-footer{display:flex;justify-content:space-between;align-items:center}.public-store.arch-footer-minimal .ps-footer nav{display:flex;gap:16px}.public-store.arch-footer-brand .ps-footer{padding-top:64px;padding-bottom:64px}.public-store.arch-footer-brand .ps-footer>div b{font-family:var(--ps-heading-font);font-size:clamp(28px,4vw,52px)}
 @media(max-width:767px){.public-store.arch-header-centered .ps-header,.public-store.arch-header-bold .ps-header{display:flex;padding-left:14px;padding-right:14px}.public-store.arch-header-centered .ps-header nav{display:none}.public-store.arch-header-centered .ps-header nav.ps-nav-open{display:flex}.public-store.arch-hero-split .ps-hero-content,.public-store.arch-hero-product-focus .ps-hero-content{width:auto;margin:0 18px}.public-store.arch-catalog-editorial .ps-product-card:nth-child(3n+1){transform:none}.public-store.arch-footer-minimal .ps-footer{display:block}.public-store.arch-footer-minimal .ps-footer nav{margin-top:18px;flex-wrap:wrap}}
+
+
+/* Meta Store V1 — generated editorial content */
+.public-store .ps-ai-page .ps-page-head{max-width:820px;margin-inline:auto;text-align:center;padding-top:clamp(54px,8vw,110px);padding-bottom:clamp(32px,5vw,64px)}
+.public-store .ps-ai-page .ps-page-head h1,.public-store .ps-faq-page>h1{font-size:clamp(34px,5vw,64px);letter-spacing:-.035em;line-height:1.05}
+.public-store .ps-ai-page .ps-page-head p,.public-store .ps-page-intro{max-width:720px;margin:18px auto 0;color:var(--ps-muted);font-size:clamp(16px,2vw,19px)}
+.public-store .ps-info-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}
+.public-store .ps-info-grid article{background:var(--ps-surface);border:1px solid var(--ps-border);padding:clamp(22px,3vw,34px);min-height:130px;display:flex;align-items:center}
+.public-store .ps-info-grid article b{font-family:var(--ps-heading-font);font-size:18px;line-height:1.45}
+.public-store .ps-custom-benefits .ps-component-benefits>div{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.public-store .ps-custom-benefits .ps-component-benefits article{background:var(--ps-surface);border:1px solid var(--ps-border);padding:24px;border-radius:var(--ps-radius)}
+.public-store .ps-custom-imageText .ps-custom-split{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);align-items:center;gap:clamp(28px,6vw,80px)}
+.public-store .ps-custom-imageText .ps-custom-split h2,.public-store .ps-custom-cta h2,.public-store .ps-component-benefits h2,.public-store .ps-component-reviews h2{font-size:clamp(28px,4vw,48px);line-height:1.08;letter-spacing:-.025em}
+.public-store .ps-custom-cta>div{max-width:820px;margin:auto;text-align:center}
+.public-store .ps-custom-cta p{max-width:650px;margin:14px auto 22px;color:var(--ps-muted)}
+.public-store .ps-component-reviews>div{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.public-store .ps-component-reviews blockquote{margin:0;padding:24px;background:var(--ps-surface);border:1px solid var(--ps-border);border-radius:var(--ps-radius)}
+.public-store .ps-footer>div p{max-width:520px;color:var(--ps-muted);margin:8px 0 12px;line-height:1.6}
+@media(max-width:767px){.public-store .ps-info-grid,.public-store .ps-custom-benefits .ps-component-benefits>div,.public-store .ps-component-reviews>div,.public-store .ps-custom-imageText .ps-custom-split{grid-template-columns:1fr}.public-store .ps-ai-page .ps-page-head{text-align:start}.public-store .ps-custom-imageText .ps-custom-split{gap:22px}}
