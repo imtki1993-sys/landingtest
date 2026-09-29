@@ -1923,3 +1923,27 @@ main.public-store>.ps-header{order:-19!important}
   color:var(--ps-text,#111827)!important;
  }
 }
+
+
+/* Storefront fixed header V4 — stays pinned to viewport while scrolling */
+.public-store{
+ --ps-fixed-header-height:72px;
+ padding-top:var(--ps-fixed-header-height)!important;
+}
+.public-store .ps-header{
+ position:fixed!important;
+ top:0!important;
+ left:0!important;
+ right:0!important;
+ width:100%!important;
+ min-height:var(--ps-fixed-header-height)!important;
+ z-index:1500!important;
+ background:var(--ps-surface,#fff)!important;
+}
+@media(max-width:767px){
+ .public-store{--ps-fixed-header-height:64px}
+ .public-store .ps-header{
+  min-height:64px!important;
+  height:64px!important;
+ }
+}
