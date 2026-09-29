@@ -2077,3 +2077,24 @@ main.public-store>.ps-header{order:-19!important}
 .public-store[class*="theme-free-"]{
  background:var(--ps-store-bg,var(--tpl-bg,#fff))!important;
 }
+
+
+/* Store Hero background slider */
+.public-store .ps-hero-slides{position:absolute;inset:0;z-index:-2;overflow:hidden;pointer-events:none}
+.public-store .ps-hero-slides .ps-hero-bg{
+ position:absolute;inset:0;opacity:0;
+ background-size:cover;background-position:var(--ps-hero-position,center);background-repeat:no-repeat;
+ transition:opacity .9s ease,transform 1.1s ease;
+}
+.public-store .ps-hero-slides .ps-hero-bg.is-active{opacity:1}
+.public-store .ps-hero-transition-slide .ps-hero-slides .ps-hero-bg{transform:translateX(8%) scale(1.04)}
+.public-store .ps-hero-transition-slide .ps-hero-slides .ps-hero-bg.is-active{transform:translateX(0) scale(1.04)}
+.public-store .ps-hero-effect-zoom .ps-hero-slides .ps-hero-bg.is-active{animation:psHeroZoom 14s ease-in-out infinite alternate}
+.public-store .ps-hero-effect-float .ps-hero-slides .ps-hero-bg.is-active{animation:psHeroFloat 12s ease-in-out infinite alternate}
+.public-store .ps-hero-effect-parallax .ps-hero-slides .ps-hero-bg{background-attachment:fixed}
+.store-hero-image-list{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:10px 0 14px}
+.store-hero-image-list>div{position:relative;aspect-ratio:16/9;border-radius:10px;overflow:hidden;background:#eef2f7}
+.store-hero-image-list img{width:100%;height:100%;object-fit:cover;display:block}
+.store-hero-image-list button{position:absolute;top:5px;right:5px;width:26px;height:26px;border:0;border-radius:999px;background:#111827;color:#fff;font-size:18px;line-height:1}
+@media(max-width:767px){.public-store .ps-hero-effect-parallax .ps-hero-slides .ps-hero-bg{background-attachment:scroll}.store-hero-image-list{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(prefers-reduced-motion:reduce){.public-store .ps-hero-slides .ps-hero-bg{transition:none!important;animation:none!important}}
