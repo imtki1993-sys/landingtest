@@ -2250,3 +2250,39 @@ main.public-store>.ps-header{order:-19!important}
  .public-store .ps-catalog-results.is-single>.ps-grid{grid-template-columns:minmax(0,1fr)!important}
  .public-store .ps-catalog-results.is-single .ps-product-card{max-width:420px!important;margin:0 auto}
 }
+
+
+/* Store Builder workspace V2 — wider editing canvas */
+@media(min-width:1201px){
+ .store-builder-shell{
+   --sb-nav-width:150px;
+   --sb-editor-width:540px;
+   grid-template-columns:var(--sb-nav-width) var(--sb-editor-width) minmax(560px,1fr)!important;
+   width:100%!important;
+   max-width:none!important;
+   overflow-x:hidden!important;
+ }
+ .store-builder-side{width:auto!important;min-width:0!important;padding:18px 10px!important;overflow-x:hidden!important}
+ .store-builder-controls{width:auto!important;min-width:0!important;max-width:none!important;overflow-x:hidden!important;overflow-y:auto!important;height:100vh!important}
+ .store-builder-controls>header{box-sizing:border-box;width:100%;padding:0 16px!important}
+ .store-settings-card{box-sizing:border-box;width:100%;max-width:none!important;padding:22px 20px!important;overflow-x:hidden!important}
+ .store-settings-card>*{max-width:100%;box-sizing:border-box}
+ .store-settings-card input:not([type=checkbox]):not([type=radio]),.store-settings-card textarea,.store-settings-card select{max-width:100%;box-sizing:border-box}
+ .store-block-picker{grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:9px!important}
+ .store-block-picker button{min-width:0!important;width:100%!important;white-space:normal!important;overflow-wrap:anywhere!important}
+ .store-font-grid,.store-color-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+ .store-builder-products{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+ .store-builder-preview{min-width:0!important;padding:18px 22px!important;overflow-x:hidden!important}
+ .store-preview-stage,.store-real-preview{width:100%!important;max-width:100%!important}
+}
+@media(min-width:1600px){
+ .store-builder-shell{--sb-editor-width:580px;grid-template-columns:var(--sb-nav-width) var(--sb-editor-width) minmax(720px,1fr)!important}
+ .store-settings-card{padding-left:24px!important;padding-right:24px!important}
+}
+@media(min-width:801px) and (max-width:1200px){
+ .store-builder-shell{grid-template-columns:140px 430px minmax(420px,1fr)!important;overflow-x:hidden!important}
+ .store-builder-controls{min-width:0!important;overflow-x:hidden!important}
+ .store-settings-card{padding:18px!important;overflow-x:hidden!important}
+ .store-block-picker{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+ .store-builder-preview{min-width:0!important}
+}
