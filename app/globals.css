@@ -2117,3 +2117,11 @@ main.public-store>.ps-header{order:-19!important}
 .store-section-delete:hover{background:#ffe4e6!important;border-color:#fda4af!important}
 .store-custom-block-head .store-section-delete{width:auto!important;min-width:max-content}
 @media(max-width:767px){.store-home-layout-order>div{flex-wrap:wrap}.store-section-delete{margin-left:0!important}}
+
+
+/* Custom Store sections inherit the active template unless a section background is explicitly set */
+.public-store .ps-custom-benefits,
+.public-store .ps-custom-products,
+.public-store .ps-custom-reviews{
+ background:var(--ps-section-bg,var(--ps-store-bg,var(--tpl-bg,var(--ps-surface,#fff))))!important;
+}
