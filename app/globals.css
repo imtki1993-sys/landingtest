@@ -2273,7 +2273,7 @@ main.public-store>.ps-header{order:-19!important}
  .store-font-grid,.store-color-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}
  .store-builder-products{grid-template-columns:repeat(2,minmax(0,1fr))!important}
  .store-builder-preview{min-width:0!important;padding:18px 22px!important;overflow-x:hidden!important}
- .store-preview-stage,.store-real-preview{width:100%!important;max-width:100%!important}
+ .store-preview-stage,.store-real-preview-desktop{width:100%!important;max-width:100%!important}
 }
 @media(min-width:1600px){
  .store-builder-shell{--sb-editor-width:580px;grid-template-columns:var(--sb-nav-width) var(--sb-editor-width) minmax(720px,1fr)!important}
