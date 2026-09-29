@@ -1,5 +1,6 @@
 import OpenAI from "openai";
 type Locale="darija"|"ar"|"fr"|"en";
+import {getStoreBenchmarkNiche} from "./store-benchmark-niches";
 
 function cleanJson(v:string){return JSON.parse(v.replace(/```json|```/g,"").trim())}
 
@@ -17,6 +18,8 @@ const BENCHMARK_HINTS=[
 
 export async function generateProfessionalStore(input:{client:OpenAI;name:string;locale:Locale;niche:string}){
  const language=input.locale==="fr"?"français":input.locale==="ar"?"arabe standard":"darija marocaine en alphabet arabe";
+ const benchmark=getStoreBenchmarkNiche(input.niche);
+ const benchmarkReference=benchmark?`Référence benchmark sélectionnée: ${benchmark.label} (${benchmark.referencePath}). Utilise cette page comme référence de catégorie, structure, hiérarchie et direction visuelle. Adapte-la au Store LandPro et au contenu généré; ne copie pas de faux témoignages, chiffres, certifications ou garanties.`:"";
  const prompt=`Tu es un expert e-commerce senior qui applique STRICTEMENT la méthode UI/UX Pro Max du benchmark hylarucoder/benchmark-skill-ui-ux-pro-max.
 
 Tu ne dois pas utiliser de template LandPro préconçu ni de palette LandPro historique.
@@ -49,7 +52,8 @@ Règles UI/UX Pro Max obligatoires:
 - ne pas utiliser de faux témoignages, fausses certifications, faux chiffres ou garanties inventées.
 
 Nom boutique: ${input.name}
-Niche: ${input.niche}
+Niche: ${benchmark?.label||input.niche}
+${benchmarkReference}
 Langue: ${language}
 Marché: Maroc
 Contexte: e-commerce, paiement à la livraison possible.
@@ -131,7 +135,7 @@ En darija, écris naturellement en alphabet arabe marocain.`;
   content:c,
   settings:{
    aiGenerated:true,aiEngine:"benchmark-ui-ux-pro-max-v1",aiNiche:input.niche,aiDirection:normalizedDesignSystem.style,
-   benchmarkSource:"hylarucoder/benchmark-skill-ui-ux-pro-max",benchmarkCategory:c.benchmark_category||"E-commerce",
+   benchmarkSource:"hylarucoder/benchmark-skill-ui-ux-pro-max",benchmarkNicheId:benchmark?.id||input.niche,benchmarkReferencePath:benchmark?.referencePath||null,benchmarkCategory:c.benchmark_category||benchmark?.label||"E-commerce",
    designSystem:normalizedDesignSystem,storeArchitecture:normalizedDesignSystem.architecture,
    primary:normalizedDesignSystem.colors.primary,accent:normalizedDesignSystem.colors.accent,storeBackground:normalizedDesignSystem.colors.background,
    headerBackground:normalizedDesignSystem.colors.surface,headerTextColor:normalizedDesignSystem.colors.text,
