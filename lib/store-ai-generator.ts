@@ -1,5 +1,5 @@
 import OpenAI from "openai";
-import type {Locale} from "./design-engine/types";
+type Locale="darija"|"ar"|"fr"|"en";
 
 function cleanJson(v:string){return JSON.parse(v.replace(/```json|```/g,"").trim())}
 
