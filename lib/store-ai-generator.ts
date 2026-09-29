@@ -43,7 +43,7 @@ Tu dois:
 - recommander un profil visuel adapté à la niche;
 - utiliser une hiérarchie courte, claire et mobile-first;
 - éviter le contenu générique répétitif;
-- en darija, écrire naturellement en alphabet arabe marocain.
+- en darija, écrire naturellement en alphabet arabe marocain;\n- créer visual_plan comme directeur artistique e-commerce: prompts photoréalistes premium cohérents avec la niche, lumière crédible, composition publicitaire, sans texte intégré, sans logo inventé, sans prix, sans badge et sans caractéristiques produit non fournies;\n- Hero: cadrage large 16:9 avec espace négatif pour le contenu UI; Story: image éditoriale 4:5; Catégories: images 1:1 distinctes et cohérentes;\n- ne jamais inventer un produit précis: si aucun produit/référence visuelle n’est fourni, générer uniquement un univers de marque/lifestyle/catégorie générique.
 
 Choisis design_profile uniquement parmi:
 automotive-tech, beauty, fashion-luxury, health-wellness, sport-fitness, home-lifestyle, electronics-tech, kids-family, general.
@@ -64,7 +64,8 @@ Retourne UNIQUEMENT un JSON valide:
 "delivery":{"title":"","intro":"","points":["","",""]},
 "contact":{"title":"","intro":""},
 "faq":[{"question":"","answer":""},{"question":"","answer":""},{"question":"","answer":""},{"question":"","answer":""}],
-"footer":{"about":"","support_title":"","legal_title":""}
+"footer":{"about":"","support_title":"","legal_title":""},
+"visual_plan":{"art_direction":"","hero":{"prompt":"","aspect_ratio":"16:9"},"story":{"prompt":"","aspect_ratio":"4:5"},"categories":[{"name":"","prompt":"","aspect_ratio":"1:1"},{"name":"","prompt":"","aspect_ratio":"1:1"},{"name":"","prompt":"","aspect_ratio":"1:1"}]}
 }`;
  const ai=await input.client.responses.create({model:"muse-spark-1.3-contributor",input:prompt,reasoning:{effort:"low"},store:false});
  const c=cleanJson(ai.output_text);
@@ -81,6 +82,6 @@ Retourne UNIQUEMENT un JSON valide:
  ],shop:[],product:[],delivery:[{id:"ai_delivery",type:"benefits",visible:true,variant:"cards",title:c.delivery?.title||"",text:c.delivery?.intro||"",items:c.delivery?.points||[]}],contact:[{id:"ai_contact_intro",type:"text",visible:true,variant:"default",title:c.contact?.title||"",text:c.contact?.intro||""}],faq:[]};
  return {
   templateId,profile,content:c,
-  settings:{aiGenerated:true,aiEngine:"meta-store-v1",aiNiche:input.niche,aiDirection:ds.style,designSystem:ds,primary:ds.colors.primary,accent:ds.colors.accent,storeBackground:ds.colors.background,headerBackground:ds.colors.primary,headerTextColor:ds.colors.onPrimary,headerMenuBackground:ds.colors.surface,headerMenuTextColor:ds.colors.text,headerCartColor:ds.colors.accent,headingFont:ds.typography.headingFont,bodyFont:ds.typography.bodyFont,bodyLineHeight:ds.typography.lineHeight,textDirection:ds.typography.direction,announcement:c.announcement||"",heroEyebrow:c.hero?.eyebrow||"",heroTitle:c.hero?.title||input.name,heroText:c.hero?.text||"",heroButton:c.hero?.cta||(rtl?"شوف المتجر":"Découvrir la boutique"),heroSecondaryButton:c.hero?.secondary_cta||"",collectionTitle:c.featured?.title||(rtl?"اختياراتنا":"Notre sélection"),collectionSubtitle:c.featured?.subtitle||"",categories:Array.isArray(c.categories)?c.categories:[],trustContent:c.trust,showAnnouncement:true,showProducts:true,showTrust:true,showFooter:true,showFaq:true,selectedProductIds:[],sectionOrder:["hero","ai_benefits","ai_story","products","ai_reviews","trust","ai_cta","faq","footer"],homeLayoutOrder:["native:hero","ai_benefits","ai_story","native:products","ai_reviews","native:trust","ai_cta","native:faq"],pageSections,faq:(c.faq||[]).map((x:any)=>({q:x.question,a:x.answer})),brandContent:c.brand,deliveryContent:c.delivery,contactContent:c.contact,footerContent:c.footer,generatedFor:input.name}
+  settings:{aiGenerated:true,aiEngine:"meta-store-v1",aiNiche:input.niche,aiDirection:ds.style,designSystem:ds,primary:ds.colors.primary,accent:ds.colors.accent,storeBackground:ds.colors.background,headerBackground:ds.colors.primary,headerTextColor:ds.colors.onPrimary,headerMenuBackground:ds.colors.surface,headerMenuTextColor:ds.colors.text,headerCartColor:ds.colors.accent,headingFont:ds.typography.headingFont,bodyFont:ds.typography.bodyFont,bodyLineHeight:ds.typography.lineHeight,textDirection:ds.typography.direction,announcement:c.announcement||"",heroEyebrow:c.hero?.eyebrow||"",heroTitle:c.hero?.title||input.name,heroText:c.hero?.text||"",heroButton:c.hero?.cta||(rtl?"شوف المتجر":"Découvrir la boutique"),heroSecondaryButton:c.hero?.secondary_cta||"",collectionTitle:c.featured?.title||(rtl?"اختياراتنا":"Notre sélection"),collectionSubtitle:c.featured?.subtitle||"",categories:Array.isArray(c.categories)?c.categories:[],trustContent:c.trust,visualPlan:c.visual_plan||null,visualGenerationStatus:"planned",showAnnouncement:true,showProducts:true,showTrust:true,showFooter:true,showFaq:true,selectedProductIds:[],sectionOrder:["hero","ai_benefits","ai_story","products","ai_reviews","trust","ai_cta","faq","footer"],homeLayoutOrder:["native:hero","ai_benefits","ai_story","native:products","ai_reviews","native:trust","ai_cta","native:faq"],pageSections,faq:(c.faq||[]).map((x:any)=>({q:x.question,a:x.answer})),brandContent:c.brand,deliveryContent:c.delivery,contactContent:c.contact,footerContent:c.footer,generatedFor:input.name}
  }
 }
