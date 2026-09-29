@@ -12,12 +12,24 @@ const exact:Record<string,BenchmarkTemplateRuntime>={
 const luxury=new Set(["luxury-premium","photography","wedding-event","hotel-hospitality"]);
 const automotive=new Set(["ev-charging","drone-fleet","sports"]);
 const soft=new Set(["florist","healthcare-app","medical-clinic","pharmacy","dental","mental-health","senior-care","childcare","pet-tech"]);
-const tech=new Set(["saas","micro-saas","ai-chatbot","developer-tool","cybersecurity","analytics-dashboard","financial-dashboard","design-system","productivity-tool","robotics-automation","spatial-computing","vr-ar-platform","blockchain-defi","fintech-crypto","gaming","generative-art","quantum-computing","biotech"]);
+const tech=new Set(["saas","micro-saas","ai-chatbot","developer-tool","cybersecurity","analytics-dashboard","financial-dashboard","design-system","productivity-tool","robotics-automation","spatial-computing","vr-ar-platform","blockchain-defi","fintech-crypto","gaming","generative-art","quantum-computing","biotech","smart-home","space-tech","social-media-app","video-streaming","music-streaming","creator-economy"]);
+const food=new Set(["bakery-cafe","coffee-shop","restaurant-food","brewery-winery"]);
+const travel=new Set(["airline","conference","event-management","museum","theater","travel-tourism"]);
+const property=new Set(["architecture-interior","construction","home-services","real-estate","cleaning"]);
+const editorial=new Set(["magazine-blog","news-media","newsletter","podcast","knowledge-base","portfolio-personal","freelancer","creative-agency","marketing-agency"]);
+const commerce=new Set(["digital-products","marketplace","subscription-box","nft-web3","membership","hyperlocal"]);
+const institutional=new Set(["agriculture","b2b-service","banking-traditional","church","coding-bootcamp","consulting","coworking","dating-app","educational-app","edutainment","government-public-service","insurance","job-board","language-learning","legal-services","logistics-delivery","micro-credentials","non-profit","online-course","remote-work","service-landing","sustainability-esg","sustainable-energy"]);
 export function getBenchmarkTemplateRuntime(id?:string|null):BenchmarkTemplateRuntime{
  const key=String(id||"ecommerce");if(exact[key])return exact[key];
  if(luxury.has(key))return{id:key,header:"floating-glass",hero:"luxury-fullscreen",catalog:"editorial",productCard:"luxury",trust:"minimal",footer:"luxury",sections:["hero","products","trust","about","faq"]};
  if(automotive.has(key))return{id:key,header:"classic",hero:"cinematic",catalog:"technical",productCard:"technical",trust:"stats",footer:"dark",sections:["hero","products","benefits","about","trust"]};
  if(soft.has(key))return{id:key,header:"minimal",hero:"soft-split",catalog:"grid",productCard:"soft",trust:"cards",footer:"minimal",sections:["hero","benefits","products","trust","faq"]};
  if(tech.has(key))return{id:key,header:"floating-glass",hero:"centered",catalog:"dense",productCard:"modern",trust:"stats",footer:"dark",sections:["hero","benefits","products","trust","faq"]};
+ if(food.has(key))return{id:key,header:"floating-glass",hero:"soft-split",catalog:"editorial",productCard:"soft",trust:"cards",footer:"dark",sections:["hero","products","benefits","about","trust","faq"]};
+ if(travel.has(key))return{id:key,header:"overlay",hero:"cinematic",catalog:"editorial",productCard:"modern",trust:"stats",footer:"dark",sections:["hero","benefits","products","about","trust","faq"]};
+ if(property.has(key))return{id:key,header:"minimal",hero:"split",catalog:"editorial",productCard:"luxury",trust:"minimal",footer:"columns",sections:["hero","products","about","benefits","trust","faq"]};
+ if(editorial.has(key))return{id:key,header:"minimal",hero:"centered",catalog:"editorial",productCard:"luxury",trust:"minimal",footer:"minimal",sections:["hero","products","about","trust","faq"]};
+ if(commerce.has(key))return{id:key,header:"floating-glass",hero:"split",catalog:"dense",productCard:"modern",trust:"cards",footer:"columns",sections:["hero","products","benefits","trust","faq"]};
+ if(institutional.has(key))return{id:key,header:"classic",hero:"split",catalog:"grid",productCard:"modern",trust:"cards",footer:"columns",sections:["hero","benefits","about","products","trust","faq"]};
  return{id:key,header:"classic",hero:"split",catalog:"grid",productCard:"modern",trust:"cards",footer:"columns",sections:["hero","products","trust","faq"]};
 }
