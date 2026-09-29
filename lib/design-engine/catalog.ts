@@ -1,0 +1,13 @@
+import type{DesignContext,ProductProfile}from"./types";
+export const PROFILE_PRESETS:Record<ProductProfile,{style:string;mode:"light"|"dark";primary:string;secondary:string;accent:string;background:string;surface:string;heading:string;body:string;hero:string;card:string;radius:number}>={
+"automotive-tech":{style:"Performance Tech",mode:"dark",primary:"#111827",secondary:"#334155",accent:"#f97316",background:"#070b12",surface:"#111827",heading:"Manrope",body:"Inter",hero:"product-focus",card:"technical",radius:14},
+beauty:{style:"Soft Editorial",mode:"light",primary:"#5b214b",secondary:"#f3dce8",accent:"#db2777",background:"#fff7fb",surface:"#ffffff",heading:"Playfair Display",body:"Inter",hero:"editorial",card:"soft",radius:22},
+"fashion-luxury":{style:"Luxury Editorial",mode:"light",primary:"#21180f",secondary:"#eee5d8",accent:"#b58b52",background:"#faf7f0",surface:"#fffdf9",heading:"Playfair Display",body:"Manrope",hero:"editorial",card:"minimal",radius:4},
+"health-wellness":{style:"Trust & Wellness",mode:"light",primary:"#285943",secondary:"#dcebe2",accent:"#16a34a",background:"#f5fbf7",surface:"#ffffff",heading:"Manrope",body:"Inter",hero:"split",card:"clean",radius:18},
+"sport-fitness":{style:"Dynamic Performance",mode:"dark",primary:"#172554",secondary:"#1e3a8a",accent:"#f97316",background:"#0f172a",surface:"#172033",heading:"Manrope",body:"Inter",hero:"product-focus",card:"bold",radius:10},
+"home-lifestyle":{style:"Warm Minimal",mode:"light",primary:"#44403c",secondary:"#e7e5e4",accent:"#a16207",background:"#fafaf9",surface:"#ffffff",heading:"Manrope",body:"Inter",hero:"split",card:"soft",radius:14},
+"electronics-tech":{style:"Modern Tech",mode:"dark",primary:"#102a43",secondary:"#243b53",accent:"#3b82f6",background:"#071321",surface:"#0d2035",heading:"Manrope",body:"Inter",hero:"split",card:"technical",radius:12},
+"kids-family":{style:"Friendly Commerce",mode:"light",primary:"#4b7189",secondary:"#e8f3f8",accent:"#f59eae",background:"#f7fcff",surface:"#ffffff",heading:"Nunito",body:"Inter",hero:"centered",card:"soft",radius:24},
+general:{style:"Modern Commerce",mode:"light",primary:"#17324d",secondary:"#eaf2f8",accent:"#16a34a",background:"#f8fafc",surface:"#ffffff",heading:"Manrope",body:"Inter",hero:"split",card:"commerce",radius:14}};
+export function normalizeDial(value:number|undefined,fallback:number){return Math.max(1,Math.min(10,Math.round(value??fallback)))}
+export function contextDefaults(c:DesignContext){return{variance:normalizeDial(c.variance,c.page==="dashboard"||c.page==="orders"||c.page==="analytics"?3:6),motion:normalizeDial(c.motion,c.page==="landing"||c.page==="store"?4:2),density:normalizeDial(c.density,c.page==="dashboard"||c.page==="orders"||c.page==="analytics"?7:4)}}
