@@ -2125,3 +2125,69 @@ main.public-store>.ps-header{order:-19!important}
 .public-store .ps-custom-reviews{
  background:var(--ps-section-bg,var(--ps-store-bg,var(--tpl-bg,var(--ps-surface,#fff))))!important;
 }
+
+
+/* Storefront Template Background Engine — structural sections follow active template */
+.public-store{
+ background:var(--ps-store-bg,var(--tpl-bg,var(--ps-surface,#fff)))!important;
+}
+.public-store .ps-unified-native,
+.public-store .ps-native-wrap,
+.public-store .ps-catalog,
+.public-store .ps-trust,
+.public-store .ps-faq,
+.public-store .ps-categories,
+.public-store .ps-shop-page,
+.public-store .ps-product-page,
+.public-store .ps-info-page,
+.public-store .ps-faq-page,
+.public-store .ps-legal{
+ background:var(--ps-store-bg,var(--tpl-bg,var(--ps-surface,#fff)))!important;
+}
+.public-store .ps-custom{
+ background:var(--ps-section-bg,var(--ps-store-bg,var(--tpl-bg,var(--ps-surface,#fff))))!important;
+}
+@media(max-width:1024px){
+ .public-store .ps-unified-native,
+ .public-store .ps-native-wrap,
+ .public-store .ps-catalog,
+ .public-store .ps-trust,
+ .public-store .ps-faq,
+ .public-store .ps-categories,
+ .public-store .ps-shop-page,
+ .public-store .ps-product-page,
+ .public-store .ps-info-page,
+ .public-store .ps-faq-page,
+ .public-store .ps-legal{
+  background:var(--ps-store-bg,var(--tpl-bg,var(--ps-surface,#fff)))!important;
+ }
+}
+@media(max-width:767px){
+ .public-store .ps-custom,
+ .public-store .ps-unified-native,
+ .public-store .ps-native-wrap,
+ .public-store .ps-catalog,
+ .public-store .ps-trust,
+ .public-store .ps-faq,
+ .public-store .ps-categories,
+ .public-store .ps-shop-page,
+ .public-store .ps-product-page,
+ .public-store .ps-info-page,
+ .public-store .ps-faq-page,
+ .public-store .ps-legal{
+  background-color:var(--ps-section-bg,var(--ps-store-bg,var(--tpl-bg,var(--ps-surface,#fff))))!important;
+ }
+ .public-store .ps-unified-native,
+ .public-store .ps-native-wrap,
+ .public-store .ps-catalog,
+ .public-store .ps-trust,
+ .public-store .ps-faq,
+ .public-store .ps-categories,
+ .public-store .ps-shop-page,
+ .public-store .ps-product-page,
+ .public-store .ps-info-page,
+ .public-store .ps-faq-page,
+ .public-store .ps-legal{
+  --ps-section-bg:var(--ps-store-bg,var(--tpl-bg,var(--ps-surface,#fff)));
+ }
+}
