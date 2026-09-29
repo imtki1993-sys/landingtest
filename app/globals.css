@@ -1669,6 +1669,22 @@ main.public-store>.ps-header{order:-19!important}
  .public-store .ps-contact-form{grid-template-columns:1fr}
  .public-store .ps-footer{padding-inline:16px}
 }
+/* Small phones keep the merchant-selected mobile grid. The minmax rule prevents overflow. */
 @media(max-width:380px){
- .public-store .ps-grid{grid-template-columns:1fr}
+ .public-store .ps-grid{grid-template-columns:repeat(var(--ps-product-cols-mobile,2),minmax(0,1fr))}
+ .public-store .ps-product-card>div:last-child{padding:10px}
+ .public-store .ps-product-card h3{font-size:13px}
 }
+
+/* Responsive Engine V2 overrides legacy Store breakpoints.
+   Builder values are the source of truth for public Store sections. */
+@media(max-width:767px){
+ .public-store .ps-custom.ps-width-contained,
+ .public-store .ps-custom.ps-width-wide{width:min(100% - 20px,1180px)}
+ .public-store .ps-custom-gallery,
+ .public-store .ps-component-benefits>div,
+ .public-store .ps-component-reviews>div{grid-template-columns:repeat(var(--ps-mobile-cols,1),minmax(0,1fr))!important}
+ .public-store .ps-custom.ps-custom-gallery{width:min(100% - 20px,1180px);gap:var(--ps-gap,18px)}
+ .public-store .ps-custom.ps-custom-gallery.ps-width-full{width:100%}
+}
+
