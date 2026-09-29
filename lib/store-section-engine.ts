@@ -38,3 +38,17 @@ export function moveItemBy<T>(items:T[],index:number,dir:number):T[]{
 export function duplicateStoreBlock(block:StoreBlock):StoreBlock{
  return {...block,id:"b_"+Date.now()+"_"+Math.random().toString(36).slice(2,7)};
 }
+
+export function removeCustomSection(settings:any,page:string,id:string){
+ const blocks=Array.isArray(settings.pageSections?.[page])?settings.pageSections[page].filter((b:any)=>b.id!==id):[];
+ return {...settings,pageSections:{...(settings.pageSections||{}),[page]:blocks},homeLayoutOrder:Array.isArray(settings.homeLayoutOrder)?settings.homeLayoutOrder.filter((x:string)=>x!==id):settings.homeLayoutOrder};
+}
+
+export function hideHomeNativeSection(settings:any,type:string){
+ const nativeId="native:"+type;
+ const next={...settings,sectionOrder:(settings.sectionOrder||[]).filter((x:string)=>x!==type),homeLayoutOrder:Array.isArray(settings.homeLayoutOrder)?settings.homeLayoutOrder.filter((x:string)=>x!==nativeId):settings.homeLayoutOrder};
+ if(type==="products")next.showProducts=false;
+ if(type==="trust")next.showTrust=false;
+ if(type==="faq")next.showFaq=false;
+ return next;
+}
