@@ -2,7 +2,7 @@ export type BenchmarkSection="hero"|"products"|"benefits"|"trust"|"about"|"faq";
 export type BenchmarkTemplateRuntime={
  id:string;header:"floating-glass"|"overlay"|"classic"|"minimal"|"fitness";hero:"luxury-fullscreen"|"cinematic"|"split"|"soft-split"|"centered"|"fitness";catalog:"editorial"|"technical"|"grid"|"dense"|"fitness";productCard:"luxury"|"technical"|"soft"|"modern"|"fitness";trust:"minimal"|"stats"|"cards"|"fitness";footer:"luxury"|"dark"|"columns"|"minimal"|"fitness";sections:BenchmarkSection[];referencePath?:string;
 };
-const exact:Record<string,BenchmarkTemplateRuntime>={
+export const BENCHMARK_TEMPLATE_BLUEPRINTS:Record<string,BenchmarkTemplateRuntime>={
  ecommerce:{id:"ecommerce",header:"floating-glass",hero:"split",catalog:"grid",productCard:"modern",trust:"cards",footer:"dark",sections:["hero","products","benefits","trust","faq"],referencePath:"pages/ecommerce/index.html"},
  "ecommerce-luxury":{id:"ecommerce-luxury",header:"floating-glass",hero:"luxury-fullscreen",catalog:"editorial",productCard:"luxury",trust:"minimal",footer:"luxury",sections:["hero","products","trust","about","faq"],referencePath:"pages/ecommerce-luxury/index.html"},
  automotive:{id:"automotive",header:"classic",hero:"cinematic",catalog:"technical",productCard:"technical",trust:"stats",footer:"dark",sections:["hero","products","benefits","about","trust"],referencePath:"pages/automotive/index.html"},
@@ -115,7 +115,7 @@ const editorial=new Set(["magazine-blog","news-media","newsletter","podcast","kn
 const commerce=new Set(["digital-products","marketplace","subscription-box","nft-web3","membership","hyperlocal"]);
 const institutional=new Set(["agriculture","b2b-service","banking-traditional","church","coding-bootcamp","consulting","coworking","dating-app","educational-app","edutainment","government-public-service","insurance","job-board","language-learning","legal-services","logistics-delivery","micro-credentials","non-profit","online-course","remote-work","service-landing","sustainability-esg","sustainable-energy"]);
 export function getBenchmarkTemplateRuntime(id?:string|null):BenchmarkTemplateRuntime{
- const key=String(id||"ecommerce");if(exact[key])return exact[key];
+ const key=String(id||"ecommerce");if(BENCHMARK_TEMPLATE_BLUEPRINTS[key])return BENCHMARK_TEMPLATE_BLUEPRINTS[key];
  if(luxury.has(key))return{id:key,header:"floating-glass",hero:"luxury-fullscreen",catalog:"editorial",productCard:"luxury",trust:"minimal",footer:"luxury",sections:["hero","products","trust","about","faq"]};
  if(automotive.has(key))return{id:key,header:"classic",hero:"cinematic",catalog:"technical",productCard:"technical",trust:"stats",footer:"dark",sections:["hero","products","benefits","about","trust"]};
  if(soft.has(key))return{id:key,header:"minimal",hero:"soft-split",catalog:"grid",productCard:"soft",trust:"cards",footer:"minimal",sections:["hero","benefits","products","trust","faq"]};
