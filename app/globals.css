@@ -2098,3 +2098,22 @@ main.public-store>.ps-header{order:-19!important}
 .store-hero-image-list button{position:absolute;top:5px;right:5px;width:26px;height:26px;border:0;border-radius:999px;background:#111827;color:#fff;font-size:18px;line-height:1}
 @media(max-width:767px){.public-store .ps-hero-effect-parallax .ps-hero-slides .ps-hero-bg{background-attachment:scroll}.store-hero-image-list{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(prefers-reduced-motion:reduce){.public-store .ps-hero-slides .ps-hero-bg{transition:none!important;animation:none!important}}
+
+
+/* Pages & Sections — explicit delete action */
+.store-home-layout-order>div{position:relative}
+.store-section-delete{
+ margin-left:auto!important;
+ border:1px solid #fecaca!important;
+ background:#fff1f2!important;
+ color:#be123c!important;
+ border-radius:9px!important;
+ padding:7px 10px!important;
+ font-size:12px!important;
+ font-weight:800!important;
+ cursor:pointer;
+ white-space:nowrap;
+}
+.store-section-delete:hover{background:#ffe4e6!important;border-color:#fda4af!important}
+.store-custom-block-head .store-section-delete{width:auto!important;min-width:max-content}
+@media(max-width:767px){.store-home-layout-order>div{flex-wrap:wrap}.store-section-delete{margin-left:0!important}}
