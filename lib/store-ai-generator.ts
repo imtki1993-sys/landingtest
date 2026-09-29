@@ -1,6 +1,7 @@
 import OpenAI from "openai";
 type Locale="darija"|"ar"|"fr"|"en";
 import {getStoreBenchmarkNiche} from "./store-benchmark-niches";
+import {BENCHMARK_TEMPLATE_BLUEPRINTS} from "./benchmark-template-registry";
 
 function cleanJson(v:string){return JSON.parse(v.replace(/```json|```/g,"").trim())}
 
@@ -19,6 +20,11 @@ const BENCHMARK_HINTS=[
 export async function generateProfessionalStore(input:{client:OpenAI;name:string;locale:Locale;niche:string}){
  const language=input.locale==="fr"?"français":input.locale==="ar"?"arabe standard":"darija marocaine en alphabet arabe";
  const benchmark=getStoreBenchmarkNiche(input.niche);
+ const runtimeBlueprint=BENCHMARK_TEMPLATE_BLUEPRINTS[benchmark?.id||input.niche];
+ const benchmarkBlueprint=runtimeBlueprint?JSON.stringify({
+  id:runtimeBlueprint.id,header:runtimeBlueprint.header,hero:runtimeBlueprint.hero,catalog:runtimeBlueprint.catalog,
+  productCard:runtimeBlueprint.productCard,trust:runtimeBlueprint.trust,footer:runtimeBlueprint.footer,sections:runtimeBlueprint.sections
+ }):"";
  const benchmarkReference=benchmark?`Référence benchmark sélectionnée: ${benchmark.label} (${benchmark.referencePath}). Utilise cette page comme référence de catégorie, structure, hiérarchie et direction visuelle. Adapte-la au Store LandPro et au contenu généré; ne copie pas de faux témoignages, chiffres, certifications ou garanties.`:"";
  const prompt=`Tu es un expert e-commerce senior qui applique STRICTEMENT la méthode UI/UX Pro Max du benchmark hylarucoder/benchmark-skill-ui-ux-pro-max.
 
@@ -54,12 +60,13 @@ Règles UI/UX Pro Max obligatoires:
 Nom boutique: ${input.name}
 Niche: ${benchmark?.label||input.niche}
 ${benchmarkReference}
+${benchmarkBlueprint?`Blueprint runtime LandPro OBLIGATOIRE (ne change pas ses variantes ni son ordre): ${benchmarkBlueprint}`:""}
 Langue: ${language}
 Marché: Maroc
 Contexte: e-commerce, paiement à la livraison possible.
 
 Tu dois produire le CONTENU COMPLET et le DESIGN SYSTEM COMPLET de la boutique.
-Le design doit être spécifique à la niche, pas générique.
+Le design doit être spécifique à la niche, pas générique.\nSi un Blueprint runtime LandPro est fourni, ton design_system.architecture, tes composants et ton contenu DOIVENT suivre ce blueprint. Ne propose pas une architecture incompatible.
 
 Retourne UNIQUEMENT ce JSON valide:
 {
@@ -103,6 +110,7 @@ En darija, écris naturellement en alphabet arabe marocain.`;
  const ai=await input.client.responses.create({model:"muse-spark-1.3-contributor",input:prompt,reasoning:{effort:"low"},store:false});
  const c=cleanJson(ai.output_text);
  const ds=c.design_system||{};
+ if(runtimeBlueprint){ds.architecture={header:runtimeBlueprint.header,hero:runtimeBlueprint.hero,catalog:runtimeBlueprint.catalog,footer:runtimeBlueprint.footer};ds.components={...(ds.components||{}),hero:runtimeBlueprint.hero,product_card:runtimeBlueprint.productCard,trust:runtimeBlueprint.trust};}
  const colors=ds.colors||{},type=ds.typography||{},layout=ds.layout||{},components=ds.components||{},responsive=ds.responsive||{},architecture=ds.architecture||{};
  const rtl=input.locale!=="fr";
  const pageSections={home:[
@@ -147,8 +155,8 @@ En darija, écris naturellement en alphabet arabe marocain.`;
    collectionTitle:c.featured?.title||(rtl?"اختياراتنا":"Notre sélection"),collectionSubtitle:c.featured?.subtitle||"",
    categories:Array.isArray(c.categories)?c.categories:[],trustContent:c.trust,visualPlan:c.visual_plan||null,visualGenerationStatus:"planned",
    showAnnouncement:true,showProducts:true,showTrust:true,showFooter:true,showFaq:true,selectedProductIds:[],
-   sectionOrder:["hero","ai_benefits","ai_story","products","ai_reviews","trust","ai_cta","faq","footer"],
-   homeLayoutOrder:["native:hero","ai_benefits","ai_story","native:products","ai_reviews","native:trust","ai_cta","native:faq"],
+   sectionOrder:runtimeBlueprint?[...runtimeBlueprint.sections,"footer"]:["hero","ai_benefits","ai_story","products","ai_reviews","trust","ai_cta","faq","footer"],
+   homeLayoutOrder:runtimeBlueprint?runtimeBlueprint.sections.map((id:string)=>"native:"+id):["native:hero","ai_benefits","ai_story","native:products","ai_reviews","native:trust","ai_cta","native:faq"],
    pageSections,faq:(c.faq||[]).map((x:any)=>({q:x.question,a:x.answer})),brandContent:c.brand,deliveryContent:c.delivery,contactContent:c.contact,footerContent:c.footer,generatedFor:input.name
   }
  }
