@@ -2,19 +2,20 @@ import {NextResponse} from "next/server"; import {createClient} from "@supabase/
 function db(){const u=process.env.NEXT_PUBLIC_SUPABASE_URL,k=process.env.SUPABASE_SECRET_KEY;if(!u||!k)throw new Error("Supabase env missing");return createClient(u,k,{auth:{persistSession:false}})}
 export async function GET(req:Request){try{
  const {s:supabase,workspaceId}=await authContext(req),url=new URL(req.url),requested=Number(url.searchParams.get("limit")||50),limit=Math.min(100,Math.max(1,Number.isFinite(requested)?requested:50)),cursor=url.searchParams.get("cursor"),dateFrom=url.searchParams.get("dateFrom"),dateTo=url.searchParams.get("dateTo");
- let ordersQuery=supabase.from("orders").select("id,order_number,lead_id,landing_page_id,product_id,quantity,unit_price,subtotal,shipping_price,discount,total,currency,shipment_status,tracking_number,delivery_company_id,carrier_city_id,carrier_city_name,shipped_at,delivered_at,returned_at,created_at").eq("workspace_id",workspaceId).order("created_at",{ascending:false}).limit(limit+1);
+ let ordersQuery=supabase.from("orders").select("id,order_number,lead_id,landing_page_id,store_id,product_id,quantity,unit_price,subtotal,shipping_price,discount,total,currency,shipment_status,tracking_number,delivery_company_id,carrier_city_id,carrier_city_name,shipped_at,delivered_at,returned_at,created_at").eq("workspace_id",workspaceId).order("created_at",{ascending:false}).limit(limit+1);
  if(cursor)ordersQuery=ordersQuery.lt("created_at",cursor);
  const {data:orders,error}=await ordersQuery;
  if(error)throw error;
- const fetched=orders||[],hasMore=fetched.length>limit,base=hasMore?fetched.slice(0,limit):fetched,leadIds=[...new Set(base.map((o:any)=>o.lead_id).filter(Boolean))],productIds=[...new Set(base.map((o:any)=>o.product_id).filter(Boolean))],landingIds=[...new Set(base.map((o:any)=>o.landing_page_id).filter(Boolean))],carrierIds=[...new Set(base.map((o:any)=>o.delivery_company_id).filter(Boolean))];
- const [leadsQ,productsQ,landingsQ,carriersQ]=await Promise.all([
+ const fetched=orders||[],hasMore=fetched.length>limit,base=hasMore?fetched.slice(0,limit):fetched,leadIds=[...new Set(base.map((o:any)=>o.lead_id).filter(Boolean))],productIds=[...new Set(base.map((o:any)=>o.product_id).filter(Boolean))],landingIds=[...new Set(base.map((o:any)=>o.landing_page_id).filter(Boolean))],storeIds=[...new Set(base.map((o:any)=>o.store_id).filter(Boolean))],carrierIds=[...new Set(base.map((o:any)=>o.delivery_company_id).filter(Boolean))];
+ const [leadsQ,productsQ,landingsQ,storesQ,carriersQ]=await Promise.all([
   leadIds.length?supabase.from("leads").select("id,full_name,phone_raw,phone_e164,city_name,address,status,notes").eq("workspace_id",workspaceId).in("id",leadIds):Promise.resolve({data:[]}),
   productIds.length?supabase.from("products").select("id,name").eq("workspace_id",workspaceId).in("id",productIds):Promise.resolve({data:[]}),
   landingIds.length?supabase.from("landing_pages").select("id,name,slug").eq("workspace_id",workspaceId).in("id",landingIds):Promise.resolve({data:[]}),
+  storeIds.length?supabase.from("stores").select("id,name,slug").eq("workspace_id",workspaceId).in("id",storeIds):Promise.resolve({data:[]}),
   carrierIds.length?supabase.from("delivery_companies").select("id,name,code").eq("workspace_id",workspaceId).in("id",carrierIds):Promise.resolve({data:[]})
  ]);
- const by=(rows:any[]=[])=>new Map(rows.map((x:any)=>[x.id,x])),leads=by(leadsQ.data||[]),products=by(productsQ.data||[]),landings=by(landingsQ.data||[]),carriers=by(carriersQ.data||[]);
- const rows=base.map((o:any)=>({...o,lead:leads.get(o.lead_id)||null,product:products.get(o.product_id)||null,landing:landings.get(o.landing_page_id)||null,delivery_company:carriers.get(o.delivery_company_id)||null}));
+ const by=(rows:any[]=[])=>new Map(rows.map((x:any)=>[x.id,x])),leads=by(leadsQ.data||[]),products=by(productsQ.data||[]),landings=by(landingsQ.data||[]),stores=by(storesQ.data||[]),carriers=by(carriersQ.data||[]);
+ const rows=base.map((o:any)=>({...o,lead:leads.get(o.lead_id)||null,product:products.get(o.product_id)||null,landing:landings.get(o.landing_page_id)||null,store:stores.get(o.store_id)||null,delivery_company:carriers.get(o.delivery_company_id)||null}));
  let kpiQuery=supabase.from("orders").select("total,shipment_status,tracking_number,lead_id,created_at").eq("workspace_id",workspaceId);if(dateFrom)kpiQuery=kpiQuery.gte("created_at",dateFrom+"T00:00:00");if(dateTo)kpiQuery=kpiQuery.lt("created_at",new Date(new Date(dateTo+"T00:00:00").getTime()+86400000).toISOString());const {data:kpiOrders,error:kpiError}=await kpiQuery;
  if(kpiError)throw kpiError;
  const all:any[]=kpiOrders||[],allLeadIds=[...new Set(all.map((o:any)=>o.lead_id).filter(Boolean))];
