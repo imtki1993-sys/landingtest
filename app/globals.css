@@ -1604,3 +1604,10 @@ main.public-store>.ps-header{order:-19!important}
 .public-store h1,.public-store h2,.public-store h3,.public-store h4,.public-store .ps-brand{font-family:var(--ps-heading-font,var(--ps-body-font,Arial,sans-serif));font-weight:var(--ps-heading-weight,700)}
 .public-store .ps-hero h1{font-size:clamp(30px,var(--ps-heading-size,44px),72px)}
 @media(max-width:700px){.store-font-grid{grid-template-columns:1fr}}
+
+/* Store Design Studio - advanced inspector */
+.store-inspector-tabs{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin:12px 0}
+.store-inspector-tabs span{padding:7px 5px;border:1px solid #e5e7eb;border-radius:8px;text-align:center;font-size:11px;font-weight:700;background:#f8fafc}
+.store-section-settings[open]{border-color:#cbd5e1;background:#fff}
+.ps-custom{border:var(--ps-border-width,0) solid var(--ps-border-color,#e5e7eb);box-shadow:var(--ps-shadow,none);opacity:var(--ps-opacity,1)}
+.ps-custom-gallery,.ps-component-benefits>div,.ps-component-reviews>div{gap:var(--ps-gap,18px)}
