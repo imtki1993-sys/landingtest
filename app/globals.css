@@ -2314,3 +2314,22 @@ main.public-store>.ps-header{order:-19!important}
    margin-right:auto!important;
  }
 }
+
+
+/* LandPro Design Engine V1 — shared preview/public tokens */
+.public-store{background:var(--ps-store-bg,#fff);color:var(--ps-text,#111827);font-family:var(--ps-body-font);line-height:var(--ps-body-line,1.6)}
+.public-store h1,.public-store h2,.public-store h3{font-family:var(--ps-heading-font);font-weight:var(--ps-heading-weight,700)}
+.public-store .ps-header,.public-store .ps-catalog,.public-store .ps-info-page,.public-store .ps-product-page,.public-store .ps-faq-page,.public-store .ps-legal{max-width:var(--ps-container-width,1200px);margin-left:auto;margin-right:auto}
+.public-store .ps-native-wrap,.public-store .ps-custom{transition:background-color var(--ps-motion-duration,240ms) ease,color var(--ps-motion-duration,240ms) ease,transform var(--ps-motion-duration,240ms) ease}
+.public-store .ps-product-card,.public-store .ps-custom>div,.public-store .ps-info-grid article{border-radius:var(--ps-radius,12px)}
+.public-store .ps-product-card>div:last-child>button,.public-store .ps-product-info>button,.public-store .ps-hero-content>a,.public-store .ps-custom a,.public-store .ps-contact-form button{min-height:var(--ps-button-min-height,44px);border-radius:var(--ps-radius,12px);background:var(--ps-accent,#22c55e);color:#fff;display:inline-flex;align-items:center;justify-content:center}
+.public-store input,.public-store select,.public-store textarea{min-height:var(--ps-input-min-height,44px);border-color:var(--ps-border,#e2e8f0)}
+.public-store .ps-hero-content,.public-store .ps-title,.public-store .ps-page-head{max-width:var(--ps-container-width,1200px)}
+.public-store.ai-card-technical .ps-product-card{border:1px solid var(--ps-border,#334155)}
+.public-store.ai-card-soft .ps-product-card{box-shadow:0 12px 32px rgba(15,23,42,.08)}
+.public-store.ai-card-minimal .ps-product-card{box-shadow:none;border:0}
+.public-store.ai-card-bold .ps-product-card{box-shadow:0 16px 40px rgba(15,23,42,.16)}
+.public-store.ai-layout-editorial .ps-hero-content{max-width:min(760px,82%);margin-inline-start:8%}
+.public-store.ai-layout-centered .ps-hero-content{text-align:center;margin-left:auto;margin-right:auto}
+.public-store.ai-layout-product-focus .ps-hero-content{max-width:620px}
+@media(max-width:767px){.public-store .ps-catalog,.public-store .ps-info-page,.public-store .ps-product-page,.public-store .ps-faq-page,.public-store .ps-legal{padding-left:16px;padding-right:16px}.public-store .ps-product-card>div:last-child>button,.public-store .ps-product-info>button,.public-store .ps-hero-content>a,.public-store .ps-custom a,.public-store .ps-contact-form button{width:100%}}
