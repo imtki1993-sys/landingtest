@@ -11,7 +11,7 @@ const exact:Record<string,BenchmarkTemplateRuntime>={
 };
 const luxury=new Set(["luxury-premium","photography","wedding-event","hotel-hospitality"]);
 const automotive=new Set(["ev-charging","drone-fleet","sports"]);
-const soft=new Set(["florist","healthcare-app","medical-clinic","pharmacy","dental","mental-health","senior-care","childcare","pet-tech"]);
+const soft=new Set(["florist","healthcare-app","medical-clinic","pharmacy","dental","mental-health","senior-care","childcare","pet-tech","biohacking","veterinary"]);
 const tech=new Set(["saas","micro-saas","ai-chatbot","developer-tool","cybersecurity","analytics-dashboard","financial-dashboard","design-system","productivity-tool","robotics-automation","spatial-computing","vr-ar-platform","blockchain-defi","fintech-crypto","gaming","generative-art","quantum-computing","biotech","smart-home","space-tech","social-media-app","video-streaming","music-streaming","creator-economy"]);
 const food=new Set(["bakery-cafe","coffee-shop","restaurant-food","brewery-winery"]);
 const travel=new Set(["airline","conference","event-management","museum","theater","travel-tourism"]);
