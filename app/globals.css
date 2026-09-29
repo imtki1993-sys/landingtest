@@ -1947,3 +1947,39 @@ main.public-store>.ps-header{order:-19!important}
   height:64px!important;
  }
 }
+
+
+/* Storefront header V5 — single theme-aware override layer */
+.public-store .ps-header{
+ background:var(--ps-header-bg,var(--ps-surface,#fff))!important;
+ color:var(--ps-header-text,var(--ps-text,#111827))!important;
+}
+.public-store .ps-brand,
+.public-store .ps-header nav a{
+ color:var(--ps-header-text,var(--ps-text,#111827))!important;
+}
+.public-store .ps-cart-button{
+ background:color-mix(in srgb,var(--ps-header-cart,var(--ps-accent)) 12%,var(--ps-header-bg,var(--ps-surface,#fff)))!important;
+ color:var(--ps-header-text,var(--ps-text,#111827))!important;
+}
+.public-store .ps-cart-button i{
+ background:var(--ps-header-cart,var(--ps-accent))!important;
+ color:#fff!important;
+}
+@media(max-width:767px){
+ .public-store .ps-mobile-menu-toggle{
+  background:var(--ps-header-bg,var(--ps-surface,#fff))!important;
+  border-color:color-mix(in srgb,var(--ps-header-text,var(--ps-text)) 16%,transparent)!important;
+ }
+ .public-store .ps-mobile-menu-toggle span{
+  background:var(--ps-header-text,var(--ps-text,#111827))!important;
+ }
+ .public-store .ps-header nav{
+  background:var(--ps-header-menu-bg,var(--ps-surface,#fff))!important;
+  border-color:color-mix(in srgb,var(--ps-header-menu-text,var(--ps-text)) 14%,transparent)!important;
+ }
+ .public-store .ps-header nav>a{
+  background:color-mix(in srgb,var(--ps-header-menu-text,var(--ps-text)) 6%,var(--ps-header-menu-bg,var(--ps-surface,#fff)))!important;
+  color:var(--ps-header-menu-text,var(--ps-text,#111827))!important;
+ }
+}
