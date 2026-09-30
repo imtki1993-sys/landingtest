@@ -3203,3 +3203,33 @@ main.public-store>.ps-header{order:-19!important}
 }
 .landing-benchmark[data-preview-viewport="mobile"].uiux-pattern-family-split :is(.lp-feature-grid,.lp-benefits),
 .landing-benchmark[data-preview-viewport="mobile"].uiux-pattern-family-feature :is(.lp-feature-grid,.lp-benefits){grid-template-columns:1fr!important}
+
+
+/* Builder V3 v4.0 — Hero media dimensions */
+.landing-benchmark .lp-hero-real :is(.hero-control-media-wrap,.lp-hero-media,.hero-parallax-media,.hero-zoom-media,.hero-story-stack,.hero-commerce-main,.hero-video-full,.hero-video-ugc-media){
+  width:min(100%,var(--hero-media-width,100%))!important;
+  max-width:100%!important;
+}
+.landing-benchmark .lp-hero-real :is(.hero-control-media-wrap img,.hero-control-media-wrap video,.hero-control-media){
+  max-width:100%!important;
+  height:var(--hero-media-height,520px)!important;
+  aspect-ratio:var(--hero-media-aspect,auto);
+  border-radius:var(--hero-media-radius,24px)!important;
+}
+.landing-benchmark .lp-hero-real.hero-fit-contain :is(.hero-control-media-wrap img,.hero-control-media-wrap video,.hero-control-media){object-fit:contain!important}
+.landing-benchmark .lp-hero-real.hero-fit-cover :is(.hero-control-media-wrap img,.hero-control-media-wrap video,.hero-control-media){object-fit:cover!important}
+.landing-benchmark .lp-hero-real .hero-motion-track.hero-control-media-wrap{
+  width:var(--hero-media-width,100%)!important;
+  max-width:none!important;
+}
+.landing-benchmark .lp-hero-real .hero-motion-track img{
+  height:min(var(--hero-media-height,520px),72vh)!important;
+  aspect-ratio:var(--hero-media-aspect,auto);
+  border-radius:var(--hero-media-radius,24px)!important;
+}
+@media(max-width:767px){
+ .landing-benchmark .lp-hero-real :is(.hero-control-media-wrap,.lp-hero-media,.hero-parallax-media,.hero-zoom-media,.hero-story-stack,.hero-commerce-main,.hero-video-full,.hero-video-ugc-media){width:100%!important}
+ .landing-benchmark .lp-hero-real :is(.hero-control-media-wrap img,.hero-control-media-wrap video,.hero-control-media){height:min(var(--hero-media-height,520px),72vh)!important}
+}
+.landing-benchmark[data-preview-viewport="mobile"] .lp-hero-real :is(.hero-control-media-wrap,.lp-hero-media,.hero-parallax-media,.hero-zoom-media,.hero-story-stack,.hero-commerce-main,.hero-video-full,.hero-video-ugc-media){width:100%!important}
+.landing-benchmark[data-preview-viewport="mobile"] .lp-hero-real :is(.hero-control-media-wrap img,.hero-control-media-wrap video,.hero-control-media){height:min(var(--hero-media-height,520px),72vh)!important}
