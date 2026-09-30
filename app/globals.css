@@ -2746,3 +2746,8 @@ main.public-store>.ps-header{order:-19!important}
 .landing-benchmark .lp-order.lp-order-after-hero{background:transparent!important;background-image:none!important;box-shadow:none!important}
 .landing-benchmark .lp-order.lp-order-after-hero::before,.landing-benchmark .lp-order.lp-order-after-hero::after{content:none!important;display:none!important;background:none!important}
 .landing-benchmark .lp-order.lp-order-after-hero>.lp-wrap{position:relative;z-index:auto}
+
+/* Builder V3 — stronger Hero typography hierarchy */
+.landing-benchmark .lp-hero-real h1,.landing-benchmark .lp-hero h1{font-size:clamp(3.6rem,6.4vw,7.4rem)!important;line-height:.92!important;letter-spacing:-.055em!important;font-weight:850!important;max-width:13ch}
+.landing-benchmark .lp-hero-real .lp-sub,.landing-benchmark .lp-hero .lp-sub{font-size:clamp(1.15rem,1.65vw,1.55rem)!important;line-height:1.55;max-width:58ch}
+@media(max-width:767px){.landing-benchmark .lp-hero-real h1,.landing-benchmark .lp-hero h1{font-size:clamp(2.55rem,11vw,4.2rem)!important;line-height:.96!important;max-width:14ch}.landing-benchmark .lp-hero-real .lp-sub,.landing-benchmark .lp-hero .lp-sub{font-size:1.08rem!important}}
