@@ -2751,3 +2751,88 @@ main.public-store>.ps-header{order:-19!important}
 .landing-benchmark .lp-hero-real h1,.landing-benchmark .lp-hero h1{font-size:clamp(3.6rem,6.4vw,7.4rem)!important;line-height:.92!important;letter-spacing:-.055em!important;font-weight:850!important;max-width:13ch}
 .landing-benchmark .lp-hero-real .lp-sub,.landing-benchmark .lp-hero .lp-sub{font-size:clamp(1.15rem,1.65vw,1.55rem)!important;line-height:1.55;max-width:58ch}
 @media(max-width:767px){.landing-benchmark .lp-hero-real h1,.landing-benchmark .lp-hero h1{font-size:clamp(2.55rem,11vw,4.2rem)!important;line-height:.96!important;max-width:14ch}.landing-benchmark .lp-hero-real .lp-sub,.landing-benchmark .lp-hero .lp-sub{font-size:1.08rem!important}}
+
+
+/* Builder V3 v3.2 — responsive Hero hierarchy + template-aware Footer */
+.landing-benchmark .lp-hero-real h1{
+  overflow-wrap:anywhere;
+  text-wrap:balance;
+}
+.landing-benchmark .hero-cod{
+  grid-template-columns:minmax(0,1.08fr) minmax(300px,.92fr);
+  gap:clamp(28px,5vw,72px);
+  align-items:center;
+}
+.landing-benchmark .hero-cod>div:first-child{min-width:0}
+.landing-benchmark .hero-cod h1,
+.landing-benchmark.uiux-family-bold .hero-cod h1,
+.landing-benchmark.uiux-family-editorial .hero-cod h1{
+  font-size:clamp(2.7rem,4.7vw,5.35rem)!important;
+  line-height:.96!important;
+  max-width:14ch;
+}
+.landing-benchmark .hero-offer-card{align-self:center}
+.landing-benchmark .hero-offer-card .lp-hero-img{
+  width:100%;
+  max-height:460px;
+  min-height:260px;
+  object-fit:contain;
+}
+.landing-benchmark .hero-motion-copy h1,
+.landing-benchmark .hero-story-copy h1,
+.landing-benchmark .hero-editorial h1,
+.landing-benchmark .hero-luxury h1{
+  font-size:clamp(2.8rem,5vw,5.6rem)!important;
+  line-height:.94!important;
+}
+
+/* Footer consumes the same Builder palette/tokens as every other section. */
+.landing-benchmark .lp-footer{
+  margin-top:0;
+  background:color-mix(in srgb,var(--lp-bg,#fff) 82%,var(--lp-primary,#111827) 18%)!important;
+  color:var(--lp-fg,#111827)!important;
+  border-top:1px solid var(--lp-border,color-mix(in srgb,currentColor 16%,transparent))!important;
+}
+.landing-benchmark .lp-footer:before{
+  background:radial-gradient(ellipse,color-mix(in srgb,var(--lp-accent,#fff) 18%,transparent),transparent 68%)!important;
+}
+.landing-benchmark .lp-footer-trust span{
+  color:inherit;
+  background:color-mix(in srgb,var(--lp-card,var(--lp-bg,#fff)) 82%,transparent)!important;
+  border-color:var(--lp-border,color-mix(in srgb,currentColor 16%,transparent))!important;
+  border-radius:var(--lp-radius,14px);
+}
+.landing-benchmark .lp-footer-links{
+  border-color:var(--lp-border,color-mix(in srgb,currentColor 16%,transparent))!important;
+}
+.landing-benchmark .lp-footer-links a,
+.landing-benchmark .lp-footer small{color:color-mix(in srgb,var(--lp-fg,#111827) 76%,transparent)!important}
+.landing-benchmark .lp-footer-links a:hover{color:var(--lp-primary,#111827)!important}
+.landing-benchmark.uiux-family-minimal .lp-footer{text-align:start}
+.landing-benchmark.uiux-family-minimal .lp-footer-trust{max-width:none;grid-template-columns:repeat(2,minmax(0,260px));justify-content:start}
+.landing-benchmark.uiux-family-minimal .lp-footer-links{justify-content:flex-start}
+.landing-benchmark.uiux-family-brutal .lp-footer-trust span{border:3px solid var(--lp-fg)!important;border-radius:0!important;box-shadow:5px 5px 0 var(--lp-fg)}
+.landing-benchmark.uiux-family-glass .lp-footer-trust span{backdrop-filter:blur(18px)}
+.landing-benchmark.uiux-family-editorial .lp-footer-brand{font-family:var(--lp-heading-font),serif;font-size:clamp(1.5rem,3vw,2.5rem);font-weight:500}
+.landing-benchmark.uiux-family-bold .lp-footer-brand{font-size:clamp(1.6rem,3.5vw,3rem);font-weight:950;letter-spacing:-.05em}
+.landing-benchmark.uiux-family-tech .lp-footer{background:linear-gradient(135deg,color-mix(in srgb,var(--lp-bg) 84%,#050816),color-mix(in srgb,var(--lp-primary) 20%,#050816))!important}
+
+@media(max-width:1024px){
+  .landing-benchmark .hero-cod h1,
+  .landing-benchmark.uiux-family-bold .hero-cod h1,
+  .landing-benchmark.uiux-family-editorial .hero-cod h1{font-size:clamp(2.5rem,5.8vw,4.4rem)!important}
+}
+@media(max-width:767px){
+  .landing-benchmark .hero-cod{grid-template-columns:1fr;gap:28px}
+  .landing-benchmark .hero-cod h1,
+  .landing-benchmark.uiux-family-bold .hero-cod h1,
+  .landing-benchmark.uiux-family-editorial .hero-cod h1,
+  .landing-benchmark .hero-motion-copy h1,
+  .landing-benchmark .hero-story-copy h1,
+  .landing-benchmark .hero-editorial h1,
+  .landing-benchmark .hero-luxury h1{font-size:clamp(2.15rem,10vw,3.45rem)!important;line-height:1!important;max-width:none}
+  .landing-benchmark .hero-offer-card .lp-hero-img{min-height:0;max-height:360px}
+  .landing-benchmark .lp-footer{padding:34px 16px 112px;text-align:center}
+  .landing-benchmark.uiux-family-minimal .lp-footer{text-align:center}
+  .landing-benchmark.uiux-family-minimal .lp-footer-trust{grid-template-columns:1fr;justify-content:stretch}
+}
