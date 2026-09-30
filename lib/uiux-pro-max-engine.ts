@@ -13,14 +13,14 @@ function splitStyles(v:string){return v.split(/[+,]/).map(x=>x.trim()).filter(Bo
 export type UiUxDesignSystem={source:string;version:string;productType:string;reasoning:Row;landing:Row;style:Row;secondaryStyles:Row[];palette:Row;typography:Row;uxRules:Row[];tokens:{colors:Record<string,string>;fonts:{heading:string;body:string};radius:string;effects:string;pattern:string;sectionOrder:string[]};antiPatterns:string[]};
 export function generateUiUxProMaxDesignSystem(input:{name:string;description?:string;characteristics?:string;language?:string}):UiUxDesignSystem{
  const query=[input.name,input.description,input.characteristics].filter(Boolean).join(" ");
- const products=csv("products.csv"),reasonings=csv("ui-reasoning.csv"),landings=csv("landing.csv"),styles=csv("styles.csv"),colors=csv("colors.csv"),typography=csv("typography.csv"),ux=csv("ux-guidelines.csv");
+ const products=csv("products.csv"),reasonings=csv("ui-reasoning.csv"),landings=csv("landing.csv"),styles=csv("styles.csv"),colors=csv("colors.csv"),typographyRows=csv("typography.csv"),ux=csv("ux-guidelines.csv");
  const product=best(products,query,["Product Type","Keywords","Key Considerations"]);
  const productType=product["Product Type"];const reasoning=exact(reasonings,"UI_Category",productType)||best(reasonings,productType,["UI_Category"]);
  const pattern=reasoning["Recommended_Pattern"]||product["Landing Page Pattern"];const landing=exact(landings,"Pattern Name",pattern)||best(landings,pattern,["Pattern Name","Keywords","Aliases"]);
  const wanted=splitStyles(reasoning["Style_Priority"]||product["Primary Style Recommendation"]);const style=exact(styles,"Style Category",wanted[0])||best(styles,wanted[0]||query,["Style Category","Keywords","Best For","Aliases"]);
  const secondaryStyles=wanted.slice(1,3).map(x=>exact(styles,"Style Category",x)||best(styles,x,["Style Category","Keywords"])).filter(Boolean) as Row[];
  const palette=exact(colors,"Product Type",productType)||best(colors,productType,["Product Type","Notes"]);
- const typoQuery=[reasoning["Typography_Mood"],productType,query].join(" ");const typography=best(typography,typoQuery,["Font Pairing Name","Mood/Style Keywords","Best For"]);
+ const typoQuery=[reasoning["Typography_Mood"],productType,query].join(" ");const typography=best(typographyRows,typoQuery,["Font Pairing Name","Mood/Style Keywords","Best For"]);
  const uxRules=ux.map(r=>({r,s:score([pattern,style["Style Category"],productType,"web navigation form accessibility mobile conversion"].join(" "),[r.Category,r.Issue,r.Platform,r.Description,r.Do,r.Severity].join(" "))+(r.Severity==="High"?4:r.Severity==="Medium"?2:0)})).sort((a,b)=>b.s-a.s).slice(0,16).map(x=>x.r);
  const order=(landing["Section Order"]||"Hero > Features > CTA > Footer").split(">").map(x=>norm(x).replace(/\s+/g,"-")).filter(Boolean);
  const vars=style["Design System Variables"]||"";const radius=(vars.match(/border-radius:\s*([^,]+)/i)?.[1]||"12px").trim();
