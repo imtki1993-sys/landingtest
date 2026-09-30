@@ -1,7 +1,8 @@
 import LandingClient from "./LandingClient";
 import {getPublicLanding} from "../../../lib/public-landing";
 
-export const revalidate=300;
+export const dynamic="force-dynamic";
+export const revalidate=0;
 
 export default async function LandingPage({params,searchParams}:{params:Promise<{slug:string}>,searchParams:Promise<{preview?:string}>}){
  const {slug}=await params,{preview}=await searchParams;
