@@ -3048,3 +3048,50 @@ main.public-store>.ps-header{order:-19!important}
 }
 .landing-benchmark[data-preview-viewport="mobile"] .lp-hero-real:is(.hero-height-balanced,.hero-height-large,.hero-height-screen){min-height:0!important}
 .landing-benchmark[data-preview-viewport="mobile"] .lp-hero-real:is(.hero-title-small,.hero-title-medium,.hero-title-large,.hero-title-xl) h1{font-size:clamp(2rem,9vw,3.2rem)!important}
+
+
+/* Builder V3 v3.6 — compact responsive COD CTA in Hero + order form */
+@media(max-width:767px){
+ .landing-benchmark .lp-hero-real .lp-cta,
+ .landing-benchmark .lp-order-after-hero .lp-cta{
+   display:flex!important;
+   align-items:center!important;
+   justify-content:center!important;
+   width:100%!important;
+   max-width:100%!important;
+   min-height:48px!important;
+   height:auto!important;
+   padding:12px 14px!important;
+   margin-inline:0!important;
+   font-size:clamp(.88rem,3.8vw,1rem)!important;
+   line-height:1.25!important;
+   letter-spacing:0!important;
+   text-align:center!important;
+   white-space:normal!important;
+   overflow-wrap:normal!important;
+   word-break:normal!important;
+   hyphens:none!important;
+ }
+ .landing-benchmark .lp-order-after-hero .lp-form{padding:18px!important}
+}
+.landing-benchmark[data-preview-viewport="mobile"] .lp-hero-real .lp-cta,
+.landing-benchmark[data-preview-viewport="mobile"] .lp-order-after-hero .lp-cta{
+ display:flex!important;
+ align-items:center!important;
+ justify-content:center!important;
+ width:100%!important;
+ max-width:100%!important;
+ min-height:48px!important;
+ height:auto!important;
+ padding:12px 14px!important;
+ margin-inline:0!important;
+ font-size:clamp(.88rem,3.8vw,1rem)!important;
+ line-height:1.25!important;
+ letter-spacing:0!important;
+ text-align:center!important;
+ white-space:normal!important;
+ overflow-wrap:normal!important;
+ word-break:normal!important;
+ hyphens:none!important;
+}
+.landing-benchmark[data-preview-viewport="mobile"] .lp-order-after-hero .lp-form{padding:18px!important}
