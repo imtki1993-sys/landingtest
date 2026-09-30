@@ -3193,6 +3193,56 @@ main.public-store>.ps-header{order:-19!important}
 
 
 
+/* E-commerce Luxury Hero: dedicated media contract.
+   Do not rely on generic Hero image sizing for this module. */
+.landing-benchmark .lp-hero-real-luxury .hero-luxury-media{
+ display:flex;
+ align-items:center;
+ justify-content:center;
+ min-width:0;
+}
+.landing-benchmark .lp-hero-real-luxury .hero-luxury-product-image{
+ display:block!important;
+ width:var(--hero-media-width,100%)!important;
+ max-width:100%!important;
+ height:var(--hero-media-height,520px)!important;
+ max-height:720px!important;
+ min-height:0!important;
+ margin:0 auto!important;
+ object-fit:var(--hero-media-fit,contain);
+ object-position:center;
+ border-radius:var(--hero-media-radius,24px)!important;
+ aspect-ratio:var(--hero-media-aspect,auto);
+}
+@media(max-width:767px){
+ .landing-benchmark .lp-hero-real-luxury .hero-luxury{
+   grid-template-columns:1fr!important;
+   gap:30px!important;
+ }
+ .landing-benchmark .lp-hero-real-luxury .hero-luxury-media{
+   display:flex!important;
+   width:100%!important;
+   max-width:560px!important;
+   min-height:180px!important;
+   margin-inline:auto!important;
+   order:-1!important;
+ }
+ .landing-benchmark .lp-hero-real-luxury .hero-luxury-product-image{
+   display:block!important;
+   visibility:visible!important;
+   opacity:1!important;
+   width:min(var(--hero-media-width,100%),100%)!important;
+   height:auto!important;
+   max-height:min(var(--hero-media-height,520px),62vh)!important;
+   min-height:180px!important;
+   object-fit:contain!important;
+ }
+}
+.landing-benchmark[data-preview-viewport="mobile"].lp-hero-real-luxury .hero-luxury-product-image,
+.landing-benchmark[data-preview-viewport="mobile"] .lp-hero-real-luxury .hero-luxury-product-image{
+ display:block!important;visibility:visible!important;opacity:1!important;width:100%!important;height:auto!important;min-height:180px!important;max-height:min(var(--hero-media-height,520px),62vh)!important;object-fit:contain!important
+}
+
 /* Builder V3 v4.5 — public mobile Hero media visibility guard.
    Keep real product media visible when two-column Hero modules collapse to one column. */
 @media(max-width:767px){
