@@ -2960,3 +2960,60 @@ main.public-store>.ps-header{order:-19!important}
   hyphens:none!important;
 }
 .landing-benchmark[data-preview-viewport="mobile"] .hero-form-card{width:100%!important;box-sizing:border-box}
+
+
+/* Builder V3 v3.5 — full mobile preview emulation.
+   The editor's 390px device is a container inside a desktop viewport; mirror public mobile rules explicitly. */
+.landing-benchmark[data-preview-viewport="mobile"]{
+  width:100%!important;
+  max-width:390px!important;
+  margin-inline:auto!important;
+  overflow-x:hidden!important;
+  --lp-section-space:48px;
+}
+.landing-benchmark[data-preview-viewport="mobile"] *,
+.landing-benchmark[data-preview-viewport="mobile"] *::before,
+.landing-benchmark[data-preview-viewport="mobile"] *::after{box-sizing:border-box}
+.landing-benchmark[data-preview-viewport="mobile"] :is(.lp-wrap,.lp-hero-grid,.lp-order>.lp-wrap){
+  width:calc(100% - 28px)!important;
+  max-width:none!important;
+  margin-inline:auto!important;
+}
+.landing-benchmark[data-preview-viewport="mobile"] :is(.lp-section,.lp-story,.lp-how,.lp-trust,.lp-order){
+  padding-left:14px!important;
+  padding-right:14px!important;
+}
+.landing-benchmark[data-preview-viewport="mobile"] :is(.lp-benefits,.lp-feature-grid,.lp-steps,.lp-trust-grid,.lp-image-text-grid){
+  grid-template-columns:1fr!important;
+}
+.landing-benchmark[data-preview-viewport="mobile"] .lp-custom-gallery{
+  grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  gap:10px!important;
+}
+.landing-benchmark[data-preview-viewport="mobile"] :is(.lp-custom-gallery img,.lp-image-text-grid img,.lp-hero-img){
+  max-width:100%!important;
+}
+.landing-benchmark[data-preview-viewport="mobile"] .lp-form{
+  width:100%!important;
+  max-width:100%!important;
+  padding:20px!important;
+}
+.landing-benchmark[data-preview-viewport="mobile"] .lp-form :is(input,select,textarea,button){
+  width:100%!important;
+  max-width:100%!important;
+}
+.landing-benchmark[data-preview-viewport="mobile"] .lp-cta{
+  max-width:100%!important;
+  white-space:normal!important;
+}
+.landing-benchmark[data-preview-viewport="mobile"] .hero-editorial-index{display:none!important}
+.landing-benchmark[data-preview-viewport="mobile"] .hero-commerce-gallery{grid-template-columns:1fr!important}
+.landing-benchmark[data-preview-viewport="mobile"] .hero-commerce-gallery>div{grid-template-columns:repeat(3,minmax(0,1fr))!important}
+.landing-benchmark[data-preview-viewport="mobile"] .hero-commerce aside{position:static!important}
+.landing-benchmark[data-preview-viewport="mobile"] :is(.hero-luxury-media,.hero-ugc-media,.hero-product-stage){order:-1}
+.landing-benchmark[data-preview-viewport="mobile"] :is(.hero-full-overlay .lp-copy,.hero-bg-copy .lp-copy){padding:24px!important}
+.landing-benchmark[data-preview-viewport="mobile"] :is(.uiux-pattern-family-story .lp-section:nth-of-type(even) .lp-wrap){transform:none!important}
+.landing-benchmark[data-preview-viewport="mobile"] .lp-footer .lp-wrap{
+  width:calc(100% - 28px)!important;
+  max-width:none!important;
+}
