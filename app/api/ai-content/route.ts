@@ -2,7 +2,7 @@ import {NextResponse} from "next/server";
 import {authContext} from "../../../lib/server-auth";
 import OpenAI from "openai";
 import {decryptIntegrationSecret} from "../../../lib/integration-secrets";
-import {landingUiUxPrompt,getLandingUiUxProfile} from "../../../lib/landing-uiux-pro-max";
+import {getLandingBenchmarkBlueprint,getLandingBenchmarkNiche} from "../../../lib/landing-benchmark-blueprints";
 
 function parseJson(s:string){return JSON.parse(s.replace(/```json|```/g,"").trim())}
 const themeRules:Record<string,string>={
@@ -21,7 +21,7 @@ const themeRules:Record<string,string>={
 
 export async function POST(req:Request){
  try{
-  const p=await req.json(),section=p.section||"all",theme=p.theme||"cod-s11",language=p.language||"Darija Maroc";
+  const p=await req.json(),section=p.section||"all",niche=String(p.niche||p.theme||"ecommerce"),language=p.language||"Darija Maroc";
   if(!p.name)return NextResponse.json({error:"Nom du produit requis"},{status:400});
   const {s,workspaceId,user}=await authContext(req);
   const {data:integration,error:integrationError}=await s.from("workspace_integrations").select("openai_api_key_enc").eq("workspace_id",workspaceId).maybeSingle();
@@ -30,8 +30,10 @@ export async function POST(req:Request){
   if(!key)return NextResponse.json({error:"Configure ta propre clé Meta Model API dans Paramètres > Intégrations."},{status:503});
   const client=new OpenAI({baseURL:"https://api.meta.ai/v1",apiKey:key});
   const brief=String(p.description||"aucun").trim().slice(0,3500);
-  const uiux=landingUiUxPrompt(theme),uiuxProfile=getLandingUiUxProfile(theme);
-  const facts=`Produit: ${p.name}. Prix: ${p.price??"non fourni"} MAD. Ancien prix: ${p.oldPrice||"non fourni"}. Faits produit: ${brief}. Thème: ${theme} (${themeRules[theme]||"COD ecommerce"}). Langue: ${language}.`;
+  const blueprint=getLandingBenchmarkBlueprint(niche),nicheInfo=getLandingBenchmarkNiche(niche);
+  if(!blueprint||!nicheInfo)return NextResponse.json({error:"Niche UI/UX Pro Max invalide"},{status:400});
+  const uiux=`UI/UX Pro Max blueprint obligatoire: ${JSON.stringify(blueprint)}. Référence: ${nicheInfo.referencePath}. Respecte cette architecture et adapte le contenu au produit COD sans inventer de faits.`;
+  const facts=`Produit: ${p.name}. Prix: ${p.price??"non fourni"} MAD. Ancien prix: ${p.oldPrice||"non fourni"}. Faits produit: ${brief}. Niche: ${niche}. Langue: ${language}.`;
   const schemas:Record<string,string>={
    hero:'{"headline":"","subheadline":"","cta":"","delivery":""}',
    benefits:'{"description":"","benefits":["","","",""]}',
@@ -55,6 +57,6 @@ export async function POST(req:Request){
   }else ai=await client.responses.create({model:"muse-spark-1.3-contributor",input:prompt,reasoning:{effort:"low"},store:false});
   const content=parseJson(ai.output_text);
   const usage=(ai as any).usage||null;
-  return NextResponse.json({content,section,usage,designSystem:{source:"ui-ux-pro-max-v2",profile:uiuxProfile}});
+  return NextResponse.json({content,section,usage,designSystem:{source:"ui-ux-pro-max-100",niche:nicheInfo,blueprint}});
  }catch(e:any){return NextResponse.json({error:e?.message||"Erreur génération contenu"},{status:500})}
 }
