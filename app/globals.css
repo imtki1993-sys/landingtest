@@ -2594,3 +2594,17 @@ main.public-store>.ps-header{order:-19!important}
 .landing-niche-tools{display:grid;grid-template-columns:1fr 260px;gap:12px;margin-bottom:18px}.landing-niche-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;max-height:56vh;overflow:auto;padding:2px}.landing-niche-grid>button{position:relative;display:grid;text-align:left;padding:0 0 12px;overflow:hidden;border:1px solid #e2e8f0;border-radius:14px;background:#fff;cursor:pointer;transition:.18s ease}.landing-niche-grid>button:hover,.landing-niche-grid>button.active{border-color:#111827;box-shadow:0 8px 30px rgba(15,23,42,.12);transform:translateY(-2px)}.landing-niche-grid iframe{width:200%;height:300px;border:0;pointer-events:none;transform:scale(.5);transform-origin:top left;margin-bottom:-150px;background:#f8fafc}.landing-niche-grid b,.landing-niche-grid small{padding-inline:12px}.landing-niche-grid b{padding-top:10px}.landing-niche-grid small{color:#64748b;margin-top:3px}.landing-create-summary{max-width:720px;margin:auto;text-align:center;padding-block:56px}.landing-create-summary h3{font-size:30px;margin:0 0 20px}
 @media(max-width:900px){.landing-niche-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.landing-create-grid{grid-template-columns:1fr 1fr}.landing-niche-tools{grid-template-columns:1fr}}
 @media(max-width:600px){.landing-create-overlay{padding:0}.landing-create-wizard{width:100%;height:100%;max-height:none;border-radius:0}.landing-create-head,.landing-create-body{padding-inline:16px}.landing-create-steps{padding-inline:16px}.landing-create-grid,.landing-niche-grid{grid-template-columns:1fr}.landing-create-head h2{font-size:22px}}
+
+
+/* UI/UX Pro Max runtime design tokens */
+.landing-benchmark{background:var(--lp-bg,#fff);color:var(--lp-fg,#111827);font-family:var(--lp-body-font,Inter),system-ui,sans-serif}
+.landing-benchmark h1,.landing-benchmark h2,.landing-benchmark h3,.landing-benchmark .lp-price{font-family:var(--lp-heading-font,Inter),system-ui,sans-serif}
+.landing-benchmark .lp-hero{background:var(--lp-bg,#fff);color:var(--lp-fg,#111827)}
+.landing-benchmark .lp-badge,.landing-benchmark .lp-category{color:var(--lp-primary,#2563eb)}
+.landing-benchmark .lp-cta,.landing-benchmark button[type="submit"]{background:var(--lp-accent,var(--lp-primary,#2563eb));border-color:var(--lp-accent,var(--lp-primary,#2563eb));border-radius:var(--lp-radius,12px)}
+.landing-benchmark .lp-whatsapp{border-radius:var(--lp-radius,12px)}
+.landing-benchmark .lp-section{background:var(--lp-bg,#fff);color:var(--lp-fg,#111827)}
+.landing-benchmark .lp-benefit,.landing-benchmark .lp-feature,.landing-benchmark .lp-trust-grid>div,.landing-benchmark .lp-faq,.landing-benchmark .lp-order-card{background:var(--lp-card,#fff);border-color:var(--lp-border,#e5e7eb);border-radius:var(--lp-radius,12px)}
+.landing-benchmark.uiux-glassmorphism .lp-benefit,.landing-benchmark.uiux-glassmorphism .lp-feature,.landing-benchmark.uiux-glassmorphism .lp-order-card{background:color-mix(in srgb,var(--lp-card,#fff) 72%,transparent);backdrop-filter:blur(15px)}
+.landing-benchmark.uiux-minimalism-and-swiss-style .lp-benefit,.landing-benchmark.uiux-minimalism-and-swiss-style .lp-feature{box-shadow:none;border-radius:0}
+@media(prefers-reduced-motion:reduce){.landing-benchmark *{scroll-behavior:auto!important;animation:none!important;transition:none!important}}
