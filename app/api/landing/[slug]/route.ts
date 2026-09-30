@@ -1,4 +1,5 @@
 import {NextResponse} from "next/server";
+export const dynamic="force-dynamic";
 import {adminDb,authContext} from "../../../../lib/server-auth";
 import {resolvePublishedMetaPixel} from "../../../../lib/meta-pixel";
 
@@ -27,6 +28,6 @@ export async function GET(req:Request,{params}:{params:Promise<{slug:string}>}){
   const activeProduct=preview?(p||{}):(publishedConfig?.product||p||{});
   const whatsapp=(w?.settings as any)?.whatsapp_phone||(activeSeo as any)?.whatsapp_phone||"";
   const payload={id:lp.id,name:activeProduct?.name||lp.name,price:activeProduct?.price,oldPrice:activeProduct?.compare_at_price,description:activeProduct?.description,locale:lp.locale,content:(activeSeo as any)?.ai_content||{},images:(activeSeo as any)?.images||activeProduct?.image_urls||[],whatsappPhone:String(whatsapp).replace(/\D/g,""),metaPixelId:preview?((activeSeo as any)?.meta_pixel_id||null):publishedPixel};
-  return NextResponse.json(payload,{headers:preview?{"Cache-Control":"private, no-store"}:{"Cache-Control":"public, s-maxage=300, stale-while-revalidate=3600"}});
+  return NextResponse.json(payload,{headers:{"Cache-Control":"private, no-store, no-cache, max-age=0, must-revalidate","CDN-Cache-Control":"no-store","Vercel-CDN-Cache-Control":"no-store"}});
  }catch(e:any){return NextResponse.json({error:e.message},{status:500})}
 }
