@@ -3075,6 +3075,12 @@ main.public-store>.ps-header{order:-19!important}
 .landing-benchmark .lp-hero-real.hero-architecture-editorial :is(.hero-control-copy,.hero-control-copy-wrap) h1{font-family:var(--lp-heading-font,serif)!important;font-weight:500!important;letter-spacing:-.035em!important}
 .landing-benchmark .lp-hero-real.hero-architecture-conversion .lp-cta{box-shadow:0 12px 30px color-mix(in srgb,var(--lp-primary) 24%,transparent)!important}
 .landing-benchmark .lp-hero-real.hero-architecture-split :is(.hero-form,.hero-split,.hero-cod,.hero-minimal,.hero-editorial,.hero-luxury,.hero-ugc,.hero-commerce,.hero-video-ugc){grid-template-columns:minmax(0,1fr) minmax(320px,1fr)!important}
+/* Split must collapse before its fixed 320px second track can overflow/narrow the public viewport. */
+@media(max-width:900px){
+ .landing-benchmark .lp-hero-real.hero-architecture-split :is(.hero-form,.hero-split,.hero-cod,.hero-minimal,.hero-editorial,.hero-luxury,.hero-ugc,.hero-commerce,.hero-video-ugc){grid-template-columns:minmax(0,1fr)!important;direction:ltr!important}
+ .landing-benchmark .lp-hero-real-luxury.hero-architecture-split .hero-luxury-media{grid-column:1!important;grid-row:auto!important}
+ .landing-benchmark .lp-hero-real-luxury.hero-architecture-split .hero-luxury-copy{grid-column:1!important;grid-row:auto!important;direction:rtl}
+}
 @media(max-width:767px){
  .landing-benchmark .lp-hero-real :is(.hero-form,.hero-split,.hero-cod,.hero-minimal,.hero-editorial,.hero-luxury,.hero-ugc,.hero-commerce,.hero-video-ugc){grid-template-columns:1fr!important;direction:ltr!important}
  .landing-benchmark .lp-hero-real.hero-title-small :is(.hero-control-copy,.hero-control-copy-wrap) h1{font-size:1.9rem!important}
