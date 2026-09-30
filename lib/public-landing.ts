@@ -1,4 +1,3 @@
-import {unstable_cache} from "next/cache";
 import {adminDb} from "./server-auth";
 import {resolvePublishedMetaPixel} from "./meta-pixel";
 
@@ -23,5 +22,5 @@ async function loadPublicLanding(slug:string){
 }
 
 export function getPublicLanding(slug:string){
- return unstable_cache(()=>loadPublicLanding(slug),["public-landing",slug],{revalidate:3600,tags:["landing:"+slug]})();
+ return loadPublicLanding(slug);
 }
