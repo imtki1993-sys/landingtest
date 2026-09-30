@@ -2668,3 +2668,24 @@ main.public-store>.ps-header{order:-19!important}
 .landing-benchmark .lp-form-architecture-compact form{display:grid;grid-template-columns:1fr 1fr;gap:12px}.landing-benchmark .lp-form-architecture-compact form>:is(.lp-quantity-offers,.lp-qty,.lp-order-total,.lp-cta,.lp-form-whatsapp,p){grid-column:1/-1}
 .landing-benchmark .lp-form-architecture-editorial{text-align:start}.landing-benchmark .lp-form-architecture-editorial h2{font-size:clamp(2.4rem,5vw,4.8rem);max-width:12ch}
 @media(max-width:767px){.landing-benchmark .lp-form-architecture-compact form{grid-template-columns:1fr}}
+
+/* Builder V3 Template Runtime */
+.landing-benchmark[class*="uiux-style-"]{font-family:var(--lp-body-font,Inter),sans-serif;background:var(--lp-bg);color:var(--lp-fg)}
+.landing-benchmark[class*="uiux-style-"] :is(h1,h2,h3,.lp-price){font-family:var(--lp-heading-font,Inter),sans-serif}
+.landing-benchmark[class*="uiux-style-glass"] :is(.lp-form,.lp-benefit,.lp-feature-card,.lp-faq){background:color-mix(in srgb,var(--lp-card) 78%,transparent)!important;backdrop-filter:blur(18px);box-shadow:0 16px 42px color-mix(in srgb,var(--lp-fg) 12%,transparent)!important}
+.landing-benchmark[class*="uiux-style-neumorph"] :is(.lp-form,.lp-benefit,.lp-feature-card){border:0!important;box-shadow:10px 10px 24px color-mix(in srgb,var(--lp-fg) 12%,transparent),-10px -10px 24px color-mix(in srgb,var(--lp-bg) 70%,white)!important}
+.landing-benchmark[class*="uiux-style-luxury"] h1,.landing-benchmark[class*="uiux-style-editorial"] h1{font-size:clamp(3.2rem,7vw,7rem);line-height:.94;letter-spacing:-.045em}
+.landing-benchmark[class*="uiux-style-minimal"] :is(.lp-form,.lp-benefit,.lp-feature-card,.lp-faq){box-shadow:none!important;border-radius:4px!important}
+.landing-benchmark[class*="uiux-style-bold"] h1{font-size:clamp(3.5rem,8vw,8rem);line-height:.88;font-weight:900;letter-spacing:-.06em}
+.landing-benchmark.uiux-pattern-saas-product .lp-hero-grid,.landing-benchmark[class*="uiux-pattern-split"] .lp-hero-grid{grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr)}
+.landing-benchmark[class*="uiux-pattern-story"] .lp-hero-grid,.landing-benchmark[class*="uiux-pattern-editorial"] .lp-hero-grid{grid-template-columns:1fr}.landing-benchmark[class*="uiux-pattern-story"] .lp-copy,.landing-benchmark[class*="uiux-pattern-editorial"] .lp-copy{max-width:850px;margin-inline:auto;text-align:center}
+.landing-benchmark[class*="uiux-pattern-minimal"] .lp-section{padding-block:clamp(70px,10vw,140px)}
+.landing-benchmark[class*="uiux-pattern-feature"] .lp-feature-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+.landing-benchmark .lp-form-classic{max-width:900px;margin-inline:auto}
+.landing-benchmark .lp-form-card{max-width:940px;margin-inline:auto;background:var(--lp-card)!important;border:1px solid var(--lp-border)!important;border-radius:28px!important;box-shadow:0 24px 60px color-mix(in srgb,var(--lp-fg) 13%,transparent)!important}
+.landing-benchmark .lp-form-compact{max-width:1000px;margin-inline:auto;padding:22px!important}.landing-benchmark .lp-form-compact form{gap:10px}
+.landing-benchmark .lp-form-minimal{max-width:800px;margin-inline:auto;background:transparent!important;border:0!important;box-shadow:none!important;padding-inline:0!important}
+.landing-benchmark .lp-form-minimal input{background:transparent!important;border:0!important;border-bottom:1px solid var(--lp-border)!important;border-radius:0!important;padding-inline:0!important}
+.landing-benchmark .lp-form-architecture-trust{border-top:5px solid var(--lp-primary)!important}.landing-benchmark .lp-form-architecture-trust:before{content:"✓ Paiement à la livraison · Commande sécurisée";display:block;font-size:.82rem;font-weight:800;color:var(--lp-primary);margin-bottom:12px}
+.landing-benchmark .lp-form-architecture-editorial{display:grid;grid-template-columns:minmax(180px,.65fr) minmax(0,1.35fr);column-gap:40px;align-items:start}.landing-benchmark .lp-form-architecture-editorial form{grid-column:2;grid-row:1/4}.landing-benchmark .lp-form-architecture-editorial>h2,.landing-benchmark .lp-form-architecture-editorial>p{grid-column:1}
+@media(max-width:767px){.landing-benchmark[class*="uiux-pattern-"] .lp-hero-grid,.landing-benchmark[class*="uiux-pattern-feature"] .lp-feature-grid,.landing-benchmark .lp-form-architecture-editorial{grid-template-columns:1fr}.landing-benchmark .lp-form-architecture-editorial form{grid-column:1;grid-row:auto}}
