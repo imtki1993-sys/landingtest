@@ -2,6 +2,7 @@ import {NextResponse} from "next/server";
 import {authContext} from "../../../lib/server-auth";
 import OpenAI from "openai";
 import {decryptIntegrationSecret} from "../../../lib/integration-secrets";
+import {landingUiUxPrompt,getLandingUiUxProfile} from "../../../lib/landing-uiux-pro-max";
 
 function parseJson(s:string){return JSON.parse(s.replace(/```json|```/g,"").trim())}
 const themeRules:Record<string,string>={
@@ -29,6 +30,7 @@ export async function POST(req:Request){
   if(!key)return NextResponse.json({error:"Configure ta propre clé Meta Model API dans Paramètres > Intégrations."},{status:503});
   const client=new OpenAI({baseURL:"https://api.meta.ai/v1",apiKey:key});
   const brief=String(p.description||"aucun").trim().slice(0,3500);
+  const uiux=landingUiUxPrompt(theme),uiuxProfile=getLandingUiUxProfile(theme);
   const facts=`Produit: ${p.name}. Prix: ${p.price??"non fourni"} MAD. Ancien prix: ${p.oldPrice||"non fourni"}. Faits produit: ${brief}. Thème: ${theme} (${themeRules[theme]||"COD ecommerce"}). Langue: ${language}.`;
   const schemas:Record<string,string>={
    hero:'{"headline":"","subheadline":"","cta":"","delivery":""}',
@@ -40,7 +42,7 @@ export async function POST(req:Request){
    faq:'{"faq":[{"question":"","answer":""},{"question":"","answer":""},{"question":"","answer":""}]}',
    all:'{"headline":"","subheadline":"","description":"","benefits":["","","",""],"cta":"","delivery":"","problem":"","solution":"","problem_title":"","problem_text":"","features_title":"","features":["","",""],"how_title":"","how_steps":["","",""],"trust_title":"","trust_points":["","",""],"faq":[{"question":"","answer":""},{"question":"","answer":""},{"question":"","answer":""}]}'
   };
-  const prompt=`Landing COD Maroc. Écris uniquement le contenu demandé, sans HTML/CSS. Utilise seulement les faits fournis; n’invente aucune caractéristique, certification, statistique, témoignage, garantie, résultat ou urgence. Santé/sport: aucune promesse médicale. Darija: alphabet arabe naturel. Ton adapté au thème. ${facts} Section: "${section}". Réponds UNIQUEMENT avec ce JSON valide: ${schemas[section]||schemas.all}`;
+  const prompt=`Landing COD Maroc. ${uiux}  Écris uniquement le contenu demandé, sans HTML/CSS. Utilise seulement les faits fournis; n’invente aucune caractéristique, certification, statistique, témoignage, garantie, résultat ou urgence. Santé/sport: aucune promesse médicale. Darija: alphabet arabe naturel. Ton adapté au thème. ${facts} Section: "${section}". Réponds UNIQUEMENT avec ce JSON valide: ${schemas[section]||schemas.all}`;
   const images=Array.isArray(p.images)?p.images.filter((x:any)=>typeof x==="string"&&/^https?:\/\//.test(x)).slice(0,5):[];
   let ai:any;
   if(images.length){
@@ -53,6 +55,6 @@ export async function POST(req:Request){
   }else ai=await client.responses.create({model:"muse-spark-1.3-contributor",input:prompt,reasoning:{effort:"low"},store:false});
   const content=parseJson(ai.output_text);
   const usage=(ai as any).usage||null;
-  return NextResponse.json({content,section,usage});
+  return NextResponse.json({content,section,usage,designSystem:{source:"ui-ux-pro-max-v2",profile:uiuxProfile}});
  }catch(e:any){return NextResponse.json({error:e?.message||"Erreur génération contenu"},{status:500})}
 }
