@@ -2910,58 +2910,7 @@ main.public-store>.ps-header{order:-19!important}
 }
 
 
-/* Builder V3 v3.4 — editor preview parity.
-   Builder viewport buttons simulate width in a container, so do not rely on browser @media alone. */
-.landing-benchmark[data-preview-viewport="desktop"] .lp-hero-real:not(.hero-motion),
-.landing-benchmark[data-preview-viewport="tablet"] .lp-hero-real:not(.hero-motion){
-  min-height:0!important;
-  padding-block:clamp(34px,4.5vw,68px)!important;
-}
-.landing-benchmark[data-preview-viewport="desktop"] :is(.hero-form,.hero-split,.hero-cod,.hero-minimal,.hero-luxury,.hero-ugc),
-.landing-benchmark[data-preview-viewport="tablet"] :is(.hero-form,.hero-split,.hero-cod,.hero-minimal,.hero-luxury,.hero-ugc){
-  grid-template-columns:minmax(0,1.12fr) minmax(300px,.88fr)!important;
-  gap:clamp(28px,4vw,64px)!important;
-  align-items:center!important;
-}
-.landing-benchmark[data-preview-viewport="desktop"] .lp-hero-real :is(.lp-copy h1,.hero-form h1,.hero-split h1,.hero-cod h1,.hero-minimal h1,.hero-luxury h1,.hero-ugc h1),
-.landing-benchmark[data-preview-viewport="tablet"] .lp-hero-real :is(.lp-copy h1,.hero-form h1,.hero-split h1,.hero-cod h1,.hero-minimal h1,.hero-luxury h1,.hero-ugc h1){
-  font-size:clamp(2.25rem,3.45vw,4.15rem)!important;
-  line-height:1.02!important;
-  letter-spacing:-.045em!important;
-  max-width:17ch!important;
-  overflow-wrap:normal!important;
-  word-break:normal!important;
-  hyphens:none!important;
-  text-wrap:balance;
-}
-.landing-benchmark[data-preview-viewport="tablet"] :is(.hero-form,.hero-split,.hero-cod,.hero-minimal,.hero-luxury,.hero-ugc){
-  grid-template-columns:minmax(0,1fr) minmax(280px,.82fr)!important;
-  gap:30px!important;
-}
-.landing-benchmark[data-preview-viewport="tablet"] .lp-hero-real :is(.lp-copy h1,.hero-form h1,.hero-split h1,.hero-cod h1,.hero-minimal h1,.hero-luxury h1,.hero-ugc h1){
-  font-size:clamp(2.1rem,4.5vw,3.35rem)!important;
-  max-width:18ch!important;
-}
-.landing-benchmark[data-preview-viewport="mobile"] .lp-hero-real:not(.hero-motion){
-  min-height:0!important;
-  padding:34px 16px 42px!important;
-}
-.landing-benchmark[data-preview-viewport="mobile"] :is(.hero-form,.hero-split,.hero-cod,.hero-minimal,.hero-luxury,.hero-ugc,.hero-editorial){
-  grid-template-columns:1fr!important;
-  gap:26px!important;
-}
-.landing-benchmark[data-preview-viewport="mobile"] .lp-hero-real :is(.lp-copy h1,.hero-form h1,.hero-split h1,.hero-cod h1,.hero-minimal h1,.hero-luxury h1,.hero-ugc h1){
-  font-size:clamp(2rem,9vw,3rem)!important;
-  line-height:1.03!important;
-  letter-spacing:-.035em!important;
-  max-width:none!important;
-  overflow-wrap:normal!important;
-  word-break:normal!important;
-  hyphens:none!important;
-}
-.landing-benchmark[data-preview-viewport="mobile"] .hero-form-card{width:100%!important;box-sizing:border-box}
-
-
+/* Builder V3 preview parity is consolidated in the v3.5/v3.8/v4.3 rules below. */
 /* Builder V3 v3.5 — full mobile preview emulation.
    The editor's 390px device is a container inside a desktop viewport; mirror public mobile rules explicitly. */
 .landing-benchmark[data-preview-viewport="mobile"]{
