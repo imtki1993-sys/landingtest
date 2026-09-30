@@ -2741,3 +2741,8 @@ main.public-store>.ps-header{order:-19!important}
 .uiux-pattern-family-social .lp-trust,.uiux-pattern-family-social .lp-faq{background:color-mix(in srgb,var(--lp-primary) 6%,var(--lp-bg))}.uiux-pattern-family-social .lp-trust-grid{grid-template-columns:repeat(2,minmax(0,1fr));font-size:1.05rem}
 .uiux-pattern-family-conversion .lp-order{padding-block:clamp(72px,9vw,130px)}.uiux-pattern-family-conversion .lp-cta{font-size:1.08rem;font-weight:900}.uiux-pattern-family-conversion .lp-trust{border-block:1px solid var(--lp-border)}
 @media(max-width:767px){.uiux-pattern-family-split .lp-benefits-grid,.uiux-pattern-family-split .lp-features-grid,.uiux-pattern-family-split .lp-trust-grid,.uiux-pattern-family-feature .lp-benefits-grid,.uiux-pattern-family-feature .lp-features-grid,.uiux-pattern-family-social .lp-trust-grid{grid-template-columns:1fr}.uiux-pattern-family-story .lp-section:nth-of-type(even) .lp-wrap{transform:none}}
+
+/* Builder V3 COD section: no independent background layer */
+.landing-benchmark .lp-order.lp-order-after-hero{background:transparent!important;background-image:none!important;box-shadow:none!important}
+.landing-benchmark .lp-order.lp-order-after-hero::before,.landing-benchmark .lp-order.lp-order-after-hero::after{content:none!important;display:none!important;background:none!important}
+.landing-benchmark .lp-order.lp-order-after-hero>.lp-wrap{position:relative;z-index:auto}
