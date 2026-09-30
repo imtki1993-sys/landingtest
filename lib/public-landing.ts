@@ -1,5 +1,6 @@
 import {adminDb} from "./server-auth";
 import {resolvePublishedMetaPixel} from "./meta-pixel";
+import {getUiuxLibrary} from "./uiux-library-data";
 
 async function loadPublicLanding(slug:string){
  const s=adminDb();
@@ -18,7 +19,9 @@ async function loadPublicLanding(slug:string){
  ]);
  const activeSeo=publishedConfig?.seo||lp.seo||{},activeProduct=publishedConfig?.product||p||{};
  const whatsapp=(w?.settings as any)?.whatsapp_phone||(activeSeo as any)?.whatsapp_phone||"";
- return {id:lp.id,name:activeProduct?.name||lp.name,price:activeProduct?.price,oldPrice:activeProduct?.compare_at_price,description:activeProduct?.description,locale:lp.locale,content:(activeSeo as any)?.ai_content||{},images:(activeSeo as any)?.images||activeProduct?.image_urls||[],whatsappPhone:String(whatsapp).replace(/\D/g,""),metaPixelId:publishedPixel};
+ const savedContent=(activeSeo as any)?.ai_content||{};
+ const content={...savedContent,uiux_library:getUiuxLibrary()};
+ return {id:lp.id,name:activeProduct?.name||lp.name,price:activeProduct?.price,oldPrice:activeProduct?.compare_at_price,description:activeProduct?.description,locale:lp.locale,content,images:(activeSeo as any)?.images||activeProduct?.image_urls||[],whatsappPhone:String(whatsapp).replace(/\D/g,""),metaPixelId:publishedPixel};
 }
 
 export function getPublicLanding(slug:string){
