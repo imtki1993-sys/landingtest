@@ -3139,3 +3139,41 @@ main.public-store>.ps-header{order:-19!important}
 .landing-benchmark[data-preview-viewport="mobile"] .lp-hero-real.hero-height-balanced{min-height:62svh!important}
 .landing-benchmark[data-preview-viewport="mobile"] .lp-hero-real.hero-height-large{min-height:78svh!important}
 .landing-benchmark[data-preview-viewport="mobile"] .lp-hero-real.hero-height-screen{min-height:100svh!important}
+
+
+/* Builder V3 v3.8 — universal Hero Studio hooks for every renderer module */
+.landing-benchmark .lp-hero-real.hero-title-small :is(.hero-control-copy,.hero-control-copy-wrap) h1{font-size:clamp(1.9rem,2.7vw,3rem)!important}
+.landing-benchmark .lp-hero-real.hero-title-medium :is(.hero-control-copy,.hero-control-copy-wrap) h1{font-size:clamp(2.3rem,3.5vw,4rem)!important}
+.landing-benchmark .lp-hero-real.hero-title-large :is(.hero-control-copy,.hero-control-copy-wrap) h1{font-size:clamp(2.8rem,4.5vw,5.2rem)!important}
+.landing-benchmark .lp-hero-real.hero-title-xl :is(.hero-control-copy,.hero-control-copy-wrap) h1{font-size:clamp(3.3rem,5.7vw,6.4rem)!important}
+.landing-benchmark .lp-hero-real.hero-text-narrow :is(.hero-control-copy,.hero-control-copy-wrap){width:min(100%,420px)!important;max-width:420px!important}
+.landing-benchmark .lp-hero-real.hero-text-medium :is(.hero-control-copy,.hero-control-copy-wrap){width:min(100%,620px)!important;max-width:620px!important}
+.landing-benchmark .lp-hero-real.hero-text-wide :is(.hero-control-copy,.hero-control-copy-wrap){width:min(100%,820px)!important;max-width:820px!important}
+.landing-benchmark .lp-hero-real.hero-align-left :is(.hero-control-copy,.hero-control-copy-wrap){text-align:left!important;margin-inline:0 auto!important}
+.landing-benchmark .lp-hero-real.hero-align-center :is(.hero-control-copy,.hero-control-copy-wrap){text-align:center!important;margin-inline:auto!important}
+.landing-benchmark .lp-hero-real.hero-align-right :is(.hero-control-copy,.hero-control-copy-wrap){text-align:right!important;margin-inline:auto 0!important}
+.landing-benchmark .lp-hero-real.hero-fit-contain :is(.hero-control-media,.hero-control-media-wrap img,.hero-control-media-wrap video){object-fit:contain!important}
+.landing-benchmark .lp-hero-real.hero-fit-cover :is(.hero-control-media,.hero-control-media-wrap img,.hero-control-media-wrap video){object-fit:cover!important}
+.landing-benchmark .lp-hero-real.hero-media-top :is(.hero-form,.hero-split,.hero-cod,.hero-minimal,.hero-editorial,.hero-luxury,.hero-ugc,.hero-commerce,.hero-video-ugc){grid-template-columns:1fr!important}
+.landing-benchmark .lp-hero-real.hero-media-top .hero-control-media-wrap{order:-2!important}
+.landing-benchmark .lp-hero-real.hero-media-left :is(.hero-form,.hero-split,.hero-cod,.hero-minimal,.hero-editorial,.hero-luxury,.hero-ugc,.hero-commerce,.hero-video-ugc){direction:rtl!important}
+.landing-benchmark .lp-hero-real.hero-media-left :is(.hero-form,.hero-split,.hero-cod,.hero-minimal,.hero-editorial,.hero-luxury,.hero-ugc,.hero-commerce,.hero-video-ugc)>*{direction:ltr!important}
+.landing-benchmark .lp-hero-real.hero-media-right :is(.hero-form,.hero-split,.hero-cod,.hero-minimal,.hero-editorial,.hero-luxury,.hero-ugc,.hero-commerce,.hero-video-ugc){direction:ltr!important}
+.landing-benchmark .lp-hero-real.hero-architecture-centered .hero-control-copy,
+.landing-benchmark .lp-hero-real.hero-architecture-centered .hero-control-copy-wrap{text-align:center!important;margin-inline:auto!important}
+.landing-benchmark .lp-hero-real.hero-architecture-impact :is(.hero-control-copy,.hero-control-copy-wrap) h1{font-weight:900!important;letter-spacing:-.06em!important;text-transform:none}
+.landing-benchmark .lp-hero-real.hero-architecture-editorial :is(.hero-control-copy,.hero-control-copy-wrap) h1{font-family:var(--lp-heading-font,serif)!important;font-weight:500!important;letter-spacing:-.035em!important}
+.landing-benchmark .lp-hero-real.hero-architecture-conversion .lp-cta{box-shadow:0 12px 30px color-mix(in srgb,var(--lp-primary) 24%,transparent)!important}
+.landing-benchmark .lp-hero-real.hero-architecture-split :is(.hero-form,.hero-split,.hero-cod,.hero-minimal,.hero-editorial,.hero-luxury,.hero-ugc,.hero-commerce,.hero-video-ugc){grid-template-columns:minmax(0,1fr) minmax(320px,1fr)!important}
+@media(max-width:767px){
+ .landing-benchmark .lp-hero-real :is(.hero-form,.hero-split,.hero-cod,.hero-minimal,.hero-editorial,.hero-luxury,.hero-ugc,.hero-commerce,.hero-video-ugc){grid-template-columns:1fr!important;direction:ltr!important}
+ .landing-benchmark .lp-hero-real.hero-title-small :is(.hero-control-copy,.hero-control-copy-wrap) h1{font-size:1.9rem!important}
+ .landing-benchmark .lp-hero-real.hero-title-medium :is(.hero-control-copy,.hero-control-copy-wrap) h1{font-size:2.2rem!important}
+ .landing-benchmark .lp-hero-real.hero-title-large :is(.hero-control-copy,.hero-control-copy-wrap) h1{font-size:2.65rem!important}
+ .landing-benchmark .lp-hero-real.hero-title-xl :is(.hero-control-copy,.hero-control-copy-wrap) h1{font-size:3rem!important}
+}
+.landing-benchmark[data-preview-viewport="mobile"] .lp-hero-real :is(.hero-form,.hero-split,.hero-cod,.hero-minimal,.hero-editorial,.hero-luxury,.hero-ugc,.hero-commerce,.hero-video-ugc){grid-template-columns:1fr!important;direction:ltr!important}
+.landing-benchmark[data-preview-viewport="mobile"] .lp-hero-real.hero-title-small :is(.hero-control-copy,.hero-control-copy-wrap) h1{font-size:1.9rem!important}
+.landing-benchmark[data-preview-viewport="mobile"] .lp-hero-real.hero-title-medium :is(.hero-control-copy,.hero-control-copy-wrap) h1{font-size:2.2rem!important}
+.landing-benchmark[data-preview-viewport="mobile"] .lp-hero-real.hero-title-large :is(.hero-control-copy,.hero-control-copy-wrap) h1{font-size:2.65rem!important}
+.landing-benchmark[data-preview-viewport="mobile"] .lp-hero-real.hero-title-xl :is(.hero-control-copy,.hero-control-copy-wrap) h1{font-size:3rem!important}
