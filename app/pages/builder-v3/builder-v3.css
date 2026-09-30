@@ -7,3 +7,8 @@
 .bv3-hero-subpanel{display:grid;gap:14px}
 .bv3-hero-subpanel>.bv3-help{margin:0}
 @media(max-width:620px){.bv3-hero-tabs{grid-template-columns:1fr 1fr}.bv3-hero-tabs button{font-size:12px;padding:7px 5px}}
+
+
+.bv3-stage{position:relative;padding-top:54px}
+.bv3-device-label{position:absolute;top:16px;left:50%;transform:translateX(-50%);z-index:2;padding:6px 10px;border:1px solid #cbd5e1;border-radius:999px;background:#fff;color:#475569;font-size:11px;font-weight:800;white-space:nowrap;box-shadow:0 2px 8px rgba(15,23,42,.06)}
+.bv3-device-frame{overflow:hidden}
