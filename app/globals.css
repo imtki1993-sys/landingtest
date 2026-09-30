@@ -2836,3 +2836,75 @@ main.public-store>.ps-header{order:-19!important}
   .landing-benchmark.uiux-family-minimal .lp-footer{text-align:center}
   .landing-benchmark.uiux-family-minimal .lp-footer-trust{grid-template-columns:1fr;justify-content:stretch}
 }
+
+
+/* Builder V3 v3.3 — Hero compactness guardrail.
+   A product name must never turn one Hero into several desktop screens. */
+@media(min-width:768px){
+  .landing-benchmark .lp-hero-real:not(.hero-motion){
+    min-height:0!important;
+    padding-block:clamp(34px,4.5vw,68px)!important;
+  }
+  .landing-benchmark .hero-form,
+  .landing-benchmark .hero-split,
+  .landing-benchmark .hero-cod,
+  .landing-benchmark .hero-minimal,
+  .landing-benchmark .hero-luxury,
+  .landing-benchmark .hero-ugc{
+    width:min(var(--lp-container,1180px),calc(100% - 48px))!important;
+    grid-template-columns:minmax(0,1.12fr) minmax(340px,.88fr)!important;
+    gap:clamp(30px,5vw,72px)!important;
+    align-items:center!important;
+  }
+  .landing-benchmark .hero-form>.lp-copy,
+  .landing-benchmark .hero-split>div,
+  .landing-benchmark .hero-cod>div,
+  .landing-benchmark .hero-minimal>div,
+  .landing-benchmark .hero-luxury>div,
+  .landing-benchmark .hero-ugc>div{min-width:0!important}
+  .landing-benchmark .lp-hero-real :is(.lp-copy h1,.hero-form h1,.hero-split h1,.hero-cod h1,.hero-minimal h1,.hero-luxury h1,.hero-ugc h1){
+    font-size:clamp(2.25rem,3.45vw,4.15rem)!important;
+    line-height:1.02!important;
+    letter-spacing:-.045em!important;
+    max-width:17ch!important;
+    overflow-wrap:normal!important;
+    word-break:normal!important;
+    hyphens:none!important;
+    text-wrap:balance;
+  }
+  .landing-benchmark .hero-form-card{
+    width:min(100%,430px);
+    justify-self:end;
+    padding:clamp(22px,2.6vw,34px)!important;
+  }
+  .landing-benchmark .hero-form .lp-copy .lp-sub{max-width:56ch}
+  .landing-benchmark .hero-minimal{min-height:0!important}
+}
+@media(min-width:768px) and (max-width:1024px){
+  .landing-benchmark .hero-form,
+  .landing-benchmark .hero-split,
+  .landing-benchmark .hero-cod,
+  .landing-benchmark .hero-minimal,
+  .landing-benchmark .hero-luxury,
+  .landing-benchmark .hero-ugc{
+    grid-template-columns:minmax(0,1fr) minmax(300px,.82fr)!important;
+    width:min(var(--lp-container,1180px),calc(100% - 36px))!important;
+  }
+  .landing-benchmark .lp-hero-real :is(.lp-copy h1,.hero-form h1,.hero-split h1,.hero-cod h1,.hero-minimal h1,.hero-luxury h1,.hero-ugc h1){
+    font-size:clamp(2.15rem,4.7vw,3.45rem)!important;
+    max-width:18ch!important;
+  }
+}
+@media(max-width:767px){
+  .landing-benchmark .lp-hero-real:not(.hero-motion){padding:34px 16px 42px!important}
+  .landing-benchmark .lp-hero-real :is(.lp-copy h1,.hero-form h1,.hero-split h1,.hero-cod h1,.hero-minimal h1,.hero-luxury h1,.hero-ugc h1){
+    font-size:clamp(2rem,9vw,3rem)!important;
+    line-height:1.03!important;
+    letter-spacing:-.035em!important;
+    overflow-wrap:normal!important;
+    word-break:normal!important;
+    hyphens:none!important;
+    max-width:none!important;
+  }
+  .landing-benchmark .hero-form-card{width:100%;box-sizing:border-box}
+}
