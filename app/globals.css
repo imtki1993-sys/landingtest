@@ -2643,3 +2643,16 @@ main.public-store>.ps-header{order:-19!important}
 .landing-benchmark[dir="rtl"] :is(.lp-copy,.lp-section,.lp-story,.lp-how,.lp-trust,.lp-form){text-align:right}
 .landing-benchmark[dir="rtl"] .lp-copy h1,.landing-benchmark[dir="rtl"] .lp-sub{margin-right:0;margin-left:auto}
 @media(max-width:767px){.landing-benchmark{--lp-section-space:48px}.landing-benchmark .lp-wrap,.landing-benchmark .lp-hero-grid{width:min(100% - 28px,var(--lp-container))}.landing-benchmark .lp-copy h1{font-size:clamp(2.15rem,11vw,3.5rem)}.landing-benchmark .lp-custom-gallery{grid-template-columns:repeat(2,minmax(0,1fr))}.landing-benchmark .lp-image-text-grid{grid-template-columns:1fr}.landing-benchmark .lp-form{padding:20px}.landing-benchmark .lp-gallery-thumbs{grid-template-columns:repeat(4,minmax(0,1fr))}}
+
+/* UI/UX Pro Max v3.1 — COD form inherits the landing design system */
+.landing-benchmark .lp-order,
+.landing-benchmark .lp-order.lp-order-after-hero{background:var(--lp-bg,#fff)!important;color:var(--lp-fg,#111827)!important;padding-block:var(--lp-section-space,clamp(56px,7vw,96px))!important}
+.landing-benchmark .lp-order>.lp-wrap{width:min(var(--lp-container,1180px),calc(100% - 40px));margin-inline:auto}
+.landing-benchmark .lp-order .lp-form{background:var(--lp-surface,var(--lp-card,#fff))!important;color:var(--lp-fg,#111827)!important;box-shadow:0 18px 55px color-mix(in srgb,var(--lp-fg,#111827) 12%,transparent)!important}
+.landing-benchmark .lp-order .lp-form :is(h2,p,label,b,span,small){color:inherit}
+.landing-benchmark .lp-order .lp-form input{background:color-mix(in srgb,var(--lp-bg,#fff) 94%,var(--lp-fg,#111827) 6%)!important;color:var(--lp-fg,#111827)!important;border:1px solid var(--lp-border,#dbe1e8)!important}
+.landing-benchmark .lp-order .lp-form input::placeholder{color:color-mix(in srgb,var(--lp-fg,#111827) 52%,transparent)!important}
+.landing-benchmark .lp-order .lp-quantity-offers button{background:color-mix(in srgb,var(--lp-surface,var(--lp-card,#fff)) 92%,var(--lp-fg,#111827) 8%)!important;color:var(--lp-fg,#111827)!important}
+.landing-benchmark .lp-order .lp-quantity-offers button.active{border-color:var(--lp-primary,#2563eb)!important;box-shadow:inset 0 0 0 1px var(--lp-primary,#2563eb)!important}
+.landing-benchmark .lp-order .lp-order-total{background:color-mix(in srgb,var(--lp-primary,#2563eb) 16%,var(--lp-surface,var(--lp-card,#fff)))!important;color:var(--lp-fg,#111827)!important}
+@media(max-width:767px){.landing-benchmark .lp-order>.lp-wrap{width:calc(100% - 28px)}}
