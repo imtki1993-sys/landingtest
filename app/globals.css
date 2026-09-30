@@ -2545,3 +2545,40 @@ main.public-store>.ps-header{order:-19!important}
 .lp[class*="uiux-"] :focus-visible{outline:3px solid currentColor;outline-offset:3px}
 @media(max-width:767px){.lp.uiux-ecommerce-fashion .lp-visual,.lp.uiux-ecommerce-luxury .lp-visual{min-height:360px}.lp[class*="uiux-"] .lp-hero-grid{gap:22px}.lp[class*="uiux-"] h1{overflow-wrap:anywhere}}
 @media(prefers-reduced-motion:reduce){.lp[class*="uiux-"] *{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
+
+
+/* UI/UX Pro Max structural landing architectures */
+.lp-hero-architecture-editorial .lp-hero-grid{grid-template-columns:minmax(0,.82fr) minmax(0,1.18fr);min-height:min(820px,88vh);align-items:stretch}
+.lp-hero-architecture-editorial .lp-copy{display:flex;flex-direction:column;justify-content:center;padding-block:clamp(48px,8vw,120px)}
+.lp-hero-architecture-editorial .lp-visual{min-height:100%}
+.lp-hero-architecture-editorial .lp-cta{align-self:flex-start}
+.lp-hero-architecture-impact{min-height:min(780px,86vh);display:grid;align-items:center}
+.lp-hero-architecture-impact .lp-hero-grid{grid-template-columns:minmax(0,1.05fr) minmax(340px,.95fr);gap:clamp(28px,6vw,88px)}
+.lp-hero-architecture-impact h1{font-size:clamp(3rem,7vw,7rem);line-height:.92}
+.lp-hero-architecture-impact .lp-visual{transform:rotate(-1deg)}
+.lp-hero-architecture-soft .lp-hero-grid{grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(28px,5vw,72px)}
+.lp-hero-architecture-soft .lp-copy{max-width:650px}
+.lp-hero-architecture-soft .lp-visual{border-radius:32px;overflow:hidden}
+.lp-hero-architecture-conversion .lp-copy{max-width:680px}
+.lp-benefits-architecture-technical,.lp-features-architecture-technical{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.lp-benefits-architecture-technical .lp-benefit,.lp-feature-card-technical{border-radius:6px!important;box-shadow:none!important;border:1px solid rgba(127,127,127,.28);min-height:150px;align-content:center}
+.lp-benefits-architecture-editorial,.lp-features-architecture-editorial{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:20px}
+.lp-benefits-architecture-editorial>*{grid-column:span 4}.lp-features-architecture-editorial>*{grid-column:span 4}
+.lp-benefits-architecture-editorial>*:first-child,.lp-features-architecture-editorial>*:first-child{grid-column:span 7}
+.lp-benefits-architecture-editorial>*:nth-child(2),.lp-features-architecture-editorial>*:nth-child(2){grid-column:span 5}
+.lp-feature-card-editorial{box-shadow:none!important;border-radius:2px!important;border-top:1px solid currentColor}
+.lp-benefits-architecture-soft,.lp-features-architecture-soft{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:22px}
+.lp-benefits-architecture-soft .lp-benefit,.lp-feature-card-soft{border-radius:26px!important;padding:clamp(22px,3vw,36px)}
+.lp-form-architecture-editorial{max-width:760px;margin-inline:auto;border-radius:2px!important;box-shadow:none!important;border-block:1px solid rgba(127,127,127,.35)}
+.lp-form-architecture-compact{display:grid;grid-template-columns:minmax(0,.72fr) minmax(0,1.28fr);column-gap:32px;align-items:start}
+.lp-form-architecture-compact>h2,.lp-form-architecture-compact>p,.lp-form-architecture-compact>.lp-success{grid-column:1}
+.lp-form-architecture-compact>form{grid-column:2;grid-row:1/span 5}
+.lp-form-architecture-trust{max-width:760px;margin-inline:auto}
+@media(max-width:767px){
+ .lp-hero-architecture-editorial .lp-hero-grid,.lp-hero-architecture-impact .lp-hero-grid,.lp-hero-architecture-soft .lp-hero-grid{grid-template-columns:1fr;min-height:auto}
+ .lp-hero-architecture-editorial .lp-copy{padding-block:30px 10px}.lp-hero-architecture-impact{min-height:auto}.lp-hero-architecture-impact h1{font-size:clamp(2.5rem,14vw,4.4rem)}
+ .lp-hero-architecture-impact .lp-visual{transform:none}.lp-hero-architecture-soft .lp-visual{border-radius:20px}
+ .lp-benefits-architecture-technical,.lp-features-architecture-technical,.lp-benefits-architecture-soft,.lp-features-architecture-soft{grid-template-columns:1fr}
+ .lp-benefits-architecture-editorial,.lp-features-architecture-editorial{grid-template-columns:1fr}.lp-benefits-architecture-editorial>*,.lp-benefits-architecture-editorial>*:first-child,.lp-benefits-architecture-editorial>*:nth-child(2),.lp-features-architecture-editorial>*,.lp-features-architecture-editorial>*:first-child,.lp-features-architecture-editorial>*:nth-child(2){grid-column:auto}
+ .lp-form-architecture-compact{display:block}
+}
