@@ -3193,6 +3193,43 @@ main.public-store>.ps-header{order:-19!important}
 
 
 
+/* Builder V3 v4.5 — public mobile Hero media visibility guard.
+   Keep real product media visible when two-column Hero modules collapse to one column. */
+@media(max-width:767px){
+ .landing-benchmark .lp-hero-real :is(.hero-luxury-media,.hero-ugc-media,.hero-product-stage,.hero-commerce-gallery,.hero-video-phone,.hero-offer-card).hero-control-media-wrap{
+   display:block!important;
+   visibility:visible!important;
+   opacity:1!important;
+   width:100%!important;
+   max-width:100%!important;
+   min-width:0!important;
+   order:-1!important;
+   overflow:visible;
+ }
+ .landing-benchmark .lp-hero-real :is(.hero-luxury-media,.hero-ugc-media,.hero-product-stage,.hero-commerce-gallery,.hero-video-phone,.hero-offer-card).hero-control-media-wrap>.lp-hero-img{
+   display:block!important;
+   visibility:visible!important;
+   opacity:1!important;
+   width:100%!important;
+   max-width:100%!important;
+   height:auto!important;
+   max-height:min(var(--hero-media-height,520px),68vh)!important;
+   min-height:120px;
+   margin:0 auto!important;
+   object-position:center;
+ }
+ .landing-benchmark .lp-hero-real .hero-luxury-media.hero-control-media-wrap{
+   max-width:min(100%,560px)!important;
+   margin-inline:auto!important;
+ }
+}
+.landing-benchmark[data-preview-viewport="mobile"] .lp-hero-real :is(.hero-luxury-media,.hero-ugc-media,.hero-product-stage,.hero-commerce-gallery,.hero-video-phone,.hero-offer-card).hero-control-media-wrap{
+ display:block!important;visibility:visible!important;opacity:1!important;width:100%!important;max-width:100%!important;min-width:0!important;order:-1!important
+}
+.landing-benchmark[data-preview-viewport="mobile"] .lp-hero-real :is(.hero-luxury-media,.hero-ugc-media,.hero-product-stage,.hero-commerce-gallery,.hero-video-phone,.hero-offer-card).hero-control-media-wrap>.lp-hero-img{
+ display:block!important;visibility:visible!important;opacity:1!important;width:100%!important;max-width:100%!important;height:auto!important;max-height:min(var(--hero-media-height,520px),68vh)!important;min-height:120px;margin:0 auto!important;object-position:center
+}
+
 /* Builder V3 v4.3 — preview/public breakpoint parity */
 .landing-benchmark[data-preview-viewport="tablet"]{width:100%!important;max-width:768px!important;margin-inline:auto!important;overflow-x:hidden!important}
 .landing-benchmark[data-preview-viewport="tablet"] *,.landing-benchmark[data-preview-viewport="tablet"] *::before,.landing-benchmark[data-preview-viewport="tablet"] *::after{box-sizing:border-box}
