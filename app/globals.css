@@ -3193,6 +3193,49 @@ main.public-store>.ps-header{order:-19!important}
 
 
 
+/* E-commerce Luxury v4.6 — intrinsic public media sizing.
+   The Luxury product image must have a renderable box even before mobile breakpoints apply. */
+.landing-benchmark .lp-hero-real-luxury .hero-luxury-media.hero-control-media-wrap{
+ display:flex!important;
+ position:relative!important;
+ align-items:center!important;
+ justify-content:center!important;
+ width:100%!important;
+ min-width:0!important;
+ min-height:clamp(240px,48vw,560px)!important;
+ overflow:visible!important;
+}
+.landing-benchmark .lp-hero-real-luxury .hero-luxury-media.hero-control-media-wrap .hero-luxury-product-image{
+ display:block!important;
+ visibility:visible!important;
+ opacity:1!important;
+ position:relative!important;
+ width:min(100%,560px)!important;
+ height:auto!important;
+ min-width:1px!important;
+ min-height:240px!important;
+ max-height:620px!important;
+ margin:0 auto!important;
+ object-fit:contain!important;
+ object-position:center!important;
+}
+@media(max-width:900px){
+ .landing-benchmark .lp-hero-real-luxury .hero-luxury{
+  grid-template-columns:minmax(0,1fr)!important;
+ }
+ .landing-benchmark .lp-hero-real-luxury .hero-luxury-media.hero-control-media-wrap{
+  order:-1!important;
+  min-height:280px!important;
+  max-width:620px!important;
+  margin-inline:auto!important;
+ }
+ .landing-benchmark .lp-hero-real-luxury .hero-luxury-media.hero-control-media-wrap .hero-luxury-product-image{
+  width:min(100%,560px)!important;
+  min-height:280px!important;
+  max-height:62vh!important;
+ }
+}
+
 /* E-commerce Luxury Hero: dedicated media contract.
    Do not rely on generic Hero image sizing for this module. */
 .landing-benchmark .lp-hero-real-luxury .hero-luxury-media{
