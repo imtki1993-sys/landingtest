@@ -5,6 +5,11 @@ export async function generateBuilderContent(input:{name:string;price:any;oldPri
  return x;
 }
 
+export function applyAiDesignSystem(draft:any,result:any){
+ const profile=result?.designSystem?.profile;if(!profile)return draft;
+ return {...draft,design_profile:profile.id,design_system:result.designSystem,section_order:Array.isArray(profile.sectionOrder)&&profile.sectionOrder.length?profile.sectionOrder:draft.section_order};
+}
+
 export function normalizeAiContent(content:any){
  const a={...(content||{})};
  if(Array.isArray(a.features))a.features=a.features.map((v:any)=>typeof v==="string"?v:[v?.title,v?.text].filter(Boolean).join(" — "));
