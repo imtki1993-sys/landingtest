@@ -2526,3 +2526,22 @@ main.public-store>.ps-header{order:-19!important}
 @media(max-width:414px){.benchmark-runtime :is(.benchmark-catalog,.ps-benchmark-benefits,.ps-benchmark-about,.ps-faq,.ps-info-page,.ps-product-page){padding-inline:14px}.benchmark-hero-content{padding-inline:16px}.benchmark-grid{gap:10px}.benchmark-product-card>div:last-child{padding:12px}.ps-hero-actions a{width:100%}}
 @media(max-width:375px){.benchmark-runtime :is(.benchmark-catalog,.ps-benchmark-benefits,.ps-benchmark-about,.ps-faq,.ps-info-page,.ps-product-page){padding-inline:12px}.benchmark-grid{grid-template-columns:repeat(min(2,var(--ps-product-cols-mobile,2)),minmax(0,1fr))!important}.benchmark-product-card>div:last-child{padding:10px}.benchmark-product-card p{display:none}}
 @media(max-width:320px){.benchmark-runtime :is(.benchmark-catalog,.ps-benchmark-benefits,.ps-benchmark-about,.ps-faq,.ps-info-page,.ps-product-page){padding-inline:10px}.benchmark-hero-content{padding-inline:12px}.benchmark-grid{grid-template-columns:1fr!important}.benchmark-product-card p{display:block}.benchmark-header-mode-floating-glass .ps-header{width:calc(100% - 12px);margin:6px}.benchmark-niche-ecommerce-luxury .benchmark-hero-content h1,.benchmark-niche-automotive .benchmark-hero-content h1,.benchmark-niche-fitness-gym .benchmark-hero-content h1{font-size:2.25rem}.ps-hero-actions a{width:100%}}
+
+
+/* UI/UX Pro Max v2 — LandPro landing runtime */
+.lp[class*="uiux-"]{--uupm-radius:18px;--uupm-shadow:0 18px 55px rgba(15,23,42,.10);overflow-x:clip}
+.lp[class*="uiux-"] .lp-hero,.lp[class*="uiux-"] .lp-section,.lp[class*="uiux-"] .lp-story,.lp[class*="uiux-"] .lp-how,.lp[class*="uiux-"] .lp-trust{overflow:hidden}
+.lp[class*="uiux-"] .lp-feature-card,.lp[class*="uiux-"] .lp-benefit,.lp[class*="uiux-"] .lp-form{border-radius:var(--uupm-radius);box-shadow:var(--uupm-shadow)}
+.lp.uiux-automotive{--uupm-radius:8px}.lp.uiux-automotive .lp-hero{background:linear-gradient(135deg,#090d12,#18212b);color:#fff}.lp.uiux-automotive h1{text-transform:uppercase;letter-spacing:-.035em}.lp.uiux-automotive .lp-feature-card{border-left:3px solid currentColor}
+.lp.uiux-ecommerce-electronics .lp-hero{background:radial-gradient(circle at 80% 15%,#dbeafe 0,transparent 34%),#f8fafc}.lp.uiux-ecommerce-electronics .lp-feature-card{border:1px solid #dbe4ef}
+.lp.uiux-beauty-spa{--uupm-radius:28px}.lp.uiux-beauty-spa .lp-hero{background:linear-gradient(135deg,#fff7f8,#f7f1ec)}.lp.uiux-beauty-spa h1,.lp.uiux-beauty-spa h2{font-weight:600;letter-spacing:-.025em}
+.lp.uiux-healthcare .lp-hero{background:linear-gradient(135deg,#f4fbf8,#f8fafc)}.lp.uiux-healthcare .lp-form{border:1px solid #d8ebe4}
+.lp.uiux-ecommerce-fashion .lp-hero-grid,.lp.uiux-ecommerce-luxury .lp-hero-grid{align-items:stretch}.lp.uiux-ecommerce-fashion .lp-visual,.lp.uiux-ecommerce-luxury .lp-visual{min-height:560px}.lp.uiux-ecommerce-fashion .lp-visual img,.lp.uiux-ecommerce-luxury .lp-visual img{height:100%;object-fit:cover}
+.lp.uiux-ecommerce-luxury{--uupm-radius:2px}.lp.uiux-ecommerce-luxury .lp-hero{background:#111;color:#f8f5ee}.lp.uiux-ecommerce-luxury h1{font-weight:500;letter-spacing:-.03em}.lp.uiux-ecommerce-luxury .lp-feature-card{box-shadow:none;border-top:1px solid currentColor}
+.lp.uiux-fitness{--uupm-radius:6px}.lp.uiux-fitness .lp-hero{background:#0b0b0c;color:#fff}.lp.uiux-fitness h1{text-transform:uppercase;font-weight:900}.lp.uiux-fitness .lp-cta{text-transform:uppercase}
+.lp.uiux-home-services .lp-hero,.lp.uiux-decor .lp-hero{background:linear-gradient(135deg,#faf7f2,#f3eee6)}
+.lp.uiux-family{--uupm-radius:24px}.lp.uiux-family .lp-hero{background:linear-gradient(135deg,#fff9ed,#f1f8ff)}
+.lp.uiux-ecommerce .lp-hero{background:linear-gradient(135deg,#f8fafc,#eef2ff)}
+.lp[class*="uiux-"] :focus-visible{outline:3px solid currentColor;outline-offset:3px}
+@media(max-width:767px){.lp.uiux-ecommerce-fashion .lp-visual,.lp.uiux-ecommerce-luxury .lp-visual{min-height:360px}.lp[class*="uiux-"] .lp-hero-grid{gap:22px}.lp[class*="uiux-"] h1{overflow-wrap:anywhere}}
+@media(prefers-reduced-motion:reduce){.lp[class*="uiux-"] *{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
