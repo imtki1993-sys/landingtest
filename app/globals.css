@@ -3270,3 +3270,13 @@ main.public-store>.ps-header{order:-19!important}
 .landing-benchmark.uiux-pattern-family-social .lp-trust{background:color-mix(in srgb,var(--lp-primary,#2563eb) 8%,var(--lp-bg,#fff))!important}.landing-benchmark.uiux-pattern-family-social .lp-trust-grid{gap:18px}
 .landing-benchmark.uiux-pattern-family-conversion .lp-order{background:color-mix(in srgb,var(--lp-primary,#2563eb) 7%,var(--lp-bg,#fff))!important}.landing-benchmark.uiux-pattern-family-conversion .lp-form{border-top:5px solid var(--lp-primary)!important}
 @media(max-width:767px){.landing-benchmark.uiux-pattern-family-split :is(.lp-feature-grid,.lp-benefits),.landing-benchmark.uiux-pattern-family-feature :is(.lp-feature-grid,.lp-benefits){grid-template-columns:1fr!important}}
+
+
+/* Builder V3 responsive custom media */
+.lp-responsive-media-shell{width:100%;max-width:var(--media-max-width,100%);margin:var(--media-margin,0 auto)}
+.lp-responsive-media-frame{width:100%;height:var(--media-height,auto)}
+.lp-responsive-media-frame :is(img,video){display:block;width:100%;height:100%;max-width:100%}
+@media(min-width:768px) and (max-width:1023px){.lp-responsive-media-shell{max-width:var(--media-tablet-width,var(--media-max-width,100%))}.lp-responsive-media-frame{height:var(--media-tablet-height,var(--media-height,auto))}}
+@media(max-width:767px){.lp-responsive-media-shell{max-width:var(--media-mobile-width,100%)}.lp-responsive-media-frame{height:var(--media-mobile-height,auto)}}
+[data-preview-viewport="tablet"] .lp-responsive-media-shell{max-width:var(--media-tablet-width,var(--media-max-width,100%))}[data-preview-viewport="tablet"] .lp-responsive-media-frame{height:var(--media-tablet-height,var(--media-height,auto))}
+[data-preview-viewport="mobile"] .lp-responsive-media-shell{max-width:var(--media-mobile-width,100%)}[data-preview-viewport="mobile"] .lp-responsive-media-frame{height:var(--media-mobile-height,auto)}
