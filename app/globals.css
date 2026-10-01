@@ -3443,3 +3443,10 @@ main.public-store>.ps-header{order:-19!important}
 
 /* Hero custom background */
 .landing-benchmark .lp-hero-real{background-color:var(--hero-bg-color,transparent)!important}
+
+/* Footer Studio */
+.landing-benchmark .lp-footer.lp-footer-studio{background:var(--footer-bg,#cbdcf8)!important;color:var(--footer-text,#0f172a)!important;padding-top:var(--footer-pad-y,48px)!important;padding-bottom:var(--footer-pad-y,48px)!important;font-size:var(--footer-text-size,15px)!important;text-align:var(--footer-align,center)!important}
+.landing-benchmark .lp-footer.lp-footer-studio .lp-wrap{text-align:inherit!important}
+.landing-benchmark .lp-footer.lp-footer-studio .lp-footer-brand{font-size:var(--footer-title-size,28px)!important;color:var(--footer-text,#0f172a)!important}
+.landing-benchmark .lp-footer.lp-footer-studio :is(a,small,span){color:var(--footer-text,#0f172a)!important;font-size:var(--footer-text-size,15px)!important}
+.landing-benchmark .lp-footer.lp-footer-studio a{color:var(--footer-link,#0f172a)!important}
