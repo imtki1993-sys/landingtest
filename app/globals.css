@@ -3346,3 +3346,10 @@ main.public-store>.ps-header{order:-19!important}
 .landing-benchmark[data-preview-viewport="mobile"] :is(.lp-benefit,.lp-feature-card,.lp-step,.lp-faq,.lp-trust-grid>div){min-width:0!important}
 .landing-benchmark[data-preview-viewport="mobile"] :is(h1,h2,h3,p,a,button,span){overflow-wrap:anywhere}
 .landing-benchmark[data-preview-viewport="desktop"]{width:100%!important;max-width:1440px!important;margin-inline:auto!important;overflow-x:hidden!important}
+
+/* Legacy landing WhatsApp floating CTA — restored for Builder V3/public parity */
+.lp-whatsapp-float.lp-whatsapp-float-legacy{width:auto!important;height:58px!important;padding:8px 18px 8px 12px!important;display:flex!important;align-items:center!important;gap:8px!important;border-radius:999px!important;font-size:15px!important;line-height:1!important}
+.lp-whatsapp-float.lp-whatsapp-float-legacy .wa-icon{width:38px!important;height:38px!important;display:grid!important;place-items:center!important;flex:0 0 38px!important;background:transparent!important;color:#fff!important}
+.lp-whatsapp-float.lp-whatsapp-float-legacy .wa-icon svg{width:32px!important;height:32px!important}
+.lp-whatsapp-float.lp-whatsapp-float-legacy .wa-label{display:inline!important;color:#fff!important;font-size:15px!important;font-weight:800!important;white-space:nowrap!important}
+@media(max-width:700px){.lp-whatsapp-float.lp-whatsapp-float-legacy{right:14px!important;bottom:78px!important;height:55px!important;padding:7px 15px 7px 10px!important}.lp-whatsapp-float.lp-whatsapp-float-legacy .wa-icon{width:36px!important;height:36px!important;flex-basis:36px!important}.lp-whatsapp-float.lp-whatsapp-float-legacy .wa-icon svg{width:30px!important;height:30px!important}.lp-whatsapp-float.lp-whatsapp-float-legacy .wa-label{display:inline!important;font-size:14px!important}}
