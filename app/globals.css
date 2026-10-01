@@ -3369,3 +3369,15 @@ main.public-store>.ps-header{order:-19!important}
 .landing-benchmark[data-preview-viewport="mobile"] .lp-whatsapp-float.lp-whatsapp-float-legacy .wa-icon{width:34px!important;height:34px!important}
 .landing-benchmark[data-preview-viewport="mobile"] .lp-whatsapp-float.lp-whatsapp-float-legacy .wa-icon svg{width:31px!important;height:31px!important}
 .landing-benchmark[data-preview-viewport="mobile"] .lp-whatsapp-float.lp-whatsapp-float-legacy .wa-label{display:none!important}
+
+/* Hero Engine V2 — shared professional controls */
+.landing-benchmark .lp-hero-real{padding-top:var(--hero-pad-y,72px)!important;padding-bottom:var(--hero-pad-y,72px)!important}
+.landing-benchmark .lp-hero-real h1{font-size:var(--hero-title-size,56px)!important;line-height:1.04!important;letter-spacing:-.035em}
+.landing-benchmark .lp-hero-real .lp-sub,.landing-benchmark .lp-hero-real .hero-control-copy>p{font-size:var(--hero-subtitle-size,18px)!important;line-height:1.65}
+.landing-benchmark .lp-hero-real .hero-pro-cta{min-height:var(--hero-cta-height,56px)!important;font-size:var(--hero-cta-font-size,17px)!important;border-radius:var(--hero-cta-radius,14px)!important;width:var(--hero-cta-width,auto)!important;display:inline-flex!important;align-items:center!important;justify-content:center!important}
+.landing-benchmark .lp-hero-real :is(.hero-split,.hero-cod,.hero-luxury,.hero-ugc,.hero-commerce,.hero-minimal,.hero-editorial,.hero-video-ugc,.hero-form){gap:var(--hero-gap,48px)!important}
+@media(max-width:900px){.landing-benchmark .lp-hero-real h1{font-size:var(--hero-title-size-tablet,44px)!important}}
+@media(max-width:700px){.landing-benchmark .lp-hero-real{padding-top:calc(var(--hero-pad-y,72px)*.65)!important;padding-bottom:calc(var(--hero-pad-y,72px)*.65)!important}.landing-benchmark .lp-hero-real h1{font-size:var(--hero-title-size-mobile,34px)!important}.landing-benchmark .lp-hero-real .lp-sub,.landing-benchmark .lp-hero-real .hero-control-copy>p{font-size:var(--hero-subtitle-size-mobile,16px)!important}.landing-benchmark .lp-hero-real .hero-pro-cta{max-width:100%}}
+.landing-benchmark[data-preview-viewport="tablet"] .lp-hero-real h1{font-size:var(--hero-title-size-tablet,44px)!important}
+.landing-benchmark[data-preview-viewport="mobile"] .lp-hero-real h1{font-size:var(--hero-title-size-mobile,34px)!important}
+.landing-benchmark[data-preview-viewport="mobile"] .lp-hero-real .lp-sub,.landing-benchmark[data-preview-viewport="mobile"] .lp-hero-real .hero-control-copy>p{font-size:var(--hero-subtitle-size-mobile,16px)!important}
