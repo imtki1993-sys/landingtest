@@ -3353,3 +3353,19 @@ main.public-store>.ps-header{order:-19!important}
 .lp-whatsapp-float.lp-whatsapp-float-legacy .wa-icon svg{width:32px!important;height:32px!important}
 .lp-whatsapp-float.lp-whatsapp-float-legacy .wa-label{display:inline!important;color:#fff!important;font-size:15px!important;font-weight:800!important;white-space:nowrap!important}
 @media(max-width:700px){.lp-whatsapp-float.lp-whatsapp-float-legacy{right:14px!important;bottom:78px!important;height:55px!important;padding:7px 15px 7px 10px!important}.lp-whatsapp-float.lp-whatsapp-float-legacy .wa-icon{width:36px!important;height:36px!important;flex-basis:36px!important}.lp-whatsapp-float.lp-whatsapp-float-legacy .wa-icon svg{width:30px!important;height:30px!important}.lp-whatsapp-float.lp-whatsapp-float-legacy .wa-label{display:inline!important;font-size:14px!important}}
+
+/* Mobile sticky COD + WhatsApp: keep both actions visible without overlap */
+@media(max-width:700px){
+ .landing-benchmark .lp-sticky{z-index:1001!important;min-height:66px!important;padding:10px 92px 10px 12px!important;display:flex!important;align-items:center!important;justify-content:center!important;box-sizing:border-box!important}
+ .landing-benchmark .lp-sticky a{display:block!important;width:100%!important;line-height:1.25!important}
+ .landing-benchmark .lp-whatsapp-float.lp-whatsapp-float-legacy{right:14px!important;bottom:7px!important;z-index:1002!important;width:52px!important;height:52px!important;padding:0!important;border-radius:50%!important;display:grid!important;place-items:center!important}
+ .landing-benchmark .lp-whatsapp-float.lp-whatsapp-float-legacy .wa-icon{width:34px!important;height:34px!important;display:grid!important;place-items:center!important}
+ .landing-benchmark .lp-whatsapp-float.lp-whatsapp-float-legacy .wa-icon svg{width:31px!important;height:31px!important}
+ .landing-benchmark .lp-whatsapp-float.lp-whatsapp-float-legacy .wa-label{display:none!important}
+}
+/* Same mobile layout inside Builder V3 emulated mobile viewport */
+.landing-benchmark[data-preview-viewport="mobile"] .lp-sticky{z-index:1001!important;min-height:66px!important;padding:10px 92px 10px 12px!important;display:flex!important;align-items:center!important;justify-content:center!important;box-sizing:border-box!important}
+.landing-benchmark[data-preview-viewport="mobile"] .lp-whatsapp-float.lp-whatsapp-float-legacy{right:14px!important;bottom:7px!important;z-index:1002!important;width:52px!important;height:52px!important;padding:0!important;border-radius:50%!important;display:grid!important;place-items:center!important}
+.landing-benchmark[data-preview-viewport="mobile"] .lp-whatsapp-float.lp-whatsapp-float-legacy .wa-icon{width:34px!important;height:34px!important}
+.landing-benchmark[data-preview-viewport="mobile"] .lp-whatsapp-float.lp-whatsapp-float-legacy .wa-icon svg{width:31px!important;height:31px!important}
+.landing-benchmark[data-preview-viewport="mobile"] .lp-whatsapp-float.lp-whatsapp-float-legacy .wa-label{display:none!important}
