@@ -3440,3 +3440,6 @@ main.public-store>.ps-header{order:-19!important}
 .hero-gallery-marquee{overflow:hidden}.hero-gallery-marquee-track{display:flex;width:max-content;gap:16px;animation:heroProductMarquee var(--hero-gallery-speed,18s) linear infinite}.hero-gallery-marquee img{width:min(72vw,440px)!important;height:var(--hero-media-height,520px)!important;object-fit:contain;flex:none}
 @keyframes heroProductMarquee{to{transform:translateX(-50%)}}
 @media(max-width:700px){.hero-gallery-stage{min-height:min(var(--hero-media-height,520px),420px)}.hero-gallery-arrow{width:38px;height:38px}.hero-gallery-marquee img{width:78vw!important;height:min(var(--hero-media-height,520px),420px)!important}}
+
+/* Hero custom background */
+.landing-benchmark .lp-hero-real{background-color:var(--hero-bg-color,transparent)!important}
