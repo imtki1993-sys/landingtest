@@ -27,7 +27,7 @@ export async function GET(req:Request,{params}:{params:Promise<{slug:string}>}){
   ]);
   const activeSeo=preview?(lp.seo||{}):(publishedConfig?.seo||lp.seo||{});
   const activeProduct=preview?(p||{}):(publishedConfig?.product||p||{});
-  const whatsapp=(w?.settings as any)?.whatsapp_phone||(activeSeo as any)?.whatsapp_phone||"";
+  const whatsapp=(activeSeo as any)?.whatsapp_phone||(lp.seo as any)?.whatsapp_phone||(w?.settings as any)?.whatsapp_phone||"";
   const savedContent=(activeSeo as any)?.ai_content||{};
   const content={...savedContent,uiux_library:getUiuxLibrary()};
   const payload={id:lp.id,name:activeProduct?.name||lp.name,price:activeProduct?.price,oldPrice:activeProduct?.compare_at_price,description:activeProduct?.description,locale:lp.locale,content,images:(activeSeo as any)?.images||activeProduct?.image_urls||[],whatsappPhone:String(whatsapp).replace(/\D/g,""),metaPixelId:preview?((activeSeo as any)?.meta_pixel_id||null):publishedPixel};
