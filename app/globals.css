@@ -3507,3 +3507,15 @@ input,textarea,select{border-color:#dfe3ea}input:focus,textarea:focus,select:foc
 @media(max-width:1050px){.dash-shell{grid-template-columns:218px minmax(0,1fr)!important}.dash-content{padding:26px 24px 42px!important}}
 @media(max-width:800px){.dash-shell{display:block!important}.dash-side{display:none!important}.dash-content{padding:18px 15px 34px!important}.dash-header{align-items:flex-start!important;gap:15px!important}.dash-header-actions{flex-wrap:wrap!important;justify-content:flex-end!important}.dash-header h1,.dash-header h2{font-size:24px!important}.dashboard-kpis{grid-template-columns:repeat(2,minmax(0,1fr))!important}}
 @media(max-width:520px){.dash-content{padding:15px 11px 30px!important}.dashboard-kpis{grid-template-columns:1fr!important}.dash-header{flex-direction:column!important}.dash-header-actions{width:100%!important;justify-content:flex-start!important}.dashboard-new{flex:1!important;text-align:center!important}}
+
+
+/* LandPro Saa full-width shell fix — 2026-10-01 */
+@media(min-width:801px){
+  .dash-shell{width:100%!important;max-width:none!important;grid-template-columns:248px minmax(0,1fr)!important}
+  .dash-content{width:100%!important;max-width:none!important;min-width:0!important;margin:0!important;padding-left:28px!important;padding-right:28px!important;box-sizing:border-box!important}
+  .dash-content>*,.dashboard-main-grid,.dashboard-bottom-grid,.dashboard-kpis,.pages-panel,.orders-panel,.analytics-panel,.products-panel,.settings-panel,.domains-panel{max-width:none!important}
+}
+@media(min-width:801px) and (max-width:1050px){
+  .dash-shell{grid-template-columns:218px minmax(0,1fr)!important}
+  .dash-content{padding-left:22px!important;padding-right:22px!important}
+}
