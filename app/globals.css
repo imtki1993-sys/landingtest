@@ -3535,3 +3535,18 @@ input,textarea,select{border-color:#dfe3ea}input:focus,textarea:focus,select:foc
 .pages-panel,.orders-panel,.analytics-panel,.products-panel,.settings-panel,.domains-panel{border:1px solid var(--lp-border)!important;border-radius:var(--lp-radius)!important;box-shadow:0 1px 3px rgba(16,24,40,.035)!important;background:#fff!important}.orders-table thead th{background:#fafbfc!important;color:#8993a4!important;font-size:9px!important;text-transform:uppercase!important;letter-spacing:.35px!important}.orders-table tbody td{font-size:10px!important;padding-top:10px!important;padding-bottom:10px!important}.analytics-kpis{gap:9px!important}.analytics-kpis article{border-radius:9px!important;box-shadow:none!important;padding:12px!important}.analytics-kpis article small{font-size:9px!important}.analytics-kpis article b{font-size:18px!important}
 @media(max-width:1150px) and (min-width:801px){.dash-shell{grid-template-columns:200px minmax(0,1fr)!important}.dashboard-kpis{grid-template-columns:repeat(3,minmax(0,1fr))!important}}
 @media(max-width:800px){.dashboard-main-grid{grid-template-columns:1fr!important}.dashboard-kpis{grid-template-columns:repeat(2,minmax(0,1fr))!important}}
+
+
+/* LandPro reference topbar + page composition */
+.dash-content{position:relative!important;padding-top:76px!important}
+.dash-content:before{content:"";position:absolute;left:0;right:0;top:0;height:54px;background:#fff;border-bottom:1px solid #eceef2;z-index:1}
+.dash-header{position:relative;z-index:2}
+.dash-header-actions{position:absolute!important;right:0!important;top:-61px!important;height:42px!important;z-index:4!important}
+.dash-header-actions:before{content:"⌕  Rechercher...";display:flex;align-items:center;width:220px;height:32px;padding:0 11px;border:1px solid #e5e8ee;border-radius:7px;background:#f8f9fb;color:#a0a8b5;font-size:10px;font-weight:500;box-sizing:border-box}
+.dash-header-actions:after{content:"♢";display:grid;place-items:center;width:32px;height:32px;border:1px solid #e5e8ee;border-radius:7px;background:#fff;color:#667085;font-size:13px;order:8}
+.dash-header-actions .avatar{order:9}.dash-header-actions .ghost-btn{order:10}.dash-header-actions .primary,.dash-header-actions .dashboard-new{position:absolute!important;right:0;top:58px;white-space:nowrap}
+.home-dashboard .dash-header-actions .primary{top:58px}
+.analytics-dashboard .analytics-filters{background:#fff;border:1px solid #e8ebf0;border-radius:8px;padding:5px!important;gap:5px!important;box-shadow:none!important}.analytics-dashboard .analytics-filters :is(select,input,button){min-height:30px!important;height:30px!important;font-size:9px!important;border-radius:6px!important}
+.pages-toolbar{min-height:46px!important;padding:10px 14px!important;border-bottom:1px solid #edf0f3!important}.pages-toolbar b{font-size:12px!important}.pages-toolbar span{font-size:9px!important;color:#98a1af!important}
+@media(max-width:1000px){.dash-header-actions:before{width:160px}.dash-header-actions .ghost-btn{display:none!important}}
+@media(max-width:800px){.dash-content{padding-top:18px!important}.dash-content:before{display:none}.dash-header-actions{position:static!important;height:auto!important}.dash-header-actions:before,.dash-header-actions:after{display:none!important}.dash-header-actions .primary,.dash-header-actions .dashboard-new{position:static!important}}
