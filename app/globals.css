@@ -4022,3 +4022,40 @@ html[data-theme="dark"] .orders-dashboard .orders-pagination button{
  border-color:#344258!important;
 }
 html[data-theme="dark"] .orders-dashboard .orders-pagination button:disabled{opacity:.45}
+
+
+/* Orders layout final fix — pagination belongs to panel, never becomes a white flex filler */
+@media(min-width:801px){
+ .orders-dashboard .orders-panel{
+   height:auto!important;
+   min-height:0!important;
+   max-height:none!important;
+   display:block!important;
+   overflow:visible!important;
+   background:transparent!important;
+ }
+ .orders-dashboard .orders-table-wrap{
+   height:calc(100vh - 360px)!important;
+   min-height:360px!important;
+   max-height:620px!important;
+   overflow:auto!important;
+   background:#111827!important;
+   border-radius:0!important;
+ }
+ .orders-dashboard .orders-pagination{
+   height:52px!important;
+   min-height:52px!important;
+   max-height:52px!important;
+   box-sizing:border-box!important;
+   margin:0!important;
+   padding:7px 12px!important;
+   overflow:hidden!important;
+   border-radius:0 0 10px 10px!important;
+ }
+}
+html[data-theme="dark"] .orders-dashboard .orders-panel,
+html[data-theme="dark"] .orders-dashboard .orders-pagination{
+ background:#111827!important;
+}
+html[data-theme="dark"] .orders-dashboard .orders-pagination span,
+html[data-theme="dark"] .orders-dashboard .orders-pagination small{color:#94a3b8!important}
