@@ -9,7 +9,7 @@ export async function GET(req:Request){try{
  const fetched=orders||[],hasMore=fetched.length>limit,base=hasMore?fetched.slice(0,limit):fetched,leadIds=[...new Set(base.map((o:any)=>o.lead_id).filter(Boolean))],productIds=[...new Set(base.map((o:any)=>o.product_id).filter(Boolean))],landingIds=[...new Set(base.map((o:any)=>o.landing_page_id).filter(Boolean))],storeIds=[...new Set(base.map((o:any)=>o.store_id).filter(Boolean))],carrierIds=[...new Set(base.map((o:any)=>o.delivery_company_id).filter(Boolean))];
  const [leadsQ,productsQ,landingsQ,storesQ,carriersQ]=await Promise.all([
   leadIds.length?supabase.from("leads").select("id,full_name,phone_raw,phone_e164,city_name,address,status,notes").eq("workspace_id",workspaceId).in("id",leadIds):Promise.resolve({data:[]}),
-  productIds.length?supabase.from("products").select("id,name").eq("workspace_id",workspaceId).in("id",productIds):Promise.resolve({data:[]}),
+  productIds.length?supabase.from("products").select("id,name,images").eq("workspace_id",workspaceId).in("id",productIds):Promise.resolve({data:[]}),
   landingIds.length?supabase.from("landing_pages").select("id,name,slug").eq("workspace_id",workspaceId).in("id",landingIds):Promise.resolve({data:[]}),
   storeIds.length?supabase.from("stores").select("id,name,slug").eq("workspace_id",workspaceId).in("id",storeIds):Promise.resolve({data:[]}),
   carrierIds.length?supabase.from("delivery_companies").select("id,name,code").eq("workspace_id",workspaceId).in("id",carrierIds):Promise.resolve({data:[]})
