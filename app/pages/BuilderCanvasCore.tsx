@@ -2,7 +2,7 @@
 import type {ReactNode} from "react";
 
 type Props={
- draft:any; editing:any; images:string[]; previewMode:"desktop"|"mobile"; selectedSection:string;
+ draft:any; editing:any; images:string[]; previewMode:"desktop"|"tablet"|"mobile"; selectedSection:string;
  setSelectedSection:(k:string)=>void; canvasStyle:(k:string)=>any; tools:(k:string)=>ReactNode;
  inlineText:(field:string,value:string)=>void;
  editListItem:(field:string,index:number,value:string)=>void;
