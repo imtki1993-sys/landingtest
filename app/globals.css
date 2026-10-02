@@ -3872,3 +3872,51 @@ html[data-theme="dark"] .dashboard-main :is(.dashboard-performance-grid>*,.dashb
 /* Shared headings that inherited near-black colors from legacy light rules */
 html[data-theme="dark"] .dash-content :is(.section-title,.panel-title,.card-title,.table-title){color:#f1f5f9!important}
 html[data-theme="dark"] .dash-content :is(.section-subtitle,.panel-subtitle,.card-subtitle){color:#94a3b8!important}
+
+
+/* Orders Dark Mode V4 — screenshot polish */
+html[data-theme="dark"] .orders-dashboard :is(.orders-table-shell,.orders-table-container,.orders-table-scroll,.orders-table-viewport,.orders-table-footer,.orders-table-bottom,.orders-panel-body){
+ background:#111827!important;
+ border-color:#253147!important;
+ color:#f1f5f9!important;
+}
+html[data-theme="dark"] .orders-dashboard .orders-table-wrap{
+ background:#111827!important;
+}
+html[data-theme="dark"] .orders-dashboard .orders-table-wrap::after{
+ background:#111827!important;
+}
+
+/* Keep operational warning rows visible without white blocks */
+html[data-theme="dark"] .orders-dashboard :is(.order-warning,.order-alert,.order-needs-action,.order-issue){
+ background:#2a2113!important;
+ color:#fbbf24!important;
+ border-color:#92400e!important;
+}
+html[data-theme="dark"] .orders-dashboard tr:has(.order-warning) td:first-child,
+html[data-theme="dark"] .orders-dashboard tr:has(.order-alert) td:first-child,
+html[data-theme="dark"] .orders-dashboard tr:has(.order-needs-action) td:first-child,
+html[data-theme="dark"] .orders-dashboard tr:has(.order-issue) td:first-child{
+ background:#2a2113!important;
+}
+
+/* Action buttons: dark neutral instead of white */
+html[data-theme="dark"] .orders-dashboard :is(.order-actions,.actions-cell) button,
+html[data-theme="dark"] .orders-dashboard td:last-child button{
+ background:#172033!important;
+ color:#e5e7eb!important;
+ border-color:#344258!important;
+ box-shadow:none!important;
+}
+html[data-theme="dark"] .orders-dashboard :is(.order-actions,.actions-cell) button:hover,
+html[data-theme="dark"] .orders-dashboard td:last-child button:hover{
+ background:#202b40!important;
+ border-color:#4b5d78!important;
+}
+
+/* Tracking controls remain compact and readable */
+html[data-theme="dark"] .orders-dashboard :is(.tracking-cell,.order-tracking) :is(input,button){
+ background:#172033!important;
+ color:#e5e7eb!important;
+ border-color:#344258!important;
+}
