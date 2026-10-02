@@ -1,0 +1,2 @@
+"use client";
+export default function SaaSTopbar(){return <div className="saas-topbar"><div className="saas-global-search"><span>⌕</span><input aria-label="Recherche globale" placeholder="Rechercher..."/></div><div className="saas-topbar-actions"><button type="button" className="saas-notification" aria-label="Notifications">♢<i></i></button><div className="saas-user"><div className="avatar">M</div><div><b>Mohamed</b><small>Pro Plan</small></div><span>⌄</span></div></div></div>}
