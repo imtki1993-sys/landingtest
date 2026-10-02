@@ -4099,3 +4099,39 @@ html[data-theme="dark"] .landing-card-media .status.draft,html[data-theme="dark"
 @media(max-width:650px){.landing-card-grid,.store-card-grid{grid-template-columns:1fr!important}.landing-library-tools{grid-template-columns:1fr!important}.landing-tabs{gap:16px!important;overflow-x:auto!important}.pages-dashboard>.dash-header,.store-library-page>.dash-header{align-items:flex-start!important}.landing-card-media,.store-card-media{height:190px!important}}
 
 .store-card-main-image{width:100%!important;height:100%!important;object-fit:cover!important;display:block!important}
+
+
+/* Analytics dark mode — remove remaining light surfaces */
+html[data-theme="dark"] .analytics-dashboard .analytics-kpis{
+ background:transparent!important;
+}
+html[data-theme="dark"] .analytics-dashboard .analytics-kpis article,
+html[data-theme="dark"] .analytics-dashboard .analytics-chart-card,
+html[data-theme="dark"] .analytics-dashboard .analytics-source-card,
+html[data-theme="dark"] .analytics-dashboard .pages-panel,
+html[data-theme="dark"] .analytics-dashboard .pages-toolbar{
+ background:#111827!important;
+ border-color:#253147!important;
+ color:#e5e7eb!important;
+}
+html[data-theme="dark"] .analytics-dashboard .analytics-chart-card .analytics-card-head b,
+html[data-theme="dark"] .analytics-dashboard .analytics-source-card .analytics-card-head b,
+html[data-theme="dark"] .analytics-dashboard .pages-toolbar b,
+html[data-theme="dark"] .analytics-dashboard .analytics-kpis b{
+ color:#f1f5f9!important;
+}
+html[data-theme="dark"] .analytics-dashboard .analytics-card-head small,
+html[data-theme="dark"] .analytics-dashboard .analytics-card-head>span,
+html[data-theme="dark"] .analytics-dashboard .pages-toolbar span,
+html[data-theme="dark"] .analytics-dashboard .analytics-kpis small,
+html[data-theme="dark"] .analytics-dashboard .analytics-kpis span{
+ color:#94a3b8!important;
+}
+html[data-theme="dark"] .analytics-dashboard .analytics-trend-chart{
+ border-color:#253147!important;
+ background-image:linear-gradient(to bottom,transparent calc(33.33% - 1px),#253147 33.33%,transparent calc(33.33% + 1px),transparent calc(66.66% - 1px),#253147 66.66%,transparent calc(66.66% + 1px))!important;
+}
+html[data-theme="dark"] .analytics-dashboard .analytics-table-wrap,
+html[data-theme="dark"] .analytics-dashboard .analytics-table{
+ background:#111827!important;
+}
