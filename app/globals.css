@@ -3920,3 +3920,59 @@ html[data-theme="dark"] .orders-dashboard :is(.tracking-cell,.order-tracking) :i
  color:#e5e7eb!important;
  border-color:#344258!important;
 }
+
+
+/* Orders Dark Mode V5 — exact DOM selectors from /orders */
+html[data-theme="dark"] .orders-dashboard .orders-table-wrap{
+ background:#111827!important;
+ border-color:#253147!important;
+ scrollbar-color:#64748b #111827!important;
+}
+html[data-theme="dark"] .orders-dashboard .orders-table-wrap::-webkit-scrollbar-track{background:#111827!important}
+html[data-theme="dark"] .orders-dashboard .orders-table-wrap::-webkit-scrollbar-corner{background:#111827!important}
+html[data-theme="dark"] .orders-dashboard .orders-table-wrap::-webkit-scrollbar-thumb{background:#64748b!important}
+
+/* Exact alert cell: the alert is inside the sticky second column */
+html[data-theme="dark"] .orders-dashboard .orders-table tr.order-needs-action td:nth-child(2){
+ background:#172033!important;
+ color:#f1f5f9!important;
+}
+html[data-theme="dark"] .orders-dashboard .orders-table tr.order-needs-action.warning td:nth-child(2){
+ box-shadow:inset 3px 0 #f59e0b!important;
+}
+html[data-theme="dark"] .orders-dashboard .orders-table tr.order-needs-action.danger td:nth-child(2){
+ box-shadow:inset 3px 0 #ef4444!important;
+}
+html[data-theme="dark"] .orders-dashboard .order-alert{
+ background:#2a2113!important;
+ color:#fbbf24!important;
+ border:1px solid #7c4a03!important;
+}
+
+/* Exact Actions control is a details/summary, not a button */
+html[data-theme="dark"] .orders-dashboard .order-action-menu summary{
+ background:#172033!important;
+ color:#e5e7eb!important;
+ border-color:#344258!important;
+}
+html[data-theme="dark"] .orders-dashboard .order-action-menu[open] summary,
+html[data-theme="dark"] .orders-dashboard .order-action-menu summary:hover{
+ background:#202b40!important;
+ border-color:#4b5d78!important;
+}
+html[data-theme="dark"] .orders-dashboard .order-action-list{
+ background:#111827!important;
+ border-color:#344258!important;
+ box-shadow:0 14px 30px rgba(0,0,0,.35)!important;
+}
+html[data-theme="dark"] .orders-dashboard .order-action-list :is(button,a){
+ background:#111827!important;
+ color:#e5e7eb!important;
+}
+html[data-theme="dark"] .orders-dashboard .order-action-list :is(button,a):hover{background:#202b40!important}
+html[data-theme="dark"] .orders-dashboard .order-action-list .order-delete{color:#f87171!important}
+
+/* Prevent the legacy sticky command/table wrappers from painting light gutters */
+html[data-theme="dark"] .orders-dashboard :is(.orders-panel,.orders-sticky-command,.orders-toolbar,.orders-filters,.orders-bulkbar,.orders-table){
+ border-color:#253147!important;
+}
