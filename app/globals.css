@@ -4027,3 +4027,21 @@ html[data-theme="dark"] .orders-dashboard .orders-pagination button:disabled{opa
 /* Orders sticky backdrop follows active theme only */
 html[data-theme="light"] .orders-sticky-command::before{background:#fff!important}
 html[data-theme="dark"] .orders-sticky-command::before{background:#0b1120!important}
+
+
+/* Orders status palette — identical in light and dark modes */
+.orders-dashboard .orders-table .confirmation-status.status-new{background:#eff6ff!important;border-color:#bfdbfe!important;color:#2563eb!important}
+.orders-dashboard .orders-table .confirmation-status.status-contacted{background:#fff7ed!important;border-color:#fed7aa!important;color:#c2410c!important}
+.orders-dashboard .orders-table .confirmation-status.status-confirmed{background:#ecfdf3!important;border-color:#bbf7d0!important;color:#15803d!important}
+.orders-dashboard .orders-table .confirmation-status.status-no_answer{background:#fff1f2!important;border-color:#fecdd3!important;color:#be123c!important}
+.orders-dashboard .orders-table .confirmation-status.status-call_back{background:#fefce8!important;border-color:#fde68a!important;color:#a16207!important}
+.orders-dashboard .orders-table .confirmation-status.status-cancelled{background:#fef2f2!important;border-color:#fecaca!important;color:#dc2626!important}
+.orders-dashboard .orders-table .delivery-status.status-pending{background:#f8fafc!important;border-color:#dbe3ec!important;color:#64748b!important}
+.orders-dashboard .orders-table .delivery-status.status-picked_up{background:#f5f3ff!important;border-color:#ddd6fe!important;color:#7c3aed!important}
+.orders-dashboard .orders-table .delivery-status.status-in_transit{background:#eff6ff!important;border-color:#bfdbfe!important;color:#2563eb!important}
+.orders-dashboard .orders-table .delivery-status.status-out_for_delivery{background:#fff7ed!important;border-color:#fed7aa!important;color:#c2410c!important}
+.orders-dashboard .orders-table .delivery-status.status-delivered{background:#ecfdf3!important;border-color:#bbf7d0!important;color:#15803d!important}
+.orders-dashboard .orders-table .delivery-status.status-failed{background:#fff1f2!important;border-color:#fecdd3!important;color:#be123c!important}
+.orders-dashboard .orders-table .delivery-status.status-returning{background:#fdf4ff!important;border-color:#f5d0fe!important;color:#a21caf!important}
+.orders-dashboard .orders-table .delivery-status.status-returned{background:#fef2f2!important;border-color:#fecaca!important;color:#dc2626!important}
+.orders-dashboard .orders-table .delivery-status.status-cancelled{background:#f1f5f9!important;border-color:#cbd5e1!important;color:#475569!important}
