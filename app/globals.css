@@ -3679,3 +3679,120 @@ html[data-theme="dark"] .orders-table tbody tr:hover td,html[data-theme="dark"] 
 html[data-theme="dark"] .landing-card-media,html[data-theme="dark"] .landing-placeholder{background:#172033!important}
 html[data-theme="dark"] .dash-side{background:#080f1d!important;border-color:#1e293b!important}
 html[data-theme="dark"] a{color:inherit}
+
+/* LandPro Dark Mode V2 — page-level surface harmonization */
+html[data-theme="dark"]{
+ --lp-dark-bg:#0b1120;--lp-dark-card:#111827;--lp-dark-card-2:#172033;
+ --lp-dark-border:#253147;--lp-dark-text:#f1f5f9;--lp-dark-muted:#94a3b8;
+}
+html[data-theme="dark"] .dash-content,
+html[data-theme="dark"] .dashboard-main,
+html[data-theme="dark"] .pages-main,
+html[data-theme="dark"] .stores-main,
+html[data-theme="dark"] .delivery-main,
+html[data-theme="dark"] .products-main,
+html[data-theme="dark"] .domains-main,
+html[data-theme="dark"] .analytics-main{background:var(--lp-dark-bg)!important;color:var(--lp-dark-text)!important}
+
+/* Common SaaS white surfaces */
+html[data-theme="dark"] :is(.kpi-card,.dashboard-kpi,.dashboard-panel,.dashboard-chart,.dashboard-status,.dashboard-recent,.dashboard-quick-actions,.performance-card,.stat-card,.summary-card,.store-card,.stores-panel,.store-create-panel,.carrier-card,.delivery-card,.products-panel,.product-card,.product-row,.domain-connect,.domain-card,.domains-panel,.analytics-kpi,.analytics-panel,.analytics-chart,.analytics-source-card,.analytics-table-panel,.messages-panel,.settings-panel,.settings-card,.account-card,.account-plan-card,.admin-clients-panel,.admin-client-kpis>*,.pages-panel,.landing-library,.landing-card){
+ background:var(--lp-dark-card)!important;border-color:var(--lp-dark-border)!important;color:var(--lp-dark-text)!important;box-shadow:none!important;
+}
+html[data-theme="dark"] :is(.kpi-card,.dashboard-kpi,.stat-card,.summary-card,.analytics-kpi) :is(b,strong,h2,h3,.value),
+html[data-theme="dark"] :is(.store-card,.carrier-card,.product-card,.product-row,.domain-card,.dashboard-panel,.analytics-panel) :is(b,strong,h2,h3){
+ color:var(--lp-dark-text)!important;
+}
+html[data-theme="dark"] :is(.kpi-card,.dashboard-kpi,.stat-card,.summary-card,.store-card,.carrier-card,.product-row,.domain-card,.analytics-kpi,.dashboard-panel,.analytics-panel) :is(p,small,.muted,.subtitle){
+ color:var(--lp-dark-muted)!important;
+}
+
+/* Dashboard */
+html[data-theme="dark"] .dashboard-kpis>*,
+html[data-theme="dark"] .dashboard-performance-grid>*,
+html[data-theme="dark"] .dashboard-bottom-grid>*{background:var(--lp-dark-card)!important;border-color:var(--lp-dark-border)!important;color:var(--lp-dark-text)!important}
+html[data-theme="dark"] .dashboard-kpis>* :is(b,strong){color:var(--lp-dark-text)!important}
+html[data-theme="dark"] .dashboard-kpis>* :is(span,small,p){color:var(--lp-dark-muted)!important}
+html[data-theme="dark"] .dashboard-recent-order{border-color:var(--lp-dark-border)!important}
+
+/* Orders */
+html[data-theme="dark"] .orders-panel,
+html[data-theme="dark"] .orders-sticky-command,
+html[data-theme="dark"] .orders-toolbar,
+html[data-theme="dark"] .orders-bulkbar{background:var(--lp-dark-card)!important;border-color:var(--lp-dark-border)!important}
+html[data-theme="dark"] .orders-toolbar-meta,
+html[data-theme="dark"] .orders-toolbar-meta>b{color:var(--lp-dark-text)!important}
+html[data-theme="dark"] .orders-toolbar-meta>span{background:var(--lp-dark-card-2)!important;color:var(--lp-dark-muted)!important}
+html[data-theme="dark"] .orders-table-wrap{background:var(--lp-dark-card)!important;border-color:var(--lp-dark-border)!important}
+html[data-theme="dark"] .orders-table tbody tr td{background:var(--lp-dark-card)!important}
+html[data-theme="dark"] .orders-table tbody tr:hover td{background:var(--lp-dark-card-2)!important}
+html[data-theme="dark"] .orders-table .order-warning,
+html[data-theme="dark"] .orders-table .order-alert{background:rgba(245,158,11,.12)!important;color:#fbbf24!important}
+
+/* Stores */
+html[data-theme="dark"] .stores-panel,
+html[data-theme="dark"] .stores-list,
+html[data-theme="dark"] .stores-grid,
+html[data-theme="dark"] .store-card,
+html[data-theme="dark"] .store-create-panel{background:var(--lp-dark-card)!important;border-color:var(--lp-dark-border)!important;color:var(--lp-dark-text)!important}
+html[data-theme="dark"] .store-card :is(h2,h3,b,strong){color:var(--lp-dark-text)!important}
+html[data-theme="dark"] .store-card :is(p,small,span){color:var(--lp-dark-muted)}
+html[data-theme="dark"] .store-card button:not(.primary){border-color:#3a465b!important}
+
+/* Delivery */
+html[data-theme="dark"] .carrier-grid>*,
+html[data-theme="dark"] .carrier-card,
+html[data-theme="dark"] .delivery-active,
+html[data-theme="dark"] .delivery-panel{background:var(--lp-dark-card)!important;border-color:var(--lp-dark-border)!important;color:var(--lp-dark-text)!important}
+html[data-theme="dark"] .carrier-card .carrier-logo{background:var(--lp-dark-card-2)!important;color:var(--lp-dark-text)!important}
+html[data-theme="dark"] .carrier-card :is(h3,b,strong){color:var(--lp-dark-text)!important}
+html[data-theme="dark"] .carrier-card :is(p,small){color:var(--lp-dark-muted)!important}
+
+/* Products */
+html[data-theme="dark"] .products-summary>*,
+html[data-theme="dark"] .products-panel,
+html[data-theme="dark"] .product-row,
+html[data-theme="dark"] .product-card{background:var(--lp-dark-card)!important;border-color:var(--lp-dark-border)!important;color:var(--lp-dark-text)!important}
+html[data-theme="dark"] .product-row :is(h3,b,strong){color:var(--lp-dark-text)!important}
+html[data-theme="dark"] .product-row :is(p,small,span:not(.badge)){color:var(--lp-dark-muted)}
+html[data-theme="dark"] .product-thumb{background:var(--lp-dark-card-2)!important}
+
+/* Domains */
+html[data-theme="dark"] .domain-connect,
+html[data-theme="dark"] .domain-connect-card,
+html[data-theme="dark"] .domains-panel,
+html[data-theme="dark"] .domain-card,
+html[data-theme="dark"] .domain-row{background:var(--lp-dark-card)!important;border-color:var(--lp-dark-border)!important;color:var(--lp-dark-text)!important}
+html[data-theme="dark"] .domain-card :is(h3,b,strong),html[data-theme="dark"] .domain-row :is(h3,b,strong){color:var(--lp-dark-text)!important}
+html[data-theme="dark"] .domain-card :is(p,small),html[data-theme="dark"] .domain-row :is(p,small){color:var(--lp-dark-muted)!important}
+
+/* Analytics */
+html[data-theme="dark"] .analytics-kpis>*,
+html[data-theme="dark"] .analytics-overview>*,
+html[data-theme="dark"] .analytics-panel,
+html[data-theme="dark"] .analytics-chart,
+html[data-theme="dark"] .analytics-source-card{background:var(--lp-dark-card)!important;border-color:var(--lp-dark-border)!important;color:var(--lp-dark-text)!important}
+html[data-theme="dark"] .analytics-kpis>* :is(b,strong,h3){color:var(--lp-dark-text)!important}
+html[data-theme="dark"] .analytics-kpis>* :is(p,small,span){color:var(--lp-dark-muted)}
+html[data-theme="dark"] .analytics-table-panel,
+html[data-theme="dark"] .analytics-table{background:var(--lp-dark-card)!important;border-color:var(--lp-dark-border)!important;color:var(--lp-dark-text)!important}
+html[data-theme="dark"] .analytics-table th{background:var(--lp-dark-card-2)!important;color:#b8c5d9!important;border-color:var(--lp-dark-border)!important}
+html[data-theme="dark"] .analytics-table td{background:var(--lp-dark-card)!important;color:#dbe4f0!important;border-color:var(--lp-dark-border)!important}
+
+/* Admin clients / subscription / settings / messages */
+html[data-theme="dark"] .admin-clients-toolbar,
+html[data-theme="dark"] .admin-clients-filters{background:var(--lp-dark-card)!important;border-color:var(--lp-dark-border)!important}
+html[data-theme="dark"] .admin-clients-table input,
+html[data-theme="dark"] .admin-clients-table select{background:var(--lp-dark-card-2)!important;border-color:#344258!important;color:var(--lp-dark-text)!important}
+html[data-theme="dark"] .messages-panel,
+html[data-theme="dark"] .account-card,
+html[data-theme="dark"] .account-plan-card,
+html[data-theme="dark"] .settings-card{background:var(--lp-dark-card)!important;border-color:var(--lp-dark-border)!important;color:var(--lp-dark-text)!important}
+
+/* Form surfaces and contrast, without recoloring semantic badges/buttons */
+html[data-theme="dark"] .dash-content :is(input:not([type="checkbox"]):not([type="radio"]),select,textarea){
+ background:#101a2c!important;border-color:#344258!important;color:var(--lp-dark-text)!important;
+}
+html[data-theme="dark"] .dash-content input::placeholder,
+html[data-theme="dark"] .dash-content textarea::placeholder{color:#718096!important}
+html[data-theme="dark"] .dash-content option{background:#101a2c;color:var(--lp-dark-text)}
+html[data-theme="dark"] .dash-content hr{border-color:var(--lp-dark-border)!important}
