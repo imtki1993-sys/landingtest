@@ -4,7 +4,7 @@ const money=(n:any)=>Number(n||0).toLocaleString("fr-MA",{maximumFractionDigits:
 const pct=(n:any)=>Number(n||0).toLocaleString("fr-MA",{maximumFractionDigits:1})+"%";
 export default function Home(){
  const [data,setData]=useState<any>(null),[error,setError]=useState("");
- useEffect(()=>{fetch("/api/dashboard",{cache:"no-store"}).then(async r=>{const x=await r.json();if(!r.ok)throw new Error(x.error||"Dashboard indisponible");setData(x)}).catch(e=>setError(e.message))},[]);
+ useEffect(()=>{fetch("/api/dashboard",{cache:"no-store"}).then(async r=>{const x=await r.json();if(!r.ok)throw new Error(x.error||"Dashboard indisponible");setData(x);fetch("/api/dashboard/analytics",{cache:"no-store"}).then(async ar=>{const ax=await ar.json();if(ar.ok)setData((d:any)=>({...d,totals:{...(d?.totals||{}),...(ax.totals||{})},topLandings:ax.topLandings||[]}))}).catch(()=>{})}).catch(e=>setError(e.message))},[]);
  async function logout(){await fetch("/api/auth/logout",{method:"POST"});window.location.href="/login"}
  const t=data?.totals||{},recent=data?.recentOrders||[],top=data?.topLandings||[];
  return <main className="dash-shell has-shared-topbar"><SaaSTopbar/><SaaSSidebar/>
