@@ -3976,3 +3976,23 @@ html[data-theme="dark"] .orders-dashboard .order-action-list .order-delete{color
 html[data-theme="dark"] .orders-dashboard :is(.orders-panel,.orders-sticky-command,.orders-toolbar,.orders-filters,.orders-bulkbar,.orders-table){
  border-color:#253147!important;
 }
+
+
+/* Orders layout V6 — remove artificial empty table floor */
+@media (min-width:901px){
+ html[data-theme="dark"] .orders-dashboard .orders-panel,
+ html[data-theme="light"] .orders-dashboard .orders-panel{
+   height:auto!important;
+   min-height:0!important;
+ }
+ html[data-theme="dark"] .orders-dashboard .orders-table-wrap,
+ html[data-theme="light"] .orders-dashboard .orders-table-wrap{
+   flex:0 1 auto!important;
+   min-height:0!important;
+   height:auto!important;
+   max-height:calc(100vh - 295px)!important;
+   overflow:auto!important;
+ }
+}
+html[data-theme="dark"] .orders-dashboard .orders-table-wrap{background:#111827!important}
+html[data-theme="dark"] .orders-dashboard .orders-panel{background:#111827!important}
