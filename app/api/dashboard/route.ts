@@ -7,7 +7,7 @@ export async function GET(req:Request){try{
   s.from("landing_pages").select("id",{count:"exact",head:true}).eq("workspace_id",workspaceId).is("archived_at",null).eq("status","PUBLISHED"),
   s.from("products").select("id",{count:"exact",head:true}).eq("workspace_id",workspaceId),
   s.from("orders").select("id,order_number,total,currency,shipment_status,tracking_number,created_at,lead_id,product_id,landing_page_id").eq("workspace_id",workspaceId).order("created_at",{ascending:false}).limit(6),
-  s.rpc("analytics_dashboard_aggregate",{p_workspace_id:workspaceId,p_from:epoch}),
+  s.rpc("analytics_dashboard_aggregate",{p_workspace_id:workspaceId,p_from:epoch,p_to:null,p_product_id:null}),
   s.rpc("workspace_plan_usage",{p_workspace_id:workspaceId})
  ]);
  if(landingsCountQ.error)throw landingsCountQ.error;if(publishedCountQ.error)throw publishedCountQ.error;if(productsQ.error)throw productsQ.error;if(recentOrdersQ.error)throw recentOrdersQ.error;if(analyticsQ.error)throw analyticsQ.error;
