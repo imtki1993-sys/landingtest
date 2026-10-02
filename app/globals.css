@@ -4022,3 +4022,8 @@ html[data-theme="dark"] .orders-dashboard .orders-pagination button{
  border-color:#344258!important;
 }
 html[data-theme="dark"] .orders-dashboard .orders-pagination button:disabled{opacity:.45}
+
+
+/* Orders sticky backdrop follows active theme only */
+html[data-theme="light"] .orders-sticky-command::before{background:#fff!important}
+html[data-theme="dark"] .orders-sticky-command::before{background:#0b1120!important}
