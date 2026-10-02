@@ -4097,3 +4097,5 @@ html[data-theme="dark"] .landing-card-media .status.draft,html[data-theme="dark"
 @media(max-width:1250px){.landing-card-grid,.store-card-grid{grid-template-columns:repeat(3,minmax(0,1fr))!important}}
 @media(max-width:950px){.landing-card-grid,.store-card-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}.landing-library-tools{grid-template-columns:1fr 120px 130px!important}}
 @media(max-width:650px){.landing-card-grid,.store-card-grid{grid-template-columns:1fr!important}.landing-library-tools{grid-template-columns:1fr!important}.landing-tabs{gap:16px!important;overflow-x:auto!important}.pages-dashboard>.dash-header,.store-library-page>.dash-header{align-items:flex-start!important}.landing-card-media,.store-card-media{height:190px!important}}
+
+.store-card-main-image{width:100%!important;height:100%!important;object-fit:cover!important;display:block!important}
