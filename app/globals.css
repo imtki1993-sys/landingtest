@@ -4283,3 +4283,18 @@ html:not([data-theme="dark"]) .orders-dashboard .orders-table td{background:#fff
 html:not([data-theme="dark"]) .orders-dashboard .orders-table tbody tr:hover td{background:#f8fbff!important}
 html:not([data-theme="dark"]) .orders-dashboard .orders-pagination{background:#fff!important;border-color:#dfe6ef!important;color:#53637a!important}
 html:not([data-theme="dark"]) .orders-dashboard .orders-pagination button{background:#fff!important;border-color:#d8e0eb!important;color:#26364d!important}
+
+
+/* Store Generator Pro V2 — Modern Glow Commerce */
+.store-pro-v2{background:#f8f9fc;overflow:hidden}
+.store-pro-v2:before,.store-pro-v2:after{content:"";position:fixed;width:520px;height:520px;border-radius:50%;filter:blur(180px);opacity:.14;pointer-events:none;z-index:0}
+.store-pro-v2:before{background:var(--pro-glow-pink);left:-260px;top:18vh}.store-pro-v2:after{background:var(--pro-glow-green);right:-260px;top:55vh}
+.store-pro-v2>*{position:relative;z-index:1}.store-pro-v2 .ps-header{width:min(calc(100% - 32px),var(--pro-container));margin:16px auto 0;border:1px solid rgba(24,24,26,.08);border-radius:18px;box-shadow:0 12px 40px rgba(24,24,26,.06);backdrop-filter:blur(18px)}
+.store-pro-v2 .ps-hero{width:min(calc(100% - 32px),var(--pro-container));margin:28px auto;border-radius:var(--pro-radius);overflow:hidden;min-height:560px;box-shadow:0 24px 70px rgba(24,24,26,.08)}
+.store-pro-v2 .ps-hero-content{max-width:620px}.store-pro-v2 .ps-hero-content h1{letter-spacing:-.045em;line-height:1.02}.store-pro-v2 .ps-hero-actions a{border-radius:999px;min-height:52px;padding-inline:24px}
+.store-pro-v2 .ps-categories,.store-pro-v2 .ps-catalog,.store-pro-v2 .ps-benchmark-benefits,.store-pro-v2 .ps-benchmark-about,.store-pro-v2 .ps-faq,.store-pro-v2 .ps-custom{width:min(calc(100% - 32px),var(--pro-container));margin-left:auto;margin-right:auto}
+.store-pro-v2 .ps-product-card{border-radius:var(--pro-radius);border:1px solid rgba(24,24,26,.07);background:rgba(255,255,255,.9);box-shadow:0 10px 35px rgba(24,24,26,.055);overflow:hidden;transition:transform .22s ease,box-shadow .22s ease}
+.store-pro-v2 .ps-product-card:hover{transform:translateY(-4px);box-shadow:0 20px 48px rgba(24,24,26,.1)}
+.store-pro-v2 .ps-product-card button{border-radius:999px;min-height:48px}.store-pro-v2 .ps-trust{width:min(calc(100% - 32px),var(--pro-container));margin:40px auto;border-radius:var(--pro-radius);background:#18181a;color:#fff;padding:26px}
+.store-pro-v2 .ps-faq details{background:rgba(255,255,255,.9);border:1px solid rgba(24,24,26,.08);border-radius:18px;margin-bottom:12px}
+@media(max-width:767px){.store-pro-v2 .ps-header{width:calc(100% - 20px);margin-top:10px;border-radius:14px}.store-pro-v2 .ps-hero{width:calc(100% - 20px);margin:14px auto;min-height:460px;border-radius:20px}.store-pro-v2 .ps-categories,.store-pro-v2 .ps-catalog,.store-pro-v2 .ps-benchmark-benefits,.store-pro-v2 .ps-benchmark-about,.store-pro-v2 .ps-faq,.store-pro-v2 .ps-custom,.store-pro-v2 .ps-trust{width:calc(100% - 20px)}}
