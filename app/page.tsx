@@ -1,4 +1,4 @@
-"use client";import Link from "next/link";import SaaSSidebar from "./components/SaaSSidebar";import {useEffect,useState} from "react";
+"use client";import Link from "next/link";import SaaSSidebar from "./components/SaaSSidebar";import SaaSTopbar from "./components/SaaSTopbar";import {useEffect,useState} from "react";
 const Icon=({children}:{children:string})=><span className="dash-icon">{children}</span>;
 const money=(n:any)=>Number(n||0).toLocaleString("fr-MA",{maximumFractionDigits:0})+" DH";
 const pct=(n:any)=>Number(n||0).toLocaleString("fr-MA",{maximumFractionDigits:1})+"%";
@@ -7,7 +7,7 @@ export default function Home(){
  useEffect(()=>{fetch("/api/dashboard",{cache:"no-store"}).then(async r=>{const x=await r.json();if(!r.ok)throw new Error(x.error||"Dashboard indisponible");setData(x)}).catch(e=>setError(e.message))},[]);
  async function logout(){await fetch("/api/auth/logout",{method:"POST"});window.location.href="/login"}
  const t=data?.totals||{},recent=data?.recentOrders||[],top=data?.topLandings||[];
- return <main className="dash-shell"><SaaSSidebar/>
+ return <main className="dash-shell has-shared-topbar"><SaaSTopbar/><SaaSSidebar/>
  <section className="dash-content home-dashboard"><header className="dash-header"><div><span className="eyebrow">LANDPRO · COD COMMERCE</span><h1>Dashboard</h1><p>Vue d’ensemble de votre activité COD.</p></div><div className="dash-header-actions"><Link href="/pages" className="primary dashboard-new">+ Nouvelle landing</Link><button type="button" className="ghost-btn" onClick={logout}>Déconnexion</button><span className="avatar">M</span></div></header>
  {error&&<div className="dash-error dashboard-error">{error}</div>}
  {!data?<div className="dashboard-loading">Chargement du dashboard…</div>:<>
