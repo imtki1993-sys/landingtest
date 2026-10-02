@@ -1,4 +1,4 @@
-"use client";import Link from "next/link";import {useEffect,useState} from "react";
+"use client";import Link from "next/link";import SaaSSidebar from "./components/SaaSSidebar";import {useEffect,useState} from "react";
 const Icon=({children}:{children:string})=><span className="dash-icon">{children}</span>;
 const money=(n:any)=>Number(n||0).toLocaleString("fr-MA",{maximumFractionDigits:0})+" DH";
 const pct=(n:any)=>Number(n||0).toLocaleString("fr-MA",{maximumFractionDigits:1})+"%";
@@ -7,7 +7,7 @@ export default function Home(){
  useEffect(()=>{fetch("/api/dashboard",{cache:"no-store"}).then(async r=>{const x=await r.json();if(!r.ok)throw new Error(x.error||"Dashboard indisponible");setData(x)}).catch(e=>setError(e.message))},[]);
  async function logout(){await fetch("/api/auth/logout",{method:"POST"});window.location.href="/login"}
  const t=data?.totals||{},recent=data?.recentOrders||[],top=data?.topLandings||[];
- return <main className="dash-shell"><aside className="dash-side"><div className="dash-brand"><div className="brand-mark">M</div><div><b>LandPro</b><small>COD COMMERCE</small></div></div><nav className="dash-nav"><Link className="active" href="/">⌂ Dashboard</Link><Link href="/pages">▣ Landing Pages</Link><Link href="/stores">▦ Stores</Link><Link href="/orders">◎ Commandes</Link><Link href="/messages">✉ Messages</Link><Link href="/delivery">🚚 Livraison</Link><Link href="/products">◇ Mes produits</Link><Link href="/domains">⌁ Domaines</Link><Link href="/analytics">↗ Analytics</Link><Link href="/settings">⚙ Paramètres</Link>{data?.isPlatformAdmin&&<Link href="/admin/clients">♙ Clients SaaS</Link>}</nav></aside>
+ return <main className="dash-shell"><SaaSSidebar/>
  <section className="dash-content home-dashboard"><header className="dash-header"><div><span className="eyebrow">LANDPRO · COD COMMERCE</span><h1>Dashboard</h1><p>Vue d’ensemble de votre activité COD.</p></div><div className="dash-header-actions"><Link href="/pages" className="primary dashboard-new">+ Nouvelle landing</Link><button type="button" className="ghost-btn" onClick={logout}>Déconnexion</button><span className="avatar">M</span></div></header>
  {error&&<div className="dash-error dashboard-error">{error}</div>}
  {!data?<div className="dashboard-loading">Chargement du dashboard…</div>:<>
