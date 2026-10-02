@@ -3796,3 +3796,79 @@ html[data-theme="dark"] .dash-content input::placeholder,
 html[data-theme="dark"] .dash-content textarea::placeholder{color:#718096!important}
 html[data-theme="dark"] .dash-content option{background:#101a2c;color:var(--lp-dark-text)}
 html[data-theme="dark"] .dash-content hr{border-color:var(--lp-dark-border)!important}
+
+
+/* LandPro Dark Mode V3 — screenshot-verified hard surface cleanup */
+html[data-theme="dark"] .dash-content :is(
+ .dashboard-performance,.dashboard-performance-card,.dashboard-landings-performance,.dashboard-performance-stats,
+ .landing-library-head,.landing-list-head,.landing-grid-head,
+ .orders-command-center,.orders-filters-wrap,.orders-actions-bar,
+ .stores-list-panel,.stores-section,.stores-list-head,.store-item,.store-quick-create,
+ .delivery-active,.delivery-active-panel,.delivery-active-list,.carrier-active-list,
+ .products-summary-card,.products-list,.products-list-head,.catalog-panel,.catalog-head,
+ .domains-list,.domains-list-head,.domain-list-panel,
+ .analytics-kpi-grid,.analytics-kpi-row,.analytics-filters,.analytics-evolution,.analytics-performance,
+ .analytics-performance-panel,.analytics-table-head
+){background:#111827!important;border-color:#253147!important;color:#f1f5f9!important;box-shadow:none!important}
+
+/* Any direct white article/card surfaces in the affected business grids */
+html[data-theme="dark"] :is(.stores-main,.delivery-main,.products-main,.domains-main,.analytics-main,.pages-main) :is(section,article)>:is(.card,.panel){
+ background:#111827!important;border-color:#253147!important;color:#f1f5f9!important;
+}
+
+/* Landing library header + cards */
+html[data-theme="dark"] .landing-library :is(header,.landing-library-header,.landing-section-title){
+ background:#111827!important;border-color:#253147!important;color:#f1f5f9!important;
+}
+html[data-theme="dark"] .landing-library-tools :is(input,select){background:#101a2c!important;color:#f1f5f9!important;border-color:#344258!important}
+
+/* Orders: eliminate the remaining light command/filter/action strips */
+html[data-theme="dark"] .orders-dashboard :is(.orders-panel,.orders-sticky-command,.orders-toolbar,.orders-bulkbar,.orders-filters,.orders-table-wrap){
+ background:#111827!important;border-color:#253147!important;color:#f1f5f9!important;
+}
+html[data-theme="dark"] .orders-dashboard .orders-bulkbar button:not([class*="primary"]):not([class*="ozon"]){
+ background:#172033!important;border-color:#344258!important;color:#e5e7eb!important;
+}
+
+/* Stores: list container, cards and quick creation area */
+html[data-theme="dark"] .stores-main :is(.stores-panel,.stores-list,.stores-grid,.store-card,.store-row,.store-create-panel,.store-create-card){
+ background:#111827!important;border-color:#253147!important;color:#f1f5f9!important;
+}
+html[data-theme="dark"] .stores-main :is(.stores-panel,.stores-list,.store-create-panel) :is(header,.section-head){
+ background:#111827!important;border-color:#253147!important;color:#f1f5f9!important;
+}
+
+/* Delivery: active carriers list */
+html[data-theme="dark"] .delivery-main :is(.delivery-active,.delivery-panel,.active-carriers,.active-carriers-list,.active-carrier-row){
+ background:#111827!important;border-color:#253147!important;color:#f1f5f9!important;
+}
+
+/* Products: KPI cards + catalogue rows */
+html[data-theme="dark"] .products-main :is(.products-summary>*,.products-panel,.products-list,.products-list-head,.product-row,.product-card){
+ background:#111827!important;border-color:#253147!important;color:#f1f5f9!important;
+}
+html[data-theme="dark"] .products-main .product-row :is(button,a):not(.primary){
+ border-color:#344258!important;
+}
+
+/* Domains: connected domains panel */
+html[data-theme="dark"] .domains-main :is(.domain-connect,.domains-panel,.domains-list,.domains-list-head,.domain-row,.domain-card){
+ background:#111827!important;border-color:#253147!important;color:#f1f5f9!important;
+}
+
+/* Analytics: KPI background, chart canvas and performance table */
+html[data-theme="dark"] .analytics-main :is(.analytics-kpis,.analytics-kpis>*,.analytics-overview>*,.analytics-panel,.analytics-chart,.analytics-source-card,.analytics-table-panel,.analytics-table-wrap){
+ background:#111827!important;border-color:#253147!important;color:#f1f5f9!important;
+}
+html[data-theme="dark"] .analytics-main svg :is(.grid-line,.axis-line){stroke:#334155!important}
+html[data-theme="dark"] .analytics-main :is(.analytics-table,.analytics-table tbody,.analytics-table tr){background:#111827!important}
+html[data-theme="dark"] .analytics-main .analytics-table tbody tr:hover td{background:#172033!important}
+
+/* Dashboard performance mini-cards */
+html[data-theme="dark"] .dashboard-main :is(.dashboard-performance-grid>*,.dashboard-bottom-grid>*,.performance-card,.performance-stat){
+ background:#111827!important;border-color:#253147!important;color:#f1f5f9!important;
+}
+
+/* Shared headings that inherited near-black colors from legacy light rules */
+html[data-theme="dark"] .dash-content :is(.section-title,.panel-title,.card-title,.table-title){color:#f1f5f9!important}
+html[data-theme="dark"] .dash-content :is(.section-subtitle,.panel-subtitle,.card-subtitle){color:#94a3b8!important}
