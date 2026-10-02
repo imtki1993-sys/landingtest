@@ -4188,3 +4188,29 @@ html[data-theme="dark"] .product-catalog-tools select{background:#111827!importa
 html[data-theme="dark"] .orders-dashboard .orders-summary-v2>span,html[data-theme="dark"] .orders-dashboard .orders-reset-filters,html[data-theme="dark"] .orders-dashboard .orders-pagination{background:#111827!important;border-color:#253147!important;color:#e5e7eb!important}
 @media(max-width:1450px){.orders-dashboard .orders-summary-v2{grid-template-columns:repeat(3,1fr)!important}.orders-dashboard .orders-filters{grid-template-columns:minmax(250px,1fr) repeat(3,minmax(130px,.55fr))!important}.orders-dashboard .orders-date-range{grid-column:1/3!important}.orders-dashboard .orders-reset-filters{grid-column:auto!important}}
 @media(max-width:900px){.orders-dashboard .orders-summary-v2{grid-template-columns:repeat(2,1fr)!important}.orders-dashboard .orders-filters{grid-template-columns:1fr!important}.orders-dashboard .orders-date-range,.orders-dashboard .orders-reset-filters{grid-column:auto!important}.orders-dashboard .orders-toolbar-meta{min-width:0!important}}
+
+
+/* Orders UI V3 — screenshot correction: clean 3-row command center */
+.orders-dashboard .orders-add-btn-v2,
+.orders-dashboard .dash-header .orders-add-btn-v2{background:#2563eb!important;background-image:none!important;border-color:#2563eb!important;color:#fff!important}
+.orders-dashboard .orders-toolbar{display:flex!important;flex-direction:column!important;align-items:stretch!important;gap:8px!important;padding:9px 10px!important}
+.orders-dashboard .orders-toolbar-meta{width:100%!important;min-width:0!important;display:flex!important;align-items:center!important;gap:8px!important;flex-wrap:nowrap!important}
+.orders-dashboard .orders-toolbar-meta>b{margin-right:auto!important}
+.orders-dashboard .orders-toolbar-meta>span{white-space:nowrap!important}
+.orders-dashboard .orders-toolbar-meta>label{white-space:nowrap!important}
+.orders-dashboard .orders-view-toggle{flex:0 0 auto!important}
+.orders-dashboard .orders-filters{width:100%!important;display:grid!important;grid-template-columns:minmax(300px,1.65fr) repeat(4,minmax(125px,.72fr)) minmax(230px,1fr) auto!important;gap:6px!important;align-items:center!important}
+.orders-dashboard .orders-search{min-width:0!important}.orders-dashboard .orders-search input{max-width:none!important;width:100%!important}
+.orders-dashboard .orders-date-range{display:grid!important;grid-template-columns:1fr 1fr!important;grid-column:auto!important;gap:6px!important}
+.orders-dashboard .orders-reset-filters{grid-column:auto!important}
+.orders-dashboard .orders-bulkbar{height:46px!important;min-height:46px!important;margin:0!important;padding:6px 10px!important;border-radius:0!important}
+.orders-dashboard .orders-bulk-select,.orders-dashboard .orders-bulk-actions{display:flex!important;align-items:center!important;gap:6px!important}
+.orders-dashboard .orders-bulk-actions{margin-left:auto!important}
+.orders-dashboard .orders-table-wrap{border-radius:0!important}
+.orders-dashboard .orders-pagination{min-height:44px!important;max-height:48px!important;margin:0!important;padding:6px 10px!important;border-radius:0 0 10px 10px!important}
+.orders-dashboard .orders-table th:nth-child(7),.orders-dashboard .orders-table td:nth-child(7){min-width:135px!important;max-width:160px!important}
+.orders-dashboard .orders-table th:nth-child(8),.orders-dashboard .orders-table td:nth-child(8){min-width:235px!important;max-width:285px!important}
+.orders-dashboard .order-alert{max-width:105px!important;overflow:hidden!important;text-overflow:ellipsis!important;white-space:nowrap!important}
+.orders-dashboard .order-alert:hover{max-width:none!important}
+@media(max-width:1500px){.orders-dashboard .orders-filters{grid-template-columns:minmax(280px,1.4fr) repeat(4,minmax(115px,.65fr))!important}.orders-dashboard .orders-date-range{grid-column:1/3!important}.orders-dashboard .orders-reset-filters{grid-column:3!important}}
+@media(max-width:1050px){.orders-dashboard .orders-toolbar-meta{flex-wrap:wrap!important}.orders-dashboard .orders-filters{grid-template-columns:1fr 1fr!important}.orders-dashboard .orders-date-range,.orders-dashboard .orders-reset-filters{grid-column:auto!important}.orders-dashboard .orders-bulkbar{height:auto!important;flex-wrap:wrap!important}.orders-dashboard .orders-bulk-actions{margin-left:0!important}}
