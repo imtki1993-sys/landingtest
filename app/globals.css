@@ -4343,3 +4343,14 @@ html:not([data-theme="dark"]) .orders-dashboard .orders-pagination button{backgr
 
 
 .landing-card-title-menu{position:relative}.landing-card-title-menu>summary{list-style:none;cursor:pointer;display:grid;place-items:center;min-width:42px;height:42px;border:1px solid var(--dash-border,#334155);border-radius:12px;font-weight:900;user-select:none}.landing-card-title-menu>summary::-webkit-details-marker{display:none}.landing-card-title-menu[open]>summary{background:rgba(99,102,241,.12)}.landing-card-title-menu>div{position:absolute;right:0;top:calc(100% + 8px);z-index:30;min-width:180px;padding:7px;background:var(--dash-card,#fff);border:1px solid var(--dash-border,#e5e7eb);border-radius:12px;box-shadow:0 16px 40px rgba(15,23,42,.18);display:grid;gap:3px}.landing-card-title-menu>div button{width:100%;text-align:left;padding:10px 12px;border:0;border-radius:8px;background:transparent;cursor:pointer}.landing-card-title-menu>div button:hover{background:rgba(100,116,139,.1)}
+
+
+/* Landing card action menus: keep dropdowns visible inside the library grid */
+.landing-library-reference .landing-card{overflow:visible!important}
+.landing-library-reference .landing-card-media{overflow:hidden;border-radius:inherit}
+.landing-library-reference .landing-card-body{overflow:visible!important;position:relative;z-index:2}
+.landing-library-reference .landing-card-actions{overflow:visible!important;position:relative}
+.landing-library-reference .landing-card-actions>details{position:relative;z-index:40}
+.landing-library-reference .landing-card-actions>details>summary{cursor:pointer}
+.landing-library-reference .landing-card-actions>details>div{position:absolute!important;right:0!important;bottom:calc(100% + 8px)!important;top:auto!important;z-index:100!important;min-width:180px!important;max-height:none!important;overflow:visible!important}
+.landing-library-reference .landing-card-title-menu{z-index:50}
