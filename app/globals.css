@@ -4152,3 +4152,21 @@ html[data-theme="dark"] .product-kpis article,html[data-theme="dark"] .product-c
 html[data-theme="dark"] .product-catalog-tools select{background:#111827!important;border-color:#253147!important;color:#e5e7eb!important}
 @media(max-width:1100px){.product-kpis{grid-template-columns:repeat(2,1fr)}.delivery-dashboard .carrier-grid-pro{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:700px){.product-kpis{grid-template-columns:1fr 1fr}.product-catalog-tools{grid-template-columns:1fr}.delivery-dashboard .carrier-grid-pro{grid-template-columns:1fr}.delivery-mini-kpis{grid-template-columns:1fr}.delivery-dashboard .carrier-choice{grid-template-columns:38px 1fr}.delivery-dashboard .carrier-choice>button{grid-column:1/-1}.products-catalog-dashboard>.dash-header{align-items:flex-start}}
+
+
+/* Orders semantic selects — same status colors in light and dark */
+.orders-dashboard .orders-table select.confirmation-status.status-new{background:#dbeafe!important;border-color:#93c5fd!important;color:#1d4ed8!important}
+.orders-dashboard .orders-table select.confirmation-status.status-contacted{background:#ffedd5!important;border-color:#fdba74!important;color:#c2410c!important}
+.orders-dashboard .orders-table select.confirmation-status.status-confirmed{background:#dcfce7!important;border-color:#86efac!important;color:#15803d!important}
+.orders-dashboard .orders-table select.confirmation-status.status-no_answer{background:#ffe4e6!important;border-color:#fda4af!important;color:#be123c!important}
+.orders-dashboard .orders-table select.confirmation-status.status-call_back{background:#fef3c7!important;border-color:#fcd34d!important;color:#a16207!important}
+.orders-dashboard .orders-table select.confirmation-status.status-cancelled{background:#fee2e2!important;border-color:#fca5a5!important;color:#b91c1c!important}
+.orders-dashboard .orders-table select.delivery-status.status-pending{background:#e2e8f0!important;border-color:#cbd5e1!important;color:#475569!important}
+.orders-dashboard .orders-table select.delivery-status.status-picked_up{background:#ede9fe!important;border-color:#c4b5fd!important;color:#6d28d9!important}
+.orders-dashboard .orders-table select.delivery-status.status-in_transit{background:#dbeafe!important;border-color:#93c5fd!important;color:#1d4ed8!important}
+.orders-dashboard .orders-table select.delivery-status.status-out_for_delivery{background:#ffedd5!important;border-color:#fdba74!important;color:#c2410c!important}
+.orders-dashboard .orders-table select.delivery-status.status-delivered{background:#dcfce7!important;border-color:#86efac!important;color:#15803d!important}
+.orders-dashboard .orders-table select.delivery-status.status-failed{background:#ffe4e6!important;border-color:#fda4af!important;color:#be123c!important}
+.orders-dashboard .orders-table select.delivery-status.status-returning{background:#fae8ff!important;border-color:#e879f9!important;color:#a21caf!important}
+.orders-dashboard .orders-table select.delivery-status.status-returned{background:#fee2e2!important;border-color:#fca5a5!important;color:#b91c1c!important}
+.orders-dashboard .orders-table select.delivery-status.status-cancelled{background:#e5e7eb!important;border-color:#cbd5e1!important;color:#374151!important}
