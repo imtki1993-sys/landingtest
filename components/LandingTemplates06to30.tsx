@@ -47,9 +47,9 @@ export default function LandingTemplates06to30({data,preview=false,onSubmit}:P){
  const price=<div className="v46-price"><b>{data.price} DH</b>{data.oldPrice&&<del>{data.oldPrice} DH</del>}</div>;
  const heroMedia=img(0,"hero-media");
  const hero=<section className={"v46-hero hero-"+s.hero}>
-   {(data.templateId==="auto-gear"||data.templateId==="tech-gadget")&&<div className="v46-mobile-hero-media">{heroMedia}</div>}
+   {(data.templateId==="auto-gear"||data.templateId==="tech-gadget"||data.templateId==="video-first")&&<div className="v46-mobile-hero-media">{heroMedia}</div>}
    <div className="v46-hero-copy"><small>{s.eyebrow}</small><h1>{headline}</h1><p>{sub}</p>{price}<a href="#order" className="v46-primary">{data.templateId==="whatsapp-commerce"?"Commander sur WhatsApp":(c.cta||(rtl?"اطلب الآن":"Commander maintenant"))}</a><div className="v46-mini-trust">✓ Paiement à la livraison　✓ Livraison Maroc</div></div>
-   <div className={(data.templateId==="auto-gear"||data.templateId==="tech-gadget")?"v46-desktop-hero-media":""}>{heroMedia}</div>
+   <div className={(data.templateId==="auto-gear"||data.templateId==="tech-gadget"||data.templateId==="video-first")?"v46-desktop-hero-media":""}>{heroMedia}</div>
    {s.hero==="offer"&&<aside><b>{rtl?"عرض اليوم":"OFFRE DU JOUR"}</b><span>{data.oldPrice?Math.max(0,Math.round((1-Number(data.price)/Number(data.oldPrice))*100))+"%":"COD"}</span><small>{rtl?"خلص حتى يوصلك":"Payez à la livraison"}</small></aside>}
  </section>;
  const cards=(items:any[],kind:string)=><section className={"v46-cards "+kind}><div className="v46-section-head"><small>{kind.toUpperCase()}</small><h2>{kind==="benefits"?"Pourquoi vous allez l'aimer":"Tout ce qu'il vous faut"}</h2></div><div>{items.map((x:any,i:number)=><article key={i}><i>{String(i+1).padStart(2,"0")}</i><b>{typeof x==="string"?x:x?.title||x?.text}</b><p>{typeof x==="object"?x?.text:"Un avantage clair, utile et facile à comprendre."}</p></article>)}</div></section>;
