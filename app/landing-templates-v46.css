@@ -40,3 +40,31 @@
  }
  .template-minimal-clean .v46-hero.hero-center .v46-hero-copy{max-width:820px;margin:0 auto}
 }
+
+
+/* Minimal Clean desktop v2 — do not force product photos into a fixed 460px crop */
+@media(min-width:901px){
+ .template-minimal-clean .v46-hero.hero-center .hero-media{
+   width:min(100%,920px)!important;
+   height:auto!important;
+   min-height:0!important;
+   aspect-ratio:auto!important;
+   padding:0!important;
+   overflow:visible!important;
+   background:transparent!important;
+   border:0!important;
+   border-radius:0!important
+ }
+ .template-minimal-clean .v46-hero.hero-center .hero-media img{
+   display:block!important;
+   width:auto!important;
+   height:auto!important;
+   max-width:100%!important;
+   max-height:620px!important;
+   margin:0 auto!important;
+   padding:0!important;
+   object-fit:contain!important;
+   object-position:center!important;
+   border-radius:18px
+ }
+}
