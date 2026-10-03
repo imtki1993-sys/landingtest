@@ -360,3 +360,71 @@
  .landing-v4-runtime:not(.v4-builder-preview) .template-auto-gear .v46-hero.hero-media>.v46-hero-copy{display:block!important;visibility:visible!important;opacity:1!important;order:1!important;width:100%!important;position:relative!important}
  .landing-v4-runtime:not(.v4-builder-preview) .template-auto-gear .v46-desktop-hero-media{display:none!important}
 }
+
+
+/* V4.8 — responsive typography contract for templates 06-30 */
+.v46{
+ --hero-title-size:clamp(48px,4.6vw,72px);
+ --hero-subtitle-size:17px;
+ --section-title-size:36px;
+ --card-title-size:17px;
+ --body-size:15px;
+ --price-size:31px;
+ --cta-size:14px;
+ --nav-size:13px;
+}
+.v46 .v46-hero h1{font-size:var(--hero-title-size)!important}
+.v46 .v46-hero p{font-size:var(--hero-subtitle-size)!important}
+.v46 .v46-section-head h2{font-size:var(--section-title-size)!important}
+.v46 .v46-cards article b{font-size:var(--card-title-size)!important}
+.v46 .v46-price b{font-size:var(--price-size)!important}
+.v46 .v46-primary{font-size:var(--cta-size)!important}
+.v46>header nav a{font-size:var(--nav-size)!important}
+@media(min-width:701px) and (max-width:900px){
+ .landing-v4-runtime:not(.v4-builder-preview) .v46{
+  --hero-title-size:clamp(42px,6vw,54px);
+  --hero-subtitle-size:16px;
+  --section-title-size:32px;
+  --card-title-size:16px;
+  --body-size:14px;
+  --price-size:30px;
+  --cta-size:13px;
+  --nav-size:12px
+ }
+}
+.v4-frame.tablet .v46{
+ --hero-title-size:50px;
+ --hero-subtitle-size:16px;
+ --section-title-size:32px;
+ --card-title-size:16px;
+ --body-size:14px;
+ --price-size:30px;
+ --cta-size:13px;
+ --nav-size:12px
+}
+@media(max-width:700px){
+ .landing-v4-runtime:not(.v4-builder-preview) .v46{
+  --hero-title-size:clamp(34px,10vw,42px);
+  --hero-subtitle-size:16px;
+  --section-title-size:30px;
+  --card-title-size:16px;
+  --body-size:14px;
+  --price-size:34px;
+  --cta-size:14px;
+  --nav-size:12px
+ }
+}
+.v4-frame.mobile .v46{
+ --hero-title-size:38px;
+ --hero-subtitle-size:16px;
+ --section-title-size:30px;
+ --card-title-size:16px;
+ --body-size:14px;
+ --price-size:34px;
+ --cta-size:14px;
+ --nav-size:12px
+}
+/* Long Arabic/French product names must wrap without overflowing any device. */
+.v46 .v46-hero h1,.v46 .v46-section-head h2,.v46 .v46-cards article b{
+ max-width:100%;overflow-wrap:break-word;word-break:normal
+}
