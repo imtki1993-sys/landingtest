@@ -19,3 +19,20 @@
 
 .bv3-gallery-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px;border:1px solid #bfdbfe;border-radius:14px;background:#eff6ff}
 .bv3-gallery-head>div{display:grid;gap:4px}.bv3-gallery-head b{font-size:15px}.bv3-gallery-head span{font-size:12px;color:#475569}.bv3-gallery-count{white-space:nowrap;padding:6px 9px;border-radius:999px;background:#fff;color:#1d4ed8!important;font-weight:800}
+
+
+/* Builder V3 v4.5 — keep the simulated viewport exact.
+   The editor column may be narrower than Tablet/Desktop; scroll the stage
+   instead of shrinking the runtime, so preview breakpoints stay truthful. */
+.bv3-stage{display:block!important;min-width:0;overflow:auto!important}
+.bv3-device-scroll{width:100%;min-width:0;overflow:visible;display:flex;justify-content:center;align-items:flex-start}
+.bv3-device-frame{flex:0 0 auto!important;max-width:none!important;min-width:0;overflow:hidden}
+.bv3-stage.desktop .bv3-device-frame{width:1440px!important}
+.bv3-stage.tablet .bv3-device-frame{width:768px!important}
+.bv3-stage.mobile .bv3-device-frame{width:390px!important}
+.bv3-stage.desktop .bv3-runtime-preview,
+.bv3-stage.tablet .bv3-runtime-preview,
+.bv3-stage.mobile .bv3-runtime-preview{width:100%!important;max-width:none!important;min-width:0}
+@media(max-width:1500px){
+  .bv3-device-scroll{justify-content:flex-start}
+}
