@@ -135,3 +135,14 @@
  .landing-v4-runtime:not(.v4-builder-preview) .template-auto-gear .v46-auto-mobile-media>.hero-media img{display:block!important;width:100%!important;height:100%!important;object-fit:contain!important;padding:10px!important}
  .landing-v4-runtime:not(.v4-builder-preview) .template-auto-gear .v46-auto-desktop-media{display:none!important}
 }
+
+
+/* Auto Gear mobile final order: header stays, then PHOTO, then the complete original hero text */
+.v4-frame.mobile .template-auto-gear .v46-hero.hero-media>.v46-auto-mobile-media{order:-20!important}
+.v4-frame.mobile .template-auto-gear .v46-hero.hero-media>.v46-hero-copy{order:-10!important;display:block!important;visibility:visible!important;opacity:1!important}
+.v4-frame.mobile .template-auto-gear .v46-hero.hero-media>.v46-auto-desktop-media{display:none!important}
+@media(max-width:700px){
+ .landing-v4-runtime:not(.v4-builder-preview) .template-auto-gear .v46-hero.hero-media>.v46-auto-mobile-media{order:-20!important}
+ .landing-v4-runtime:not(.v4-builder-preview) .template-auto-gear .v46-hero.hero-media>.v46-hero-copy{order:-10!important;display:block!important;visibility:visible!important;opacity:1!important}
+ .landing-v4-runtime:not(.v4-builder-preview) .template-auto-gear .v46-hero.hero-media>.v46-auto-desktop-media{display:none!important}
+}
