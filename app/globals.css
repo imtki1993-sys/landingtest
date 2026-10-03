@@ -4448,3 +4448,14 @@ html:not([data-theme="dark"]) .orders-dashboard .orders-pagination button{backgr
 @media(max-width:900px){.v4-showcase{grid-template-columns:1fr}.v4-showcase aside{position:relative;height:auto;max-height:340px}.v4-stage{min-width:0;padding:14px}.v4-toolbar{gap:12px;align-items:flex-start;flex-direction:column}.v4-toolbar>div:last-child{display:flex;flex-wrap:wrap}.landing-create-v4-frame{max-height:68vh}}
 /* Public V4 uses browser breakpoints but reuses exact device rules by applying equivalent layout */
 @media(max-width:900px) and (min-width:701px){.landing-v4-runtime:not(.v4-builder-preview) .v4-demo header nav{display:none}.landing-v4-runtime:not(.v4-builder-preview) .v4-hero{grid-template-columns:1fr 1fr;min-height:auto;padding:38px 24px;gap:28px}.landing-v4-runtime:not(.v4-builder-preview) .v4-copy h1{font-size:46px}.landing-v4-runtime:not(.v4-builder-preview) .v4-product{height:340px}.landing-v4-runtime:not(.v4-builder-preview) .v4-story{padding:48px 28px;gap:28px}.landing-v4-runtime:not(.v4-builder-preview) .v4-order-section{grid-template-columns:minmax(0,1fr) minmax(330px,390px);gap:24px;padding:44px 28px}}
+
+
+/* V4 isolation: prevent legacy dashboard element selectors (main/section/header) from breaking landing layouts */
+main.v4-demo{display:block!important;grid-template-columns:none!important;width:100%!important;max-width:none!important;min-width:0!important;min-height:100vh;margin:0!important;padding:0!important;overflow-x:hidden}
+main.v4-demo>section{width:100%;box-sizing:border-box}
+main.v4-demo>header{margin-bottom:0}
+.v4-frame.mobile main.v4-demo,.v4-frame.tablet main.v4-demo,.v4-frame.desktop main.v4-demo{display:block!important}
+.v4-frame.mobile main.v4-demo>*,.v4-frame.tablet main.v4-demo>*,.v4-frame.desktop main.v4-demo>*{min-width:0;max-width:100%}
+.v4-frame.mobile .v4-hero,.v4-frame.mobile .v4-benefits,.v4-frame.mobile .v4-story,.v4-frame.mobile .v4-social,.v4-frame.mobile .v4-bundles,.v4-frame.mobile .v4-compare,.v4-frame.mobile .v4-order-section,.v4-frame.mobile .v4-faq{width:100%!important;max-width:100%!important;margin-left:auto!important;margin-right:auto!important}
+.v4-frame.tablet .v4-hero,.v4-frame.tablet .v4-benefits,.v4-frame.tablet .v4-story,.v4-frame.tablet .v4-social,.v4-frame.tablet .v4-bundles,.v4-frame.tablet .v4-compare,.v4-frame.tablet .v4-order-section,.v4-frame.tablet .v4-faq{width:100%!important;max-width:100%!important}
+@media(max-width:700px){main.v4-demo{display:block!important;grid-template-columns:none!important}main.v4-demo>section{max-width:100%!important}}
