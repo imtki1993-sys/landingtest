@@ -615,3 +615,24 @@
 .v4-frame.desktop .template-benefit-cards .v46-hero.hero-center>.hero-media img{
  display:block!important;width:100%!important;height:100%!important;object-fit:contain!important;object-position:center center!important
 }
+
+
+/* Benefit Cards desktop image final — neutralize legacy hero-media crop rules */
+@media(min-width:901px){
+ .landing-v4-runtime:not(.v4-builder-preview) .template-benefit-cards .v46-hero.hero-center>.v46-media.hero-media,
+ .v4-frame.desktop .template-benefit-cards .v46-hero.hero-center>.v46-media.hero-media{
+  position:relative!important;inset:auto!important;transform:none!important;
+  display:flex!important;align-items:center!important;justify-content:center!important;
+  width:min(920px,100%)!important;height:auto!important;min-height:420px!important;max-height:560px!important;
+  aspect-ratio:auto!important;margin:36px auto 0!important;padding:0!important;
+  overflow:visible!important;background:transparent!important
+ }
+ .landing-v4-runtime:not(.v4-builder-preview) .template-benefit-cards .v46-hero.hero-center>.v46-media.hero-media>img,
+ .v4-frame.desktop .template-benefit-cards .v46-hero.hero-center>.v46-media.hero-media>img{
+  position:relative!important;inset:auto!important;transform:none!important;
+  display:block!important;width:auto!important;height:auto!important;
+  max-width:100%!important;max-height:520px!important;
+  object-fit:contain!important;object-position:center!important;
+  margin:auto!important;visibility:visible!important;opacity:1!important
+ }
+}
