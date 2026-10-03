@@ -266,3 +266,34 @@
  .template-story-selling .v46-price{margin:20px 0!important}
  .template-story-selling .v46-primary{display:inline-flex!important;align-items:center!important;justify-content:center!important;min-height:50px!important}
 }
+
+
+/* Tech Gadget + Auto Gear mobile hero contract:
+   keep ALL content and ALL media; only control their order. */
+.v46-mobile-hero-media{display:none}
+.v46-desktop-hero-media{display:contents}
+.v4-frame.mobile :is(.template-tech-gadget,.template-auto-gear) .v46-hero.hero-media{
+ display:flex!important;flex-direction:column!important
+}
+.v4-frame.mobile :is(.template-tech-gadget,.template-auto-gear) .v46-mobile-hero-media{
+ display:block!important;order:-20!important;width:100%!important;visibility:visible!important;opacity:1!important
+}
+.v4-frame.mobile :is(.template-tech-gadget,.template-auto-gear) .v46-mobile-hero-media>.hero-media{
+ display:grid!important;width:100%!important;height:auto!important;min-height:0!important;aspect-ratio:1/1!important;
+ visibility:visible!important;opacity:1!important;overflow:hidden!important
+}
+.v4-frame.mobile :is(.template-tech-gadget,.template-auto-gear) .v46-mobile-hero-media>.hero-media img{
+ display:block!important;width:100%!important;height:100%!important;object-fit:contain!important;visibility:visible!important;opacity:1!important
+}
+.v4-frame.mobile :is(.template-tech-gadget,.template-auto-gear) .v46-hero-copy{
+ display:block!important;order:-10!important;width:100%!important;visibility:visible!important;opacity:1!important
+}
+.v4-frame.mobile :is(.template-tech-gadget,.template-auto-gear) .v46-desktop-hero-media{display:none!important}
+@media(max-width:700px){
+ .landing-v4-runtime:not(.v4-builder-preview) :is(.template-tech-gadget,.template-auto-gear) .v46-hero.hero-media{display:flex!important;flex-direction:column!important}
+ .landing-v4-runtime:not(.v4-builder-preview) :is(.template-tech-gadget,.template-auto-gear) .v46-mobile-hero-media{display:block!important;order:-20!important;width:100%!important;visibility:visible!important;opacity:1!important}
+ .landing-v4-runtime:not(.v4-builder-preview) :is(.template-tech-gadget,.template-auto-gear) .v46-mobile-hero-media>.hero-media{display:grid!important;width:100%!important;height:auto!important;min-height:0!important;aspect-ratio:1/1!important;visibility:visible!important;opacity:1!important;overflow:hidden!important}
+ .landing-v4-runtime:not(.v4-builder-preview) :is(.template-tech-gadget,.template-auto-gear) .v46-mobile-hero-media>.hero-media img{display:block!important;width:100%!important;height:100%!important;object-fit:contain!important;visibility:visible!important;opacity:1!important}
+ .landing-v4-runtime:not(.v4-builder-preview) :is(.template-tech-gadget,.template-auto-gear) .v46-hero-copy{display:block!important;order:-10!important;width:100%!important;visibility:visible!important;opacity:1!important}
+ .landing-v4-runtime:not(.v4-builder-preview) :is(.template-tech-gadget,.template-auto-gear) .v46-desktop-hero-media{display:none!important}
+}
