@@ -1,9 +1,11 @@
 "use client";
 import React from "react";
 import {landingTemplate} from "../lib/landing-template-presets";
+import LandingTemplates01to05 from "./LandingTemplates01to05";
 
 export type LandingV4Data={templateId:string;name:string;description?:string;price:number;oldPrice?:number|string;images?:string[];content?:any;locale?:string};
 export default function LandingTemplateV4({data,preview=false,onSubmit}:{data:LandingV4Data;preview?:boolean;onSubmit?:(e:React.FormEvent<HTMLFormElement>,qty:number)=>void}){
+ const firstFive=["cod-direct","premium-product","ugc-social","problem-solver","marketplace-cod"].includes(data.templateId);if(firstFive)return <LandingTemplates01to05 data={data} preview={preview} onSubmit={onSubmit}/>;
  const t=landingTemplate(data.templateId),c=data.content||{},images=data.images||[],offers=Array.isArray(c.quantity_offers)&&c.quantity_offers.length?c.quantity_offers:[{qty:1,price:data.price,label:"1 pièce"},{qty:2,price:data.price*2,label:"2 pièces"},{qty:3,price:data.price*3,label:"3 pièces"}];
  const [qty,setQty]=React.useState(Number(c.quantity_default_qty||offers[0]?.qty||1));const selected=offers.find((x:any)=>Number(x.qty)===qty),total=Number(selected?.price??data.price*qty),rtl=String(data.locale||"").startsWith("ar")||["arabic-cod","darija-morocco","whatsapp-commerce"].includes(data.templateId);
  const copy:any={headline:c.headline||data.name,subheadline:c.subheadline||c.description||data.description||t.description,benefits:(c.benefits||["Simple à utiliser","Conçu pour le quotidien","Commande sécurisée"]).slice(0,3),features:(c.features||[]).slice(0,4),faq:(c.faq||[]).slice(0,4)};
