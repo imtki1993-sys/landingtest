@@ -45,7 +45,7 @@ export default function LandingTemplates06to30({data,preview=false,onSubmit}:P){
  const features=(Array.isArray(c.features)&&c.features.length?c.features:["Design fonctionnel","Utilisation intuitive","Finition durable","Pensé pour vos besoins"]).slice(0,4);
  const img=(i:number,cl="")=><div className={"v46-media "+cl}>{imgs[i]?<img src={imgs[i]} alt={data.name}/>:<><div className="v46-placeholder"/><span>{data.name}</span></>}</div>;
  const price=<div className="v46-price"><b>{data.price} DH</b>{data.oldPrice&&<del>{data.oldPrice} DH</del>}</div>;
- const heroMedia=img(data.templateId==="benefit-cards" && imgs.length>1 ? 1 : 0,"hero-media");
+ const heroMedia=img((data.templateId==="benefit-cards"||data.templateId==="social-proof") && imgs.length>1 ? 1 : 0,"hero-media");
  const hero=<section className={"v46-hero hero-"+s.hero}>
    {(data.templateId==="auto-gear"||data.templateId==="tech-gadget"||data.templateId==="video-first")&&<div className="v46-mobile-hero-media">{heroMedia}</div>}
    <div className="v46-hero-copy"><small>{s.eyebrow}</small><h1>{headline}</h1><p>{sub}</p>{price}<a href="#order" className="v46-primary">{data.templateId==="whatsapp-commerce"?"Commander sur WhatsApp":(c.cta||(rtl?"اطلب الآن":"Commander maintenant"))}</a><div className="v46-mini-trust">✓ Paiement à la livraison　✓ Livraison Maroc</div></div>
