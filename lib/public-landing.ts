@@ -18,7 +18,7 @@ async function loadPublicLanding(slug:string){
   resolvePublishedMetaPixel(lp.workspace_id,lp.id)
  ]);
  const activeSeo=publishedConfig?.seo||lp.seo||{},activeProduct=publishedConfig?.product||p||{};
- const whatsapp=(w?.settings as any)?.whatsapp_phone||(activeSeo as any)?.whatsapp_phone||"";
+ const whatsapp=(activeSeo as any)?.whatsapp_phone||(lp.seo as any)?.whatsapp_phone||(w?.settings as any)?.whatsapp_phone||"";
  const savedContent=(activeSeo as any)?.ai_content||{};
  const content={...savedContent,uiux_library:getUiuxLibrary()};
  return {id:lp.id,name:activeProduct?.name||lp.name,price:activeProduct?.price,oldPrice:activeProduct?.compare_at_price,description:activeProduct?.description,locale:lp.locale,content,images:(activeSeo as any)?.images||activeProduct?.image_urls||[],whatsappPhone:String(whatsapp).replace(/\D/g,""),metaPixelId:publishedPixel};
