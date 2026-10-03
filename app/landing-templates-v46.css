@@ -120,3 +120,18 @@
  .landing-v4-runtime:not(.v4-builder-preview) .template-auto-gear .v46-hero.hero-media>.hero-media{order:-2!important;display:grid!important;visibility:visible!important;opacity:1!important}
  .landing-v4-runtime:not(.v4-builder-preview) .template-auto-gear .v46-hero.hero-media>.v46-hero-copy{order:0!important}
 }
+
+
+/* Auto Gear structural mobile media — explicit node, no ordering dependency */
+.v46-auto-mobile-media{display:none}
+.v46-auto-desktop-media{display:contents}
+.v4-frame.mobile .template-auto-gear .v46-auto-mobile-media{display:block!important;order:-10!important;width:100%!important}
+.v4-frame.mobile .template-auto-gear .v46-auto-mobile-media>.hero-media{display:grid!important;width:100%!important;height:auto!important;aspect-ratio:1/1!important;min-height:0!important;border-radius:18px!important}
+.v4-frame.mobile .template-auto-gear .v46-auto-mobile-media>.hero-media img{display:block!important;width:100%!important;height:100%!important;object-fit:contain!important;padding:10px!important}
+.v4-frame.mobile .template-auto-gear .v46-auto-desktop-media{display:none!important}
+@media(max-width:700px){
+ .landing-v4-runtime:not(.v4-builder-preview) .template-auto-gear .v46-auto-mobile-media{display:block!important;order:-10!important;width:100%!important}
+ .landing-v4-runtime:not(.v4-builder-preview) .template-auto-gear .v46-auto-mobile-media>.hero-media{display:grid!important;width:100%!important;height:auto!important;aspect-ratio:1/1!important;min-height:0!important;border-radius:18px!important}
+ .landing-v4-runtime:not(.v4-builder-preview) .template-auto-gear .v46-auto-mobile-media>.hero-media img{display:block!important;width:100%!important;height:100%!important;object-fit:contain!important;padding:10px!important}
+ .landing-v4-runtime:not(.v4-builder-preview) .template-auto-gear .v46-auto-desktop-media{display:none!important}
+}
