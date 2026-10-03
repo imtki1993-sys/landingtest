@@ -100,3 +100,12 @@
  .landing-v4-runtime:not(.v4-builder-preview) .template-auto-gear .v46-primary{display:flex!important;width:100%!important;min-height:50px!important;align-items:center!important;justify-content:center!important}
  .landing-v4-runtime:not(.v4-builder-preview) .template-auto-gear .v46-cards{padding:42px 16px!important;overflow:hidden}.landing-v4-runtime:not(.v4-builder-preview) .template-auto-gear .v46-cards>div:last-child{grid-template-columns:1fr!important}
 }
+
+
+/* Auto Gear mobile: product image first, hero copy second */
+.v4-frame.mobile .template-auto-gear .v46-hero.hero-media>.hero-media{order:-1!important}
+.v4-frame.mobile .template-auto-gear .v46-hero.hero-media>.v46-hero-copy{order:1!important}
+@media(max-width:700px){
+ .landing-v4-runtime:not(.v4-builder-preview) .template-auto-gear .v46-hero.hero-media>.hero-media{order:-1!important}
+ .landing-v4-runtime:not(.v4-builder-preview) .template-auto-gear .v46-hero.hero-media>.v46-hero-copy{order:1!important}
+}
