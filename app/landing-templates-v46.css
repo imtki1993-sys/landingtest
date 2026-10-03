@@ -220,3 +220,20 @@
  .landing-v4-runtime:not(.v4-builder-preview) .template-tech-gadget>header>b{font-size:17px!important}
  .landing-v4-runtime:not(.v4-builder-preview) .template-tech-gadget>header>a{padding:10px 16px!important;font-size:12px!important;min-width:0!important}
 }
+
+
+/* Tech Gadget mobile v2 — preserve original hero image; never hide/replace it */
+.v4-frame.mobile .template-tech-gadget .v46-hero.hero-media>.hero-media{
+ display:grid!important;visibility:visible!important;opacity:1!important;order:1!important
+}
+.v4-frame.mobile .template-tech-gadget .v46-hero.hero-media>.hero-media img{
+ display:block!important;visibility:visible!important;opacity:1!important
+}
+@media(max-width:700px){
+ .landing-v4-runtime:not(.v4-builder-preview) .template-tech-gadget .v46-hero.hero-media>.hero-media{
+  display:grid!important;visibility:visible!important;opacity:1!important;order:1!important
+ }
+ .landing-v4-runtime:not(.v4-builder-preview) .template-tech-gadget .v46-hero.hero-media>.hero-media img{
+  display:block!important;visibility:visible!important;opacity:1!important
+ }
+}
