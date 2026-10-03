@@ -4546,3 +4546,18 @@ main.v45>section{width:100%}
  .editor-live .builder-canvas-core .builder-gallery-images{grid-template-columns:1fr!important}
  .editor-live .builder-canvas-core .lp-order,.editor-live .builder-canvas-core .lp-form{width:100%!important;max-width:100%!important}
 }
+
+
+/* V4 nav links keep each template header design; only direct CTA is a button */
+.v45>header nav a,.v4-frame.mobile .v45>header nav a{
+ display:inline!important;background:transparent!important;background-color:transparent!important;
+ border:0!important;border-radius:0!important;box-shadow:none!important;padding:0!important;
+ width:auto!important;height:auto!important;min-width:0!important;min-height:0!important;
+ color:inherit;text-decoration:none!important;font:inherit;line-height:inherit
+}
+.v45>header>a{display:inline-flex;align-items:center;justify-content:center}
+.v45-premium>header nav a{color:#d8c29a!important}.v45-premium>header nav a:hover{color:#fff4d6!important}
+.v45-ugc>header nav a{color:#5f6170!important}.v45-ugc>header nav a:hover{color:#7c3aed!important}
+.v45-problem>header nav a{color:#5f6170!important}.v45-problem>header nav a:hover{color:#ef3f32!important}
+.v45-market>header nav a{color:#53657a!important}.v45-market>header nav a:hover{color:#2563eb!important}
+.v45-cod>header nav a{color:#53657a!important}.v45-cod>header nav a:hover{color:#0f9f55!important}
