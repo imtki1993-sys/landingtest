@@ -4507,3 +4507,11 @@ main.v4-demo>header{margin-bottom:0}
  .landing-v4-runtime:not(.v4-builder-preview) .v45-market-main{display:block;padding:0 14px}.landing-v4-runtime:not(.v4-builder-preview) .v45-gallery{grid-template-columns:1fr}.landing-v4-runtime:not(.v4-builder-preview) .v45-gallery>.v45-mainpic{height:390px!important;object-fit:cover}.landing-v4-runtime:not(.v4-builder-preview) .v45-thumbs{display:flex;overflow-x:auto;margin-top:8px}.landing-v4-runtime:not(.v4-builder-preview) .v45-thumbs button{min-width:72px}.landing-v4-runtime:not(.v4-builder-preview) .v45-buybox{position:static;margin-top:16px;padding:18px}.landing-v4-runtime:not(.v4-builder-preview) .v45-market-tabs{overflow-x:auto;white-space:nowrap;gap:24px}.landing-v4-runtime:not(.v4-builder-preview) .v45-specs>div{grid-template-columns:1fr 1fr}
  .landing-v4-runtime:not(.v4-builder-preview) .v45-form{width:auto;margin:35px 14px;padding:18px}.landing-v4-runtime:not(.v4-builder-preview) .v45-buybox .v45-form{margin:20px 0 0;padding:0}.landing-v4-runtime:not(.v4-builder-preview) .v45-packs{grid-template-columns:repeat(3,minmax(0,1fr))}.landing-v4-runtime:not(.v4-builder-preview) .v45-packs button{font-size:10px;padding:9px 3px}.landing-v4-runtime:not(.v4-builder-preview) .v45-footer{flex-direction:column;gap:7px;padding:24px 16px}
 }
+
+
+/* Critical V4 isolation: dashboard/global main layout must never leak into landing renderers */
+main.v45{display:block!important;width:100%!important;max-width:none!important;min-width:0!important;margin:0!important;padding:0!important;grid-template-columns:none!important;grid-template-rows:none!important;gap:0!important}
+main.v45>.v45-top{display:block!important;width:100%!important;max-width:none!important}
+main.v45>header{display:flex!important;width:100%!important}
+main.v45>section{width:100%}
+.v4-gallery-modalbody main.v45,.v4-gallery-scale main.v45{display:block!important}
