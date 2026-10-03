@@ -636,3 +636,36 @@
   margin:auto!important;visibility:visible!important;opacity:1!important
  }
 }
+
+
+/* Influencer Pick mobile — keep hero and UGC media in separate document flow */
+.v4-frame.mobile .template-influencer-pick .v46-hero.hero-media{
+ display:flex!important;flex-direction:column!important;width:100%!important;height:auto!important;min-height:0!important;max-height:none!important;
+ overflow:visible!important;gap:20px!important;padding-bottom:32px!important
+}
+.v4-frame.mobile .template-influencer-pick .v46-hero.hero-media>.v46-hero-copy{
+ position:relative!important;inset:auto!important;order:0!important;width:100%!important;height:auto!important;overflow:visible!important
+}
+.v4-frame.mobile .template-influencer-pick .v46-hero.hero-media>.v46-media.hero-media{
+ position:relative!important;inset:auto!important;transform:none!important;order:1!important;
+ width:100%!important;height:360px!important;min-height:0!important;margin:0!important;overflow:hidden!important
+}
+.v4-frame.mobile .template-influencer-pick .v46-hero.hero-media>.v46-media.hero-media img{
+ position:relative!important;inset:auto!important;transform:none!important;width:100%!important;height:100%!important;object-fit:contain!important
+}
+.v4-frame.mobile .template-influencer-pick .v46-ugc{
+ position:relative!important;inset:auto!important;clear:both!important;margin-top:0!important;z-index:auto!important
+}
+.v4-frame.mobile .template-influencer-pick .v46-ugc .v46-media{
+ position:relative!important;inset:auto!important;transform:none!important;margin:0!important
+}
+@media(max-width:700px){
+ .landing-v4-runtime:not(.v4-builder-preview) .template-influencer-pick .v46-hero.hero-media{
+  display:flex!important;flex-direction:column!important;width:100%!important;height:auto!important;min-height:0!important;max-height:none!important;overflow:visible!important;gap:20px!important;padding-bottom:32px!important
+ }
+ .landing-v4-runtime:not(.v4-builder-preview) .template-influencer-pick .v46-hero.hero-media>.v46-hero-copy{position:relative!important;inset:auto!important;order:0!important;width:100%!important;height:auto!important;overflow:visible!important}
+ .landing-v4-runtime:not(.v4-builder-preview) .template-influencer-pick .v46-hero.hero-media>.v46-media.hero-media{position:relative!important;inset:auto!important;transform:none!important;order:1!important;width:100%!important;height:360px!important;min-height:0!important;margin:0!important;overflow:hidden!important}
+ .landing-v4-runtime:not(.v4-builder-preview) .template-influencer-pick .v46-hero.hero-media>.v46-media.hero-media img{position:relative!important;inset:auto!important;transform:none!important;width:100%!important;height:100%!important;object-fit:contain!important}
+ .landing-v4-runtime:not(.v4-builder-preview) .template-influencer-pick .v46-ugc{position:relative!important;inset:auto!important;clear:both!important;margin-top:0!important;z-index:auto!important}
+ .landing-v4-runtime:not(.v4-builder-preview) .template-influencer-pick .v46-ugc .v46-media{position:relative!important;inset:auto!important;transform:none!important;margin:0!important}
+}
