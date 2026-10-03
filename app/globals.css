@@ -4561,3 +4561,93 @@ main.v45>section{width:100%}
 .v45-problem>header nav a{color:#5f6170!important}.v45-problem>header nav a:hover{color:#ef3f32!important}
 .v45-market>header nav a{color:#53657a!important}.v45-market>header nav a:hover{color:#2563eb!important}
 .v45-cod>header nav a{color:#53657a!important}.v45-cod>header nav a:hover{color:#0f9f55!important}
+
+
+/* Builder V3 v4.4 — explicit tablet container emulation.
+   CSS media queries use the browser viewport, not the editor's inner device frame,
+   so tablet preview needs the same responsive contract expressed via data-preview-viewport. */
+.landing-benchmark[data-preview-viewport="tablet"]{
+  width:100%!important;
+  max-width:768px!important;
+  margin-inline:auto!important;
+  overflow-x:hidden!important;
+}
+.landing-benchmark[data-preview-viewport="tablet"] :is(.lp-wrap,.lp-hero-grid,.lp-order>.lp-wrap){
+  width:calc(100% - 36px)!important;
+  max-width:none!important;
+  min-width:0!important;
+  margin-inline:auto!important;
+}
+.landing-benchmark[data-preview-viewport="tablet"] .lp-hero-real:not(.hero-motion){
+  min-height:0!important;
+  padding:clamp(34px,5vw,52px) 18px!important;
+}
+.landing-benchmark[data-preview-viewport="tablet"] :is(
+  .hero-form,.hero-split,.hero-cod,.hero-minimal,.hero-luxury,.hero-ugc,
+  .hero-commerce,.hero-editorial,.hero-video-ugc,.hero-story-sticky
+){
+  width:100%!important;
+  max-width:100%!important;
+  min-width:0!important;
+  grid-template-columns:minmax(0,1fr)!important;
+  gap:28px!important;
+}
+.landing-benchmark[data-preview-viewport="tablet"] :is(
+  .hero-form>*,.hero-split>*,.hero-cod>*,.hero-minimal>*,.hero-luxury>*,
+  .hero-ugc>*,.hero-commerce>*,.hero-editorial>*
+){min-width:0!important;max-width:100%!important}
+.landing-benchmark[data-preview-viewport="tablet"] :is(
+  .lp-copy,.hero-control-copy,.hero-control-copy-wrap,.hero-luxury-copy,
+  .hero-commerce aside,.hero-form-card,.hero-offer-card
+){
+  width:100%!important;
+  max-width:100%!important;
+  min-width:0!important;
+  position:static!important;
+}
+.landing-benchmark[data-preview-viewport="tablet"] .lp-hero-real :is(
+  .lp-copy h1,.hero-form h1,.hero-split h1,.hero-cod h1,.hero-minimal h1,
+  .hero-luxury h1,.hero-ugc h1,.hero-editorial h1,.hero-commerce h1
+){
+  font-size:var(--hero-title-size-tablet,44px)!important;
+  line-height:1.03!important;
+  max-width:18ch!important;
+  min-width:0!important;
+  overflow-wrap:normal!important;
+  word-break:normal!important;
+  hyphens:none!important;
+  white-space:normal!important;
+}
+.landing-benchmark[data-preview-viewport="tablet"] .lp-hero-real :is(.lp-sub,.hero-control-copy p,.hero-control-copy-wrap p){
+  font-size:var(--hero-subtitle-size-tablet,17px)!important;
+  max-width:60ch!important;
+  overflow-wrap:normal!important;
+  word-break:normal!important;
+}
+.landing-benchmark[data-preview-viewport="tablet"] :is(
+  .hero-luxury-media,.hero-ugc-media,.hero-product-stage,.hero-commerce-gallery,
+  .hero-video-phone,.hero-offer-card
+){
+  width:100%!important;
+  max-width:620px!important;
+  min-width:0!important;
+  margin-inline:auto!important;
+  order:-1;
+}
+.landing-benchmark[data-preview-viewport="tablet"] .hero-editorial-index{display:none!important}
+.landing-benchmark[data-preview-viewport="tablet"] .hero-commerce aside{position:static!important}
+.landing-benchmark[data-preview-viewport="tablet"] .hero-commerce-gallery{
+  grid-template-columns:minmax(0,1fr)!important;
+}
+.landing-benchmark[data-preview-viewport="tablet"] .hero-commerce-gallery>div{
+  grid-template-columns:repeat(3,minmax(0,1fr))!important;
+}
+.landing-benchmark[data-preview-viewport="tablet"] :is(.lp-order>.lp-wrap,.lp-image-text-grid){
+  grid-template-columns:minmax(0,1fr)!important;
+}
+.landing-benchmark[data-preview-viewport="tablet"] :is(.lp-benefits,.lp-feature-grid,.lp-steps,.lp-trust-grid){
+  grid-template-columns:repeat(2,minmax(0,1fr))!important;
+}
+.landing-benchmark[data-preview-viewport="tablet"] :is(img,video,iframe,svg){
+  max-width:100%!important;
+}
