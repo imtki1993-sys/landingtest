@@ -68,3 +68,35 @@
    border-radius:18px
  }
 }
+
+
+/* Auto Gear mobile — isolate RTL product content from the LTR template layout */
+.v4-frame.mobile .template-auto-gear,
+@media(max-width:700px){.landing-v4-runtime:not(.v4-builder-preview) .template-auto-gear{direction:ltr}}
+.v4-frame.mobile .template-auto-gear .v46-hero,
+.v4-frame.mobile .template-auto-gear .v46-cards,
+.v4-frame.mobile .template-auto-gear .v46-order,
+.v4-frame.mobile .template-auto-gear .v46-faq{min-width:0;max-width:100%;overflow:hidden}
+.v4-frame.mobile .template-auto-gear .v46-hero{display:flex!important;flex-direction:column!important;padding:22px 16px 34px!important;gap:20px!important}
+.v4-frame.mobile .template-auto-gear .v46-hero .hero-media{order:0!important;width:100%!important;height:auto!important;min-height:0!important;aspect-ratio:1/1!important;border-radius:18px!important}
+.v4-frame.mobile .template-auto-gear .v46-hero .hero-media img{width:100%!important;height:100%!important;object-fit:contain!important;padding:10px!important}
+.v4-frame.mobile .template-auto-gear .v46-hero-copy{order:1!important;width:100%!important;text-align:start!important}
+.v4-frame.mobile .template-auto-gear .v46-hero-copy h1{font-size:38px!important;line-height:1.08!important;letter-spacing:-1.2px!important;max-width:100%!important;margin:10px 0 14px!important;overflow-wrap:anywhere!important}
+.v4-frame.mobile .template-auto-gear .v46-hero-copy p{font-size:15px!important;line-height:1.65!important;max-width:100%!important}
+.v4-frame.mobile .template-auto-gear .v46-price{margin:15px 0!important}.v4-frame.mobile .template-auto-gear .v46-price b{font-size:28px!important}
+.v4-frame.mobile .template-auto-gear .v46-primary{display:flex!important;width:100%!important;min-height:50px!important;align-items:center!important;justify-content:center!important;text-align:center!important}
+.v4-frame.mobile .template-auto-gear .v46-mini-trust{font-size:11px!important;line-height:1.6!important}
+.v4-frame.mobile .template-auto-gear .v46-cards{padding:42px 16px!important}.v4-frame.mobile .template-auto-gear .v46-section-head h2{font-size:29px!important;line-height:1.1!important}
+.v4-frame.mobile .template-auto-gear .v46-cards>div:last-child{display:grid!important;grid-template-columns:1fr!important;gap:12px!important}
+.v4-frame.mobile .template-auto-gear .v46-cards article{width:100%!important;min-width:0!important;padding:20px!important}.v4-frame.mobile .template-auto-gear .v46-cards article b{font-size:16px!important;line-height:1.35!important}.v4-frame.mobile .template-auto-gear .v46-cards article p{font-size:13px!important;line-height:1.55!important}
+.v4-frame.mobile .template-auto-gear [dir="rtl"],.v4-frame.mobile .template-auto-gear :is(h1,p,b,span)[lang="ar"]{direction:rtl;text-align:right}
+@media(max-width:700px){
+ .landing-v4-runtime:not(.v4-builder-preview) .template-auto-gear .v46-hero{display:flex!important;flex-direction:column!important;padding:22px 16px 34px!important;gap:20px!important;overflow:hidden}
+ .landing-v4-runtime:not(.v4-builder-preview) .template-auto-gear .v46-hero .hero-media{order:0!important;width:100%!important;height:auto!important;min-height:0!important;aspect-ratio:1/1!important;border-radius:18px!important}
+ .landing-v4-runtime:not(.v4-builder-preview) .template-auto-gear .v46-hero .hero-media img{width:100%!important;height:100%!important;object-fit:contain!important;padding:10px!important}
+ .landing-v4-runtime:not(.v4-builder-preview) .template-auto-gear .v46-hero-copy{order:1!important;width:100%!important;text-align:start!important}
+ .landing-v4-runtime:not(.v4-builder-preview) .template-auto-gear .v46-hero-copy h1{font-size:38px!important;line-height:1.08!important;letter-spacing:-1.2px!important;max-width:100%!important;margin:10px 0 14px!important;overflow-wrap:anywhere!important}
+ .landing-v4-runtime:not(.v4-builder-preview) .template-auto-gear .v46-hero-copy p{font-size:15px!important;line-height:1.65!important;max-width:100%!important}
+ .landing-v4-runtime:not(.v4-builder-preview) .template-auto-gear .v46-primary{display:flex!important;width:100%!important;min-height:50px!important;align-items:center!important;justify-content:center!important}
+ .landing-v4-runtime:not(.v4-builder-preview) .template-auto-gear .v46-cards{padding:42px 16px!important;overflow:hidden}.landing-v4-runtime:not(.v4-builder-preview) .template-auto-gear .v46-cards>div:last-child{grid-template-columns:1fr!important}
+}
