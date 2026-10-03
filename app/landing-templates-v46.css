@@ -669,3 +669,58 @@
  .landing-v4-runtime:not(.v4-builder-preview) .template-influencer-pick .v46-ugc{position:relative!important;inset:auto!important;clear:both!important;margin-top:0!important;z-index:auto!important}
  .landing-v4-runtime:not(.v4-builder-preview) .template-influencer-pick .v46-ugc .v46-media{position:relative!important;inset:auto!important;transform:none!important;margin:0!important}
 }
+
+
+/* V5 — genuinely distinct hero compositions for templates 21-30 */
+@media(min-width:901px){
+ .hero-unique-one-screen-cod{grid-template-columns:1fr .72fr!important;min-height:610px!important;padding:72px 7%!important;background:linear-gradient(135deg,#f4fff9 0 62%,#e6f8ef 62%)!important}
+ .hero-unique-one-screen-cod>.hero-media{height:430px!important;border-radius:36px!important}
+ .hero-unique-long-sales{display:grid!important;grid-template-columns:.82fr 1.18fr!important;min-height:720px!important;padding:90px 7%!important;align-items:start!important}
+ .hero-unique-long-sales>.hero-media{height:610px!important;border-radius:4px!important}
+ .hero-unique-comparison-pro{grid-template-columns:1fr 1fr!important;min-height:650px!important;padding:70px 7%!important;background:linear-gradient(90deg,#fff 0 50%,#f0faf8 50%)!important}
+ .hero-unique-comparison-pro>.hero-media{height:500px!important;border-radius:18px!important;border:2px solid var(--v46-accent)!important}
+ .hero-unique-bundle-offer{grid-template-columns:1.05fr .75fr .42fr!important;min-height:620px!important;padding:68px 6%!important;background:#fff8f2!important}
+ .hero-unique-bundle-offer>aside{align-self:center!important;transform:rotate(2deg)!important;border-radius:28px!important}
+ .hero-unique-fashion-editorial{grid-template-columns:.78fr 1.22fr!important;min-height:760px!important;padding:54px 5%!important;gap:70px!important}
+ .hero-unique-fashion-editorial>.hero-media{height:680px!important;border-radius:0!important;order:-1!important}
+ .hero-unique-fashion-editorial>.v46-hero-copy{align-self:end!important;padding-bottom:65px!important}
+ .hero-unique-home-solution{grid-template-columns:1fr 1fr!important;min-height:620px!important;padding:64px 7%!important;background:#fffaf1!important}
+ .hero-unique-home-solution>.hero-media{height:490px!important;border-radius:60px 12px 60px 12px!important}
+ .hero-unique-arabic-cod{grid-template-columns:1fr .8fr .38fr!important;min-height:630px!important;padding:70px 7%!important;background:linear-gradient(135deg,#f4fff7,#fff)!important}
+ .hero-unique-arabic-cod>.v46-hero-copy{text-align:right!important}
+ .hero-unique-darija-morocco{grid-template-columns:.9fr 1.1fr!important;min-height:640px!important;padding:70px 7%!important;background:linear-gradient(180deg,#fff 0 72%,#fff7ed 72%)!important}
+ .hero-unique-darija-morocco>.hero-media{height:510px!important;border-radius:26px!important}
+ .hero-unique-whatsapp-commerce{grid-template-columns:1fr .9fr .38fr!important;min-height:610px!important;padding:66px 7%!important;background:#effcf5!important}
+ .hero-unique-whatsapp-commerce .v46-primary{border-radius:14px!important;box-shadow:0 12px 30px rgba(0,0,0,.12)!important}
+ .hero-unique-conversion-max{grid-template-columns:1.08fr .78fr .4fr!important;min-height:650px!important;padding:62px 6%!important;background:linear-gradient(135deg,#fff4f4,#fff 48%,#fff7f7)!important}
+ .hero-unique-conversion-max>.hero-media{height:510px!important;border-radius:28px!important}
+}
+.v4-frame.desktop .hero-unique-one-screen-cod{grid-template-columns:1fr .72fr!important;background:linear-gradient(135deg,#f4fff9 0 62%,#e6f8ef 62%)!important}
+.v4-frame.desktop .hero-unique-long-sales{grid-template-columns:.82fr 1.18fr!important;align-items:start!important}
+.v4-frame.desktop .hero-unique-comparison-pro{grid-template-columns:1fr 1fr!important;background:linear-gradient(90deg,#fff 0 50%,#f0faf8 50%)!important}
+.v4-frame.desktop .hero-unique-bundle-offer{grid-template-columns:1.05fr .75fr .42fr!important;background:#fff8f2!important}
+.v4-frame.desktop .hero-unique-fashion-editorial{grid-template-columns:.78fr 1.22fr!important}
+.v4-frame.desktop .hero-unique-fashion-editorial>.hero-media{order:-1!important;border-radius:0!important}
+.v4-frame.desktop .hero-unique-home-solution{grid-template-columns:1fr 1fr!important;background:#fffaf1!important}
+.v4-frame.desktop .hero-unique-arabic-cod{grid-template-columns:1fr .8fr .38fr!important;background:linear-gradient(135deg,#f4fff7,#fff)!important}
+.v4-frame.desktop .hero-unique-darija-morocco{grid-template-columns:.9fr 1.1fr!important;background:linear-gradient(180deg,#fff 0 72%,#fff7ed 72%)!important}
+.v4-frame.desktop .hero-unique-whatsapp-commerce{grid-template-columns:1fr .9fr .38fr!important;background:#effcf5!important}
+.v4-frame.desktop .hero-unique-conversion-max{grid-template-columns:1.08fr .78fr .4fr!important;background:linear-gradient(135deg,#fff4f4,#fff 48%,#fff7f7)!important}
+
+/* Tablet keeps the identity but collapses complex 3-column offers safely. */
+.v4-frame.tablet :is(.hero-unique-bundle-offer,.hero-unique-arabic-cod,.hero-unique-whatsapp-commerce,.hero-unique-conversion-max){grid-template-columns:1fr .85fr!important}
+.v4-frame.tablet :is(.hero-unique-bundle-offer,.hero-unique-arabic-cod,.hero-unique-whatsapp-commerce,.hero-unique-conversion-max)>aside{grid-column:1/-1!important}
+
+/* Mobile: distinct visual signatures, complete content preserved. */
+.v4-frame.mobile [class*="hero-unique-"]{height:auto!important;min-height:0!important;max-height:none!important;overflow:visible!important}
+.v4-frame.mobile .hero-unique-one-screen-cod{background:#f4fff9!important;border-bottom:8px solid var(--v46-accent)!important}
+.v4-frame.mobile .hero-unique-long-sales{border-left:6px solid var(--v46-accent)!important}
+.v4-frame.mobile .hero-unique-comparison-pro{background:linear-gradient(180deg,#fff,#f0faf8)!important}
+.v4-frame.mobile .hero-unique-bundle-offer{background:#fff8f2!important}
+.v4-frame.mobile .hero-unique-fashion-editorial>.hero-media{border-radius:0!important}
+.v4-frame.mobile .hero-unique-home-solution{background:#fffaf1!important}
+.v4-frame.mobile .hero-unique-arabic-cod{background:#f4fff7!important}
+.v4-frame.mobile .hero-unique-darija-morocco{background:linear-gradient(180deg,#fff,#fff7ed)!important}
+.v4-frame.mobile .hero-unique-whatsapp-commerce{background:#effcf5!important}
+.v4-frame.mobile .hero-unique-whatsapp-commerce .v46-primary{border-radius:14px!important}
+.v4-frame.mobile .hero-unique-conversion-max{background:#fff4f4!important;border-bottom:8px solid var(--v46-accent)!important}
