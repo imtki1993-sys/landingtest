@@ -237,3 +237,32 @@
   display:block!important;visibility:visible!important;opacity:1!important
  }
 }
+
+
+/* Story Selling — dedicated desktop hero, preserve every original element */
+@media(min-width:901px){
+ .template-story-selling .v46-hero.hero-editorial{
+  max-width:1180px!important;min-height:680px!important;margin:0 auto!important;padding:54px 24px 72px!important;
+  display:grid!important;grid-template-columns:minmax(0,.92fr) minmax(0,1.08fr)!important;
+  gap:64px!important;align-items:center!important;overflow:visible!important
+ }
+ .template-story-selling .v46-hero.hero-editorial .v46-hero-copy{
+  width:100%!important;max-width:560px!important;padding:20px 0!important;min-width:0!important
+ }
+ .template-story-selling .v46-hero.hero-editorial .v46-hero-copy h1{
+  font-size:clamp(52px,4.3vw,70px)!important;line-height:.98!important;letter-spacing:-2.8px!important;
+  max-width:10.5ch!important;margin:14px 0 20px!important;overflow-wrap:normal!important;word-break:normal!important
+ }
+ .template-story-selling .v46-hero.hero-editorial .v46-hero-copy p{
+  max-width:520px!important;font-size:17px!important;line-height:1.65!important;margin-bottom:18px!important
+ }
+ .template-story-selling .v46-hero.hero-editorial>.hero-media{
+  width:100%!important;height:610px!important;min-height:0!important;border-radius:28px!important;overflow:hidden!important
+ }
+ .template-story-selling .v46-hero.hero-editorial>.hero-media img{
+  display:block!important;width:100%!important;height:100%!important;object-fit:contain!important;object-position:center!important;
+  padding:24px!important
+ }
+ .template-story-selling .v46-price{margin:20px 0!important}
+ .template-story-selling .v46-primary{display:inline-flex!important;align-items:center!important;justify-content:center!important;min-height:50px!important}
+}
