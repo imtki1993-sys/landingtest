@@ -4515,3 +4515,7 @@ main.v45>.v45-top{display:block!important;width:100%!important;max-width:none!im
 main.v45>header{display:flex!important;width:100%!important}
 main.v45>section{width:100%}
 .v4-gallery-modalbody main.v45,.v4-gallery-scale main.v45{display:block!important}
+
+
+/* V4 functional anchor navigation */
+.v45{scroll-behavior:smooth}.v45>header nav{display:flex;align-items:center;gap:22px}.v45>header nav a{color:#64748b;text-decoration:none;font-size:13px;font-weight:600;transition:.15s}.v45>header nav a:hover{color:var(--accent,#16a34a)}.v45 #avantages,.v45 #avis,.v45 #faq,.v45 #order{scroll-margin-top:90px}
