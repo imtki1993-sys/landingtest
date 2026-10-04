@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600" width="600" height="600">
+<defs>
+  <radialGradient id="sh-spray" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#000" stop-opacity=".35"/><stop offset="1" stop-color="#000" stop-opacity="0"/></radialGradient>
+  <linearGradient id="gloss-spray" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".55"/><stop offset=".5" stop-color="#fff" stop-opacity="0"/></linearGradient>
+  <linearGradient id="spr1" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#bfeaff"/><stop offset="1" stop-color="#62b9ef"/></linearGradient>
+</defs>
+<ellipse cx="300" cy="545" rx="190" ry="26" fill="url(#sh-spray)"/>
+
+    <path d="M250 70 L360 70 L380 120 L250 130 Z" fill="#2a8fd8"/>
+    <rect x="255" y="125" width="70" height="60" rx="6" fill="#ffffff"/>
+    <path d="M325 140 L395 165 L390 180 L325 170 Z" fill="#2a8fd8"/>
+    <path d="M220 185 L360 185 C390 230 400 300 395 510 L205 510 C200 300 200 230 220 185 Z" fill="url(#spr1)"/>
+    <rect x="230" y="300" width="140" height="130" rx="12" fill="#fff" opacity=".9"/>
+    <text x="300" y="358" font-family="Helvetica,Arial" font-size="24" font-weight="800" fill="#2a8fd8" text-anchor="middle">CLEAN</text>
+    <text x="300" y="386" font-family="Helvetica,Arial" font-size="14" fill="#5f8fb3" text-anchor="middle">Multi-surfaces</text>
+</svg>

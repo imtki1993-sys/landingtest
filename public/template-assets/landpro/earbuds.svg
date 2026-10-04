@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600" width="600" height="600">
+<defs>
+  <radialGradient id="sh-earbuds" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#000" stop-opacity=".35"/><stop offset="1" stop-color="#000" stop-opacity="0"/></radialGradient>
+  <linearGradient id="gloss-earbuds" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".55"/><stop offset=".5" stop-color="#fff" stop-opacity="0"/></linearGradient>
+  <linearGradient id="eb1" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#c9ced8"/></linearGradient>
+</defs>
+<ellipse cx="300" cy="545" rx="190" ry="26" fill="url(#sh-earbuds)"/>
+
+    <rect x="160" y="250" width="280" height="240" rx="110" fill="url(#eb1)"/>
+    <rect x="160" y="250" width="280" height="90" rx="60" fill="#e9ecf1"/>
+    <line x1="165" y1="340" x2="435" y2="340" stroke="#c6ccd6" stroke-width="3"/>
+    <circle cx="300" cy="420" r="6" fill="#57d38c"/>
+    <g transform="translate(200 120) rotate(-12)"><ellipse cx="40" cy="60" rx="52" ry="58" fill="url(#eb1)"/><rect x="25" y="100" width="30" height="110" rx="15" fill="url(#eb1)"/><circle cx="30" cy="48" r="18" fill="#2b2f36"/></g>
+    <g transform="translate(330 110) rotate(12)"><ellipse cx="40" cy="60" rx="52" ry="58" fill="url(#eb1)"/><rect x="25" y="100" width="30" height="110" rx="15" fill="url(#eb1)"/><circle cx="50" cy="48" r="18" fill="#2b2f36"/></g>
+    <rect x="160" y="250" width="280" height="240" rx="110" fill="url(#gloss-earbuds)"/>
+</svg>

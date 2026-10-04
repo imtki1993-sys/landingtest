@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600" width="600" height="600">
+<defs>
+  <radialGradient id="sh-bottle" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#000" stop-opacity=".35"/><stop offset="1" stop-color="#000" stop-opacity="0"/></radialGradient>
+  <linearGradient id="gloss-bottle" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".55"/><stop offset=".5" stop-color="#fff" stop-opacity="0"/></linearGradient>
+  <linearGradient id="bt1" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2fb3c9"/><stop offset="1" stop-color="#1b5f8a"/></linearGradient>
+</defs>
+<ellipse cx="300" cy="545" rx="190" ry="26" fill="url(#sh-bottle)"/>
+
+    <rect x="255" y="60" width="90" height="70" rx="16" fill="#1d2b3a"/>
+    <rect x="215" y="125" width="170" height="390" rx="60" fill="url(#bt1)"/>
+    <rect x="215" y="250" width="170" height="16" fill="#ffffff" opacity=".25"/>
+    <rect x="215" y="125" width="170" height="390" rx="60" fill="url(#gloss-bottle)"/>
+</svg>
