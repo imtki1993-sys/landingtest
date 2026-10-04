@@ -30,7 +30,13 @@ p("home-solution","Home Solution","Home","Usage maison, démonstration et résul
 p("arabic-cod","Arabic COD","Morocco COD","Architecture RTL native et conversion COD.","RTL COD","compact",["hero","order","benefits","features","trust","faq"],"#15803d",false,"rtl"),
 p("darija-morocco","Darija Morocco","Morocco COD","Structure COD pensée pour le marché marocain.","Morocco","cards",["hero","benefits","order","features","trust","faq"],"#b45309",false,"morocco"),
 p("whatsapp-commerce","WhatsApp Commerce","Morocco COD","COD et WhatsApp au centre du parcours.","WhatsApp","compact",["hero","order","trust","benefits","features","faq"],"#16a34a",false,"whatsapp"),
-p("conversion-max","Conversion Max","Conversion","Hero compact, preuves, offre et CTA répétés.","Performance","cards",["hero","trust","order","benefits","features","faq"],"#dc2626",false,"conversion")
+p("conversion-max","Conversion Max","Conversion","Hero compact, preuves, offre et CTA répétés.","Performance","cards",["hero","trust","order","benefits","features","faq"],"#dc2626",false,"conversion"),
+p("apple-product","Apple Product","Tech Premium","Ultra clean, produit monumental et narration premium.","Apple","premium",["hero","story","bento","benefits","proof","order","faq"],"#111111",false,"apple"),
+p("samsung-launch","Samsung Launch","Tech Premium","Lancement immersif, innovation et démonstration visuelle.","Launch","premium",["hero","launch","features","benefits","proof","order","faq"],"#1428a0",true,"samsung"),
+p("dyson-premium","Dyson Premium","Tech Premium","Ingénierie éditoriale et storytelling produit premium.","Engineering","premium",["hero","engineering","features","benefits","proof","order","faq"],"#6b4eff",false,"dyson"),
+p("nothing-tech","Nothing Tech","Tech Premium","Noir et blanc, grille technique et composition radicale.","Grid","cards",["hero","grid","benefits","proof","order","faq"],"#111111",false,"nothing"),
+p("gaming-neon","Gaming Neon","Tech Premium","Univers gaming sombre, néon et performance.","Gaming","cards",["hero","performance","benefits","proof","order","faq"],"#8b5cf6",true,"gaming")
+
 ];
 export const LANDING_TEMPLATE_CATEGORIES=["Tous",...Array.from(new Set(LANDING_TEMPLATE_PRESETS.map(x=>x.category)))];
 export const landingTemplate=(id:string)=>LANDING_TEMPLATE_PRESETS.find(x=>x.id===id)||LANDING_TEMPLATE_PRESETS[0];
