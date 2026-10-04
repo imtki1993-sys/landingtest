@@ -2,6 +2,7 @@
 import React from "react";
 import type {LandingV4Data} from "./LandingTemplateV4";
 import {landingTemplate} from "../lib/landing-template-presets";
+import {referenceTemplate} from "../lib/landing-template-reference";
 
 type P={data:LandingV4Data;preview?:boolean;onSubmit?:(e:React.FormEvent<HTMLFormElement>,qty:number)=>void};
 type Spec={hero:"split"|"center"|"media"|"offer"|"editorial";modules:string[];eyebrow:string;headline?:string};
@@ -35,7 +36,7 @@ const SPECS:Record<string,Spec>={
 };
 
 export default function LandingTemplates06to30({data,preview=false,onSubmit}:P){
- const t=landingTemplate(data.templateId),s=SPECS[data.templateId]||SPECS["conversion-max"],c=data.content||{},imgs=data.images||[];
+ const t=landingTemplate(data.templateId),ref=referenceTemplate(data.templateId),s=SPECS[data.templateId]||SPECS["conversion-max"],c=data.content||{},imgs=data.images||[];
  const offers=Array.isArray(c.quantity_offers)&&c.quantity_offers.length?c.quantity_offers:[{qty:1,price:data.price,label:"1 pièce"},{qty:2,price:data.price*2,label:"2 pièces"},{qty:3,price:data.price*3,label:"3 pièces"}];
  const [qty,setQty]=React.useState(Number(c.quantity_default_qty||offers[0]?.qty||1));
  const chosen=offers.find((x:any)=>Number(x.qty)===qty)||offers[0],total=Number(chosen?.price??data.price*qty);
@@ -72,7 +73,7 @@ export default function LandingTemplates06to30({data,preview=false,onSubmit}:P){
    return null;
  };
  const faq=(Array.isArray(c.faq)&&c.faq.length?c.faq:[{question:"Comment commander ?",answer:"Remplissez le formulaire puis notre équipe confirme votre commande."},{question:"Comment payer ?",answer:"Vous payez à la livraison."}]).slice(0,4);
- return <main className={"v46 template-"+data.templateId+" family-"+t.visualFamily+(t.dark?" is-dark":"")} dir={rtl?"rtl":"ltr"} data-v4-template={data.templateId} style={{"--v46-accent":t.accent} as any}>
+ return <main className={"v46 template-"+data.templateId+" family-"+t.visualFamily+(t.dark?" is-dark":"")} dir={rtl?"rtl":"ltr"} data-v4-template={data.templateId} data-reference-template={ref?.no} data-reference-hero={ref?.hero} style={{"--v46-accent":t.accent} as any}>
    <div className="v46-top">{rtl?"التوصيل لجميع المدن · الدفع عند الاستلام":"Livraison partout au Maroc · Paiement à la livraison"}</div>
    <header><b>{t.name}</b><nav><a href="#why">Avantages</a><a href="#order">Commander</a><a href="#faq">FAQ</a></nav><a href="#order">{rtl?"اطلب الآن":"Commander"}</a></header>
    {hero}<div id="why">{s.modules.map(module)}</div>
