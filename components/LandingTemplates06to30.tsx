@@ -48,7 +48,7 @@ export default function LandingTemplates06to30({data,preview=false,onSubmit}:P){
  const price=<div className="v46-price"><b>{data.price} DH</b>{data.oldPrice&&<del>{data.oldPrice} DH</del>}</div>;
  const heroMedia=img((data.templateId==="benefit-cards"||data.templateId==="social-proof") && imgs.length>1 ? 1 : 0,"hero-media");
  const heroOrderForm=(data.templateId==="one-screen-cod")?<form className="v46-hero-order" onSubmit={e=>{if(preview){e.preventDefault();return}onSubmit?.(e,qty)}}><div className="v46-hero-order-head"><small>COMMANDE EXPRESS</small><b>Commandez en moins d’une minute</b></div><input name="name" required={!preview} placeholder="Nom complet"/><input name="phone" required={!preview} inputMode="tel" placeholder="Téléphone"/><input name="city" required={!preview} placeholder="Ville"/><div className="v46-hero-order-packs">{offers.slice(0,3).map((o:any)=><button type="button" key={o.qty} className={qty===Number(o.qty)?"active":""} onClick={()=>setQty(Number(o.qty))}>{o.qty}× <b>{o.price} DH</b></button>)}</div><button type={preview?"button":"submit"}>Confirmer · {total} DH</button><small>✓ Paiement à la livraison</small></form>:null;
- const whatsappPhone=String((data as any).whatsappPhone||(data as any).whatsapp_phone||"").replace(/\\D/g,"");
+ const whatsappPhone=String((data as any).whatsappPhone||(data as any).whatsapp_phone||"").replace(/\D/g,"");
  const whatsappHref=whatsappPhone?"https://wa.me/"+whatsappPhone+"?text="+encodeURIComponent("Salam, je veux commander "+data.name):"#order";
  const heroVariant=data.templateId;
  const heroText=(fallback:string)=>String(c.hero_short_text||c.subheadline||fallback);
