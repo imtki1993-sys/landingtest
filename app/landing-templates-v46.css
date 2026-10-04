@@ -1885,3 +1885,36 @@
  position:relative;
  z-index:1;
 }
+
+
+/* Board audit V11 — remove non-reference decorative overlays/badges found in Hero inspection. */
+.template-auto-gear .hero-composition-auto-gear:after{
+ content:none!important;
+ display:none!important;
+}
+.template-health-trust .hero-composition-health-trust>.hero-media:after{
+ content:none!important;
+ display:none!important;
+}
+
+/* Conversion Max: final state must not resurrect legacy pseudo decorations at any breakpoint. */
+.template-conversion-max .hero-unique-conversion-max:before,
+.template-conversion-max .hero-unique-conversion-max:after{
+ content:none!important;
+ display:none!important;
+ width:0!important;
+ height:0!important;
+}
+.v4-frame.mobile .template-conversion-max .hero-unique-conversion-max:before,
+.v4-frame.tablet .template-conversion-max .hero-unique-conversion-max:before{
+ content:none!important;
+ display:none!important;
+ width:0!important;
+ height:0!important;
+}
+@media(max-width:900px){
+ .landing-v4-runtime:not(.v4-builder-preview) .template-conversion-max .hero-unique-conversion-max:before,
+ .landing-v4-runtime:not(.v4-builder-preview) .template-conversion-max .hero-unique-conversion-max:after{
+  content:none!important;display:none!important;width:0!important;height:0!important
+ }
+}
