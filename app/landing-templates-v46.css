@@ -1728,3 +1728,56 @@
   object-position:center!important;
  }
 }
+
+
+/* V46 media audit — fill framed Hero media without empty gutters.
+   Scoped per template so editorial/intentional contain layouts remain untouched. */
+.template-video-first .v46-video-stage>.hero-media img,
+.template-influencer-pick .v46-creator-stage>.hero-media img,
+.template-flash-sale .hero-composition-flash-sale>.hero-media img,
+.template-bundle-offer .hero-composition-bundle-offer>.hero-media img,
+.template-arabic-cod .hero-composition-arabic-cod>.hero-media img,
+.template-whatsapp-commerce .v46-wa-hero-phone>.hero-media img,
+.template-conversion-max .v46-conversion-product>.hero-media img{
+ width:100%!important;
+ height:100%!important;
+ max-width:none!important;
+ max-height:none!important;
+ object-fit:cover!important;
+ object-position:center!important;
+ display:block!important;
+}
+
+/* Builder mobile/tablet preview must use the same fill policy as desktop/public. */
+.v4-frame.tablet .template-video-first .v46-video-stage>.hero-media img,
+.v4-frame.mobile .template-video-first .v46-video-stage>.hero-media img,
+.v4-frame.tablet .template-influencer-pick .v46-creator-stage>.hero-media img,
+.v4-frame.mobile .template-influencer-pick .v46-creator-stage>.hero-media img,
+.v4-frame.tablet .template-flash-sale .hero-composition-flash-sale>.hero-media img,
+.v4-frame.mobile .template-flash-sale .hero-composition-flash-sale>.hero-media img,
+.v4-frame.tablet .template-bundle-offer .hero-composition-bundle-offer>.hero-media img,
+.v4-frame.mobile .template-bundle-offer .hero-composition-bundle-offer>.hero-media img,
+.v4-frame.tablet .template-arabic-cod .hero-composition-arabic-cod>.hero-media img,
+.v4-frame.mobile .template-arabic-cod .hero-composition-arabic-cod>.hero-media img,
+.v4-frame.tablet .template-whatsapp-commerce .v46-wa-hero-phone>.hero-media img,
+.v4-frame.mobile .template-whatsapp-commerce .v46-wa-hero-phone>.hero-media img,
+.v4-frame.tablet .template-conversion-max .v46-conversion-product>.hero-media img,
+.v4-frame.mobile .template-conversion-max .v46-conversion-product>.hero-media img{
+ width:100%!important;
+ height:100%!important;
+ object-fit:cover!important;
+ object-position:center!important;
+}
+
+/* Public responsive runtime parity. */
+@media(max-width:900px){
+ .landing-v4-runtime:not(.v4-builder-preview) .template-video-first .v46-video-stage>.hero-media img,
+ .landing-v4-runtime:not(.v4-builder-preview) .template-influencer-pick .v46-creator-stage>.hero-media img,
+ .landing-v4-runtime:not(.v4-builder-preview) .template-flash-sale .hero-composition-flash-sale>.hero-media img,
+ .landing-v4-runtime:not(.v4-builder-preview) .template-bundle-offer .hero-composition-bundle-offer>.hero-media img,
+ .landing-v4-runtime:not(.v4-builder-preview) .template-arabic-cod .hero-composition-arabic-cod>.hero-media img,
+ .landing-v4-runtime:not(.v4-builder-preview) .template-whatsapp-commerce .v46-wa-hero-phone>.hero-media img,
+ .landing-v4-runtime:not(.v4-builder-preview) .template-conversion-max .v46-conversion-product>.hero-media img{
+  width:100%!important;height:100%!important;object-fit:cover!important;object-position:center!important
+ }
+}
