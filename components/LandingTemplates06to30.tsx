@@ -18,21 +18,21 @@ const SPECS:Record<string,Spec>={
  "before-after":{hero:"split",modules:["compare","benefits","proof"],eyebrow:"VOYEZ LA DIFFÉRENCE"},
  "story-selling":{hero:"editorial",modules:["problem","story","benefits","proof"],eyebrow:"UNE HISTOIRE, UNE SOLUTION"},
  "video-first":{hero:"media",modules:["video","benefits","gallery","proof"],eyebrow:"VOIR EN ACTION"},
- "image-first":{hero:"editorial",modules:["gallery","story","benefits"],eyebrow:"LE PRODUIT EN IMAGE"},
- "benefit-cards":{hero:"center",modules:["benefits","features","proof"],eyebrow:"DES BÉNÉFICES CONCRETS"},
- "feature-showcase":{hero:"split",modules:["features","specs","how","proof"],eyebrow:"CHAQUE DÉTAIL COMPTE"},
- "social-proof":{hero:"center",modules:["proof","ugc","benefits"],eyebrow:"PLÉBISCITÉ PAR NOS CLIENTS"},
- "influencer-pick":{hero:"media",modules:["ugc","proof","benefits"],eyebrow:"CREATOR'S PICK"},
- "one-screen-cod":{hero:"offer",modules:["trust","benefits"],eyebrow:"COMMANDE EXPRESS"},
- "long-sales":{hero:"split",modules:["problem","story","benefits","features","how","proof"],eyebrow:"DÉCOUVREZ POURQUOI"},
- "comparison-pro":{hero:"split",modules:["compare","features","benefits","proof"],eyebrow:"COMPAREZ PAR VOUS-MÊME"},
+ "image-first":{hero:"editorial",modules:["gallery","benefits","proof"],eyebrow:"LE PRODUIT EN IMAGE"},
+ "benefit-cards":{hero:"center",modules:["benefits","proof","reviews"],eyebrow:"DES BÉNÉFICES CONCRETS"},
+ "feature-showcase":{hero:"split",modules:["features","specs","proof","reviews"],eyebrow:"CHAQUE DÉTAIL COMPTE"},
+ "social-proof":{hero:"center",modules:["proof","ugc","reviews"],eyebrow:"PLÉBISCITÉ PAR NOS CLIENTS"},
+ "influencer-pick":{hero:"media",modules:["ugc","proof","benefits","reviews"],eyebrow:"CREATOR'S PICK"},
+ "one-screen-cod":{hero:"offer",modules:["benefits","proof"],eyebrow:"COMMANDE EXPRESS"},
+ "long-sales":{hero:"split",modules:["problem","story","features","proof","reviews"],eyebrow:"DÉCOUVREZ POURQUOI"},
+ "comparison-pro":{hero:"split",modules:["compare","features","proof","reviews"],eyebrow:"COMPAREZ PAR VOUS-MÊME"},
  "bundle-offer":{hero:"offer",modules:["bundle","benefits","proof"],eyebrow:"PLUS VOUS PRENEZ, PLUS VOUS ÉCONOMISEZ"},
- "fashion-editorial":{hero:"editorial",modules:["gallery","story","details","proof"],eyebrow:"NEW EDIT"},
+ "fashion-editorial":{hero:"editorial",modules:["lookbook","details","proof"],eyebrow:"NEW EDIT"},
  "home-solution":{hero:"split",modules:["problem","benefits","how","proof"],eyebrow:"MAISON PLUS SIMPLE"},
- "arabic-cod":{hero:"offer",modules:["trust","benefits","proof"],eyebrow:"الدفع عند الاستلام"},
- "darija-morocco":{hero:"split",modules:["benefits","trust","proof"],eyebrow:"مختار للمغرب"},
- "whatsapp-commerce":{hero:"offer",modules:["trust","benefits","proof"],eyebrow:"WHATSAPP COMMERCE"},
- "conversion-max":{hero:"offer",modules:["trust","benefits","features","proof","bundle"],eyebrow:"OFFRE PERFORMANCE"}
+ "arabic-cod":{hero:"offer",modules:["benefits","proof","reviews"],eyebrow:"الدفع عند الاستلام"},
+ "darija-morocco":{hero:"split",modules:["benefits","proof","reviews"],eyebrow:"مختار للمغرب"},
+ "whatsapp-commerce":{hero:"offer",modules:["whatsapp","benefits","proof"],eyebrow:"WHATSAPP COMMERCE"},
+ "conversion-max":{hero:"offer",modules:["countdown","benefits","bundle","proof"],eyebrow:"OFFRE PERFORMANCE"}
 };
 
 export default function LandingTemplates06to30({data,preview=false,onSubmit}:P){
@@ -65,6 +65,8 @@ export default function LandingTemplates06to30({data,preview=false,onSubmit}:P){
    if(m==="story")return <section className="v46-story" key={m+i}>{img(1)}<div><small>NOTRE APPROCHE</small><h2>{c.features_title||"Pensé dans les moindres détails"}</h2><p>{c.description||sub}</p><a href="#order">Découvrir l'offre →</a></div></section>;
    if(m==="problem")return <section className="v46-problem" key={m+i}><div><small>AVANT</small><h2>{c.problem_title||"Le problème que vous connaissez déjà"}</h2><p>{c.problem||"Les solutions ordinaires compliquent souvent une tâche qui devrait rester simple."}</p></div><div><small>APRÈS</small><h2>Une solution plus simple</h2><p>{c.solution||sub}</p></div></section>;
    if(m==="compare")return <section className="v46-compare" key={m+i}><article><b>AVANT</b>{img(1)}</article><article><b>AVEC "+data.name+"</b>{img(2)}</article></section>;
+   if(m==="lookbook")return <section className="v46-lookbook" key={m+i}><div className="v46-section-head"><small>LOOKBOOK</small><h2>La collection en mouvement</h2></div><div>{[0,1,2,3].map(n=><React.Fragment key={n}>{img(n)}</React.Fragment>)}</div></section>;
+   if(m==="whatsapp")return <section className="v46-whatsapp-flow" key={m+i}><div><small>WHATSAPP COMMERCE</small><h2>Commandez directement sur WhatsApp</h2><p>Choisissez votre offre, envoyez votre demande et confirmez simplement votre commande.</p><a href="#order">Commander sur WhatsApp</a></div>{img(1)}</section>;
    if(m==="gallery")return <section className={"v46-gallery gallery-"+data.templateId} key={m+i}><div className="v46-section-head"><small>{data.templateId==="auto-gear"?"SUR LA ROUTE":data.templateId==="tech-gadget"?"PRODUCT VIEW":data.templateId==="video-first"?"EN SITUATION":"GALERIE"}</small><h2>{data.templateId==="auto-gear"?"Pensé pour votre véhicule":data.templateId==="tech-gadget"?"Chaque angle compte":data.templateId==="video-first"?"Regardez-le de plus près":"Découvrez le produit"}</h2></div><div className="v46-gallery-grid">{[0,1,2,3].map(n=><React.Fragment key={n}>{img(n)}</React.Fragment>)}</div></section>;
    if(m==="video")return <section className="v46-video" key={m+i}>{img(1)}<div className="v46-play">▶</div><strong>Découvrez le produit en situation réelle</strong></section>;
    if(m==="ugc")return <section className="v46-ugc" key={m+i}><div className="v46-section-head"><small>COMMUNAUTÉ</small><h2>Vu, testé, adopté</h2></div><div>{[1,2,3].map(n=><article key={n}>{img(n)}<b>★★★★★</b><p>“Pratique, beau et vraiment utile au quotidien.”</p></article>)}</div></section>;
