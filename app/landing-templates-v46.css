@@ -876,3 +876,71 @@
 .v4-frame.tablet :is(.v46-auto-specs>div:last-child,.v46-tech-specs>div:last-child,.v46-tech-features>div:last-child){grid-template-columns:repeat(2,1fr)!important}
 .v4-frame.mobile :is(.v46-auto-specs,.v46-tech-specs,.v46-tech-features){padding:44px 18px!important}.v4-frame.mobile :is(.v46-auto-specs>div:last-child,.v46-tech-specs>div:last-child,.v46-tech-features>div:last-child,.gallery-auto-gear .v46-gallery-grid,.gallery-tech-gadget .v46-gallery-grid,.gallery-video-first .v46-gallery-grid){grid-template-columns:1fr!important;grid-template-rows:auto!important}.v4-frame.mobile :is(.gallery-auto-gear,.gallery-tech-gadget,.gallery-video-first) .v46-media{height:320px!important;grid-row:auto!important}
 @media(max-width:700px){.landing-v4-runtime:not(.v4-builder-preview) :is(.v46-auto-specs,.v46-tech-specs,.v46-tech-features){padding:44px 18px}.landing-v4-runtime:not(.v4-builder-preview) :is(.v46-auto-specs>div:last-child,.v46-tech-specs>div:last-child,.v46-tech-features>div:last-child,.gallery-auto-gear .v46-gallery-grid,.gallery-tech-gadget .v46-gallery-grid,.gallery-video-first .v46-gallery-grid){grid-template-columns:1fr;grid-template-rows:auto}.landing-v4-runtime:not(.v4-builder-preview) :is(.gallery-auto-gear,.gallery-tech-gadget,.gallery-video-first) .v46-media{height:320px;grid-row:auto}}
+
+/* CRITICAL FLOW FIX — gallery markup now owns an inner grid.
+   The legacy .v46-gallery grid expected media as direct children and caused
+   gallery images to escape into Benefits / Proof / Order on PC and mobile. */
+.v46 .v46-gallery{
+ display:block!important;
+ grid-template-columns:none!important;
+ grid-template-rows:none!important;
+ height:auto!important;
+ min-height:0!important;
+ overflow:hidden!important;
+ position:relative!important;
+ isolation:isolate!important;
+ padding:64px 24px!important;
+ margin:0 auto!important;
+ max-width:1180px!important;
+}
+.v46 .v46-gallery>.v46-section-head{position:relative!important;z-index:1!important;margin:0 auto 30px!important}
+.v46 .v46-gallery>.v46-gallery-grid{
+ position:relative!important;
+ inset:auto!important;
+ transform:none!important;
+ width:100%!important;
+ height:auto!important;
+ min-height:0!important;
+ margin:0!important;
+ z-index:1!important;
+}
+.v46 .v46-gallery>.v46-gallery-grid>.v46-media{
+ position:relative!important;
+ inset:auto!important;
+ transform:none!important;
+ min-width:0!important;
+ max-width:100%!important;
+ overflow:hidden!important;
+}
+.v46 .v46-gallery>.v46-gallery-grid>.v46-media img{
+ position:relative!important;
+ inset:auto!important;
+ transform:none!important;
+ display:block!important;
+ width:100%!important;
+ max-width:100%!important;
+ height:100%!important;
+ object-fit:cover!important;
+}
+.v46 .gallery-auto-gear>.v46-gallery-grid{display:grid!important;grid-template-columns:1.4fr .6fr .6fr!important;grid-template-rows:240px 240px!important;gap:12px!important}
+.v46 .gallery-auto-gear>.v46-gallery-grid>.v46-media:first-child{grid-row:1/3!important}
+.v46 .gallery-tech-gadget>.v46-gallery-grid{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;grid-template-rows:none!important;gap:14px!important}
+.v46 .gallery-tech-gadget>.v46-gallery-grid>.v46-media{height:330px!important}
+.v46 .gallery-video-first>.v46-gallery-grid{display:grid!important;grid-template-columns:2fr 1fr 1fr!important;grid-template-rows:auto!important;gap:12px!important}
+.v46 .gallery-video-first>.v46-gallery-grid>.v46-media{height:280px!important}
+.v46 .gallery-video-first>.v46-gallery-grid>.v46-media:first-child{height:572px!important;grid-row:span 2!important}
+
+/* Every major section owns its vertical space; no media can paint over the next section. */
+.v46 :is(.v46-auto-specs,.v46-tech-specs,.v46-tech-features,.v46-compare,.v46-story,.v46-problem,.v46-video,.v46-proof,.v46-order,.v46-faq){
+ position:relative!important;
+ clear:both!important;
+}
+.v4-frame.mobile .v46 .v46-gallery,
+.v4-frame.tablet .v46 .v46-gallery{overflow:hidden!important}
+.v4-frame.mobile .v46 .v46-gallery>.v46-gallery-grid{display:grid!important;grid-template-columns:1fr!important;grid-template-rows:none!important;gap:14px!important}
+.v4-frame.mobile .v46 .v46-gallery>.v46-gallery-grid>.v46-media{height:300px!important;grid-column:auto!important;grid-row:auto!important}
+@media(max-width:700px){
+ .landing-v4-runtime:not(.v4-builder-preview) .v46 .v46-gallery{display:block!important;height:auto!important;min-height:0!important;overflow:hidden!important;padding:44px 18px!important}
+ .landing-v4-runtime:not(.v4-builder-preview) .v46 .v46-gallery>.v46-gallery-grid{display:grid!important;grid-template-columns:1fr!important;grid-template-rows:none!important;gap:14px!important;height:auto!important}
+ .landing-v4-runtime:not(.v4-builder-preview) .v46 .v46-gallery>.v46-gallery-grid>.v46-media{height:300px!important;grid-column:auto!important;grid-row:auto!important}
+}
