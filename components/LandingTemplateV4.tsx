@@ -1,37 +1,28 @@
 "use client";
+// Point d'entrée historique des templates : délègue au moteur LandPro (60 templates).
 import React from "react";
-import {landingTemplate} from "../lib/landing-template-presets";
-import LandingTemplates01to05 from "./LandingTemplates01to05";
-import LandingTemplates06to30 from "./LandingTemplates06to30";
-import LandingTemplates31to35 from "./LandingTemplates31to35";
+import LandproTemplate from "./landpro/LandproTemplate";
+import type { LandingV4Data } from "./landpro/types";
 
-export type LandingV4Data={templateId:string;name:string;description?:string;price:number;oldPrice?:number|string;images?:string[];content?:any;locale?:string};
-type V4Props={data:LandingV4Data;preview?:boolean;onSubmit?:(e:React.FormEvent<HTMLFormElement>,qty:number)=>void};
-// Répartiteur sans hook : chaque famille de templates est un composant séparé.
-// La clé templateId remet l'état à zéro quand on change de template dans l'éditeur.
-export default function LandingTemplateV4({data,preview=false,onSubmit}:V4Props){
- const firstFive=["cod-direct","premium-product","ugc-social","problem-solver","marketplace-cod"].includes(data.templateId);if(firstFive)return <LandingTemplates01to05 key={data.templateId} data={data} preview={preview} onSubmit={onSubmit}/>;
- const nextCollection=["apple-product","samsung-launch","dyson-premium","nothing-tech","gaming-neon"].includes(data.templateId);if(nextCollection)return <LandingTemplates31to35 key={data.templateId} data={data} preview={preview} onSubmit={onSubmit}/>;
- const remainingTemplates=["flash-sale","minimal-clean","luxury-black","beauty-glow","health-trust","auto-gear","tech-gadget","before-after","story-selling","video-first","image-first","benefit-cards","feature-showcase","social-proof","influencer-pick","one-screen-cod","long-sales","comparison-pro","bundle-offer","fashion-editorial","home-solution","arabic-cod","darija-morocco","whatsapp-commerce","conversion-max"].includes(data.templateId);if(remainingTemplates)return <LandingTemplates06to30 key={data.templateId} data={data} preview={preview} onSubmit={onSubmit}/>;
- return <LandingTemplateGeneric key={data.templateId} data={data} preview={preview} onSubmit={onSubmit}/>;
-}
-function LandingTemplateGeneric({data,preview=false,onSubmit}:V4Props){
- const t=landingTemplate(data.templateId),c=data.content||{},images=data.images||[],offers=Array.isArray(c.quantity_offers)&&c.quantity_offers.length?c.quantity_offers:[{qty:1,price:data.price,label:"1 pièce"},{qty:2,price:data.price*2,label:"2 pièces"},{qty:3,price:data.price*3,label:"3 pièces"}];
- const [qty,setQty]=React.useState(Number(c.quantity_default_qty||offers[0]?.qty||1));const selected=offers.find((x:any)=>Number(x.qty)===qty),total=Number(selected?.price??data.price*qty),rtl=String(data.locale||"").startsWith("ar")||["arabic-cod","darija-morocco","whatsapp-commerce"].includes(data.templateId);
- const copy:any={headline:c.headline||data.name,subheadline:c.subheadline||c.description||data.description||t.description,benefits:(c.benefits||["Simple à utiliser","Conçu pour le quotidien","Commande sécurisée"]).slice(0,3),features:(c.features||[]).slice(0,4),faq:(c.faq||[]).slice(0,4)};
- const image=(i:number,cls="")=>images[i]?<img className={cls} src={images[i]} alt={data.name}/>:<div className={"v4-product "+cls}><div className="v4-product-shape"/><span>{data.name}</span></div>;
- const social=["ugc-social","social-proof","influencer-pick"].includes(data.templateId),compare=["before-after","comparison-pro"].includes(data.templateId),bundle=data.templateId==="bundle-offer";
- return <main className={"v4-demo family-"+t.visualFamily+(t.dark?" is-dark":"")} data-v4-template={t.id} dir={rtl?"rtl":"ltr"} style={{"--a":t.accent} as any}>
-  <div className="v4-top">{rtl?"الدفع عند الاستلام · التوصيل لجميع المدن":"Livraison partout au Maroc · Paiement à la livraison"}</div>
-  <header><b>{t.name}</b><nav>{rtl?"الرئيسية　المميزات　الآراء　الأسئلة":"Accueil　Avantages　Avis　FAQ"}</nav><a href="#order">{rtl?"اطلب الآن":"Commander"}</a></header>
-  <section className="v4-hero"><div className="v4-copy"><span>{t.category}</span><h1>{copy.headline}</h1><p>{copy.subheadline}</p><div className="v4-price"><b>{data.price} DH</b>{data.oldPrice&&<del>{data.oldPrice} DH</del>}</div><a href="#order" className="v4-cta">{c.cta||(rtl?"اطلب الآن":"Commander maintenant")}</a></div>{image(0)}</section>
-  {compare&&<section className="v4-compare"><article>{rtl?"قبل":"AVANT"}{image(1,"v4-compare-image")}</article><article>{rtl?"بعد":"APRÈS"}{image(2,"v4-compare-image")}</article></section>}
-  {social&&<section className="v4-social"><h2>{rtl?"آراء الزبناء":"Ils parlent du produit"}</h2><div>{["★★★★★","★★★★★","★★★★★"].map((x,i)=><article key={i}>{x}<p>{rtl?"منتج عملي والتوصيل كان سريع.":"Simple, pratique et exactement ce que je cherchais."}</p></article>)}</div></section>}
-  <section className="v4-benefits">{copy.benefits.map((x:any,i:number)=><article key={i}><i>0{i+1}</i><b>{typeof x==="string"?x:x?.title||x?.text}</b><p>{typeof x==="object"?x?.text:"Une expérience claire et immédiate."}</p></article>)}</section>
-  <section className="v4-story">{image(1)}<div><small>{rtl?"لماذا هذا المنتج؟":"POURQUOI CE PRODUIT ?"}</small><h2>{c.features_title||(rtl?"مصمم ليسهل عليك حياتك":"Pensé pour vous simplifier la vie")}</h2><p>{c.description||data.description||t.description}</p><ul>{(copy.features.length?copy.features:["Bénéfice principal clairement présenté","Caractéristiques importantes","Réassurance avant commande"]).map((x:any,i:number)=><li key={i}>✓ {typeof x==="string"?x:x?.title||x?.text}</li>)}</ul></div></section>
-  {bundle&&<section className="v4-bundles"><h2>{rtl?"اختار العرض ديالك":"Choisissez votre offre"}</h2><div>{offers.slice(0,3).map((o:any,i:number)=><article key={i} className={i===1?"hot":""}>{o.label||o.qty+" pièces"}<b>{o.price} DH</b></article>)}</div></section>}
-  <section className="v4-order-section" id="order"><div><small>{rtl?"الطلب":"COMMANDE COD"}</small><h2>{rtl?"توصل بالمنتج حتى لباب دارك":"Recevez votre produit chez vous"}</h2><p>{c.delivery||(rtl?"خلص غير ملي يوصلك الطلب.":"Vous payez uniquement à la livraison.")}</p></div><div className="v4-order"><h3>{rtl?"أكد الطلب ديالك":"Commandez maintenant"}</h3><form onSubmit={e=>{if(preview){e.preventDefault();return}onSubmit?.(e,qty)}}><input name="name" required={!preview} placeholder={rtl?"الاسم الكامل":"Nom complet"}/><input name="phone" required={!preview} inputMode="tel" placeholder={rtl?"رقم الهاتف":"Téléphone"}/><input name="city" required={!preview} placeholder={rtl?"المدينة":"Ville"}/><input name="address" placeholder={rtl?"العنوان":"Adresse"}/><div className="v4-packs">{offers.slice(0,3).map((o:any)=><button type="button" key={o.qty} className={qty===Number(o.qty)?"active":""} onClick={()=>setQty(Number(o.qty))}>{o.label||o.qty+" pièces"}<br/><b>{o.price} DH</b></button>)}</div><button className="v4-buy" type={preview?"button":"submit"}>{data.templateId==="whatsapp-commerce"?"WhatsApp":(c.cta||(rtl?"أكد الطلب":"Confirmer la commande"))} · {total} DH</button></form><small>{rtl?"الدفع عند الاستلام · التوصيل لجميع المدن":"Paiement à la livraison · Livraison partout au Maroc"}</small></div></section>
-  <section className="v4-faq"><h2>{rtl?"الأسئلة الشائعة":"Questions fréquentes"}</h2>{(copy.faq.length?copy.faq:[{question:"Comment commander ?",answer:"Complétez le formulaire et confirmez votre commande."},{question:"Comment payer ?",answer:"Le paiement se fait à la livraison."}]).map((f:any,i:number)=><details key={i} open={i===0}><summary>{typeof f==="string"?f:f.question}</summary><p>{typeof f==="string"?"":f.answer}</p></details>)}</section>
-  <footer><b>{t.name}</b><span>Landing Template V4 · LandPro</span></footer>
- </main>
+export type { LandingV4Data };
+
+export default function LandingTemplateV4({ data, preview = false, demo = false, builderMode = false, onSectionSelect, onSubmit }: {
+  data: LandingV4Data;
+  preview?: boolean;
+  demo?: boolean;
+  builderMode?: boolean;
+  onSectionSelect?: (id: string) => void;
+  onSubmit?: (e: React.FormEvent<HTMLFormElement>, qty: number) => void;
+}) {
+  return (
+    <LandproTemplate
+      key={data.templateId}
+      data={data}
+      preview={preview}
+      demo={demo}
+      builderMode={builderMode}
+      onSectionSelect={onSectionSelect}
+      onSubmit={onSubmit}
+    />
+  );
 }

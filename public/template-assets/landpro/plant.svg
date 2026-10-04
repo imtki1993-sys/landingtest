@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600" width="600" height="600">
+<defs>
+  <radialGradient id="sh-plant" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#000" stop-opacity=".35"/><stop offset="1" stop-color="#000" stop-opacity="0"/></radialGradient>
+  <linearGradient id="gloss-plant" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".55"/><stop offset=".5" stop-color="#fff" stop-opacity="0"/></linearGradient>
+  <linearGradient id="pl1" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#7ed27a"/><stop offset="1" stop-color="#2e7d32"/></linearGradient><linearGradient id="pl2" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f1e6d6"/><stop offset="1" stop-color="#cbb89c"/></linearGradient>
+</defs>
+<ellipse cx="300" cy="545" rx="190" ry="26" fill="url(#sh-plant)"/>
+
+    <path d="M220 380 L380 380 L360 520 L240 520 Z" fill="url(#pl2)"/>
+    <g fill="url(#pl1)">
+      <path d="M300 380 C230 300 180 260 150 170 C230 190 290 260 300 380 Z"/>
+      <path d="M300 380 C370 300 420 260 450 170 C370 190 310 260 300 380 Z"/>
+      <path d="M300 380 C280 270 290 170 300 80 C320 170 330 270 300 380 Z"/>
+    </g>
+</svg>

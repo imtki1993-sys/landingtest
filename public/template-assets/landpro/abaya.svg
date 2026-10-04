@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600" width="600" height="600">
+<defs>
+  <radialGradient id="sh-abaya" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#000" stop-opacity=".35"/><stop offset="1" stop-color="#000" stop-opacity="0"/></radialGradient>
+  <linearGradient id="gloss-abaya" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".55"/><stop offset=".5" stop-color="#fff" stop-opacity="0"/></linearGradient>
+  <linearGradient id="ab1" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#8a4a6a"/><stop offset="1" stop-color="#4a2338"/></linearGradient>
+</defs>
+<ellipse cx="300" cy="545" rx="190" ry="26" fill="url(#sh-abaya)"/>
+
+    <circle cx="300" cy="105" r="48" fill="#e8c7a8"/>
+    <path d="M240 95 C240 30 360 30 360 95 L370 170 L230 170 Z" fill="url(#ab1)"/>
+    <path d="M230 160 L370 160 L460 540 L140 540 Z" fill="url(#ab1)"/>
+    <path d="M300 170 L300 540" stroke="#d9b78a" stroke-width="3"/>
+</svg>

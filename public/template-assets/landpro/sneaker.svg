@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600" width="600" height="600">
+<defs>
+  <radialGradient id="sh-sneaker" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#000" stop-opacity=".35"/><stop offset="1" stop-color="#000" stop-opacity="0"/></radialGradient>
+  <linearGradient id="gloss-sneaker" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".55"/><stop offset=".5" stop-color="#fff" stop-opacity="0"/></linearGradient>
+  <linearGradient id="sn1" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2c2f36"/><stop offset="1" stop-color="#0a0b0d"/></linearGradient>
+</defs>
+<ellipse cx="300" cy="545" rx="190" ry="26" fill="url(#sh-sneaker)"/>
+
+    <path d="M90 420 C110 330 200 300 250 250 L330 230 C350 300 420 320 500 340 C540 350 540 420 520 440 Z" fill="url(#sn1)"/>
+    <path d="M85 430 L525 440 C530 470 520 490 500 492 L100 488 C80 485 78 450 85 430 Z" fill="#f4f4f4"/>
+    <path d="M85 470 L525 475 L520 492 L100 490 Z" fill="#d23b3b"/>
+    <g stroke="#fff" stroke-width="6" stroke-linecap="round"><line x1="270" y1="270" x2="300" y2="290"/><line x1="285" y1="255" x2="318" y2="275"/><line x1="300" y1="242" x2="335" y2="262"/></g>
+    <path d="M90 420 C110 330 200 300 250 250 L330 230 C350 300 420 320 500 340 C540 350 540 420 520 440 Z" fill="url(#gloss-sneaker)"/>
+</svg>

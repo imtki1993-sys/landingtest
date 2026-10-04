@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600" width="600" height="600">
+<defs>
+  <radialGradient id="sh-smartphone" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#000" stop-opacity=".35"/><stop offset="1" stop-color="#000" stop-opacity="0"/></radialGradient>
+  <linearGradient id="gloss-smartphone" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".55"/><stop offset=".5" stop-color="#fff" stop-opacity="0"/></linearGradient>
+  <linearGradient id="sp1" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#c9ccd3"/><stop offset="1" stop-color="#6d7179"/></linearGradient><linearGradient id="sp2" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#1d2a6b"/><stop offset="1" stop-color="#6e2ca8"/></linearGradient><linearGradient id="sp3" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#66e0ff"/><stop offset="1" stop-color="#8a3cff"/></linearGradient>
+</defs>
+<ellipse cx="300" cy="545" rx="190" ry="26" fill="url(#sh-smartphone)"/>
+
+    <rect x="190" y="50" width="220" height="460" rx="40" fill="url(#sp1)"/>
+    <rect x="202" y="62" width="196" height="436" rx="30" fill="url(#sp2)"/>
+    <rect x="265" y="74" width="70" height="18" rx="9" fill="#08090b"/>
+    <circle cx="300" cy="280" r="80" fill="url(#sp3)" opacity=".9"/>
+    <rect x="190" y="50" width="220" height="460" rx="40" fill="url(#gloss-smartphone)"/>
+</svg>

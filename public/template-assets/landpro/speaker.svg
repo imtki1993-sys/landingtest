@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600" width="600" height="600">
+<defs>
+  <radialGradient id="sh-speaker" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#000" stop-opacity=".35"/><stop offset="1" stop-color="#000" stop-opacity="0"/></radialGradient>
+  <linearGradient id="gloss-speaker" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".55"/><stop offset=".5" stop-color="#fff" stop-opacity="0"/></linearGradient>
+  <linearGradient id="sk1" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#c8cdd5"/></linearGradient>
+</defs>
+<ellipse cx="300" cy="545" rx="190" ry="26" fill="url(#sh-speaker)"/>
+
+    <ellipse cx="300" cy="470" rx="150" ry="40" fill="#d9dde3"/>
+    <path d="M150 300 C150 160 450 160 450 300 L450 470 L150 470 Z" fill="url(#sk1)"/>
+    <ellipse cx="300" cy="300" rx="150" ry="0.1" fill="none"/>
+    <ellipse cx="300" cy="215" rx="70" ry="16" fill="#9bd7ff" opacity=".8"/>
+    <path d="M150 300 C150 160 450 160 450 300 L450 470 L150 470 Z" fill="url(#gloss-speaker)"/>
+</svg>

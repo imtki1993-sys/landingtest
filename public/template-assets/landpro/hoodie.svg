@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600" width="600" height="600">
+<defs>
+  <radialGradient id="sh-hoodie" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#000" stop-opacity=".35"/><stop offset="1" stop-color="#000" stop-opacity="0"/></radialGradient>
+  <linearGradient id="gloss-hoodie" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".55"/><stop offset=".5" stop-color="#fff" stop-opacity="0"/></linearGradient>
+  <linearGradient id="ho1" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2c2e33"/><stop offset="1" stop-color="#0e0f12"/></linearGradient>
+</defs>
+<ellipse cx="300" cy="545" rx="190" ry="26" fill="url(#sh-hoodie)"/>
+
+    <path d="M220 90 C250 60 350 60 380 90 L470 150 L520 330 L450 350 L430 260 L430 520 L170 520 L170 260 L150 350 L80 330 L130 150 Z" fill="url(#ho1)"/>
+    <path d="M240 100 C260 170 340 170 360 100" fill="#0d0e10"/>
+    <rect x="235" y="380" width="130" height="70" rx="14" fill="#1c1e22"/>
+    <line x1="285" y1="160" x2="280" y2="250" stroke="#c9ccd2" stroke-width="4"/><line x1="315" y1="160" x2="320" y2="250" stroke="#c9ccd2" stroke-width="4"/>
+</svg>

@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600" width="600" height="600">
+<defs>
+  <radialGradient id="sh-serum" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#000" stop-opacity=".35"/><stop offset="1" stop-color="#000" stop-opacity="0"/></radialGradient>
+  <linearGradient id="gloss-serum" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".55"/><stop offset=".5" stop-color="#fff" stop-opacity="0"/></linearGradient>
+  <linearGradient id="sr1" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffd9e2"/><stop offset="1" stop-color="#f3a9bb"/></linearGradient><linearGradient id="sr2" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#cfcfcf"/></linearGradient>
+</defs>
+<ellipse cx="300" cy="545" rx="190" ry="26" fill="url(#sh-serum)"/>
+
+    <rect x="262" y="60" width="76" height="110" rx="30" fill="url(#sr2)"/>
+    <rect x="250" y="160" width="100" height="40" rx="8" fill="#d8d8d8"/>
+    <rect x="200" y="195" width="200" height="320" rx="40" fill="url(#sr1)"/>
+    <rect x="225" y="300" width="150" height="110" rx="10" fill="#fff" opacity=".85"/>
+    <text x="300" y="350" font-family="Helvetica,Arial" font-size="24" font-weight="700" fill="#e08aa0" text-anchor="middle">SÉRUM</text>
+    <text x="300" y="380" font-family="Helvetica,Arial" font-size="15" fill="#9a8f93" text-anchor="middle">Hyaluronique 2%</text>
+    <rect x="200" y="195" width="200" height="320" rx="40" fill="url(#gloss-serum)"/>
+</svg>

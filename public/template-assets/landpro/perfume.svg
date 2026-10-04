@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600" width="600" height="600">
+<defs>
+  <radialGradient id="sh-perfume" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#000" stop-opacity=".35"/><stop offset="1" stop-color="#000" stop-opacity="0"/></radialGradient>
+  <linearGradient id="gloss-perfume" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".55"/><stop offset=".5" stop-color="#fff" stop-opacity="0"/></linearGradient>
+  <linearGradient id="pf1" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#3b2a14"/><stop offset="1" stop-color="#0f0a05"/></linearGradient><linearGradient id="pf2" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#8a5a1c"/><stop offset="1" stop-color="#2a1a08"/></linearGradient><linearGradient id="pf3" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f2d38f"/><stop offset="1" stop-color="#9d7428"/></linearGradient>
+</defs>
+<ellipse cx="300" cy="545" rx="190" ry="26" fill="url(#sh-perfume)"/>
+
+    <rect x="255" y="70" width="90" height="70" rx="10" fill="url(#pf3)"/>
+    <rect x="275" y="135" width="50" height="40" fill="#b48a3c"/>
+    <rect x="165" y="170" width="270" height="340" rx="34" fill="url(#pf1)"/>
+    <rect x="185" y="200" width="230" height="290" rx="22" fill="url(#pf2)" opacity=".85"/>
+    <rect x="215" y="300" width="170" height="80" rx="6" fill="none" stroke="#d9b56b" stroke-width="2"/>
+    <text x="300" y="347" font-family="Georgia,serif" font-size="26" fill="#e8cf95" text-anchor="middle" letter-spacing="6">ÉLIXIR</text>
+    <rect x="165" y="170" width="270" height="340" rx="34" fill="url(#gloss-perfume)"/>
+</svg>
