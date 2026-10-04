@@ -6,10 +6,16 @@ import LandingTemplates06to30 from "./LandingTemplates06to30";
 import LandingTemplates31to35 from "./LandingTemplates31to35";
 
 export type LandingV4Data={templateId:string;name:string;description?:string;price:number;oldPrice?:number|string;images?:string[];content?:any;locale?:string};
-export default function LandingTemplateV4({data,preview=false,onSubmit}:{data:LandingV4Data;preview?:boolean;onSubmit?:(e:React.FormEvent<HTMLFormElement>,qty:number)=>void}){
- const firstFive=["cod-direct","premium-product","ugc-social","problem-solver","marketplace-cod"].includes(data.templateId);if(firstFive)return <LandingTemplates01to05 data={data} preview={preview} onSubmit={onSubmit}/>;
- const nextCollection=["apple-product","samsung-launch","dyson-premium","nothing-tech","gaming-neon"].includes(data.templateId);if(nextCollection)return <LandingTemplates31to35 data={data} preview={preview} onSubmit={onSubmit}/>;
- const remainingTemplates=["flash-sale","minimal-clean","luxury-black","beauty-glow","health-trust","auto-gear","tech-gadget","before-after","story-selling","video-first","image-first","benefit-cards","feature-showcase","social-proof","influencer-pick","one-screen-cod","long-sales","comparison-pro","bundle-offer","fashion-editorial","home-solution","arabic-cod","darija-morocco","whatsapp-commerce","conversion-max"].includes(data.templateId);if(remainingTemplates)return <LandingTemplates06to30 data={data} preview={preview} onSubmit={onSubmit}/>;
+type V4Props={data:LandingV4Data;preview?:boolean;onSubmit?:(e:React.FormEvent<HTMLFormElement>,qty:number)=>void};
+// Répartiteur sans hook : chaque famille de templates est un composant séparé.
+// La clé templateId remet l'état à zéro quand on change de template dans l'éditeur.
+export default function LandingTemplateV4({data,preview=false,onSubmit}:V4Props){
+ const firstFive=["cod-direct","premium-product","ugc-social","problem-solver","marketplace-cod"].includes(data.templateId);if(firstFive)return <LandingTemplates01to05 key={data.templateId} data={data} preview={preview} onSubmit={onSubmit}/>;
+ const nextCollection=["apple-product","samsung-launch","dyson-premium","nothing-tech","gaming-neon"].includes(data.templateId);if(nextCollection)return <LandingTemplates31to35 key={data.templateId} data={data} preview={preview} onSubmit={onSubmit}/>;
+ const remainingTemplates=["flash-sale","minimal-clean","luxury-black","beauty-glow","health-trust","auto-gear","tech-gadget","before-after","story-selling","video-first","image-first","benefit-cards","feature-showcase","social-proof","influencer-pick","one-screen-cod","long-sales","comparison-pro","bundle-offer","fashion-editorial","home-solution","arabic-cod","darija-morocco","whatsapp-commerce","conversion-max"].includes(data.templateId);if(remainingTemplates)return <LandingTemplates06to30 key={data.templateId} data={data} preview={preview} onSubmit={onSubmit}/>;
+ return <LandingTemplateGeneric key={data.templateId} data={data} preview={preview} onSubmit={onSubmit}/>;
+}
+function LandingTemplateGeneric({data,preview=false,onSubmit}:V4Props){
  const t=landingTemplate(data.templateId),c=data.content||{},images=data.images||[],offers=Array.isArray(c.quantity_offers)&&c.quantity_offers.length?c.quantity_offers:[{qty:1,price:data.price,label:"1 pièce"},{qty:2,price:data.price*2,label:"2 pièces"},{qty:3,price:data.price*3,label:"3 pièces"}];
  const [qty,setQty]=React.useState(Number(c.quantity_default_qty||offers[0]?.qty||1));const selected=offers.find((x:any)=>Number(x.qty)===qty),total=Number(selected?.price??data.price*qty),rtl=String(data.locale||"").startsWith("ar")||["arabic-cod","darija-morocco","whatsapp-commerce"].includes(data.templateId);
  const copy:any={headline:c.headline||data.name,subheadline:c.subheadline||c.description||data.description||t.description,benefits:(c.benefits||["Simple à utiliser","Conçu pour le quotidien","Commande sécurisée"]).slice(0,3),features:(c.features||[]).slice(0,4),faq:(c.faq||[]).slice(0,4)};
