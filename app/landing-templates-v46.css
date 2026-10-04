@@ -763,3 +763,35 @@
  .landing-v4-runtime:not(.v4-builder-preview) :is(.reference-06,.reference-07,.reference-08,.reference-09,.reference-10)>.hero-media{order:1!important;width:100%!important;height:360px!important;min-height:0!important;position:relative!important;inset:auto!important;transform:none!important}
  .landing-v4-runtime:not(.v4-builder-preview) :is(.reference-06,.reference-07,.reference-08,.reference-09,.reference-10)>aside{order:2!important;width:100%!important}
 }
+
+/* Exact-reference forms + review sections — batch 06-10 */
+.v46-reviews-reference{padding:72px 7%;background:#fff}
+.v46-reviews-reference>div:last-child{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;max-width:1180px;margin:28px auto 0}
+.v46-reviews-reference article{padding:26px;border:1px solid #e5e7eb;border-radius:18px;background:#fff}
+.v46-reviews-reference article>b{display:block;letter-spacing:3px;color:var(--v46-accent);margin-bottom:12px}.v46-reviews-reference article p{line-height:1.7}.v46-reviews-reference article span{font-size:12px;opacity:.65}
+
+.template-flash-sale .v46-order{background:linear-gradient(135deg,#fff0f3,#ffe2e8);border-top:8px solid #e11d48}
+.template-flash-sale .v46-order form{background:#fff;border:2px solid #fecdd3;box-shadow:0 20px 50px #9f12391f}
+.template-flash-sale .v46-submit{background:#e11d48}.template-flash-sale .v46-reviews-reference{background:#fff7f8}
+
+.template-minimal-clean .v46-order{background:#fff;border-top:1px solid #e5e7eb;border-bottom:1px solid #e5e7eb}
+.template-minimal-clean .v46-order form{background:#fff;border:1px solid #d1d5db;border-radius:4px;box-shadow:none}
+.template-minimal-clean .v46-order input,.template-minimal-clean .v46-packs button{border-radius:2px}.template-minimal-clean .v46-submit{border-radius:2px;background:#111827}
+
+.template-luxury-black .v46-order{background:#090909;color:#f7f1df;border-top:1px solid #3a3120}
+.template-luxury-black .v46-order form{background:#111;border:1px solid #5c4c27;box-shadow:0 24px 70px #0008}
+.template-luxury-black .v46-order input{background:#0b0b0b;color:#fff;border-color:#4b4025}.template-luxury-black .v46-packs button{background:#111;color:#f7f1df;border-color:#4b4025}
+.template-luxury-black .v46-submit{background:#d6b66a;color:#090909}.template-luxury-black .v46-faq{background:#0e0e0e;color:#f7f1df}
+
+.template-beauty-glow .v46-order{background:linear-gradient(135deg,#fff7fb,#fce7f0)}
+.template-beauty-glow .v46-order form{background:#fff;border:1px solid #f5bfd4;border-radius:28px;box-shadow:0 24px 60px #be185d14}
+.template-beauty-glow .v46-order input,.template-beauty-glow .v46-packs button{border-radius:16px}.template-beauty-glow .v46-submit{background:#e84a87;border-radius:16px}
+.template-beauty-glow .v46-reviews-reference{background:#fff8fb}.template-beauty-glow .v46-reviews-reference article{border-color:#f7cadb;border-radius:26px}
+
+.template-health-trust .v46-order{background:#effcfb;border-top:1px solid #bce7e2}
+.template-health-trust .v46-order form{background:#fff;border:1px solid #bce7e2;border-radius:18px;box-shadow:0 20px 55px #0f766e12}
+.template-health-trust .v46-submit{background:#159b91}.template-health-trust .v46-reviews-reference{background:#f7fffe}.template-health-trust .v46-reviews-reference article{border-color:#bce7e2}
+
+.v4-frame.mobile .v46-reviews-reference{padding:44px 18px}.v4-frame.mobile .v46-reviews-reference>div:last-child{grid-template-columns:1fr}
+.v4-frame.tablet .v46-reviews-reference>div:last-child{grid-template-columns:1fr 1fr}
+@media(max-width:700px){.landing-v4-runtime:not(.v4-builder-preview) .v46-reviews-reference{padding:44px 18px}.landing-v4-runtime:not(.v4-builder-preview) .v46-reviews-reference>div:last-child{grid-template-columns:1fr}}
