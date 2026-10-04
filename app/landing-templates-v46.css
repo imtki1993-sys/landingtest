@@ -1540,3 +1540,51 @@
   width:100%!important;height:auto!important;min-width:100%!important;max-width:100%!important;max-height:none!important;object-fit:cover!important;
  }
 }
+
+
+/* HERO MEDIA FILL AUDIT V6 — templates whose decorative media board must be image-filled */
+:is(.template-beauty-glow .hero-composition-beauty-glow .v46-beauty-visual,
+    .template-health-trust .hero-composition-health-trust,
+    .template-image-first .hero-composition-image-first) .hero-media{
+ overflow:hidden!important;
+}
+:is(.template-beauty-glow .hero-composition-beauty-glow .v46-beauty-visual,
+    .template-health-trust .hero-composition-health-trust,
+    .template-image-first .hero-composition-image-first) .hero-media>img{
+ width:100%!important;
+ height:100%!important;
+ min-width:100%!important;
+ min-height:100%!important;
+ max-width:none!important;
+ max-height:none!important;
+ object-fit:cover!important;
+ object-position:center!important;
+ margin:0!important;
+}
+
+/* Beauty Glow: remove inner white image gutter, keep the intentional pink outer frame */
+.template-beauty-glow .hero-composition-beauty-glow .v46-beauty-visual>.hero-media{
+ padding:0!important;
+ background:transparent!important;
+}
+
+/* Health Trust: photo fills its dedicated visual card */
+.template-health-trust .hero-composition-health-trust>.hero-media{
+ padding:0!important;
+ background:transparent!important;
+}
+
+/* Image First: image is the canvas; no internal empty board */
+.template-image-first .hero-composition-image-first>.hero-media{
+ padding:0!important;
+ background:transparent!important;
+}
+
+.v4-frame.mobile :is(.template-beauty-glow .hero-composition-beauty-glow .v46-beauty-visual>.hero-media,
+ .template-health-trust .hero-composition-health-trust>.hero-media,
+ .template-image-first .hero-composition-image-first>.hero-media),
+.v4-frame.tablet :is(.template-beauty-glow .hero-composition-beauty-glow .v46-beauty-visual>.hero-media,
+ .template-health-trust .hero-composition-health-trust>.hero-media,
+ .template-image-first .hero-composition-image-first>.hero-media){
+ padding:0!important;
+}
