@@ -20,34 +20,33 @@ export default function LandingTemplates31to35({data,preview=false,onSubmit}:Pro
  if(data.templateId==="apple-product")return <main className="b60 b60-apple">
   <header><b>Apple Product</b><nav>Aperçu　Design　Performance</nav><a href="#order">Commander</a></header>
   <section className="apple-hero"><small>PRO SERIES</small><h1>{headline}</h1><p>{sub}</p>{price}<a href="#order">Découvrir</a>{media(0,"apple-product-shot")}</section>
-  <section className="apple-intro"><small>UNE NOUVELLE RÉFÉRENCE</small><h2>Puissant par nature.<br/>Simple par design.</h2></section>
-  <section className="apple-bento"><article className="apple-wide">{media(1)}<div><small>DESIGN</small><h3>Une conception spectaculaire.</h3></div></article><article className="apple-chip"><small>PERFORMANCE</small><b>PRO</b><p>{txt(features[0])}</p></article><article className="apple-detail">{media(2)}<h3>Chaque détail compte.</h3></article></section>
-  <section className="b60-benefits">{benefits.map((x:any,i:number)=><article key={i}><i>0{i+1}</i><h3>{txt(x)}</h3></article>)}</section>{common}<footer><b>Apple Product</b><span>Produit　Livraison　Contact</span></footer>
+  <section className="apple-icons">{benefits.slice(0,3).map((x:any,i:number)=><article key={i}><i>0{i+1}</i><b>{txt(x)}</b><span>Une expérience pensée dans les détails.</span></article>)}</section>
+  <section className="apple-cards"><article>{media(1)}<div><small>DESIGN</small><h3>{txt(features[0])}</h3></div></article><article>{media(2)}<div><small>PERFORMANCE</small><h3>{txt(features[1])}</h3></div></article><article className="apple-dark"><small>PRO</small><h2>{txt(features[2])}</h2><p>{sub}</p></article></section>{common}<footer><b>Apple Product</b><span>Produit　Livraison　Contact</span></footer>
  </main>;
  if(data.templateId==="samsung-launch")return <main className="b60 b60-samsung">
   <header><b>SAMSUNG</b><nav>Galaxy　Innovation　Caractéristiques</nav><a href="#order">Acheter</a></header>
   <section className="samsung-hero"><div><small>NEXT IS NOW</small><h1>{headline}</h1><p>{sub}</p>{price}<a href="#order">Découvrir maintenant</a></div>{media(0,"samsung-phone")}</section>
-  <section className="samsung-statement"><small>GALAXY EXPERIENCE</small><h2>Une nouvelle ère<br/>commence.</h2></section>
-  <section className="samsung-feature">{media(1)}<div><small>INNOVATION</small><h2>Plus intelligent.<br/>Plus immersif.</h2><p>{txt(features[0])}</p></div></section>
-  <section className="samsung-cards">{features.map((x:any,i:number)=><article key={i}><i>0{i+1}</i><h3>{txt(x)}</h3></article>)}</section>{common}<footer><b>SAMSUNG</b><span>Galaxy　Support　Livraison</span></footer>
+  <section className="samsung-feature-row">{features.map((x:any,i:number)=><article key={i}><span>0{i+1}</span><h3>{txt(x)}</h3></article>)}</section>
+  <section className="samsung-icons">{benefits.map((x:any,i:number)=><article key={i}><i>0{i+1}</i><b>{txt(x)}</b></article>)}</section>
+  <section className="samsung-gallery">{media(1)}{media(2)}<article><small>GALAXY</small><h2>Next generation technology.</h2></article></section>{common}<footer><b>SAMSUNG</b><span>Galaxy　Support　Livraison</span></footer>
  </main>;
  if(data.templateId==="dyson-premium")return <main className="b60 b60-dyson">
   <header><b>dyson</b><nav>Technologie　Design　Résultats</nav><a href="#order">Commander</a></header>
   <section className="dyson-hero"><div><small>ENGINEERED DIFFERENT</small><h1>{headline}</h1><p>{sub}</p>{price}<a href="#order">Voir la technologie</a></div>{media(0,"dyson-product")}</section>
-  <section className="dyson-engineering"><div><small>INGÉNIERIE</small><h2>La technologie au service du quotidien.</h2><p>{sub}</p></div>{media(1)}</section>
-  <section className="dyson-features">{features.map((x:any,i:number)=><article key={i}><span>0{i+1}</span><h3>{txt(x)}</h3><p>Précision, contrôle et performance.</p></article>)}</section>{common}<footer><b>dyson</b><span>Technologie　Aide　Contact</span></footer>
+  <section className="dyson-icons">{benefits.map((x:any,i:number)=><article key={i}><i>0{i+1}</i><b>{txt(x)}</b></article>)}</section>
+  <section className="dyson-cards">{features.map((x:any,i:number)=><article key={i}>{media(i+1)}<h3>{txt(x)}</h3></article>)}</section>{common}<footer><b>dyson</b><span>Technologie　Aide　Contact</span></footer>
  </main>;
  if(data.templateId==="nothing-tech")return <main className="b60 b60-nothing">
   <header><b>NOTHING</b><nav>Phone　Design　Specs</nav><a href="#order">BUY</a></header>
   <section className="nothing-hero"><div><small>LESS. BUT BETTER.</small><h1>{headline}</h1><p>{sub}</p>{price}<a href="#order">Explorer</a></div>{media(0,"nothing-phone")}</section>
-  <section className="nothing-grid"><article><span>01</span><h2>Transparent.<br/>Intentionnel.</h2></article>{media(1,"nothing-grid-media")}<article className="nothing-black"><span>02</span><h3>{txt(features[0])}</h3></article>{media(2,"nothing-grid-media")}</section>
-  <section className="nothing-specs">{features.map((x:any,i:number)=><article key={i}><b>0{i+1}</b><span>{txt(x)}</span></article>)}</section>{common}<footer><b>NOTHING</b><span>Products　Support　Community</span></footer>
+  <section className="nothing-icons">{benefits.slice(0,3).map((x:any,i:number)=><article key={i}><i>0{i+1}</i><b>{txt(x)}</b></article>)}</section>
+  <section className="nothing-cards">{features.map((x:any,i:number)=><article key={i}>{media(i+1)}<h3>{txt(x)}</h3></article>)}</section>{common}<footer><b>NOTHING</b><span>Products　Support　Community</span></footer>
  </main>;
+ if(data.templateId!=="gaming-neon")return null;
  return <main className="b60 b60-gaming">
   <header><b>LEVEL//UP</b><nav>GEAR　PERFORMANCE　SETUP</nav><a href="#order">SHOP</a></header>
   <section className="gaming-hero"><div><small>LEVEL UP</small><h1>{headline}</h1><p>{sub}</p>{price}<a href="#order">Jouer maintenant</a></div>{media(0,"gaming-controller")}<div className="gaming-glow"/></section>
-  <section className="gaming-stats">{benefits.map((x:any,i:number)=><article key={i}><span>0{i+1}</span><b>{txt(x)}</b></article>)}</section>
-  <section className="gaming-battle">{media(1)}<div><small>PERFORMANCE</small><h2>Conçu pour prendre l'avantage.</h2><p>{sub}</p></div></section>
-  <section className="gaming-features">{features.map((x:any,i:number)=><article key={i}><i>0{i+1}</i><h3>{txt(x)}</h3></article>)}</section>{common}<footer><b>LEVEL//UP</b><span>Gear　Support　Community</span></footer>
+  <section className="gaming-icons">{benefits.slice(0,3).map((x:any,i:number)=><article key={i}><i>0{i+1}</i><b>{txt(x)}</b></article>)}</section>
+  <section className="gaming-cards"><article>{media(1)}<h3>{txt(features[0])}</h3></article><article>{media(2)}<h3>{txt(features[1])}</h3></article></section>{common}<footer><b>LEVEL//UP</b><span>Gear　Support　Community</span></footer>
  </main>
 }
