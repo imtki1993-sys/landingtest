@@ -29,6 +29,11 @@ export const REFERENCE_TEMPLATES:ReferenceTemplate[]=[
 ["arabic-cod",27,"RTL Arabic COD",["benefits","proof","reviews","faq","order"],"orange-green"],
 ["darija-morocco",28,"Moroccan delivery",["benefits","proof","reviews","faq","order"],"red"],
 ["whatsapp-commerce",29,"WhatsApp phone",["whatsapp","benefits","proof","faq","order"],"whatsapp-green"],
-["conversion-max",30,"dark offer+timer",["timer","benefits","bundle","proof","faq","order"],"black-red"]
+["conversion-max",30,"dark offer+timer",["timer","benefits","bundle","proof","faq","order"],"black-red"],
+["apple-product",31,"monumental clean product",["story","bento","benefits","proof","faq","order"],"white-black"],
+["samsung-launch",32,"immersive blue launch",["launch","features","benefits","proof","faq","order"],"black-blue"],
+["dyson-premium",33,"engineering editorial",["engineering","features","benefits","proof","faq","order"],"white-purple"],
+["nothing-tech",34,"monochrome technical grid",["grid","benefits","proof","faq","order"],"white-black"],
+["gaming-neon",35,"neon gaming performance",["performance","benefits","proof","faq","order"],"black-purple"]
 ].map(([id,no,hero,sections,tone])=>({id:id as string,no:no as number,hero:hero as string,sections:sections as string[],tone:tone as string}));
 export const referenceTemplate=(id:string)=>REFERENCE_TEMPLATES.find(x=>x.id===id);
