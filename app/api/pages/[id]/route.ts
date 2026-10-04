@@ -27,6 +27,12 @@ export async function PATCH(req:Request,{params}:{params:Promise<{id:string}>}){
    if(Array.isArray(changes.images))changes.images=changes.images.filter((x:any)=>typeof x==="string"&&/^https?:\/\//.test(x)).slice(0,10);
    const {data,error}=await s.rpc("publish_landing_page_update",{p_workspace_id:workspaceId,p_landing_page_id:id,p_changes:changes});
    if(error)throw error;
+   // Keep the live landing row in sync with the exact published builder payload. The public renderer still reads the immutable published version first, while this prevents legacy RPCs from dropping newer Builder V3 fields such as quantity_offers.
+   const liveSeo={...((current.seo as any)||{}),ai_content:b.content};
+   if(Array.isArray(changes.images))liveSeo.images=changes.images;
+   if(b.metaPixelId!==undefined)liveSeo.meta_pixel_id=String(b.metaPixelId||"").replace(/\\D/g,"").slice(0,30)||null;
+   const {error:syncError}=await s.from("landing_pages").update({seo:liveSeo}).eq("id",id).eq("workspace_id",workspaceId);
+   if(syncError)throw syncError;
    revalidateTag("landing:"+current.slug);
    return NextResponse.json(data);
   }
