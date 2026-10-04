@@ -1317,3 +1317,34 @@
  .landing-v4-runtime:not(.v4-builder-preview) .template-image-first .hero-composition-image-first .v46-image-first-stage:after{background:linear-gradient(0deg,rgba(5,18,34,.94),rgba(5,18,34,.42) 65%,rgba(5,18,34,.08))}
  .landing-v4-runtime:not(.v4-builder-preview) .template-image-first .hero-composition-image-first .v46-image-first-stage>div:last-child{left:22px!important;right:22px!important;bottom:30px!important;width:auto!important}
 }
+
+
+/* #11 AUTO GEAR — product-first technical hero, exact desktop/mobile containment */
+.template-auto-gear .hero-composition-auto-gear{display:grid!important;grid-template-columns:minmax(420px,1.08fr) minmax(360px,.92fr)!important;align-items:center!important;gap:clamp(34px,5vw,72px)!important;min-height:590px!important;padding:54px clamp(34px,5vw,76px)!important;background:#101820!important;color:#fff!important;overflow:hidden!important}
+.template-auto-gear .hero-composition-auto-gear:after{content:"";position:absolute;z-index:0!important;right:-8%;top:-28%;width:48%;height:160%;background:#202a31;transform:skewX(-24deg);pointer-events:none}
+.template-auto-gear .hero-composition-auto-gear .v46-auto-visual{grid-column:1!important;grid-row:1!important;width:100%!important;min-width:0!important;max-width:none!important;padding:22px!important;border-radius:26px!important;background:#0c1218!important;overflow:hidden!important}
+.template-auto-gear .hero-composition-auto-gear .v46-auto-visual>.hero-media{position:relative!important;inset:auto!important;width:100%!important;height:460px!important;min-height:0!important;max-width:100%!important;margin:0!important;border-radius:18px!important;background:#fff!important;overflow:hidden!important}
+.template-auto-gear .hero-composition-auto-gear .v46-auto-visual>.hero-media img{position:relative!important;inset:auto!important;display:block!important;width:100%!important;height:100%!important;max-width:100%!important;object-fit:contain!important;object-position:center!important;transform:none!important}
+.template-auto-gear .hero-composition-auto-gear .v46-auto-visual>span{left:36px!important;bottom:36px!important;background:#ff7417!important;color:#111!important;padding:9px 14px!important;border-radius:999px!important;font-size:11px!important;letter-spacing:.1em!important}
+.template-auto-gear .hero-composition-auto-gear .v46-auto-copy{grid-column:2!important;grid-row:1!important;align-self:center!important;max-width:560px!important;padding:0!important;background:transparent!important}
+.template-auto-gear .hero-composition-auto-gear .v46-auto-copy>small{display:block!important;color:#ff7417!important;font-weight:900!important;letter-spacing:.15em!important;margin-bottom:12px!important}
+.template-auto-gear .hero-composition-auto-gear .v46-auto-copy h1{color:#fff!important;font-size:clamp(44px,4.6vw,66px)!important;line-height:.98!important;letter-spacing:-.04em!important;margin:0 0 20px!important;max-width:560px!important;overflow-wrap:normal!important;word-break:normal!important}
+.template-auto-gear .hero-composition-auto-gear .v46-hero-spec-row{margin:0 0 20px!important}.template-auto-gear .hero-composition-auto-gear .v46-hero-spec-row b{border-color:#4b5861!important;color:#dbe3e8!important;background:#182229!important}
+.template-auto-gear .hero-composition-auto-gear .v46-price b{color:#fff!important}.template-auto-gear .hero-composition-auto-gear .v46-price del{color:#87939b!important}.template-auto-gear .hero-composition-auto-gear .v46-primary{background:#ff7417!important;color:#101418!important;border-radius:10px!important;min-height:52px!important}
+
+/* Auto Gear fixed Builder tablet/mobile frames */
+.v4-frame.tablet .template-auto-gear .hero-composition-auto-gear{grid-template-columns:1fr 1fr!important;padding:34px 28px!important;gap:26px!important}
+.v4-frame.tablet .template-auto-gear .hero-composition-auto-gear .v46-auto-visual>.hero-media{height:360px!important}.v4-frame.tablet .template-auto-gear .hero-composition-auto-gear .v46-auto-copy h1{font-size:46px!important}
+.v4-frame.mobile .template-auto-gear .hero-composition-auto-gear{display:flex!important;flex-direction:column!important;min-height:0!important;padding:24px 18px 32px!important;gap:24px!important}
+.v4-frame.mobile .template-auto-gear .hero-composition-auto-gear .v46-auto-visual{order:1!important;width:100%!important;padding:12px!important;border-radius:20px!important}
+.v4-frame.mobile .template-auto-gear .hero-composition-auto-gear .v46-auto-visual>.hero-media{height:330px!important;width:100%!important}
+.v4-frame.mobile .template-auto-gear .hero-composition-auto-gear .v46-auto-visual>span{left:24px!important;bottom:24px!important}
+.v4-frame.mobile .template-auto-gear .hero-composition-auto-gear .v46-auto-copy{order:2!important;width:100%!important;max-width:none!important}
+.v4-frame.mobile .template-auto-gear .hero-composition-auto-gear .v46-auto-copy h1{font-size:40px!important;line-height:1!important}
+@media(max-width:900px){
+ .landing-v4-runtime:not(.v4-builder-preview) .template-auto-gear .hero-composition-auto-gear{display:flex!important;flex-direction:column!important;min-height:0!important;padding:28px 20px 36px!important;gap:26px!important}
+ .landing-v4-runtime:not(.v4-builder-preview) .template-auto-gear .hero-composition-auto-gear .v46-auto-visual{order:1!important;width:100%!important;padding:14px!important}
+ .landing-v4-runtime:not(.v4-builder-preview) .template-auto-gear .hero-composition-auto-gear .v46-auto-visual>.hero-media{height:350px!important}
+ .landing-v4-runtime:not(.v4-builder-preview) .template-auto-gear .hero-composition-auto-gear .v46-auto-copy{order:2!important;width:100%!important}
+ .landing-v4-runtime:not(.v4-builder-preview) .template-auto-gear .hero-composition-auto-gear .v46-auto-copy h1{font-size:clamp(38px,9vw,48px)!important}
+}
