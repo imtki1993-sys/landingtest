@@ -724,3 +724,42 @@
 .v4-frame.mobile .hero-unique-whatsapp-commerce{background:#effcf5!important}
 .v4-frame.mobile .hero-unique-whatsapp-commerce .v46-primary{border-radius:14px!important}
 .v4-frame.mobile .hero-unique-conversion-max{background:#fff4f4!important;border-bottom:8px solid var(--v46-accent)!important}
+
+/* Reference board rebuild — templates 06-10. These are compositions, not palette-only variants. */
+.template-flash-sale{--v46-accent:#e11d48;background:#fff7f8}
+.template-flash-sale .reference-06{background:linear-gradient(135deg,#ffedf1 0 54%,#e11d48 54%);grid-template-columns:1fr .9fr .38fr;min-height:640px}
+.template-flash-sale .reference-06>.hero-media{height:510px;background:#fff;border:10px solid #fff;box-shadow:0 24px 60px #9f123933}
+.template-flash-sale .v46-countdown{background:#e11d48;color:#fff}.template-flash-sale .v46-bundle{background:#fff0f3}
+
+.template-minimal-clean{--v46-accent:#111827;background:#fff}
+.template-minimal-clean .reference-07{background:#fff;display:grid;grid-template-columns:.8fr 1.2fr;min-height:680px;border-bottom:1px solid #e5e7eb}
+.template-minimal-clean .reference-07>.v46-hero-copy{max-width:520px}.template-minimal-clean .reference-07>.hero-media{height:590px;background:#f8fafc;border-radius:0}
+.template-minimal-clean .v46-cards article{box-shadow:none;border:1px solid #e5e7eb;border-radius:4px}
+
+.template-luxury-black{--v46-accent:#d6b66a;background:#090909;color:#f7f1df}
+.template-luxury-black .reference-08{background:radial-gradient(circle at 72% 45%,#2a2417,#090909 54%);grid-template-columns:.82fr 1.18fr;min-height:760px;border-bottom:1px solid #3a3120}
+.template-luxury-black .reference-08>.hero-media{height:680px;border:1px solid #5c4c27;border-radius:0;background:#111}
+.template-luxury-black .v46-story,.template-luxury-black .v46-details,.template-luxury-black .v46-proof{background:#0e0e0e;color:#f7f1df}
+
+.template-beauty-glow{--v46-accent:#e84a87;background:#fff8fb}
+.template-beauty-glow .reference-09{background:linear-gradient(120deg,#fff6fa 0 48%,#f8d8e6 48%);grid-template-columns:1fr 1fr;min-height:690px}
+.template-beauty-glow .reference-09>.hero-media{height:610px;border-radius:180px 180px 28px 28px;background:#fbe4ed}
+.template-beauty-glow .v46-how article,.template-beauty-glow .v46-cards article{border-radius:28px;background:#fff;box-shadow:0 16px 45px #be185d12}
+
+.template-health-trust{--v46-accent:#159b91;background:#f7fffe}
+.template-health-trust .reference-10{background:linear-gradient(135deg,#effcfb 0 58%,#dff6f2 58%);grid-template-columns:1fr .95fr;min-height:680px}
+.template-health-trust .reference-10>.hero-media{height:580px;border-radius:32px;background:#fff;border:1px solid #bce7e2}
+.template-health-trust .v46-trust{background:#e7f8f5;color:#0f766e}.template-health-trust .v46-proof{background:#0f766e;color:#fff}
+
+/* Preserve every reference element while adapting 06-10 to Builder tablet/mobile. */
+.v4-frame.tablet :is(.reference-06,.reference-07,.reference-08,.reference-09,.reference-10){grid-template-columns:1fr 1fr!important;min-height:560px!important}
+.v4-frame.mobile :is(.reference-06,.reference-07,.reference-08,.reference-09,.reference-10){display:flex!important;flex-direction:column!important;min-height:0!important;height:auto!important;padding:26px 18px 34px!important;gap:22px!important;overflow:visible!important}
+.v4-frame.mobile :is(.reference-06,.reference-07,.reference-08,.reference-09,.reference-10)>.v46-hero-copy{order:0!important;width:100%!important}
+.v4-frame.mobile :is(.reference-06,.reference-07,.reference-08,.reference-09,.reference-10)>.hero-media{order:1!important;width:100%!important;height:360px!important;min-height:0!important;position:relative!important;inset:auto!important;transform:none!important}
+.v4-frame.mobile :is(.reference-06,.reference-07,.reference-08,.reference-09,.reference-10)>aside{order:2!important;width:100%!important}
+@media(max-width:700px){
+ .landing-v4-runtime:not(.v4-builder-preview) :is(.reference-06,.reference-07,.reference-08,.reference-09,.reference-10){display:flex!important;flex-direction:column!important;min-height:0!important;height:auto!important;padding:26px 18px 34px!important;gap:22px!important;overflow:visible!important}
+ .landing-v4-runtime:not(.v4-builder-preview) :is(.reference-06,.reference-07,.reference-08,.reference-09,.reference-10)>.v46-hero-copy{order:0!important;width:100%!important}
+ .landing-v4-runtime:not(.v4-builder-preview) :is(.reference-06,.reference-07,.reference-08,.reference-09,.reference-10)>.hero-media{order:1!important;width:100%!important;height:360px!important;min-height:0!important;position:relative!important;inset:auto!important;transform:none!important}
+ .landing-v4-runtime:not(.v4-builder-preview) :is(.reference-06,.reference-07,.reference-08,.reference-09,.reference-10)>aside{order:2!important;width:100%!important}
+}
