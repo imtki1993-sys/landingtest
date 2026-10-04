@@ -1487,3 +1487,29 @@
   height:auto!important;padding:clamp(14px,4vw,24px)!important;
  }
 }
+
+
+/* AUTO GEAR HERO MEDIA V4 — photo fills the complete white image board */
+.template-auto-gear .hero-composition-auto-gear .v46-auto-visual>.hero-media{
+ padding:0!important;
+ overflow:hidden!important;
+ background:#fff!important;
+}
+.template-auto-gear .hero-composition-auto-gear .v46-auto-visual>.hero-media>img{
+ display:block!important;
+ width:100%!important;
+ height:100%!important;
+ min-width:100%!important;
+ min-height:100%!important;
+ max-width:none!important;
+ max-height:none!important;
+ object-fit:cover!important;
+ object-position:center center!important;
+ border-radius:inherit!important;
+ margin:0!important;
+}
+.v4-frame.desktop .template-auto-gear .hero-composition-auto-gear .v46-auto-visual>.hero-media,
+.v4-frame.tablet .template-auto-gear .hero-composition-auto-gear .v46-auto-visual>.hero-media,
+.v4-frame.mobile .template-auto-gear .hero-composition-auto-gear .v46-auto-visual>.hero-media{
+ padding:0!important;
+}
