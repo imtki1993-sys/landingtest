@@ -1424,3 +1424,33 @@
  opacity:1!important;
  z-index:3!important;
 }
+
+
+/* RESPONSIVE HERO IMAGE FIT V2 — media itself scales inside the white frame */
+.template-auto-gear .hero-composition-auto-gear .v46-auto-visual>.hero-media{
+ display:flex!important;align-items:center!important;justify-content:center!important;
+ padding:clamp(12px,2.2vw,28px)!important;
+}
+.template-auto-gear .hero-composition-auto-gear .v46-auto-visual>.hero-media>img{
+ position:static!important;
+ width:100%!important;height:100%!important;
+ min-width:0!important;min-height:0!important;
+ max-width:100%!important;max-height:100%!important;
+ object-fit:contain!important;object-position:center center!important;
+ margin:0!important;
+}
+.v4-frame.tablet .template-auto-gear .hero-composition-auto-gear .v46-auto-visual>.hero-media{padding:16px!important}
+.v4-frame.mobile .template-auto-gear .hero-composition-auto-gear .v46-auto-visual>.hero-media{padding:12px!important}
+@media(max-width:900px){
+ .landing-v4-runtime:not(.v4-builder-preview) .template-auto-gear .hero-composition-auto-gear .v46-auto-visual>.hero-media{padding:14px!important}
+}
+
+/* Generic protection for reference-template hero image frames */
+.v46 [class*="hero-composition-"] .v46-media{
+ box-sizing:border-box!important;
+}
+.v46 [class*="hero-composition-"] .v46-media>img{
+ min-width:0!important;min-height:0!important;
+ max-width:100%!important;max-height:100%!important;
+ object-position:center center!important;
+}
