@@ -1588,3 +1588,98 @@
  .template-image-first .hero-composition-image-first>.hero-media){
  padding:0!important;
 }
+
+
+/* Auto Gear desktop section audit V7 — one coherent content rail */
+.template-auto-gear .board-sections-auto-gear{
+ width:100%!important;
+ max-width:none!important;
+ margin:0!important;
+ padding:0!important;
+ background:#0d151d!important;
+}
+.template-auto-gear .gallery-auto-gear{
+ width:min(1180px,calc(100% - 48px))!important;
+ max-width:1180px!important;
+ margin:0 auto!important;
+ padding:72px 0!important;
+ display:block!important;
+}
+.template-auto-gear .gallery-auto-gear .v46-section-head{
+ width:100%!important;
+ max-width:none!important;
+ margin:0 0 28px!important;
+ text-align:center!important;
+}
+.template-auto-gear .gallery-auto-gear .v46-gallery-grid{
+ width:100%!important;
+ display:grid!important;
+ grid-template-columns:repeat(2,minmax(0,1fr))!important;
+ grid-auto-rows:360px!important;
+ gap:14px!important;
+}
+.template-auto-gear .gallery-auto-gear .v46-gallery-grid>.v46-media{
+ width:100%!important;
+ height:100%!important;
+ min-height:0!important;
+ margin:0!important;
+ border-radius:12px!important;
+ overflow:hidden!important;
+ background:#151f29!important;
+}
+.template-auto-gear .gallery-auto-gear .v46-gallery-grid>.v46-media img{
+ width:100%!important;
+ height:100%!important;
+ display:block!important;
+ object-fit:cover!important;
+ object-position:center!important;
+}
+.template-auto-gear .v46-faq-auto-gear{
+ width:min(1180px,calc(100% - 48px))!important;
+ max-width:1180px!important;
+ margin:0 auto!important;
+ padding:72px 0!important;
+ background:transparent!important;
+}
+.template-auto-gear .v46-faq-auto-gear .v46-section-head,
+.template-auto-gear .v46-faq-auto-gear .v46-faq-list{
+ width:100%!important;
+ max-width:none!important;
+ margin-left:0!important;
+ margin-right:0!important;
+}
+.template-auto-gear .v46-faq-auto-gear .v46-section-head{text-align:left!important}
+.template-auto-gear .v46-faq-auto-gear .v46-faq-list details{
+ width:100%!important;
+ max-width:none!important;
+ border-bottom:1px solid #2a3540!important;
+}
+.v4-frame.tablet .template-auto-gear .gallery-auto-gear,
+.v4-frame.tablet .template-auto-gear .v46-faq-auto-gear{
+ width:calc(100% - 36px)!important;
+ padding:54px 0!important;
+}
+.v4-frame.tablet .template-auto-gear .gallery-auto-gear .v46-gallery-grid{
+ grid-template-columns:repeat(2,minmax(0,1fr))!important;
+ grid-auto-rows:280px!important;
+}
+.v4-frame.mobile .template-auto-gear .gallery-auto-gear,
+.v4-frame.mobile .template-auto-gear .v46-faq-auto-gear{
+ width:calc(100% - 28px)!important;
+ padding:42px 0!important;
+}
+.v4-frame.mobile .template-auto-gear .gallery-auto-gear .v46-gallery-grid{
+ grid-template-columns:1fr!important;
+ grid-template-rows:none!important;
+ grid-auto-rows:300px!important;
+}
+@media(max-width:900px){
+ .landing-v4-runtime:not(.v4-builder-preview) .template-auto-gear .gallery-auto-gear,
+ .landing-v4-runtime:not(.v4-builder-preview) .template-auto-gear .v46-faq-auto-gear{width:calc(100% - 36px)!important;padding:54px 0!important}
+ .landing-v4-runtime:not(.v4-builder-preview) .template-auto-gear .gallery-auto-gear .v46-gallery-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;grid-auto-rows:280px!important}
+}
+@media(max-width:700px){
+ .landing-v4-runtime:not(.v4-builder-preview) .template-auto-gear .gallery-auto-gear,
+ .landing-v4-runtime:not(.v4-builder-preview) .template-auto-gear .v46-faq-auto-gear{width:calc(100% - 28px)!important;padding:42px 0!important}
+ .landing-v4-runtime:not(.v4-builder-preview) .template-auto-gear .gallery-auto-gear .v46-gallery-grid{grid-template-columns:1fr!important;grid-template-rows:none!important;grid-auto-rows:300px!important}
+}
