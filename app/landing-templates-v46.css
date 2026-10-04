@@ -1513,3 +1513,30 @@
 .v4-frame.mobile .template-auto-gear .hero-composition-auto-gear .v46-auto-visual>.hero-media{
  padding:0!important;
 }
+
+
+/* AUTO GEAR MOBILE MEDIA V5 — remove the remaining white gutter */
+.v4-frame.mobile .template-auto-gear .hero-composition-auto-gear .v46-auto-visual>.hero-media{
+ padding:0!important;
+ background:transparent!important;
+ border-radius:28px!important;
+ overflow:hidden!important;
+}
+.v4-frame.mobile .template-auto-gear .hero-composition-auto-gear .v46-auto-visual>.hero-media>img{
+ width:100%!important;
+ height:auto!important;
+ min-width:100%!important;
+ min-height:0!important;
+ max-width:100%!important;
+ max-height:none!important;
+ object-fit:cover!important;
+ border-radius:28px!important;
+}
+@media(max-width:700px){
+ .landing-v4-runtime:not(.v4-builder-preview) .template-auto-gear .hero-composition-auto-gear .v46-auto-visual>.hero-media{
+  padding:0!important;background:transparent!important;overflow:hidden!important;
+ }
+ .landing-v4-runtime:not(.v4-builder-preview) .template-auto-gear .hero-composition-auto-gear .v46-auto-visual>.hero-media>img{
+  width:100%!important;height:auto!important;min-width:100%!important;max-width:100%!important;max-height:none!important;object-fit:cover!important;
+ }
+}
