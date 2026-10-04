@@ -1969,3 +1969,15 @@
 .v4-frame.tablet .b60-gaming .gaming-icons{grid-template-columns:repeat(3,minmax(0,1fr));padding-inline:16px}
 .v4-frame.tablet .b60-gaming .gaming-cards{grid-template-columns:repeat(2,minmax(0,1fr));padding-inline:16px}
 .v4-frame.tablet .b60-gaming .gaming-cards .b60-media{height:250px}
+
+/* Conversion section hard isolation — fixes dashboard/global section grid leakage */
+.b60-conversion{display:block!important;width:100%!important;max-width:none!important;min-width:0!important;clear:both!important;position:relative!important}
+.b60-conversion>.b60-order,.b60-conversion>.b60-faq{float:none!important;position:relative!important;inset:auto!important;transform:none!important}
+.v4-frame.desktop .b60-conversion>.b60-order,.v4-frame.tablet .b60-conversion>.b60-order{display:block!important;width:min(980px,calc(100% - 48px))!important;margin:64px auto!important}
+.v4-frame.desktop .b60-conversion>.b60-faq,.v4-frame.tablet .b60-conversion>.b60-faq{display:block!important;width:min(980px,calc(100% - 48px))!important;margin:64px auto!important}
+.v4-frame.desktop .b60-conversion>.b60-order form,.v4-frame.tablet .b60-conversion>.b60-order form{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;width:100%!important}
+.v4-frame.desktop .b60-conversion>.b60-order form>*,
+.v4-frame.tablet .b60-conversion>.b60-order form>*{min-width:0!important;max-width:100%!important}
+.v4-frame.mobile .b60-conversion{display:block!important}
+.v4-frame.mobile .b60-conversion>.b60-order,.v4-frame.mobile .b60-conversion>.b60-faq{display:block!important;float:none!important;clear:both!important}
+.landing-v4-runtime:not(.v4-builder-preview) .b60-conversion{display:block!important;width:100%!important;clear:both!important}
