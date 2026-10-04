@@ -1869,3 +1869,19 @@
   width:100%!important;max-width:none!important;border-radius:14px!important;align-items:flex-start!important;text-align:start!important
  }
 }
+
+
+/* Visual board audit V10 — remove remaining oversized decorative Hero circles.
+   Keep template structure/content intact; these shapes were not part of the locked board composition. */
+.template-beauty-glow .hero-composition-beauty-glow:before,
+.template-health-trust .hero-composition-health-trust:before{
+ content:none!important;
+ display:none!important;
+}
+
+/* Keep foreground content above any legacy decorative layer. */
+.template-beauty-glow .hero-composition-beauty-glow>*,
+.template-health-trust .hero-composition-health-trust>*{
+ position:relative;
+ z-index:1;
+}
