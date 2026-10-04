@@ -1821,3 +1821,72 @@
 .template-apple-product{--accent:#111;background:#fff}.template-apple-product .v60-hero{background:linear-gradient(180deg,#fff,#f5f5f7)}.template-apple-product .v60-hero-media{border-radius:0}.template-samsung-launch{--accent:#1d4ed8;background:#050505;color:#fff}.template-samsung-launch .v60-header,.template-samsung-launch .v60-top{background:#050505}.template-samsung-launch .v60-hero{max-width:none;padding-inline:max(54px,calc((100% - 1212px)/2));background:radial-gradient(circle at 72% 45%,#173a91 0,#071126 34%,#050505 66%)}.template-samsung-launch .v60-hero-media{border-radius:34px}.template-samsung-launch .v60-benefits article,.template-samsung-launch .v60-order{background:#101010}.template-samsung-launch .v60-order input,.template-samsung-launch .v60-packs button{background:#191919;color:#fff;border-color:#ffffff20}.template-samsung-launch .v60-proof,.template-samsung-launch .v60-faq details,.template-samsung-launch .v60-footer{border-color:#ffffff20}.template-dyson-premium{--accent:#5b21b6;background:#f7f4f0}.template-dyson-premium .v60-hero{background:#e9e2da;border-radius:0 0 44px 44px}.template-dyson-premium .v60-hero-media{border-radius:120px 28px 120px 28px}.template-dyson-premium .v60-tech-cards article{background:#fff}.template-nothing-tech{--accent:#111;background:#efefec}.template-nothing-tech .v60-header{border-color:#000}.template-nothing-tech .v60-hero{grid-template-columns:1fr 1fr}.template-nothing-tech .v60-hero h1{font-family:Georgia,serif;font-weight:400}.template-nothing-tech .v60-hero-media{border-radius:0;filter:grayscale(1)}.template-nothing-tech .v60-benefits article{border:1px solid #111;border-radius:0;background:transparent}.template-gaming-neon{--accent:#8b5cf6;--paper:#08060c;--ink:#fff;background:#08060c;color:#fff}.template-gaming-neon .v60-hero{max-width:none;padding-inline:max(54px,calc((100% - 1212px)/2));background:radial-gradient(circle at 72% 40%,#4c1d954f 0,#08060c 48%)}.template-gaming-neon .v60-hero-media{border:1px solid #8b5cf655;box-shadow:0 0 70px #8b5cf633}.template-gaming-neon .v60-benefits article,.template-gaming-neon .v60-order{background:#14101b}.template-gaming-neon .v60-order input,.template-gaming-neon .v60-packs button{background:#0d0a12;color:#fff;border-color:#ffffff22}.template-gaming-neon .v60-proof,.template-gaming-neon .v60-faq details,.template-gaming-neon .v60-footer{border-color:#ffffff20}
 .v4-frame.tablet .v60-hero{min-height:560px;padding:48px 30px;grid-template-columns:1fr 1fr;gap:24px}.v4-frame.tablet .v60-hero h1{font-size:52px}.v4-frame.tablet .v60-hero-media{height:430px}.v4-frame.tablet .v60-feature-media,.v4-frame.tablet .v60-engineering,.v4-frame.tablet .v60-battle{gap:28px}.v4-frame.tablet .v60-order{margin:50px 24px;padding:38px;gap:30px}.v4-frame.mobile .v60-header{height:58px;padding:0 16px}.v4-frame.mobile .v60-header nav{display:none}.v4-frame.mobile .v60-header a{padding:9px 13px}.v4-frame.mobile .v60-hero{min-height:0;padding:34px 18px 48px;grid-template-columns:1fr;gap:26px}.v4-frame.mobile .v60-hero-copy{order:0}.v4-frame.mobile .v60-hero-media{order:1;height:360px;border-radius:20px}.v4-frame.mobile .v60-hero h1{font-size:48px}.v4-frame.mobile .v60-statement{padding:70px 18px}.v4-frame.mobile .v60-statement h2{font-size:42px}.v4-frame.mobile .v60-bento,.v4-frame.mobile .v60-tech-cards,.v4-frame.mobile .v60-benefits,.v4-frame.mobile .v60-gaming-strip{grid-template-columns:1fr;margin-bottom:55px}.v4-frame.mobile .v60-bento .wide{grid-column:auto}.v4-frame.mobile .v60-feature-media,.v4-frame.mobile .v60-engineering,.v4-frame.mobile .v60-battle{margin:55px auto;grid-template-columns:1fr;gap:24px}.v4-frame.mobile .v60-feature-media>.v60-media,.v4-frame.mobile .v60-engineering>.v60-media,.v4-frame.mobile .v60-battle>.v60-media{height:360px}.v4-frame.mobile .v60-feature-media h2,.v4-frame.mobile .v60-engineering h2,.v4-frame.mobile .v60-battle h2{font-size:40px}.v4-frame.mobile .v60-nothing-grid{grid-template-columns:1fr;grid-auto-rows:320px}.v4-frame.mobile .v60-proof{margin:30px 18px 60px;padding:35px 0;grid-template-columns:1fr;gap:22px}.v4-frame.mobile .v60-proof blockquote{font-size:24px}.v4-frame.mobile .v60-order{margin:45px 14px;padding:24px 16px;grid-template-columns:1fr;gap:24px}.v4-frame.mobile .v60-order form{grid-template-columns:1fr}.v4-frame.mobile .v60-order input,.v4-frame.mobile .v60-packs,.v4-frame.mobile .v60-buy,.v4-frame.mobile .v60-order form>small{grid-column:1}.v4-frame.mobile .v60-packs{grid-template-columns:repeat(3,minmax(0,1fr))}.v4-frame.mobile .v60-packs button{padding:9px 3px;font-size:10px}.v4-frame.mobile .v60-faq{margin:60px auto}.v4-frame.mobile .v60-faq h2{font-size:36px}.v4-frame.mobile .v60-footer{padding:35px 18px;flex-direction:column}
 @media(max-width:900px){.landing-v4-runtime:not(.v4-builder-preview) .v60-hero{min-height:0;padding:38px 20px 50px;grid-template-columns:1fr}.landing-v4-runtime:not(.v4-builder-preview) .v60-hero h1{font-size:clamp(44px,11vw,64px)}.landing-v4-runtime:not(.v4-builder-preview) .v60-hero-media{height:min(88vw,500px)}.landing-v4-runtime:not(.v4-builder-preview) .v60-feature-media,.landing-v4-runtime:not(.v4-builder-preview) .v60-engineering,.landing-v4-runtime:not(.v4-builder-preview) .v60-battle{grid-template-columns:1fr}.landing-v4-runtime:not(.v4-builder-preview) .v60-order{margin:50px 16px;padding:28px 18px;grid-template-columns:1fr}.landing-v4-runtime:not(.v4-builder-preview) .v60-footer{flex-direction:column}}
+
+
+/* V2 31→35 layout safety — isolate every section and keep media inside its own box */
+.v60>section,.v60>header,.v60>footer{position:relative;isolation:isolate;clear:both;width:100%}
+.v60 .v60-media{position:relative!important;inset:auto!important;transform:none!important;width:100%!important;max-width:100%!important;min-width:0!important;min-height:0!important;overflow:hidden!important}
+.v60 .v60-media img{position:absolute!important;inset:0!important;transform:none!important;width:100%!important;height:100%!important;max-width:100%!important;max-height:100%!important;margin:0!important;padding:0!important;display:block!important}
+.v60 .v60-hero-media{min-width:0!important;max-width:100%!important;align-self:stretch}
+.v60 .v60-hero>*{min-width:0}
+.v60 .v60-bento,.v60 .v60-feature-media,.v60 .v60-engineering,.v60 .v60-tech-cards,.v60 .v60-nothing-grid,.v60 .v60-gaming-strip,.v60 .v60-battle,.v60 .v60-benefits,.v60 .v60-proof,.v60 .v60-order,.v60 .v60-faq{position:relative!important;inset:auto!important;transform:none!important;height:auto!important;clear:both!important}
+.v60 .v60-bento article,.v60 .v60-tech-cards article,.v60 .v60-benefits article,.v60 .v60-nothing-grid>*{min-width:0;overflow:hidden}
+.template-apple-product .v60-media img,.template-samsung-launch .v60-media img,.template-nothing-tech .v60-media img,.template-gaming-neon .v60-media img{object-fit:cover!important;object-position:center!important}
+.template-dyson-premium .v60-media img{object-fit:contain!important;object-position:center!important}
+.v60 .v60-order{overflow:hidden}
+.v60 .v60-order form{min-width:0}
+.v60 .v60-order input,.v60 .v60-order button{max-width:100%}
+
+.v4-frame.tablet .v60{width:100%!important;max-width:100%!important}
+.v4-frame.tablet .v60-header{width:100%;padding:0 22px}
+.v4-frame.tablet .v60-header nav{font-size:10px}
+.v4-frame.tablet .v60-hero{width:100%!important;max-width:100%!important;min-height:0!important;height:auto!important;padding:42px 28px!important;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr)!important;gap:24px!important;align-items:center!important}
+.v4-frame.tablet .v60-hero h1{font-size:clamp(44px,7vw,58px)!important}
+.v4-frame.tablet .v60-hero-media{height:420px!important;min-height:0!important}
+.v4-frame.tablet .v60-bento,.v4-frame.tablet .v60-tech-cards,.v4-frame.tablet .v60-benefits,.v4-frame.tablet .v60-gaming-strip{width:100%!important;max-width:100%!important;padding-inline:24px!important}
+.v4-frame.tablet .v60-feature-media,.v4-frame.tablet .v60-engineering,.v4-frame.tablet .v60-battle{width:100%!important;max-width:100%!important;margin:65px auto!important;padding:0 24px!important;grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important}
+.v4-frame.tablet .v60-feature-media>.v60-media,.v4-frame.tablet .v60-engineering>.v60-media,.v4-frame.tablet .v60-battle>.v60-media{height:390px!important}
+.v4-frame.tablet .v60-nothing-grid{width:100%!important;max-width:100%!important;padding:0 24px!important;grid-auto-rows:330px!important}
+.v4-frame.tablet .v60-proof{width:calc(100% - 48px)!important;max-width:none!important;margin:45px 24px 70px!important;padding:42px 20px!important}
+.v4-frame.tablet .v60-order{width:calc(100% - 48px)!important;max-width:none!important;margin:55px 24px!important;padding:34px!important;grid-template-columns:minmax(0,.75fr) minmax(0,1.25fr)!important}
+.v4-frame.tablet .v60-faq{width:100%!important;max-width:760px!important}
+
+.v4-frame.mobile .v60{width:100%!important;max-width:100%!important;overflow:hidden!important}
+.v4-frame.mobile .v60-top{font-size:9px;padding:7px 12px}
+.v4-frame.mobile .v60-hero{display:grid!important;width:100%!important;max-width:100%!important;height:auto!important;min-height:0!important;padding:28px 16px 42px!important;grid-template-columns:minmax(0,1fr)!important;gap:22px!important;align-items:stretch!important}
+.v4-frame.mobile .v60-hero>*{width:100%!important;max-width:100%!important;position:relative!important;inset:auto!important;transform:none!important}
+.v4-frame.mobile .v60-hero h1{font-size:clamp(38px,12vw,48px)!important;line-height:.98!important;overflow-wrap:anywhere}
+.v4-frame.mobile .v60-hero p{font-size:15px!important}
+.v4-frame.mobile .v60-hero-media{height:auto!important;min-height:0!important;aspect-ratio:1/1!important}
+.v4-frame.mobile .v60-neon-stats{position:relative!important;right:auto!important;bottom:auto!important;width:auto!important;justify-self:start}
+.v4-frame.mobile .v60-bento,.v4-frame.mobile .v60-tech-cards,.v4-frame.mobile .v60-benefits,.v4-frame.mobile .v60-gaming-strip{display:grid!important;width:100%!important;max-width:100%!important;padding:0 16px!important;grid-template-columns:minmax(0,1fr)!important;gap:14px!important}
+.v4-frame.mobile .v60-bento article{min-height:0!important;height:auto!important}
+.v4-frame.mobile .v60-bento .v60-media{height:auto!important;aspect-ratio:4/3!important}
+.v4-frame.mobile .v60-feature-media,.v4-frame.mobile .v60-engineering,.v4-frame.mobile .v60-battle{display:grid!important;width:100%!important;max-width:100%!important;margin:45px auto!important;padding:0 16px!important;grid-template-columns:minmax(0,1fr)!important;gap:20px!important}
+.v4-frame.mobile .v60-feature-media>.v60-media,.v4-frame.mobile .v60-engineering>.v60-media,.v4-frame.mobile .v60-battle>.v60-media{height:auto!important;aspect-ratio:4/3!important}
+.v4-frame.mobile .v60-nothing-grid{display:grid!important;width:100%!important;max-width:100%!important;margin:45px auto!important;padding:0 16px!important;grid-template-columns:minmax(0,1fr)!important;grid-auto-rows:auto!important}
+.v4-frame.mobile .v60-nothing-grid>*{min-height:280px!important}
+.v4-frame.mobile .v60-proof{width:calc(100% - 32px)!important;max-width:none!important;margin:30px 16px 55px!important;padding:30px 0!important}
+.v4-frame.mobile .v60-order{display:grid!important;width:calc(100% - 28px)!important;max-width:none!important;margin:40px 14px!important;padding:22px 14px!important;grid-template-columns:minmax(0,1fr)!important;gap:22px!important}
+.v4-frame.mobile .v60-order form{display:grid!important;width:100%!important;grid-template-columns:minmax(0,1fr)!important}
+.v4-frame.mobile .v60-faq{width:100%!important;max-width:100%!important;padding:0 16px!important}
+
+@media(max-width:900px){
+ .landing-v4-runtime:not(.v4-builder-preview) .v60{overflow:hidden!important}
+ .landing-v4-runtime:not(.v4-builder-preview) .v60-hero{display:grid!important;width:100%!important;max-width:100%!important;height:auto!important;min-height:0!important;padding:32px 18px 44px!important;grid-template-columns:minmax(0,1fr)!important;gap:24px!important}
+ .landing-v4-runtime:not(.v4-builder-preview) .v60-hero>*{width:100%!important;max-width:100%!important;position:relative!important;inset:auto!important;transform:none!important}
+ .landing-v4-runtime:not(.v4-builder-preview) .v60-hero-media{height:auto!important;aspect-ratio:1/1!important}
+ .landing-v4-runtime:not(.v4-builder-preview) .v60-bento,
+ .landing-v4-runtime:not(.v4-builder-preview) .v60-tech-cards,
+ .landing-v4-runtime:not(.v4-builder-preview) .v60-benefits,
+ .landing-v4-runtime:not(.v4-builder-preview) .v60-gaming-strip{grid-template-columns:minmax(0,1fr)!important;padding-inline:18px!important}
+ .landing-v4-runtime:not(.v4-builder-preview) .v60-feature-media,
+ .landing-v4-runtime:not(.v4-builder-preview) .v60-engineering,
+ .landing-v4-runtime:not(.v4-builder-preview) .v60-battle{width:100%!important;max-width:100%!important;padding:0 18px!important;grid-template-columns:minmax(0,1fr)!important}
+ .landing-v4-runtime:not(.v4-builder-preview) .v60-feature-media>.v60-media,
+ .landing-v4-runtime:not(.v4-builder-preview) .v60-engineering>.v60-media,
+ .landing-v4-runtime:not(.v4-builder-preview) .v60-battle>.v60-media{height:auto!important;aspect-ratio:4/3!important}
+ .landing-v4-runtime:not(.v4-builder-preview) .v60-nothing-grid{grid-template-columns:minmax(0,1fr)!important;grid-auto-rows:auto!important}
+ .landing-v4-runtime:not(.v4-builder-preview) .v60-nothing-grid>*{min-height:280px!important}
+ .landing-v4-runtime:not(.v4-builder-preview) .v60-order{width:calc(100% - 32px)!important;max-width:none!important;margin:45px 16px!important;padding:24px 16px!important;grid-template-columns:minmax(0,1fr)!important}
+}
