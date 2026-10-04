@@ -5,10 +5,10 @@ import {authContext} from "../../../../lib/server-auth";
 export async function GET(req:Request,{params}:{params:Promise<{id:string}>}){
  try{
   const {id}=await params,{s,workspaceId}=await authContext(req);
-  const {data,error}=await s.from("landing_pages").select("id,name,slug,status,locale,created_at,published_at,seo,product_id,products(price,compare_at_price,description,images)").eq("id",id).eq("workspace_id",workspaceId).is("archived_at",null).maybeSingle();
+  const {data,error}=await s.from("landing_pages").select("id,name,slug,status,locale,created_at,published_at,seo,product_id,products(price,compare_at_price,description,image_urls)").eq("id",id).eq("workspace_id",workspaceId).is("archived_at",null).maybeSingle();
   if(error)throw error;if(!data)return NextResponse.json({error:"Page introuvable"},{status:404});
   const seo:any=data.seo||{},ai:any=seo.ai_content||{},product:any=Array.isArray((data as any).products)?(data as any).products[0]:(data as any).products;
-  return NextResponse.json({page:{...data,content:ai,images:Array.isArray(seo.images)?seo.images:(product?.images||[]),price:product?.price??0,oldPrice:product?.compare_at_price??null,metaPixelId:seo.meta_pixel_id||""}});
+  return NextResponse.json({page:{...data,content:ai,images:Array.isArray(seo.images)?seo.images:(product?.image_urls||[]),price:product?.price??0,oldPrice:product?.compare_at_price??null,metaPixelId:seo.meta_pixel_id||""}});
  }catch(e:any){return NextResponse.json({error:e.message},{status:e.message==="Non autorisé"?401:500})}
 }
 
