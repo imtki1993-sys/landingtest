@@ -1385,3 +1385,42 @@
 .v4-frame.tablet .template-beauty-glow .hero-composition-beauty-glow{grid-template-columns:1fr 1fr!important;padding:34px 28px!important;gap:28px!important}.v4-frame.tablet .template-beauty-glow .hero-composition-beauty-glow .v46-beauty-visual>.hero-media{height:370px!important}.v4-frame.tablet .template-beauty-glow .hero-composition-beauty-glow .v46-hero-copy h1{font-size:46px!important}
 .v4-frame.mobile .template-beauty-glow .hero-composition-beauty-glow{display:flex!important;flex-direction:column!important;min-height:0!important;padding:24px 18px 32px!important;gap:26px!important}.v4-frame.mobile .template-beauty-glow .hero-composition-beauty-glow .v46-beauty-visual{order:1!important;width:100%!important;padding:12px!important;border-radius:24px!important}.v4-frame.mobile .template-beauty-glow .hero-composition-beauty-glow .v46-beauty-visual>.hero-media{height:330px!important}.v4-frame.mobile .template-beauty-glow .hero-composition-beauty-glow .v46-beauty-visual>span{left:24px!important;bottom:24px!important}.v4-frame.mobile .template-beauty-glow .hero-composition-beauty-glow .v46-hero-copy{order:2!important;width:100%!important;max-width:none!important}.v4-frame.mobile .template-beauty-glow .hero-composition-beauty-glow .v46-hero-copy h1{font-size:38px!important;line-height:1.02!important}.v4-frame.mobile .template-beauty-glow .hero-composition-beauty-glow .v46-hero-copy>p{-webkit-line-clamp:2!important}
 @media(max-width:900px){.landing-v4-runtime:not(.v4-builder-preview) .template-beauty-glow .hero-composition-beauty-glow{display:flex!important;flex-direction:column!important;min-height:0!important;padding:28px 20px 36px!important;gap:28px!important}.landing-v4-runtime:not(.v4-builder-preview) .template-beauty-glow .hero-composition-beauty-glow .v46-beauty-visual{order:1!important;width:100%!important;padding:14px!important}.landing-v4-runtime:not(.v4-builder-preview) .template-beauty-glow .hero-composition-beauty-glow .v46-beauty-visual>.hero-media{height:350px!important}.landing-v4-runtime:not(.v4-builder-preview) .template-beauty-glow .hero-composition-beauty-glow .v46-hero-copy{order:2!important;width:100%!important}.landing-v4-runtime:not(.v4-builder-preview) .template-beauty-glow .hero-composition-beauty-glow .v46-hero-copy h1{font-size:clamp(38px,8vw,50px)!important}}
+
+
+/* HERO MEDIA VISIBILITY CONTRACT — prevent desktop decorative layers from covering product photos */
+.v46 [class*="hero-composition-"] .v46-media,
+.v46 .v46-hero>.v46-media,
+.v46 .v46-hero .v46-auto-visual>.v46-media,
+.v46 .v46-hero .v46-beauty-visual>.v46-media,
+.v46 .v46-hero .v46-tech-stage>.v46-media,
+.v46 .v46-hero .v46-creator-stage>.v46-media{
+ position:relative!important;
+ isolation:isolate!important;
+}
+.v46 [class*="hero-composition-"] .v46-media>img,
+.v46 .v46-hero>.v46-media>img,
+.v46 .v46-hero .v46-auto-visual>.v46-media>img,
+.v46 .v46-hero .v46-beauty-visual>.v46-media>img,
+.v46 .v46-hero .v46-tech-stage>.v46-media>img,
+.v46 .v46-hero .v46-creator-stage>.v46-media>img{
+ position:relative!important;
+ z-index:3!important;
+ display:block!important;
+ visibility:visible!important;
+ opacity:1!important;
+ transform:none!important;
+ max-width:100%!important;
+}
+.v46 [class*="hero-composition-"] .v46-media:before,
+.v46 [class*="hero-composition-"] .v46-media:after,
+.v46 .v46-hero>.v46-media:before,
+.v46 .v46-hero>.v46-media:after{
+ z-index:1!important;
+ pointer-events:none!important;
+}
+.v4-frame.desktop .v46 [class*="hero-composition-"] .v46-media>img,
+.v4-frame.tablet .v46 [class*="hero-composition-"] .v46-media>img{
+ visibility:visible!important;
+ opacity:1!important;
+ z-index:3!important;
+}
