@@ -1781,3 +1781,36 @@
   width:100%!important;height:100%!important;object-fit:cover!important;object-position:center!important
  }
 }
+
+
+/* Revert audit regression: offer/conversion heroes intentionally preserve full product artwork.
+   Do not crop these four templates with cover. */
+.template-flash-sale .hero-composition-flash-sale>.hero-media img,
+.template-bundle-offer .hero-composition-bundle-offer>.hero-media img,
+.template-arabic-cod .hero-composition-arabic-cod>.hero-media img,
+.template-conversion-max .v46-conversion-product>.hero-media img,
+.v4-frame.tablet .template-flash-sale .hero-composition-flash-sale>.hero-media img,
+.v4-frame.mobile .template-flash-sale .hero-composition-flash-sale>.hero-media img,
+.v4-frame.tablet .template-bundle-offer .hero-composition-bundle-offer>.hero-media img,
+.v4-frame.mobile .template-bundle-offer .hero-composition-bundle-offer>.hero-media img,
+.v4-frame.tablet .template-arabic-cod .hero-composition-arabic-cod>.hero-media img,
+.v4-frame.mobile .template-arabic-cod .hero-composition-arabic-cod>.hero-media img,
+.v4-frame.tablet .template-conversion-max .v46-conversion-product>.hero-media img,
+.v4-frame.mobile .template-conversion-max .v46-conversion-product>.hero-media img{
+ width:100%!important;
+ height:100%!important;
+ max-width:100%!important;
+ max-height:100%!important;
+ object-fit:contain!important;
+ object-position:center!important;
+ display:block!important;
+}
+@media(max-width:900px){
+ .landing-v4-runtime:not(.v4-builder-preview) .template-flash-sale .hero-composition-flash-sale>.hero-media img,
+ .landing-v4-runtime:not(.v4-builder-preview) .template-bundle-offer .hero-composition-bundle-offer>.hero-media img,
+ .landing-v4-runtime:not(.v4-builder-preview) .template-arabic-cod .hero-composition-arabic-cod>.hero-media img,
+ .landing-v4-runtime:not(.v4-builder-preview) .template-conversion-max .v46-conversion-product>.hero-media img{
+  width:100%!important;height:100%!important;max-width:100%!important;max-height:100%!important;
+  object-fit:contain!important;object-position:center!important
+ }
+}
