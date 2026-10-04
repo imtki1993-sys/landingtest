@@ -4719,3 +4719,35 @@ main.v45>section{width:100%}
  .landing-benchmark .lp-hero-real .hero-product-gallery{width:100%!important}
  .landing-benchmark .lp-hero-real .hero-gallery-stage{height:min(var(--hero-media-height,520px),420px)!important}
 }
+
+
+/* Hero Engine V2.5 — layout, overlay and gallery mode parity */
+.landing-benchmark .lp-hero-real.hero-align-left :is(.hero-control-copy,.hero-control-copy-wrap,.hero-luxury-copy){text-align:left!important}
+.landing-benchmark .lp-hero-real.hero-align-center :is(.hero-control-copy,.hero-control-copy-wrap,.hero-luxury-copy){text-align:center!important;margin-inline:auto!important}
+.landing-benchmark .lp-hero-real.hero-align-right :is(.hero-control-copy,.hero-control-copy-wrap,.hero-luxury-copy){text-align:right!important}
+.landing-benchmark .lp-hero-real.hero-media-left :is(.hero-split,.hero-cod,.hero-minimal,.hero-editorial,.hero-luxury,.hero-ugc,.hero-commerce,.hero-form,.hero-video-ugc){direction:rtl!important}
+.landing-benchmark .lp-hero-real.hero-media-left :is(.hero-split,.hero-cod,.hero-minimal,.hero-editorial,.hero-luxury,.hero-ugc,.hero-commerce,.hero-form,.hero-video-ugc)>*{direction:ltr}
+.landing-benchmark .lp-hero-real.hero-media-right :is(.hero-split,.hero-cod,.hero-minimal,.hero-editorial,.hero-luxury,.hero-ugc,.hero-commerce,.hero-form,.hero-video-ugc){direction:ltr!important}
+.landing-benchmark .lp-hero-real.hero-media-top :is(.hero-split,.hero-cod,.hero-minimal,.hero-editorial,.hero-luxury,.hero-ugc,.hero-commerce,.hero-form,.hero-video-ugc){grid-template-columns:minmax(0,1fr)!important}
+.landing-benchmark .lp-hero-real.hero-media-top :is(.hero-product-stage,.hero-luxury-media,.hero-commerce-gallery,.hero-ugc-media,.hero-control-media-wrap){order:-2}
+.landing-benchmark .lp-hero-real-background .hero-bg:after,
+.landing-benchmark .lp-hero-real-fullscreen .hero-full-media:after{background:rgba(0,0,0,var(--hero-overlay,.38))!important}
+.landing-benchmark .lp-hero-real .hero-gallery-fixed .hero-gallery-image:not(.is-active){display:none}
+.landing-benchmark .lp-hero-real .hero-gallery-fade .hero-gallery-image{transform:none!important}
+.landing-benchmark .lp-hero-real .hero-gallery-slide .hero-gallery-image,
+.landing-benchmark .lp-hero-real .hero-gallery-autoplay .hero-gallery-image,
+.landing-benchmark .lp-hero-real .hero-gallery-arrows-autoplay .hero-gallery-image{transform:translateX(7%)}
+.landing-benchmark .lp-hero-real .hero-gallery-slide .hero-gallery-image.is-active,
+.landing-benchmark .lp-hero-real .hero-gallery-autoplay .hero-gallery-image.is-active,
+.landing-benchmark .lp-hero-real .hero-gallery-arrows-autoplay .hero-gallery-image.is-active{transform:translateX(0)}
+.landing-benchmark .lp-hero-real .hero-gallery-thumbnails .hero-gallery-thumbs{display:flex}
+.landing-benchmark .lp-hero-real .hero-gallery-marquee-track{will-change:transform}
+.landing-benchmark .lp-hero-real .hero-gallery-marquee:hover .hero-gallery-marquee-track{animation-play-state:paused}
+@media(max-width:900px){
+ .landing-benchmark .lp-hero-real.hero-media-left :is(.hero-split,.hero-cod,.hero-minimal,.hero-editorial,.hero-luxury,.hero-ugc,.hero-commerce,.hero-form,.hero-video-ugc),
+ .landing-benchmark .lp-hero-real.hero-media-right :is(.hero-split,.hero-cod,.hero-minimal,.hero-editorial,.hero-luxury,.hero-ugc,.hero-commerce,.hero-form,.hero-video-ugc){direction:ltr!important}
+}
+.landing-benchmark[data-preview-viewport="tablet"] .lp-hero-real.hero-media-left :is(.hero-split,.hero-cod,.hero-minimal,.hero-editorial,.hero-luxury,.hero-ugc,.hero-commerce,.hero-form,.hero-video-ugc),
+.landing-benchmark[data-preview-viewport="tablet"] .lp-hero-real.hero-media-right :is(.hero-split,.hero-cod,.hero-minimal,.hero-editorial,.hero-luxury,.hero-ugc,.hero-commerce,.hero-form,.hero-video-ugc),
+.landing-benchmark[data-preview-viewport="mobile"] .lp-hero-real.hero-media-left :is(.hero-split,.hero-cod,.hero-minimal,.hero-editorial,.hero-luxury,.hero-ugc,.hero-commerce,.hero-form,.hero-video-ugc),
+.landing-benchmark[data-preview-viewport="mobile"] .lp-hero-real.hero-media-right :is(.hero-split,.hero-cod,.hero-minimal,.hero-editorial,.hero-luxury,.hero-ugc,.hero-commerce,.hero-form,.hero-video-ugc){direction:ltr!important}
