@@ -944,3 +944,24 @@
  .landing-v4-runtime:not(.v4-builder-preview) .v46 .v46-gallery>.v46-gallery-grid{display:grid!important;grid-template-columns:1fr!important;grid-template-rows:none!important;gap:14px!important;height:auto!important}
  .landing-v4-runtime:not(.v4-builder-preview) .v46 .v46-gallery>.v46-gallery-grid>.v46-media{height:300px!important;grid-column:auto!important;grid-row:auto!important}
 }
+
+/* Final differentiation pass 06-15 */
+.v46-reference-benefits{padding:72px 7%;position:relative;clear:both}.v46-reference-benefits>div:last-child{max-width:1180px;margin:30px auto 0;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}.v46-reference-benefits article{padding:28px;min-width:0}.v46-reference-benefits article i{display:block;font-style:normal;font-weight:900;margin-bottom:22px}.v46-reference-benefits article b{display:block;font-size:17px;margin-bottom:9px}.v46-reference-benefits article p{font-size:13px;line-height:1.65;margin:0}
+.benefits-flash-sale{background:#fff1f4}.benefits-flash-sale article{background:#fff;border:1px solid #fecdd3;border-radius:18px}.benefits-flash-sale i{color:#e11d48}
+.benefits-minimal-clean{background:#fff;color:#111827}.benefits-minimal-clean>div:last-child{gap:0;border-block:1px solid #d1d5db}.benefits-minimal-clean article{border-right:1px solid #d1d5db;padding:32px 24px}.benefits-minimal-clean article:last-child{border-right:0}.benefits-minimal-clean i{font-size:12px;color:#64748b}
+.v46-minimal-features{padding:72px 7%;background:#f8fafc;color:#111827}.v46-minimal-features>div:last-child{max-width:1000px;margin:28px auto 0;border-top:1px solid #cbd5e1}.v46-minimal-features article{display:grid;grid-template-columns:80px 1fr;align-items:center;padding:22px 0;border-bottom:1px solid #cbd5e1}.v46-minimal-features span{font-size:12px;color:#64748b}.v46-minimal-features b{font-size:20px}
+.benefits-beauty-glow{background:#fff7fb}.benefits-beauty-glow article{background:#fff;border-radius:26px;border:1px solid #f5bfd4}.benefits-beauty-glow i{color:#db2777;font-size:22px}
+.benefits-health-trust{background:#f2fffd}.benefits-health-trust article{background:#fff;border:1px solid #bce7e2;border-radius:14px}.benefits-health-trust i{width:34px;height:34px;border-radius:50%;display:grid!important;place-items:center;background:#0f766e;color:#fff}
+.benefits-auto-gear{background:#111820;color:#fff}.benefits-auto-gear article{background:#1d252d;border-left:4px solid #f97316}.benefits-auto-gear i{color:#f97316;letter-spacing:.08em}
+.benefits-before-after{background:#f7fff9}.benefits-before-after article{background:#fff;border-top:4px solid #16a34a;box-shadow:0 12px 30px #14532d0d}.benefits-before-after i{color:#16a34a}
+.benefits-story-selling{background:#18130f;color:#f4dfc9}.benefits-story-selling article{border-top:1px solid #6b4c35;padding-left:0;padding-right:0}.benefits-story-selling i{color:#b77945}.benefits-story-selling article p{color:#cdb59f}
+.benefits-video-first{background:#111;color:#fff}.benefits-video-first article{background:#181818;border:1px solid #333;border-radius:8px}.benefits-video-first i{color:#f97316;font-size:20px}
+.proof-luxury-black,.proof-health-trust,.proof-tech-gadget{grid-template-columns:repeat(3,1fr)!important}.proof-luxury-black{background:#090909;color:#d8bb73;border-color:#4a3d22!important}.proof-health-trust{background:#0f766e;color:#fff}.proof-tech-gadget{background:#090b22;color:#fff;border-color:#4338ca!important}.proof-tech-gadget b{color:#a78bfa!important}
+
+/* Reference order contract: FAQ is a complete flow section before COD order. */
+.v46 .v46-faq{position:relative!important;clear:both!important;margin:0!important}
+.v46 .v46-order{position:relative!important;clear:both!important}
+
+.v4-frame.mobile .v46-reference-benefits>div:last-child{grid-template-columns:1fr!important}.v4-frame.mobile .v46-reference-benefits{padding:44px 18px!important}.v4-frame.mobile .benefits-minimal-clean>div:last-child{border:0!important}.v4-frame.mobile .benefits-minimal-clean article{border-right:0!important;border-bottom:1px solid #d1d5db!important}.v4-frame.mobile .v46-minimal-features{padding:44px 18px!important}
+.v4-frame.tablet .v46-reference-benefits>div:last-child{grid-template-columns:repeat(2,1fr)!important}
+@media(max-width:700px){.landing-v4-runtime:not(.v4-builder-preview) .v46-reference-benefits{padding:44px 18px}.landing-v4-runtime:not(.v4-builder-preview) .v46-reference-benefits>div:last-child{grid-template-columns:1fr}.landing-v4-runtime:not(.v4-builder-preview) .benefits-minimal-clean article{border-right:0;border-bottom:1px solid #d1d5db}.landing-v4-runtime:not(.v4-builder-preview) .v46-minimal-features{padding:44px 18px}}
