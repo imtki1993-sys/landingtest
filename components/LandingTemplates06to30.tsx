@@ -8,11 +8,11 @@ type P={data:LandingV4Data;preview?:boolean;onSubmit?:(e:React.FormEvent<HTMLFor
 type Spec={hero:"split"|"center"|"media"|"offer"|"editorial";modules:string[];eyebrow:string;headline?:string};
 
 const SPECS:Record<string,Spec>={
- "flash-sale":{hero:"offer",modules:["countdown","benefits","deal","proof"],eyebrow:"OFFRE LIMITÉE",headline:"L'offre à ne pas manquer"},
- "minimal-clean":{hero:"center",modules:["benefits","story"],eyebrow:"ESSENTIEL"},
+ "flash-sale":{hero:"offer",modules:["countdown","benefits","deal","reviews"],eyebrow:"OFFRE LIMITÉE",headline:"L'offre à ne pas manquer"},
+ "minimal-clean":{hero:"center",modules:["benefits","gallery","features"],eyebrow:"ESSENTIEL"},
  "luxury-black":{hero:"editorial",modules:["story","details","proof"],eyebrow:"ÉDITION SIGNATURE"},
- "beauty-glow":{hero:"split",modules:["benefits","routine","proof"],eyebrow:"BEAUTY ROUTINE"},
- "health-trust":{hero:"split",modules:["trust","benefits","how","proof"],eyebrow:"CONFIANCE & CONFORT"},
+ "beauty-glow":{hero:"split",modules:["benefits","routine","ugc","reviews"],eyebrow:"BEAUTY ROUTINE"},
+ "health-trust":{hero:"split",modules:["trust","benefits","proof","reviews"],eyebrow:"CONFIANCE & CONFORT"},
  "auto-gear":{hero:"media",modules:["specs","benefits","how","proof"],eyebrow:"AUTO GEAR"},
  "tech-gadget":{hero:"media",modules:["specs","features","benefits","proof"],eyebrow:"SMART TECH"},
  "before-after":{hero:"split",modules:["compare","benefits","proof"],eyebrow:"VOYEZ LA DIFFÉRENCE"},
@@ -65,6 +65,7 @@ export default function LandingTemplates06to30({data,preview=false,onSubmit}:P){
    if(m==="video")return <section className="v46-video" key={m+i}>{img(1)}<div className="v46-play">▶</div><strong>Découvrez le produit en situation réelle</strong></section>;
    if(m==="ugc")return <section className="v46-ugc" key={m+i}><div className="v46-section-head"><small>COMMUNAUTÉ</small><h2>Vu, testé, adopté</h2></div><div>{[1,2,3].map(n=><article key={n}>{img(n)}<b>★★★★★</b><p>“Pratique, beau et vraiment utile au quotidien.”</p></article>)}</div></section>;
    if(m==="proof")return <section className="v46-proof" key={m+i}><div><b>4.8/5</b><span>Note clients</span></div><div><b>+1 200</b><span>Commandes</span></div><div><b>COD</b><span>Paiement livraison</span></div><div><b>24/7</b><span>Commande en ligne</span></div></section>;
+   if(m==="reviews")return <section className="v46-reviews-reference" key={m+i}><div className="v46-section-head"><small>AVIS CLIENTS</small><h2>Ils recommandent ce produit</h2></div><div>{["Casablanca","Rabat","Marrakech"].map((city,j)=><article key={city}><b>★★★★★</b><p>“Produit conforme, pratique et livraison rapide.”</p><span>Client vérifié · {city}</span></article>)}</div></section>;
    if(m==="trust")return <section className="v46-trust" key={m+i}>{["Paiement à la livraison","Confirmation rapide","Livraison partout au Maroc","Support client"].map(x=><b key={x}>✓ {x}</b>)}</section>;
    if(m==="how"||m==="routine")return <section className="v46-how" key={m+i}><div className="v46-section-head"><small>{m==="routine"?"VOTRE ROUTINE":"3 ÉTAPES"}</small><h2>Simple du début à la fin</h2></div><div>{[1,2,3].map((n,j)=><article key={n}><span>{n}</span>{img(j)}<b>{j===0?"Choisissez":j===1?"Utilisez":"Profitez"}</b></article>)}</div></section>;
    if(m==="bundle"||m==="deal")return <section className="v46-bundle" key={m+i}><div className="v46-section-head"><small>OFFRES</small><h2>Choisissez votre formule</h2></div><div>{offers.slice(0,3).map((o:any,j:number)=><button key={j} className={qty===Number(o.qty)?"active":""} onClick={()=>setQty(Number(o.qty))}><small>{j===1?"LE PLUS CHOISI":o.label||o.qty+" pièce(s)"}</small><b>{o.price} DH</b><span>{o.qty} pièce{o.qty>1?"s":""}</span></button>)}</div></section>;
