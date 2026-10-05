@@ -1,3 +1,5 @@
+import {reportError} from "../../../../lib/monitoring";
+import {withLandingInvalidation} from "../../../../lib/landing-cache";
 import {NextResponse} from "next/server";
 import {revalidateTag} from "next/cache";
 import {authContext} from "../../../../lib/server-auth";
@@ -10,10 +12,10 @@ export async function GET(req:Request,{params}:{params:Promise<{id:string}>}){
   const seo:any=data.seo||{},ai:any=seo.ai_content||{},product:any=Array.isArray((data as any).products)?(data as any).products[0]:(data as any).products;
   const seoImages=Array.isArray(seo.images)?seo.images.filter((x:any)=>typeof x==="string"&&x.trim()):[];const productImages=Array.isArray(product?.image_urls)?product.image_urls.filter((x:any)=>typeof x==="string"&&x.trim()):[];
   return NextResponse.json({page:{...data,content:ai,images:seoImages.length?seoImages:productImages,price:product?.price??0,oldPrice:product?.compare_at_price??null,metaPixelId:seo.meta_pixel_id||""}});
- }catch(e:any){return NextResponse.json({error:e.message},{status:e.message==="Non autorisé"?401:500})}
+ }catch(e:any){reportError(e,"api/pages/[id]");return NextResponse.json({error:e.message},{status:e.message==="Non autorisé"?401:500})}
 }
 
-export async function PATCH(req:Request,{params}:{params:Promise<{id:string}>}){
+async function PATCHHandler(req:Request,{params}:{params:Promise<{id:string}>}){
  try{
   const {id}=await params,b=await req.json(),{s,workspaceId}=await authContext(req);
   const {data:current,error:ce}=await s.from("landing_pages").select("id,slug,seo,product_id").eq("id",id).eq("workspace_id",workspaceId).is("archived_at",null).maybeSingle();
@@ -54,15 +56,18 @@ export async function PATCH(req:Request,{params}:{params:Promise<{id:string}>}){
   if(error)throw error;
   if(data?.slug&&(b.status!==undefined||b.content!==undefined||b.price!==undefined||b.oldPrice!==undefined||b.metaPixelId!==undefined||b.images!==undefined))revalidateTag("landing:"+data.slug);
   return NextResponse.json(data);
- }catch(e:any){return NextResponse.json({error:e.message},{status:e.message==="Non autorisé"?401:500})}
+ }catch(e:any){reportError(e,"api/pages/[id]");return NextResponse.json({error:e.message},{status:e.message==="Non autorisé"?401:500})}
 }
 
-export async function DELETE(req:Request,{params}:{params:Promise<{id:string}>}){
+async function DELETEHandler(req:Request,{params}:{params:Promise<{id:string}>}){
  try{
   const {id}=await params,{s,workspaceId}=await authContext(req);
   const {data,error}=await s.from("landing_pages").update({archived_at:new Date().toISOString(),status:"DRAFT",published_at:null}).eq("id",id).eq("workspace_id",workspaceId).select("id,slug").maybeSingle();
   if(error)throw error;if(!data)return NextResponse.json({error:"Page introuvable"},{status:404});
   revalidateTag("landing:"+data.slug);
   return NextResponse.json({ok:true,archived:true});
- }catch(e:any){return NextResponse.json({error:e.message},{status:e.message==="Non autorisé"?401:500})}
+ }catch(e:any){reportError(e,"api/pages/[id]");return NextResponse.json({error:e.message},{status:e.message==="Non autorisé"?401:500})}
 }
+
+export const PATCH=withLandingInvalidation(PATCHHandler);
+export const DELETE=withLandingInvalidation(DELETEHandler);

@@ -1,3 +1,4 @@
+import {reportError} from "../../../lib/monitoring";
 import {NextResponse} from "next/server";
 import {authContext} from "../../../lib/server-auth";
 
@@ -22,5 +23,5 @@ export async function POST(req:Request){
   if(error)throw error;
   const {data}=s.storage.from(BUCKET).getPublicUrl(path);
   return NextResponse.json({url:data.publicUrl,path});
- }catch(e:any){return NextResponse.json({error:e.message||"Upload impossible"},{status:500})}
+ }catch(e:any){reportError(e,"api/store-media");return NextResponse.json({error:e.message||"Upload impossible"},{status:500})}
 }

@@ -1,4 +1,6 @@
 import {cache} from "react";
+import {unstable_cache} from "next/cache";
+import {PUBLIC_LANDINGS_TAG} from "./landing-cache";
 import {adminDb} from "./server-auth";
 import {resolvePublishedMetaPixel} from "./meta-pixel";
 
@@ -25,4 +27,9 @@ async function loadPublicLanding(slug:string){
 }
 
 // cache() : generateMetadata et la page partagent la même lecture (une seule série de requêtes).
-export const getPublicLanding=cache((slug:string)=>loadPublicLanding(slug));
+// Cache des données publiques : plus de requêtes Supabase à chaque visite.
+// Vidé immédiatement à chaque publication/modification (withLandingInvalidation),
+// et au plus tard toutes les 5 minutes par sécurité.
+const cachedPublicLanding=unstable_cache(async(slug:string)=>loadPublicLanding(slug),["public-landing-v1"],{tags:[PUBLIC_LANDINGS_TAG],revalidate:300});
+// cache() : generateMetadata et la page partagent la même lecture pendant une requête.
+export const getPublicLanding=cache((slug:string)=>cachedPublicLanding(slug));

@@ -1,3 +1,4 @@
+import {reportError} from "../../../lib/monitoring";
 import {NextResponse} from "next/server";
 import {authContext} from "../../../lib/server-auth";
 
@@ -79,7 +80,7 @@ export async function POST(req:Request){
   if(!title&&!description)return NextResponse.json({error:"Alibaba/AliExpress n’a fourni aucune donnée exploitable. L’import automatique ne peut pas contourner la protection du fournisseur. Ajoute les informations et images du produit manuellement.",blocked:true,source_url:canonical},{status:422});
   const brief=[title,description,supplier_price?"Prix fournisseur détecté : "+supplier_price:""].filter(Boolean).join("\n\n").slice(0,3500);
   return NextResponse.json({title,description,brief,images,supplier_price,source_url:canonical,image_count:images.length,partial:blocked||(!description&&images.length===0),warning:blocked?"Alibaba a protégé la fiche : import partiel depuis l’URL produit.":undefined});
- }catch(e:any){
+ }catch(e:any){reportError(e,"api/product-import");
   return NextResponse.json({error:e?.message||"Import fournisseur impossible"},{status:500});
  }
 }

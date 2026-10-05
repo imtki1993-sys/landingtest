@@ -1,3 +1,5 @@
+import {reportError} from "../../../lib/monitoring";
+import {withLandingInvalidation} from "../../../lib/landing-cache";
 import { NextResponse } from "next/server";
 import { authContext } from "../../../lib/server-auth";
 import OpenAI from "openai";
@@ -14,7 +16,7 @@ function cleanHtml(v:string){return v.replace(/<[^>]+>/g," ").replace(/&nbsp;/g,
 function meta(html:string,key:string){for(const tag of html.match(/<meta[^>]*>/gi)||[]){if(tag.includes('property="'+key+'"')||tag.includes('name="'+key+'"')||tag.includes("property='"+key+"'")||tag.includes("name='"+key+"'")){const m=tag.match(/content=["']([^"']*)["']/i);if(m)return cleanHtml(m[1])}}return ""}
 async function supplierData(raw:any){if(!raw)return {brief:"",images:[] as string[]};try{const u=new URL(String(raw));if(u.protocol!=="https:"||!supplierHosts.has(u.hostname.toLowerCase()))return {brief:"",images:[] as string[]};const r=await fetch(u.toString(),{headers:{"user-agent":"Mozilla/5.0 (compatible; LandingPageMotor/1.0)","accept-language":"fr-FR,fr;q=0.9,en;q=0.8"},redirect:"follow",signal:AbortSignal.timeout(10000)});if(!r.ok)return {brief:"",images:[] as string[]};const finalUrl=new URL(r.url);if(!supplierHosts.has(finalUrl.hostname.toLowerCase()))return {brief:"",images:[] as string[]};const html=(await r.text()).slice(0,2500000),title=meta(html,"og:title")||meta(html,"twitter:title")||cleanHtml(html.match(/<title[^>]*>([\s\S]*?)<\/title>/i)?.[1]||""),description=meta(html,"og:description")||meta(html,"description")||meta(html,"twitter:description"),images=[meta(html,"og:image"),meta(html,"twitter:image")].filter(Boolean);return {brief:[title,description].filter(Boolean).join("\n\n").slice(0,3500),images:[...new Set(images)].slice(0,10)}}catch{return {brief:"",images:[] as string[]}}}
 
-export async function POST(req: Request) {
+async function POSTHandler(req: Request) {
   try {
     const p = await req.json();
     if (!p.name || !p.price) return NextResponse.json({ error: "Nom et prix requis" }, { status: 400 });
@@ -66,7 +68,9 @@ Retourne UNIQUEMENT un JSON valide avec exactement ces clés:
       page: { ...content, visual_theme: theme, price: p.price, oldPrice: p.oldPrice || "", slug: data.slug, url: "https://" + customHost, fallbackUrl: "/landing/" + data.slug, hostname: customHost, images },
       record: data
     });
-  } catch (e: any) {
+  } catch (e: any) {reportError(e,"api/generate");
     return NextResponse.json({ error: e?.message || "Erreur génération IA" }, { status: 500 });
   }
 }
+
+export const POST=withLandingInvalidation(POSTHandler);

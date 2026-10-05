@@ -1,3 +1,4 @@
+import {reportError} from "../../../lib/monitoring";
 import {NextResponse} from "next/server";
 import {authContext} from "../../../lib/server-auth";
 import OpenAI from "openai";
@@ -58,5 +59,5 @@ export async function POST(req:Request){
   const content=parseJson(ai.output_text);
   const usage=(ai as any).usage||null;
   return NextResponse.json({content,section,usage,designSystem:{source:"ui-ux-pro-max-100",niche:nicheInfo,blueprint}});
- }catch(e:any){return NextResponse.json({error:e?.message||"Erreur génération contenu"},{status:500})}
+ }catch(e:any){reportError(e,"api/ai-content");return NextResponse.json({error:e?.message||"Erreur génération contenu"},{status:500})}
 }

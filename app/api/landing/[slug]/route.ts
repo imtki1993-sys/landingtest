@@ -1,3 +1,4 @@
+import {reportError} from "../../../../lib/monitoring";
 import {NextResponse} from "next/server";
 export const dynamic="force-dynamic";
 import {adminDb,authContext} from "../../../../lib/server-auth";
@@ -32,5 +33,5 @@ export async function GET(req:Request,{params}:{params:Promise<{slug:string}>}){
   const content={...savedContent,uiux_library:getUiuxLibrary()};
   const payload={id:lp.id,name:activeProduct?.name||lp.name,price:activeProduct?.price,oldPrice:activeProduct?.compare_at_price,description:activeProduct?.description,locale:lp.locale,content,images:(activeSeo as any)?.images||activeProduct?.image_urls||[],whatsappPhone:String(whatsapp).replace(/\D/g,""),metaPixelId:preview?((activeSeo as any)?.meta_pixel_id||null):publishedPixel};
   return NextResponse.json(payload,{headers:{"Cache-Control":"private, no-store, no-cache, max-age=0, must-revalidate","CDN-Cache-Control":"no-store","Vercel-CDN-Cache-Control":"no-store"}});
- }catch(e:any){return NextResponse.json({error:e.message},{status:500})}
+ }catch(e:any){reportError(e,"api/landing/[slug]");return NextResponse.json({error:e.message},{status:500})}
 }

@@ -1,3 +1,4 @@
+import {reportError} from "../../../lib/monitoring";
 import {NextResponse} from "next/server";
 import {authContext} from "../../../lib/server-auth";
 
@@ -13,5 +14,5 @@ export async function GET(req:Request){
   const monthStart=new Date();monthStart.setUTCDate(1);monthStart.setUTCHours(0,0,0,0);
   const month=successful.filter((x:any)=>new Date(x.created_at)>=monthStart);
   return NextResponse.json({calls:successful.length,input_tokens:inputTokens,output_tokens:outputTokens,total_tokens:inputTokens+outputTokens,month_calls:month.length,month_tokens:month.reduce((n:number,x:any)=>n+(Number(x.input_tokens)||0)+(Number(x.output_tokens)||0),0)});
- }catch(e:any){return NextResponse.json({error:e?.message||"Erreur statistiques IA"},{status:401})}
+ }catch(e:any){reportError(e,"api/ai-usage");return NextResponse.json({error:e?.message||"Erreur statistiques IA"},{status:401})}
 }

@@ -1,3 +1,4 @@
+import {reportError} from "../../../lib/monitoring";
 import {NextResponse} from "next/server";import {authContext} from "../../../lib/server-auth";
 export async function GET(req:Request){const started=Date.now();try{
  const {s,workspaceId,isPlatformAdmin}=await authContext(req);const authMs=Date.now()-started;
@@ -17,4 +18,4 @@ export async function GET(req:Request){const started=Date.now();try{
  ]);
  const by=(rows:any[]=[])=>new Map(rows.map((x:any)=>[x.id,x])),lm=by(lq.data||[]),pm=by(pq.data||[]),pgm=by(pgq.data||[]),plan=Array.isArray(planQ.data)?planQ.data[0]:planQ.data;
  return NextResponse.json({isPlatformAdmin,plan:plan||null,totals:{landings:landingsCountQ.count||0,published:publishedCountQ.count||0,products:productsQ.count||0},recentOrders:orders.map(o=>({...o,lead:lm.get(o.lead_id)||null,product:pm.get(o.product_id)||null,landing:pgm.get(o.landing_page_id)||null})),performance:{authMs,totalMs:Date.now()-started}});
-}catch(e:any){return NextResponse.json({error:e.message},{status:e.message==="Non autorisé"?401:500})}}
+}catch(e:any){reportError(e,"api/dashboard");return NextResponse.json({error:e.message},{status:e.message==="Non autorisé"?401:500})}}
