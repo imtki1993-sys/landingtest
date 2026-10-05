@@ -1,47 +1,533 @@
 "use client";
-import type {ReactNode} from "react";
+import type { ReactNode } from "react";
 
-type Props={
- draft:any; editing:any; images:string[]; previewMode:"desktop"|"tablet"|"mobile"; selectedSection:string;
- setSelectedSection:(k:string)=>void; canvasStyle:(k:string)=>any; tools:(k:string)=>ReactNode;
- inlineText:(field:string,value:string)=>void;
- editListItem:(field:string,index:number,value:string)=>void;
- removeListItem:(field:string,index:number)=>void;
- addListItem:(field:string,value:string)=>void;
- editFaqItem:(index:number,patch:any)=>void;
- patchCustomBlock:(key:string,patch:any)=>void;
- patchCustomFaqItem:(key:string,index:number,patch:any)=>void;
+type Props = {
+  draft: any;
+  editing: any;
+  images: string[];
+  previewMode: "desktop" | "tablet" | "mobile";
+  selectedSection: string;
+  setSelectedSection: (k: string) => void;
+  canvasStyle: (k: string) => any;
+  tools: (k: string) => ReactNode;
+  inlineText: (field: string, value: string) => void;
+  editListItem: (field: string, index: number, value: string) => void;
+  removeListItem: (field: string, index: number) => void;
+  addListItem: (field: string, value: string) => void;
+  editFaqItem: (index: number, patch: any) => void;
+  patchCustomBlock: (key: string, patch: any) => void;
+  patchCustomFaqItem: (key: string, index: number, patch: any) => void;
 };
 
-export default function BuilderCanvasCore(p:Props){
- const {draft,editing,images,previewMode,selectedSection,setSelectedSection,canvasStyle,tools,inlineText,editListItem,removeListItem,addListItem,editFaqItem,patchCustomBlock,patchCustomFaqItem}=p;
- const ds=draft.design_system||{},styleName=String(ds.style?.["Style Category"]||""),pattern=String(ds.tokens?.pattern||ds.landing?.["Pattern ID"]||"hero-features-cta"),uiuxId=String(ds.style?.["Style ID"]||draft.design_profile||"uiux-pro-max").replace(/[^a-z0-9-]/gi,"-").toLowerCase();
- const heroMode=/story|editorial|luxury/i.test(pattern+" "+styleName)?"editorial":/demo|interactive|motion|bold|vibrant/i.test(pattern+" "+styleName)?"impact":/minimal|direct|swiss/i.test(pattern+" "+styleName)?"centered":/split|feature/i.test(pattern)?"split":"conversion";
- const cardMode=/glass|tech|data/i.test(styleName)?"technical":/luxury|editorial/i.test(styleName)?"editorial":/soft|neumorph/i.test(styleName)?"soft":"conversion";
- const rootStyle={"--lp-primary":ds.tokens?.colors?.primary||undefined,"--lp-secondary":ds.tokens?.colors?.secondary||undefined,"--lp-accent":ds.tokens?.colors?.accent||undefined,"--lp-bg":ds.tokens?.colors?.background||undefined,"--lp-fg":ds.tokens?.colors?.foreground||undefined,"--lp-card":ds.tokens?.colors?.card||undefined,"--lp-border":ds.tokens?.colors?.border||undefined,"--lp-radius":ds.tokens?.radius||undefined,"--lp-heading-font":ds.tokens?.fonts?.heading||undefined,"--lp-body-font":ds.tokens?.fonts?.body||undefined} as any;
- const cls=(k:string,extra="")=>"builder-canvas-block builder-selectable "+(selectedSection===k?"selected ":"")+((draft.hidden_sections||[]).includes(k)?"builder-disabled ":"")+extra;
- const ce=(field:string,value:any,tag:"h1"|"h2"|"p"|"span"="p")=>{const Tag:any=tag;return <Tag contentEditable suppressContentEditableWarning onBlur={(e:any)=>inlineText(field,e.currentTarget.textContent||"")}>{value||""}</Tag>};
- const list=(k:string,field:string,items:any[],prefix="✓")=><div className="editor-benefits">{items.map((x:any,n:number)=>{const value=typeof x==="string"?x:(x?.title||x?.text||"");return <div className="builder-inline-row" key={n}><span>{prefix}</span><span contentEditable suppressContentEditableWarning onBlur={e=>editListItem(field,n,e.currentTarget.textContent||"")}>{value}</span><button type="button" onClick={e=>{e.stopPropagation();removeListItem(field,n)}}>×</button></div>})}<button type="button" className="builder-inline-add" onClick={e=>{e.stopPropagation();addListItem(field,"Nouveau élément")}}>+ Ajouter</button></div>;
- const custom=(k:string)=>{
-  const b=draft.custom_sections?.[k]||{},t=b.type||"text";
-  if(t==="imageText")return <section key={k} className={cls(k,"builder-custom-preview lp-image-text")} style={canvasStyle(k)} onClick={()=>setSelectedSection(k)}>{tools(k)}<div className="lp-image-text-grid">{b.image&&<img className="builder-custom-image" src={b.image} alt={b.title||""}/>}<div>{<h2 contentEditable suppressContentEditableWarning onBlur={e=>patchCustomBlock(k,{title:e.currentTarget.textContent||""})}>{b.title}</h2>}<p contentEditable suppressContentEditableWarning onBlur={e=>patchCustomBlock(k,{text:e.currentTarget.textContent||""})}>{b.text}</p></div></div></section>;
-  if(t==="gallery")return <section key={k} className={cls(k,"builder-custom-preview")} style={canvasStyle(k)} onClick={()=>setSelectedSection(k)}>{tools(k)}<h2 contentEditable suppressContentEditableWarning onBlur={e=>patchCustomBlock(k,{title:e.currentTarget.textContent||""})}>{b.title}</h2><div className="builder-custom-gallery">{(b.images||[]).map((x:string,n:number)=><img src={x} alt="" key={n}/>)}</div></section>;
-  if(t==="faqBlock")return <section key={k} className={cls(k,"builder-custom-preview")} style={canvasStyle(k)} onClick={()=>setSelectedSection(k)}>{tools(k)}<h2 contentEditable suppressContentEditableWarning onBlur={e=>patchCustomBlock(k,{title:e.currentTarget.textContent||""})}>{b.title}</h2>{(b.items||[]).map((x:any,n:number)=><div className="lp-faq" key={n}><b contentEditable suppressContentEditableWarning onBlur={e=>patchCustomFaqItem(k,n,{question:e.currentTarget.textContent||""})}>{x.question}</b><p contentEditable suppressContentEditableWarning onBlur={e=>patchCustomFaqItem(k,n,{answer:e.currentTarget.textContent||""})}>{x.answer}</p></div>)}</section>;
-  if(t==="vertical916"){const device=b.device||"phone",ratio=device==="laptop"?"16 / 9":device==="tablet"?"4 / 3":"9 / 16";return <section key={k} className={cls(k,"builder-custom-preview lp-device-media lp-device-"+device)} style={canvasStyle(k)} onClick={()=>setSelectedSection(k)}>{tools(k)}<div style={{width:"100%",maxWidth:device==="laptop"?"100%":device==="tablet"?"min(100%, 820px)":"min(100%, 430px)",margin:"0 auto"}}><div style={{aspectRatio:ratio,overflow:"hidden",borderRadius:0,background:"#111",border:"none",boxSizing:"border-box"}}>{b.mediaType==="video"?<video src={b.media||""} controls playsInline style={{width:"100%",height:"100%",objectFit:"cover"}}/>:b.media?<img src={b.media} alt={b.title||""} style={{width:"100%",height:"100%",objectFit:"cover"}}/>:<div style={{height:"100%",display:"grid",placeItems:"center",color:"#fff"}}>{device==="laptop"?"Laptop 16:9":device==="tablet"?"Tablette 4:3":"Phone 9:16"}</div>}</div><h2 contentEditable suppressContentEditableWarning onBlur={e=>patchCustomBlock(k,{title:e.currentTarget.textContent||""})}>{b.title}</h2><p contentEditable suppressContentEditableWarning onBlur={e=>patchCustomBlock(k,{text:e.currentTarget.textContent||""})}>{b.text}</p></div></section>}
-  if(t==="ctaBlock")return <section key={k} className={cls(k,"builder-custom-preview lp-custom-cta")} style={canvasStyle(k)} onClick={()=>setSelectedSection(k)}>{tools(k)}<h2 contentEditable suppressContentEditableWarning onBlur={e=>patchCustomBlock(k,{title:e.currentTarget.textContent||""})}>{b.title}</h2><p contentEditable suppressContentEditableWarning onBlur={e=>patchCustomBlock(k,{text:e.currentTarget.textContent||""})}>{b.text}</p><button contentEditable suppressContentEditableWarning onBlur={e=>patchCustomBlock(k,{button:e.currentTarget.textContent||""})}>{b.button||draft.cta||"Commander maintenant"}</button></section>;
-  return <section key={k} className={cls(k,"builder-custom-preview")} style={canvasStyle(k)} onClick={()=>setSelectedSection(k)}>{tools(k)}<h2 contentEditable suppressContentEditableWarning onBlur={e=>patchCustomBlock(k,{title:e.currentTarget.textContent||""})}>{b.title}</h2><p contentEditable suppressContentEditableWarning onBlur={e=>patchCustomBlock(k,{text:e.currentTarget.textContent||""})}>{b.text}</p></section>;
- };
- const render=(k:string)=>{
-  if(k.startsWith("custom-"))return custom(k);
-  if(k==="hero")return <section key={k} className={cls(k,"lp-hero lp-hero-"+heroMode+" editor-live-hero")} style={canvasStyle(k)} onClick={()=>setSelectedSection(k)}>{tools(k)}<div className={"builder-theme-gallery builder-gallery-"+(draft.gallery_style||"auto")}><div className="lp-gallery-label">PRODUCT</div><div className="builder-gallery-images">{images.slice(0,5).map((x,n)=><img src={x} alt="" key={x+n}/>)}</div></div><span>COD Maroc</span>{ce("headline",draft.headline||editing.name,"h1")}<div className="editor-live-price"><b>{draft.price||0} DH</b>{draft.oldPrice&&<s>{draft.oldPrice} DH</s>}</div>{ce("subheadline",draft.subheadline,"p")}<button contentEditable suppressContentEditableWarning onBlur={e=>inlineText("cta",e.currentTarget.textContent||"")}>{draft.cta||"Commander maintenant"}</button></section>;
-  if(k==="order"){const offers=Array.isArray(draft.quantity_offers)?draft.quantity_offers:[],ship=Number(draft.delivery_price||0),base=Number(draft.price||0);return <section key={k} className={cls(k,"lp-order lp-order-after-hero builder-order-shell")} style={canvasStyle(k)} onClick={()=>setSelectedSection(k)}>{tools(k)}<div className={"lp-form builder-order-preview builder-order-real lp-form-"+(draft.order_form_style||"classic")}><small>FORMULAIRE COD · {(draft.order_form_style||"classic").toUpperCase()}</small><h3>أكد الطلب ديالك</h3>{ce("delivery",draft.delivery||"الدفع عند الاستلام","p")}<div className="builder-fake-input">الاسم الكامل</div><div className="builder-fake-input">رقم الهاتف</div><div className="builder-fake-input">المدينة</div>{draft.order_show_address!==false&&<div className="builder-fake-input">العنوان (اختياري)</div>}{offers.length>0&&<div className="builder-order-offers">{offers.map((o:any,n:number)=><div key={n}><b>{o.label||o.qty+" pièces"}</b><span>{Number(o.price||0)} DH</span></div>)}</div>}<div className="builder-order-total"><span>المجموع</span><b>{base+ship} DH</b></div><button className={draft.order_pump===false?"":"builder-pump"}>{draft.cta||"Commander maintenant"} — {base+ship} DH</button>{draft.order_whatsapp!==false&&<button type="button" className="builder-whatsapp">💬 طلب عبر واتساب</button>}</div></section>}
-  if(k==="benefits")return <section key={k} className={cls(k,"lp-section lp-card-"+cardMode+" editor-live-body")} style={canvasStyle(k)} onClick={()=>setSelectedSection(k)}>{tools(k)}{draft.benefits_title&&ce("benefits_title",draft.benefits_title,"h2")}{draft.description&&ce("description",draft.description,"p")}{list(k,"benefits",draft.benefits||[])}</section>;
-  if(k==="problem")return <section key={k} className={cls(k,"lp-story")} style={canvasStyle(k)} onClick={()=>setSelectedSection(k)}>{tools(k)}{draft.problem_title&&ce("problem_title",draft.problem_title,"h2")}{ce("problem",draft.problem,"p")}{ce("solution",draft.solution,"p")}</section>;
-  if(k==="features")return <section key={k} className={cls(k,"editor-live-body")} style={canvasStyle(k)} onClick={()=>setSelectedSection(k)}>{tools(k)}<h2>Caractéristiques</h2>{list(k,"features",draft.features||[],"+")}</section>;
-  if(k==="how")return <section key={k} className={cls(k,"lp-how")} style={canvasStyle(k)} onClick={()=>setSelectedSection(k)}>{tools(k)}{draft.how_title&&ce("how_title",draft.how_title,"h2")}{list(k,"how_steps",draft.how_steps||[],"→")}</section>;
-  if(k==="trust")return <section key={k} className={cls(k,"lp-trust")} style={canvasStyle(k)} onClick={()=>setSelectedSection(k)}>{tools(k)}{draft.trust_title&&ce("trust_title",draft.trust_title,"h2")}{list(k,"trust_points",draft.trust_points||[])}</section>;
-  if(k==="faq")return <section key={k} className={cls(k,"editor-live-body")} style={canvasStyle(k)} onClick={()=>setSelectedSection(k)}>{tools(k)}<h2>FAQ</h2>{(draft.faq||[]).map((x:any,n:number)=>{const o=typeof x==="string"?{question:x,answer:""}:x;return <div className="lp-faq" key={n}><b contentEditable suppressContentEditableWarning onBlur={e=>editFaqItem(n,{question:e.currentTarget.textContent||""})}>{o.question}</b><p contentEditable suppressContentEditableWarning onBlur={e=>editFaqItem(n,{answer:e.currentTarget.textContent||""})}>{o.answer}</p></div>})}</section>;
-  return null;
- };
- return <div className={"lp landing-benchmark benchmark-"+uiuxId+" benchmark-hero-"+heroMode+" benchmark-cards-"+cardMode+" uiux-pattern-"+pattern+" builder-canvas-core builder-preview-"+previewMode} style={rootStyle} dir={editing.locale?.startsWith("ar")?"rtl":"ltr"}>{(draft.section_order||[]).map((k:string)=>render(k))}</div>;
+export default function BuilderCanvasCore(p: Props) {
+  const {
+    draft,
+    editing,
+    images,
+    previewMode,
+    selectedSection,
+    setSelectedSection,
+    canvasStyle,
+    tools,
+    inlineText,
+    editListItem,
+    removeListItem,
+    addListItem,
+    editFaqItem,
+    patchCustomBlock,
+    patchCustomFaqItem,
+  } = p;
+  const ds = draft.design_system || {},
+    styleName = String(ds.style?.["Style Category"] || ""),
+    pattern = String(ds.tokens?.pattern || ds.landing?.["Pattern ID"] || "hero-features-cta"),
+    uiuxId = String(ds.style?.["Style ID"] || draft.design_profile || "uiux-pro-max")
+      .replace(/[^a-z0-9-]/gi, "-")
+      .toLowerCase();
+  const heroMode = /story|editorial|luxury/i.test(pattern + " " + styleName)
+    ? "editorial"
+    : /demo|interactive|motion|bold|vibrant/i.test(pattern + " " + styleName)
+      ? "impact"
+      : /minimal|direct|swiss/i.test(pattern + " " + styleName)
+        ? "centered"
+        : /split|feature/i.test(pattern)
+          ? "split"
+          : "conversion";
+  const cardMode = /glass|tech|data/i.test(styleName)
+    ? "technical"
+    : /luxury|editorial/i.test(styleName)
+      ? "editorial"
+      : /soft|neumorph/i.test(styleName)
+        ? "soft"
+        : "conversion";
+  const rootStyle = {
+    "--lp-primary": ds.tokens?.colors?.primary || undefined,
+    "--lp-secondary": ds.tokens?.colors?.secondary || undefined,
+    "--lp-accent": ds.tokens?.colors?.accent || undefined,
+    "--lp-bg": ds.tokens?.colors?.background || undefined,
+    "--lp-fg": ds.tokens?.colors?.foreground || undefined,
+    "--lp-card": ds.tokens?.colors?.card || undefined,
+    "--lp-border": ds.tokens?.colors?.border || undefined,
+    "--lp-radius": ds.tokens?.radius || undefined,
+    "--lp-heading-font": ds.tokens?.fonts?.heading || undefined,
+    "--lp-body-font": ds.tokens?.fonts?.body || undefined,
+  } as any;
+  const cls = (k: string, extra = "") =>
+    "builder-canvas-block builder-selectable " +
+    (selectedSection === k ? "selected " : "") +
+    ((draft.hidden_sections || []).includes(k) ? "builder-disabled " : "") +
+    extra;
+  const ce = (field: string, value: any, tag: "h1" | "h2" | "p" | "span" = "p") => {
+    const Tag: any = tag;
+    return (
+      <Tag
+        contentEditable
+        suppressContentEditableWarning
+        onBlur={(e: any) => inlineText(field, e.currentTarget.textContent || "")}
+      >
+        {value || ""}
+      </Tag>
+    );
+  };
+  const list = (k: string, field: string, items: any[], prefix = "✓") => (
+    <div className="editor-benefits">
+      {items.map((x: any, n: number) => {
+        const value = typeof x === "string" ? x : x?.title || x?.text || "";
+        return (
+          <div className="builder-inline-row" key={n}>
+            <span>{prefix}</span>
+            <span
+              contentEditable
+              suppressContentEditableWarning
+              onBlur={(e) => editListItem(field, n, e.currentTarget.textContent || "")}
+            >
+              {value}
+            </span>
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                removeListItem(field, n);
+              }}
+            >
+              ×
+            </button>
+          </div>
+        );
+      })}
+      <button
+        type="button"
+        className="builder-inline-add"
+        onClick={(e) => {
+          e.stopPropagation();
+          addListItem(field, "Nouveau élément");
+        }}
+      >
+        + Ajouter
+      </button>
+    </div>
+  );
+  const custom = (k: string) => {
+    const b = draft.custom_sections?.[k] || {},
+      t = b.type || "text";
+    if (t === "imageText")
+      return (
+        <section
+          key={k}
+          className={cls(k, "builder-custom-preview lp-image-text")}
+          style={canvasStyle(k)}
+          onClick={() => setSelectedSection(k)}
+        >
+          {tools(k)}
+          <div className="lp-image-text-grid">
+            {b.image && <img className="builder-custom-image" src={b.image} alt={b.title || ""} />}
+            <div>
+              {
+                <h2
+                  contentEditable
+                  suppressContentEditableWarning
+                  onBlur={(e) => patchCustomBlock(k, { title: e.currentTarget.textContent || "" })}
+                >
+                  {b.title}
+                </h2>
+              }
+              <p
+                contentEditable
+                suppressContentEditableWarning
+                onBlur={(e) => patchCustomBlock(k, { text: e.currentTarget.textContent || "" })}
+              >
+                {b.text}
+              </p>
+            </div>
+          </div>
+        </section>
+      );
+    if (t === "gallery")
+      return (
+        <section
+          key={k}
+          className={cls(k, "builder-custom-preview")}
+          style={canvasStyle(k)}
+          onClick={() => setSelectedSection(k)}
+        >
+          {tools(k)}
+          <h2
+            contentEditable
+            suppressContentEditableWarning
+            onBlur={(e) => patchCustomBlock(k, { title: e.currentTarget.textContent || "" })}
+          >
+            {b.title}
+          </h2>
+          <div className="builder-custom-gallery">
+            {(b.images || []).map((x: string, n: number) => (
+              <img src={x} alt="" key={n} />
+            ))}
+          </div>
+        </section>
+      );
+    if (t === "faqBlock")
+      return (
+        <section
+          key={k}
+          className={cls(k, "builder-custom-preview")}
+          style={canvasStyle(k)}
+          onClick={() => setSelectedSection(k)}
+        >
+          {tools(k)}
+          <h2
+            contentEditable
+            suppressContentEditableWarning
+            onBlur={(e) => patchCustomBlock(k, { title: e.currentTarget.textContent || "" })}
+          >
+            {b.title}
+          </h2>
+          {(b.items || []).map((x: any, n: number) => (
+            <div className="lp-faq" key={n}>
+              <b
+                contentEditable
+                suppressContentEditableWarning
+                onBlur={(e) => patchCustomFaqItem(k, n, { question: e.currentTarget.textContent || "" })}
+              >
+                {x.question}
+              </b>
+              <p
+                contentEditable
+                suppressContentEditableWarning
+                onBlur={(e) => patchCustomFaqItem(k, n, { answer: e.currentTarget.textContent || "" })}
+              >
+                {x.answer}
+              </p>
+            </div>
+          ))}
+        </section>
+      );
+    if (t === "vertical916") {
+      const device = b.device || "phone",
+        ratio = device === "laptop" ? "16 / 9" : device === "tablet" ? "4 / 3" : "9 / 16";
+      return (
+        <section
+          key={k}
+          className={cls(k, "builder-custom-preview lp-device-media lp-device-" + device)}
+          style={canvasStyle(k)}
+          onClick={() => setSelectedSection(k)}
+        >
+          {tools(k)}
+          <div
+            style={{
+              width: "100%",
+              maxWidth: device === "laptop" ? "100%" : device === "tablet" ? "min(100%, 820px)" : "min(100%, 430px)",
+              margin: "0 auto",
+            }}
+          >
+            <div
+              style={{
+                aspectRatio: ratio,
+                overflow: "hidden",
+                borderRadius: 0,
+                background: "#111",
+                border: "none",
+                boxSizing: "border-box",
+              }}
+            >
+              {b.mediaType === "video" ? (
+                <video
+                  src={b.media || ""}
+                  controls
+                  playsInline
+                  style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                />
+              ) : b.media ? (
+                <img src={b.media} alt={b.title || ""} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+              ) : (
+                <div style={{ height: "100%", display: "grid", placeItems: "center", color: "#fff" }}>
+                  {device === "laptop" ? "Laptop 16:9" : device === "tablet" ? "Tablette 4:3" : "Phone 9:16"}
+                </div>
+              )}
+            </div>
+            <h2
+              contentEditable
+              suppressContentEditableWarning
+              onBlur={(e) => patchCustomBlock(k, { title: e.currentTarget.textContent || "" })}
+            >
+              {b.title}
+            </h2>
+            <p
+              contentEditable
+              suppressContentEditableWarning
+              onBlur={(e) => patchCustomBlock(k, { text: e.currentTarget.textContent || "" })}
+            >
+              {b.text}
+            </p>
+          </div>
+        </section>
+      );
+    }
+    if (t === "ctaBlock")
+      return (
+        <section
+          key={k}
+          className={cls(k, "builder-custom-preview lp-custom-cta")}
+          style={canvasStyle(k)}
+          onClick={() => setSelectedSection(k)}
+        >
+          {tools(k)}
+          <h2
+            contentEditable
+            suppressContentEditableWarning
+            onBlur={(e) => patchCustomBlock(k, { title: e.currentTarget.textContent || "" })}
+          >
+            {b.title}
+          </h2>
+          <p
+            contentEditable
+            suppressContentEditableWarning
+            onBlur={(e) => patchCustomBlock(k, { text: e.currentTarget.textContent || "" })}
+          >
+            {b.text}
+          </p>
+          <button
+            contentEditable
+            suppressContentEditableWarning
+            onBlur={(e) => patchCustomBlock(k, { button: e.currentTarget.textContent || "" })}
+          >
+            {b.button || draft.cta || "Commander maintenant"}
+          </button>
+        </section>
+      );
+    return (
+      <section
+        key={k}
+        className={cls(k, "builder-custom-preview")}
+        style={canvasStyle(k)}
+        onClick={() => setSelectedSection(k)}
+      >
+        {tools(k)}
+        <h2
+          contentEditable
+          suppressContentEditableWarning
+          onBlur={(e) => patchCustomBlock(k, { title: e.currentTarget.textContent || "" })}
+        >
+          {b.title}
+        </h2>
+        <p
+          contentEditable
+          suppressContentEditableWarning
+          onBlur={(e) => patchCustomBlock(k, { text: e.currentTarget.textContent || "" })}
+        >
+          {b.text}
+        </p>
+      </section>
+    );
+  };
+  const render = (k: string) => {
+    if (k.startsWith("custom-")) return custom(k);
+    if (k === "hero")
+      return (
+        <section
+          key={k}
+          className={cls(k, "lp-hero lp-hero-" + heroMode + " editor-live-hero")}
+          style={canvasStyle(k)}
+          onClick={() => setSelectedSection(k)}
+        >
+          {tools(k)}
+          <div className={"builder-theme-gallery builder-gallery-" + (draft.gallery_style || "auto")}>
+            <div className="lp-gallery-label">PRODUCT</div>
+            <div className="builder-gallery-images">
+              {images.slice(0, 5).map((x, n) => (
+                <img src={x} alt="" key={x + n} />
+              ))}
+            </div>
+          </div>
+          <span>COD Maroc</span>
+          {ce("headline", draft.headline || editing.name, "h1")}
+          <div className="editor-live-price">
+            <b>{draft.price || 0} DH</b>
+            {draft.oldPrice && <s>{draft.oldPrice} DH</s>}
+          </div>
+          {ce("subheadline", draft.subheadline, "p")}
+          <button
+            contentEditable
+            suppressContentEditableWarning
+            onBlur={(e) => inlineText("cta", e.currentTarget.textContent || "")}
+          >
+            {draft.cta || "Commander maintenant"}
+          </button>
+        </section>
+      );
+    if (k === "order") {
+      const offers = Array.isArray(draft.quantity_offers) ? draft.quantity_offers : [],
+        ship = Number(draft.delivery_price || 0),
+        base = Number(draft.price || 0);
+      return (
+        <section
+          key={k}
+          className={cls(k, "lp-order lp-order-after-hero builder-order-shell")}
+          style={canvasStyle(k)}
+          onClick={() => setSelectedSection(k)}
+        >
+          {tools(k)}
+          <div
+            className={
+              "lp-form builder-order-preview builder-order-real lp-form-" + (draft.order_form_style || "classic")
+            }
+          >
+            <small>FORMULAIRE COD · {(draft.order_form_style || "classic").toUpperCase()}</small>
+            <h3>أكد الطلب ديالك</h3>
+            {ce("delivery", draft.delivery || "الدفع عند الاستلام", "p")}
+            <div className="builder-fake-input">الاسم الكامل</div>
+            <div className="builder-fake-input">رقم الهاتف</div>
+            <div className="builder-fake-input">المدينة</div>
+            {draft.order_show_address !== false && <div className="builder-fake-input">العنوان (اختياري)</div>}
+            {offers.length > 0 && (
+              <div className="builder-order-offers">
+                {offers.map((o: any, n: number) => (
+                  <div key={n}>
+                    <b>{o.label || o.qty + " pièces"}</b>
+                    <span>{Number(o.price || 0)} DH</span>
+                  </div>
+                ))}
+              </div>
+            )}
+            <div className="builder-order-total">
+              <span>المجموع</span>
+              <b>{base + ship} DH</b>
+            </div>
+            <button className={draft.order_pump === false ? "" : "builder-pump"}>
+              {draft.cta || "Commander maintenant"} — {base + ship} DH
+            </button>
+            {draft.order_whatsapp !== false && (
+              <button type="button" className="builder-whatsapp">
+                💬 طلب عبر واتساب
+              </button>
+            )}
+          </div>
+        </section>
+      );
+    }
+    if (k === "benefits")
+      return (
+        <section
+          key={k}
+          className={cls(k, "lp-section lp-card-" + cardMode + " editor-live-body")}
+          style={canvasStyle(k)}
+          onClick={() => setSelectedSection(k)}
+        >
+          {tools(k)}
+          {draft.benefits_title && ce("benefits_title", draft.benefits_title, "h2")}
+          {draft.description && ce("description", draft.description, "p")}
+          {list(k, "benefits", draft.benefits || [])}
+        </section>
+      );
+    if (k === "problem")
+      return (
+        <section key={k} className={cls(k, "lp-story")} style={canvasStyle(k)} onClick={() => setSelectedSection(k)}>
+          {tools(k)}
+          {draft.problem_title && ce("problem_title", draft.problem_title, "h2")}
+          {ce("problem", draft.problem, "p")}
+          {ce("solution", draft.solution, "p")}
+        </section>
+      );
+    if (k === "features")
+      return (
+        <section
+          key={k}
+          className={cls(k, "editor-live-body")}
+          style={canvasStyle(k)}
+          onClick={() => setSelectedSection(k)}
+        >
+          {tools(k)}
+          <h2>Caractéristiques</h2>
+          {list(k, "features", draft.features || [], "+")}
+        </section>
+      );
+    if (k === "how")
+      return (
+        <section key={k} className={cls(k, "lp-how")} style={canvasStyle(k)} onClick={() => setSelectedSection(k)}>
+          {tools(k)}
+          {draft.how_title && ce("how_title", draft.how_title, "h2")}
+          {list(k, "how_steps", draft.how_steps || [], "→")}
+        </section>
+      );
+    if (k === "trust")
+      return (
+        <section key={k} className={cls(k, "lp-trust")} style={canvasStyle(k)} onClick={() => setSelectedSection(k)}>
+          {tools(k)}
+          {draft.trust_title && ce("trust_title", draft.trust_title, "h2")}
+          {list(k, "trust_points", draft.trust_points || [])}
+        </section>
+      );
+    if (k === "faq")
+      return (
+        <section
+          key={k}
+          className={cls(k, "editor-live-body")}
+          style={canvasStyle(k)}
+          onClick={() => setSelectedSection(k)}
+        >
+          {tools(k)}
+          <h2>FAQ</h2>
+          {(draft.faq || []).map((x: any, n: number) => {
+            const o = typeof x === "string" ? { question: x, answer: "" } : x;
+            return (
+              <div className="lp-faq" key={n}>
+                <b
+                  contentEditable
+                  suppressContentEditableWarning
+                  onBlur={(e) => editFaqItem(n, { question: e.currentTarget.textContent || "" })}
+                >
+                  {o.question}
+                </b>
+                <p
+                  contentEditable
+                  suppressContentEditableWarning
+                  onBlur={(e) => editFaqItem(n, { answer: e.currentTarget.textContent || "" })}
+                >
+                  {o.answer}
+                </p>
+              </div>
+            );
+          })}
+        </section>
+      );
+    return null;
+  };
+  return (
+    <div
+      className={
+        "lp landing-benchmark benchmark-" +
+        uiuxId +
+        " benchmark-hero-" +
+        heroMode +
+        " benchmark-cards-" +
+        cardMode +
+        " uiux-pattern-" +
+        pattern +
+        " builder-canvas-core builder-preview-" +
+        previewMode
+      }
+      style={rootStyle}
+      dir={editing.locale?.startsWith("ar") ? "rtl" : "ltr"}
+    >
+      {(draft.section_order || []).map((k: string) => render(k))}
+    </div>
+  );
 }

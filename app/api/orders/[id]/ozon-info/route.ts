@@ -1,3 +1,41 @@
-import {reportError} from "../../../../../lib/monitoring";
-import {NextResponse} from "next/server";import {authContext} from "../../../../../lib/server-auth";import {syncOzonOrder} from "../../../../../lib/ozon";
-export async function POST(req:Request,{params}:{params:Promise<{id:string}>}){try{const {id}=await params,{s,workspaceId}=await authContext(req);const {data:o}=await s.from("orders").select("id,workspace_id,tracking_number,delivery_company_id,shipment_status,shipped_at,delivered_at,returned_at").eq("id",id).eq("workspace_id",workspaceId).maybeSingle();if(!o)return NextResponse.json({error:"Commande introuvable"},{status:404});if(!o.tracking_number)return NextResponse.json({error:"Numéro de suivi manquant"},{status:400});const {data:c}=await s.from("delivery_companies").select("id,code,settings").eq("id",o.delivery_company_id).eq("workspace_id",workspaceId).maybeSingle();if(!c||c.code!=="OZON_EXPRESS")return NextResponse.json({error:"Cette commande n’est pas liée à Ozon"},{status:400});const cfg:any=c.settings||{};if(!cfg.client_id||!cfg.api_key)return NextResponse.json({error:"Configuration Ozon incomplète"},{status:400});const x=await syncOzonOrder(s,o,cfg);return NextResponse.json({ok:true,tracking_number:o.tracking_number,parcel:x.data,ozon_status:x.rawStatus||null,shipment_status:x.shipment,cancelled_reason:x.notFound?"Tracking supprimé ou introuvable chez Ozon":null})}catch(e:any){reportError(e,"api/orders/[id]/ozon-info");return NextResponse.json({error:e?.name==="TimeoutError"?"Ozon API timeout":e.message},{status:500})}}
+import { reportError } from "../../../../../lib/monitoring";
+import { NextResponse } from "next/server";
+import { authContext } from "../../../../../lib/server-auth";
+import { syncOzonOrder } from "../../../../../lib/ozon";
+export async function POST(req: Request, { params }: { params: Promise<{ id: string }> }) {
+  try {
+    const { id } = await params,
+      { s, workspaceId } = await authContext(req);
+    const { data: o } = await s
+      .from("orders")
+      .select("id,workspace_id,tracking_number,delivery_company_id,shipment_status,shipped_at,delivered_at,returned_at")
+      .eq("id", id)
+      .eq("workspace_id", workspaceId)
+      .maybeSingle();
+    if (!o) return NextResponse.json({ error: "Commande introuvable" }, { status: 404 });
+    if (!o.tracking_number) return NextResponse.json({ error: "Numéro de suivi manquant" }, { status: 400 });
+    const { data: c } = await s
+      .from("delivery_companies")
+      .select("id,code,settings")
+      .eq("id", o.delivery_company_id)
+      .eq("workspace_id", workspaceId)
+      .maybeSingle();
+    if (!c || c.code !== "OZON_EXPRESS")
+      return NextResponse.json({ error: "Cette commande n’est pas liée à Ozon" }, { status: 400 });
+    const cfg: any = c.settings || {};
+    if (!cfg.client_id || !cfg.api_key)
+      return NextResponse.json({ error: "Configuration Ozon incomplète" }, { status: 400 });
+    const x = await syncOzonOrder(s, o, cfg);
+    return NextResponse.json({
+      ok: true,
+      tracking_number: o.tracking_number,
+      parcel: x.data,
+      ozon_status: x.rawStatus || null,
+      shipment_status: x.shipment,
+      cancelled_reason: x.notFound ? "Tracking supprimé ou introuvable chez Ozon" : null,
+    });
+  } catch (e: any) {
+    reportError(e, "api/orders/[id]/ozon-info");
+    return NextResponse.json({ error: e?.name === "TimeoutError" ? "Ozon API timeout" : e.message }, { status: 500 });
+  }
+}

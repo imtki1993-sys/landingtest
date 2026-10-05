@@ -1,6 +1,70 @@
-import {reportError} from "../../../../../lib/monitoring";
-import {withLandingInvalidation} from "../../../../../lib/landing-cache";
-import {NextResponse} from "next/server";import {authContext} from "../../../../../lib/server-auth";
-function slugify(s:string){return s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"").slice(0,48)}
-async function POSTHandler(req:Request,{params}:{params:Promise<{id:string}>}){try{const {id}=await params,{s,workspaceId}=await authContext(req);const {data:src,error}=await s.from("landing_pages").select("id,name,locale,seo,product_id,products(name,price,compare_at_price,description,image_urls)").eq("id",id).eq("workspace_id",workspaceId).is("archived_at",null).maybeSingle();if(error)throw error;if(!src)return NextResponse.json({error:"Page introuvable"},{status:404});const p:any=Array.isArray(src.products)?src.products[0]:src.products;const name=(src.name+" - Copie").slice(0,120),slug=(slugify(name)||"landing")+"-"+Date.now().toString(36);const {data:made,error:ce}=await s.rpc("create_landing_product_for_workspace",{p_workspace_id:workspaceId,p_name:p?.name||name,p_slug:slug,p_price:Number(p?.price||149),p_old_price:p?.compare_at_price??null,p_description:p?.description||"",p_language:src.locale||"ar-MA"});if(ce)throw ce;const row=Array.isArray(made)?made[0]:made,newId=row?.landing_page_id||row?.page_id||row?.id;if(!newId)throw new Error("Duplication impossible");const {data:page,error:ue}=await s.from("landing_pages").update({name,seo:src.seo||{},status:"DRAFT",published_at:null,published_version_id:null,draft_version_id:null,duplicated_from_id:id}).eq("id",newId).eq("workspace_id",workspaceId).select("id,name,slug,status,locale,created_at,published_at").single();if(ue)throw ue;return NextResponse.json({page},{status:201})}catch(e:any){reportError(e,"api/pages/[id]/duplicate");const m=e.message||"Duplication impossible",limited=/landing_limit_reached|subscription_inactive|subscription_missing/.test(m);return NextResponse.json({error:m==="landing_limit_reached"?"Limite de landing pages atteinte pour ce plan.":m},{status:limited?403:500})}}
-export const POST=withLandingInvalidation(POSTHandler);
+import { reportError } from "../../../../../lib/monitoring";
+import { withLandingInvalidation } from "../../../../../lib/landing-cache";
+import { NextResponse } from "next/server";
+import { authContext } from "../../../../../lib/server-auth";
+function slugify(s: string) {
+  return s
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "")
+    .slice(0, 48);
+}
+async function POSTHandler(req: Request, { params }: { params: Promise<{ id: string }> }) {
+  try {
+    const { id } = await params,
+      { s, workspaceId } = await authContext(req);
+    const { data: src, error } = await s
+      .from("landing_pages")
+      .select("id,name,locale,seo,product_id,products(name,price,compare_at_price,description,image_urls)")
+      .eq("id", id)
+      .eq("workspace_id", workspaceId)
+      .is("archived_at", null)
+      .maybeSingle();
+    if (error) throw error;
+    if (!src) return NextResponse.json({ error: "Page introuvable" }, { status: 404 });
+    const p: any = Array.isArray(src.products) ? src.products[0] : src.products;
+    const name = (src.name + " - Copie").slice(0, 120),
+      slug = (slugify(name) || "landing") + "-" + Date.now().toString(36);
+    const { data: made, error: ce } = await s.rpc("create_landing_product_for_workspace", {
+      p_workspace_id: workspaceId,
+      p_name: p?.name || name,
+      p_slug: slug,
+      p_price: Number(p?.price || 149),
+      p_old_price: p?.compare_at_price ?? null,
+      p_description: p?.description || "",
+      p_language: src.locale || "ar-MA",
+    });
+    if (ce) throw ce;
+    const row = Array.isArray(made) ? made[0] : made,
+      newId = row?.landing_page_id || row?.page_id || row?.id;
+    if (!newId) throw new Error("Duplication impossible");
+    const { data: page, error: ue } = await s
+      .from("landing_pages")
+      .update({
+        name,
+        seo: src.seo || {},
+        status: "DRAFT",
+        published_at: null,
+        published_version_id: null,
+        draft_version_id: null,
+        duplicated_from_id: id,
+      })
+      .eq("id", newId)
+      .eq("workspace_id", workspaceId)
+      .select("id,name,slug,status,locale,created_at,published_at")
+      .single();
+    if (ue) throw ue;
+    return NextResponse.json({ page }, { status: 201 });
+  } catch (e: any) {
+    reportError(e, "api/pages/[id]/duplicate");
+    const m = e.message || "Duplication impossible",
+      limited = /landing_limit_reached|subscription_inactive|subscription_missing/.test(m);
+    return NextResponse.json(
+      { error: m === "landing_limit_reached" ? "Limite de landing pages atteinte pour ce plan." : m },
+      { status: limited ? 403 : 500 },
+    );
+  }
+}
+export const POST = withLandingInvalidation(POSTHandler);

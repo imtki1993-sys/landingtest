@@ -1,14 +1,229 @@
 "use client";
-import Link from "next/link";import SaaSSidebar from "../components/SaaSSidebar";import SaaSTopbar from "../components/SaaSTopbar";
-import {useEffect,useState} from "react";
-const carriers=[["Ozon Express","OZON_EXPRESS"],["Sendit","SENDIT"],["Cathedis","CATHEDIS"],["Ameex","AMEEX"],["DigyLog","DIGYLOG"],["ForceLog","FORCELOG"],["Olivraison","OLIVRAISON"],["Onessta","ONESSTA"],["Kargo Express","KARGO_EXPRESS"],["Speedaf Express","SPEEDAF"],["Livo","LIVO"],["Express Coursier","EXPRESS_COURSIER"]];
-export default function Delivery(){
- const [companies,setCompanies]=useState<any[]>([]),[loading,setLoading]=useState(true),[config,setConfig]=useState<any>(null),[credentials,setCredentials]=useState<any>({}),[testMsg,setTestMsg]=useState("");
- async function load(){const r=await fetch("/api/delivery-companies",{cache:"no-store"}),x=await r.json();setCompanies(x.companies||[]);setLoading(false)}
- useEffect(()=>{load()},[]);
- async function add(name:string,code:string){const r=await fetch("/api/delivery-companies",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({name,code})}),x=await r.json();if(!r.ok)return alert(x.error||"Ajout impossible");load()}
- async function saveConfig(){if(!config)return;const r=await fetch("/api/delivery-companies/"+config.id,{method:"PATCH",headers:{"content-type":"application/json"},body:JSON.stringify(credentials)}),x=await r.json();if(!r.ok)return alert(x.error||"Configuration impossible");setTestMsg("Configuration enregistrée.");load()}
- async function testConnection(){if(!config)return;setTestMsg("Test...");const url=config.code==="OZON_EXPRESS"?"/api/delivery-companies/"+config.id+"/ozon-test":"/api/delivery-companies/"+config.id;const r=await fetch(url,{method:config.code==="OZON_EXPRESS"?"GET":"POST"}),x=await r.json();const detail=x?.details?(typeof x.details==="string"?x.details:JSON.stringify(x.details,null,2)):"";setTestMsg((x.message||x.error||"Test terminé")+(detail?"\n\nDÉTAIL TECHNIQUE:\n"+detail:""))}
- const field=(label:string,key:string,password=false)=><label>{label}<input type={password?"password":"text"} value={credentials[key]||""} onChange={e=>setCredentials({...credentials,[key]:e.target.value})} autoComplete={password?"new-password":"off"}/></label>;
- return <main className="dash-shell has-shared-topbar"><SaaSTopbar/><SaaSSidebar/><section className="dash-content delivery-dashboard"><header className="dash-header"><div><span className="eyebrow">LANDING PAGE MOTOR</span><h1>Intégrations livraison COD</h1><p>Choisis les sociétés de livraison que tu utilises au Maroc.</p></div></header><div className="carrier-grid carrier-grid-pro">{carriers.map(([name,code])=>{const active=companies.find(c=>c.code===code);return <article className={"carrier-choice "+(active?"connected":"available")} key={code}><div className="carrier-badge">{name.slice(0,2).toUpperCase()}</div><div className="carrier-copy"><h3>{name}</h3><span className={"carrier-state "+(active?"on":"off")}>● {active?"Connecté":"Disponible"}</span><p>{active?"Activé dans ton workspace":"Disponible pour intégration"}</p></div><button onClick={()=>active?(setConfig(active),setCredentials({}),setTestMsg("")):add(name,code)}>{active?"Configurer":"+ Ajouter"}</button></article>})}</div><section className="delivery-active-panel"><div className="delivery-active-head"><div><h3>Mes transporteurs actifs</h3><p>Suivi et gestion de tes transporteurs connectés.</p></div><span>{companies.length} actif(s)</span></div><div className="delivery-mini-kpis"><article><small>Transporteurs</small><b>{companies.length}</b></article><article><small>Configurés</small><b>{companies.filter(c=>c.configured).length}</b></article><article><small>À configurer</small><b>{companies.filter(c=>!c.configured).length}</b></article></div>{loading?<p>Chargement...</p>:companies.length?<div className="delivery-active-table-wrap"><table className="delivery-active-table"><thead><tr><th>Transporteur</th><th>Statut</th><th>Configuration</th><th>Actions</th></tr></thead><tbody>{companies.map(c=><tr key={c.id}><td><div><span className="carrier-mini-badge">{String(c.name||c.code).slice(0,2).toUpperCase()}</span><b>{c.name}</b></div></td><td><em>● Actif</em></td><td>{c.configured?"Configuré":"À configurer"}</td><td><button onClick={()=>{setConfig(c);setCredentials({});setTestMsg("")}}>Gérer</button></td></tr>)}</tbody></table></div>:<div className="orders-empty">Choisis une société ci-dessus.</div>}</section>{config&&<div className="order-modal-backdrop" onClick={()=>setConfig(null)}><div className="order-modal carrier-config-modal" onClick={e=>e.stopPropagation()}><button className="order-modal-close" onClick={()=>setConfig(null)}>×</button><h2>Configurer {config.name}</h2>{config.code==="OZON_EXPRESS"?<>{field("Client ID","client_id")}{field("API Key","api_key",true)}</>:config.code==="SENDIT"?<>{field("Public Key","public_key",true)}{field("Secret Key","secret_key",true)}</>:<>{field("Client ID / Identifiant","client_id")}{field("API Key","api_key",true)}{field("Token API","token",true)}{field("Account ID / Code client","account_id")}</>}<div style={{display:"flex",gap:8}}><button className="carrier-save" onClick={saveConfig}>Enregistrer</button><button className="carrier-save" onClick={testConnection}>Tester la connexion</button></div>{testMsg&&<pre style={{whiteSpace:"pre-wrap",wordBreak:"break-word",fontFamily:"inherit"}}>{testMsg}</pre>}<small>Les identifiants restent masqués dans l’interface.</small></div></div>}</section></main>
+import Link from "next/link";
+import SaaSSidebar from "../components/SaaSSidebar";
+import SaaSTopbar from "../components/SaaSTopbar";
+import { useEffect, useState } from "react";
+const carriers = [
+  ["Ozon Express", "OZON_EXPRESS"],
+  ["Sendit", "SENDIT"],
+  ["Cathedis", "CATHEDIS"],
+  ["Ameex", "AMEEX"],
+  ["DigyLog", "DIGYLOG"],
+  ["ForceLog", "FORCELOG"],
+  ["Olivraison", "OLIVRAISON"],
+  ["Onessta", "ONESSTA"],
+  ["Kargo Express", "KARGO_EXPRESS"],
+  ["Speedaf Express", "SPEEDAF"],
+  ["Livo", "LIVO"],
+  ["Express Coursier", "EXPRESS_COURSIER"],
+];
+export default function Delivery() {
+  const [companies, setCompanies] = useState<any[]>([]),
+    [loading, setLoading] = useState(true),
+    [config, setConfig] = useState<any>(null),
+    [credentials, setCredentials] = useState<any>({}),
+    [testMsg, setTestMsg] = useState("");
+  async function load() {
+    const r = await fetch("/api/delivery-companies", { cache: "no-store" }),
+      x = await r.json();
+    setCompanies(x.companies || []);
+    setLoading(false);
+  }
+  useEffect(() => {
+    load();
+  }, []);
+  async function add(name: string, code: string) {
+    const r = await fetch("/api/delivery-companies", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ name, code }),
+      }),
+      x = await r.json();
+    if (!r.ok) return alert(x.error || "Ajout impossible");
+    load();
+  }
+  async function saveConfig() {
+    if (!config) return;
+    const r = await fetch("/api/delivery-companies/" + config.id, {
+        method: "PATCH",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify(credentials),
+      }),
+      x = await r.json();
+    if (!r.ok) return alert(x.error || "Configuration impossible");
+    setTestMsg("Configuration enregistrée.");
+    load();
+  }
+  async function testConnection() {
+    if (!config) return;
+    setTestMsg("Test...");
+    const url =
+      config.code === "OZON_EXPRESS"
+        ? "/api/delivery-companies/" + config.id + "/ozon-test"
+        : "/api/delivery-companies/" + config.id;
+    const r = await fetch(url, { method: config.code === "OZON_EXPRESS" ? "GET" : "POST" }),
+      x = await r.json();
+    const detail = x?.details ? (typeof x.details === "string" ? x.details : JSON.stringify(x.details, null, 2)) : "";
+    setTestMsg((x.message || x.error || "Test terminé") + (detail ? "\n\nDÉTAIL TECHNIQUE:\n" + detail : ""));
+  }
+  const field = (label: string, key: string, password = false) => (
+    <label>
+      {label}
+      <input
+        type={password ? "password" : "text"}
+        value={credentials[key] || ""}
+        onChange={(e) => setCredentials({ ...credentials, [key]: e.target.value })}
+        autoComplete={password ? "new-password" : "off"}
+      />
+    </label>
+  );
+  return (
+    <main className="dash-shell has-shared-topbar">
+      <SaaSTopbar />
+      <SaaSSidebar />
+      <section className="dash-content delivery-dashboard">
+        <header className="dash-header">
+          <div>
+            <span className="eyebrow">LANDING PAGE MOTOR</span>
+            <h1>Intégrations livraison COD</h1>
+            <p>Choisis les sociétés de livraison que tu utilises au Maroc.</p>
+          </div>
+        </header>
+        <div className="carrier-grid carrier-grid-pro">
+          {carriers.map(([name, code]) => {
+            const active = companies.find((c) => c.code === code);
+            return (
+              <article className={"carrier-choice " + (active ? "connected" : "available")} key={code}>
+                <div className="carrier-badge">{name.slice(0, 2).toUpperCase()}</div>
+                <div className="carrier-copy">
+                  <h3>{name}</h3>
+                  <span className={"carrier-state " + (active ? "on" : "off")}>
+                    ● {active ? "Connecté" : "Disponible"}
+                  </span>
+                  <p>{active ? "Activé dans ton workspace" : "Disponible pour intégration"}</p>
+                </div>
+                <button
+                  onClick={() => (active ? (setConfig(active), setCredentials({}), setTestMsg("")) : add(name, code))}
+                >
+                  {active ? "Configurer" : "+ Ajouter"}
+                </button>
+              </article>
+            );
+          })}
+        </div>
+        <section className="delivery-active-panel">
+          <div className="delivery-active-head">
+            <div>
+              <h3>Mes transporteurs actifs</h3>
+              <p>Suivi et gestion de tes transporteurs connectés.</p>
+            </div>
+            <span>{companies.length} actif(s)</span>
+          </div>
+          <div className="delivery-mini-kpis">
+            <article>
+              <small>Transporteurs</small>
+              <b>{companies.length}</b>
+            </article>
+            <article>
+              <small>Configurés</small>
+              <b>{companies.filter((c) => c.configured).length}</b>
+            </article>
+            <article>
+              <small>À configurer</small>
+              <b>{companies.filter((c) => !c.configured).length}</b>
+            </article>
+          </div>
+          {loading ? (
+            <p>Chargement...</p>
+          ) : companies.length ? (
+            <div className="delivery-active-table-wrap">
+              <table className="delivery-active-table">
+                <thead>
+                  <tr>
+                    <th>Transporteur</th>
+                    <th>Statut</th>
+                    <th>Configuration</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {companies.map((c) => (
+                    <tr key={c.id}>
+                      <td>
+                        <div>
+                          <span className="carrier-mini-badge">
+                            {String(c.name || c.code)
+                              .slice(0, 2)
+                              .toUpperCase()}
+                          </span>
+                          <b>{c.name}</b>
+                        </div>
+                      </td>
+                      <td>
+                        <em>● Actif</em>
+                      </td>
+                      <td>{c.configured ? "Configuré" : "À configurer"}</td>
+                      <td>
+                        <button
+                          onClick={() => {
+                            setConfig(c);
+                            setCredentials({});
+                            setTestMsg("");
+                          }}
+                        >
+                          Gérer
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          ) : (
+            <div className="orders-empty">Choisis une société ci-dessus.</div>
+          )}
+        </section>
+        {config && (
+          <div className="order-modal-backdrop" onClick={() => setConfig(null)}>
+            <div className="order-modal carrier-config-modal" onClick={(e) => e.stopPropagation()}>
+              <button className="order-modal-close" onClick={() => setConfig(null)}>
+                ×
+              </button>
+              <h2>Configurer {config.name}</h2>
+              {config.code === "OZON_EXPRESS" ? (
+                <>
+                  {field("Client ID", "client_id")}
+                  {field("API Key", "api_key", true)}
+                </>
+              ) : config.code === "SENDIT" ? (
+                <>
+                  {field("Public Key", "public_key", true)}
+                  {field("Secret Key", "secret_key", true)}
+                </>
+              ) : (
+                <>
+                  {field("Client ID / Identifiant", "client_id")}
+                  {field("API Key", "api_key", true)}
+                  {field("Token API", "token", true)}
+                  {field("Account ID / Code client", "account_id")}
+                </>
+              )}
+              <div style={{ display: "flex", gap: 8 }}>
+                <button className="carrier-save" onClick={saveConfig}>
+                  Enregistrer
+                </button>
+                <button className="carrier-save" onClick={testConnection}>
+                  Tester la connexion
+                </button>
+              </div>
+              {testMsg && (
+                <pre style={{ whiteSpace: "pre-wrap", wordBreak: "break-word", fontFamily: "inherit" }}>{testMsg}</pre>
+              )}
+              <small>Les identifiants restent masqués dans l’interface.</small>
+            </div>
+          </div>
+        )}
+      </section>
+    </main>
+  );
 }

@@ -1,4 +1,62 @@
 "use client";
-import Link from "next/link";import {usePathname} from "next/navigation";import {useEffect,useState} from "react";
-const items=[["/","⌂","Dashboard"],["/pages","▣","Landing Pages"],["/stores","▦","Stores"],["/orders","◎","Commandes"],["/delivery","🚚","Livraison"],["/products","◇","Mes produits"],["/domains","⌁","Domaines"],["/analytics","↗","Analytics"],["/messages","✉","Messages"],["/admin/clients","♙","Clients SaaS"],["/account","♙","Mon abonnement"],["/settings","⚙","Paramètres"]];
-export default function SaaSSidebar(){const pathname=usePathname(),[isAdmin,setIsAdmin]=useState(false);useEffect(()=>{fetch("/api/auth/context",{cache:"no-store"}).then(r=>r.ok?r.json():null).then(x=>setIsAdmin(!!x?.is_platform_admin)).catch(()=>setIsAdmin(false))},[]);return <aside className="dash-side"><div className="dash-brand"><div className="brand-mark">M</div><div><b>Landing Motor</b><small>AI COD BUILDER</small></div></div><div className="workspace-switcher"><span>Workspace</span><b>LandPro</b><i>⌄</i></div><nav className="dash-nav">{items.filter(([href])=>href!=="/admin/clients"||isAdmin).map(([href,icon,label])=>{const active=href==="/"?pathname==="/":pathname===href||pathname.startsWith(href+"/");return <Link key={href} className={active?"active":""} href={href}><span className="dash-icon">{icon}</span>{label}</Link>})}</nav><div className="sidebar-plan"><small>PLAN ACTUEL</small><b>Pro</b><span>LandPro SaaS</span></div></aside>}
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
+const items = [
+  ["/", "⌂", "Dashboard"],
+  ["/pages", "▣", "Landing Pages"],
+  ["/stores", "▦", "Stores"],
+  ["/orders", "◎", "Commandes"],
+  ["/delivery", "🚚", "Livraison"],
+  ["/products", "◇", "Mes produits"],
+  ["/domains", "⌁", "Domaines"],
+  ["/analytics", "↗", "Analytics"],
+  ["/messages", "✉", "Messages"],
+  ["/admin/clients", "♙", "Clients SaaS"],
+  ["/account", "♙", "Mon abonnement"],
+  ["/settings", "⚙", "Paramètres"],
+];
+export default function SaaSSidebar() {
+  const pathname = usePathname(),
+    [isAdmin, setIsAdmin] = useState(false);
+  useEffect(() => {
+    fetch("/api/auth/context", { cache: "no-store" })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((x) => setIsAdmin(!!x?.is_platform_admin))
+      .catch(() => setIsAdmin(false));
+  }, []);
+  return (
+    <aside className="dash-side">
+      <div className="dash-brand">
+        <div className="brand-mark">M</div>
+        <div>
+          <b>Landing Motor</b>
+          <small>AI COD BUILDER</small>
+        </div>
+      </div>
+      <div className="workspace-switcher">
+        <span>Workspace</span>
+        <b>LandPro</b>
+        <i>⌄</i>
+      </div>
+      <nav className="dash-nav">
+        {items
+          .filter(([href]) => href !== "/admin/clients" || isAdmin)
+          .map(([href, icon, label]) => {
+            const active = href === "/" ? pathname === "/" : pathname === href || pathname.startsWith(href + "/");
+            return (
+              <Link key={href} className={active ? "active" : ""} href={href}>
+                <span className="dash-icon">{icon}</span>
+                {label}
+              </Link>
+            );
+          })}
+      </nav>
+      <div className="sidebar-plan">
+        <small>PLAN ACTUEL</small>
+        <b>Pro</b>
+        <span>LandPro SaaS</span>
+      </div>
+    </aside>
+  );
+}

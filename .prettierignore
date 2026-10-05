@@ -1,0 +1,7 @@
+node_modules
+.next
+vendor
+public
+*.css
+*.md
+package-lock.json

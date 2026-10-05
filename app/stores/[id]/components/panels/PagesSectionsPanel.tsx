@@ -1,8 +1,210 @@
 "use client";
-import {BLOCKS,PAGE_LIST} from "../../../../../lib/store-builder-config";
+import { BLOCKS, PAGE_LIST } from "../../../../../lib/store-builder-config";
 import SectionDesignEditor from "../sections/SectionDesignEditor";
 import GalleryEditor from "../sections/GalleryEditor";
 import ContactEditor from "../sections/ContactEditor";
-export default function PagesSectionsPanel({editPage,setEditPage,homeItems,moveHomeItem,hideNativeSection,removeBlock,pageBlocks,addBlock,patchBlock,moveBlock,duplicateBlock,dragBlock,imageFiles}:any){
- return <div className="store-settings-card store-visual-editor"><div className="store-step-head"><span>✦</span><div><h2>Éditeur visuel des pages</h2><p>Choisis une page, puis ajoute et organise tes sections.</p></div></div><div className="store-page-tabs">{PAGE_LIST.map(x=><button key={x[0]} className={editPage===x[0]?"active":""} onClick={()=>setEditPage(x[0])}>{x[1]}</button>)}</div>{editPage==="home"&&<><h3>Ordre complet de l’accueil</h3><p className="store-layout-help">Glisse les blocs natifs et personnalisés pour définir leur ordre réel dans la boutique.</p><div className="store-home-layout-order">{homeItems().map((x:any)=><div key={x.id} draggable onDragStart={e=>e.dataTransfer.setData("text/plain",x.id)} onDragOver={e=>e.preventDefault()} onDrop={e=>{e.preventDefault();moveHomeItem(e.dataTransfer.getData("text/plain"),x.id)}}><span>☷</span><b>{x.native?({hero:"Bannière / Hero",products:"Produits populaires",trust:"Avantages COD",faq:"FAQ"} as any)[x.type]:(BLOCKS.find(b=>b[0]===x.type)?.[2]||x.type)}</b><small>{x.native?"Bloc natif":"Section personnalisée"}</small><button type="button" className="store-section-delete" onClick={()=>x.native?hideNativeSection(x.type):removeBlock(x.id)} aria-label="Supprimer la section">🗑 Supprimer</button></div>)}</div></>}<h3>+ Ajouter une section</h3><div className="store-block-library">{BLOCKS.map(x=><button key={x[0]} onClick={()=>addBlock(x[0])}><i>{x[1]}</i><b>{x[2]}</b></button>)}</div><div className="store-custom-blocks">{pageBlocks().length===0&&<div className="store-empty-blocks">Aucune section personnalisée sur cette page.</div>}{pageBlocks().map((b:any,i:number)=><div className="store-custom-block" key={b.id} draggable onDragStart={e=>e.dataTransfer.setData("text/plain",b.id)} onDragOver={e=>e.preventDefault()} onDrop={e=>{e.preventDefault();dragBlock(e.dataTransfer.getData("text/plain"),b.id)}}><div className="store-custom-block-head"><span title="Glisser pour déplacer" style={{cursor:"grab"}}>☷</span><b>{BLOCKS.find(x=>x[0]===b.type)?.[2]||b.type}</b><label><input type="checkbox" checked={b.visible!==false} onChange={e=>patchBlock(b.id,{visible:e.target.checked})}/>Visible</label><button onClick={()=>moveBlock(b.id,-1)} disabled={i===0}>↑</button><button onClick={()=>moveBlock(b.id,1)} disabled={i===pageBlocks().length-1}>↓</button><button onClick={()=>duplicateBlock(b)}>⧉</button><button className="danger store-section-delete" onClick={()=>removeBlock(b.id)}>🗑 Supprimer</button></div>{b.type==="contactForm"&&<ContactEditor block={b} patchBlock={patchBlock}/>} {["benefits","products","reviews"].includes(b.type)&&<><label>Style<select value={b.variant||"cards"} onChange={e=>patchBlock(b.id,{variant:e.target.value})}><option value="cards">Cards</option><option value="strip">Bandeau</option><option value="minimal">Minimal</option><option value="editorial">Editorial</option><option value="compact">Compact</option></select></label><label>Titre<input value={b.title||""} onChange={e=>patchBlock(b.id,{title:e.target.value})}/></label>{["benefits","reviews"].includes(b.type)&&<label>Éléments (un par ligne)<textarea value={(b.items||[]).join("\n")} onChange={e=>patchBlock(b.id,{items:e.target.value.split("\n").filter(Boolean)})}/></label>}</>}{["text","imageText","hero","cta","whatsapp"].includes(b.type)&&<label>Titre<input value={b.title||""} onChange={e=>patchBlock(b.id,{title:e.target.value})}/></label>}{["text","imageText","hero"].includes(b.type)&&<label>Texte<textarea value={b.text||""} onChange={e=>patchBlock(b.id,{text:e.target.value})}/></label>}{["image","imageText","hero"].includes(b.type)&&<><label>Image URL<input value={b.image||""} onChange={e=>patchBlock(b.id,{image:e.target.value})} placeholder="https://..."/></label><label className="store-upload-btn">📷 Importer une image<input hidden type="file" accept="image/*" onChange={e=>imageFiles(e,b)}/></label></>}{b.type==="gallery"&&<GalleryEditor block={b} patchBlock={patchBlock} imageFiles={imageFiles}/>} {["hero","cta","whatsapp"].includes(b.type)&&<label>Texte du bouton<input value={b.button||""} onChange={e=>patchBlock(b.id,{button:e.target.value})}/></label>}{["image","cta","video","whatsapp"].includes(b.type)&&<label>{b.type==="video"?"URL vidéo":"Lien / URL"}<input value={b.url||""} onChange={e=>patchBlock(b.id,{url:e.target.value})} placeholder={b.type==="video"?"https://youtube.com/...":"https://..."}/></label>}<SectionDesignEditor block={b} patchBlock={patchBlock}/></div>)}</div></div>
+export default function PagesSectionsPanel({
+  editPage,
+  setEditPage,
+  homeItems,
+  moveHomeItem,
+  hideNativeSection,
+  removeBlock,
+  pageBlocks,
+  addBlock,
+  patchBlock,
+  moveBlock,
+  duplicateBlock,
+  dragBlock,
+  imageFiles,
+}: any) {
+  return (
+    <div className="store-settings-card store-visual-editor">
+      <div className="store-step-head">
+        <span>✦</span>
+        <div>
+          <h2>Éditeur visuel des pages</h2>
+          <p>Choisis une page, puis ajoute et organise tes sections.</p>
+        </div>
+      </div>
+      <div className="store-page-tabs">
+        {PAGE_LIST.map((x) => (
+          <button key={x[0]} className={editPage === x[0] ? "active" : ""} onClick={() => setEditPage(x[0])}>
+            {x[1]}
+          </button>
+        ))}
+      </div>
+      {editPage === "home" && (
+        <>
+          <h3>Ordre complet de l’accueil</h3>
+          <p className="store-layout-help">
+            Glisse les blocs natifs et personnalisés pour définir leur ordre réel dans la boutique.
+          </p>
+          <div className="store-home-layout-order">
+            {homeItems().map((x: any) => (
+              <div
+                key={x.id}
+                draggable
+                onDragStart={(e) => e.dataTransfer.setData("text/plain", x.id)}
+                onDragOver={(e) => e.preventDefault()}
+                onDrop={(e) => {
+                  e.preventDefault();
+                  moveHomeItem(e.dataTransfer.getData("text/plain"), x.id);
+                }}
+              >
+                <span>☷</span>
+                <b>
+                  {x.native
+                    ? (
+                        {
+                          hero: "Bannière / Hero",
+                          products: "Produits populaires",
+                          trust: "Avantages COD",
+                          faq: "FAQ",
+                        } as any
+                      )[x.type]
+                    : BLOCKS.find((b) => b[0] === x.type)?.[2] || x.type}
+                </b>
+                <small>{x.native ? "Bloc natif" : "Section personnalisée"}</small>
+                <button
+                  type="button"
+                  className="store-section-delete"
+                  onClick={() => (x.native ? hideNativeSection(x.type) : removeBlock(x.id))}
+                  aria-label="Supprimer la section"
+                >
+                  🗑 Supprimer
+                </button>
+              </div>
+            ))}
+          </div>
+        </>
+      )}
+      <h3>+ Ajouter une section</h3>
+      <div className="store-block-library">
+        {BLOCKS.map((x) => (
+          <button key={x[0]} onClick={() => addBlock(x[0])}>
+            <i>{x[1]}</i>
+            <b>{x[2]}</b>
+          </button>
+        ))}
+      </div>
+      <div className="store-custom-blocks">
+        {pageBlocks().length === 0 && (
+          <div className="store-empty-blocks">Aucune section personnalisée sur cette page.</div>
+        )}
+        {pageBlocks().map((b: any, i: number) => (
+          <div
+            className="store-custom-block"
+            key={b.id}
+            draggable
+            onDragStart={(e) => e.dataTransfer.setData("text/plain", b.id)}
+            onDragOver={(e) => e.preventDefault()}
+            onDrop={(e) => {
+              e.preventDefault();
+              dragBlock(e.dataTransfer.getData("text/plain"), b.id);
+            }}
+          >
+            <div className="store-custom-block-head">
+              <span title="Glisser pour déplacer" style={{ cursor: "grab" }}>
+                ☷
+              </span>
+              <b>{BLOCKS.find((x) => x[0] === b.type)?.[2] || b.type}</b>
+              <label>
+                <input
+                  type="checkbox"
+                  checked={b.visible !== false}
+                  onChange={(e) => patchBlock(b.id, { visible: e.target.checked })}
+                />
+                Visible
+              </label>
+              <button onClick={() => moveBlock(b.id, -1)} disabled={i === 0}>
+                ↑
+              </button>
+              <button onClick={() => moveBlock(b.id, 1)} disabled={i === pageBlocks().length - 1}>
+                ↓
+              </button>
+              <button onClick={() => duplicateBlock(b)}>⧉</button>
+              <button className="danger store-section-delete" onClick={() => removeBlock(b.id)}>
+                🗑 Supprimer
+              </button>
+            </div>
+            {b.type === "contactForm" && <ContactEditor block={b} patchBlock={patchBlock} />}{" "}
+            {["benefits", "products", "reviews"].includes(b.type) && (
+              <>
+                <label>
+                  Style
+                  <select value={b.variant || "cards"} onChange={(e) => patchBlock(b.id, { variant: e.target.value })}>
+                    <option value="cards">Cards</option>
+                    <option value="strip">Bandeau</option>
+                    <option value="minimal">Minimal</option>
+                    <option value="editorial">Editorial</option>
+                    <option value="compact">Compact</option>
+                  </select>
+                </label>
+                <label>
+                  Titre
+                  <input value={b.title || ""} onChange={(e) => patchBlock(b.id, { title: e.target.value })} />
+                </label>
+                {["benefits", "reviews"].includes(b.type) && (
+                  <label>
+                    Éléments (un par ligne)
+                    <textarea
+                      value={(b.items || []).join("\n")}
+                      onChange={(e) => patchBlock(b.id, { items: e.target.value.split("\n").filter(Boolean) })}
+                    />
+                  </label>
+                )}
+              </>
+            )}
+            {["text", "imageText", "hero", "cta", "whatsapp"].includes(b.type) && (
+              <label>
+                Titre
+                <input value={b.title || ""} onChange={(e) => patchBlock(b.id, { title: e.target.value })} />
+              </label>
+            )}
+            {["text", "imageText", "hero"].includes(b.type) && (
+              <label>
+                Texte
+                <textarea value={b.text || ""} onChange={(e) => patchBlock(b.id, { text: e.target.value })} />
+              </label>
+            )}
+            {["image", "imageText", "hero"].includes(b.type) && (
+              <>
+                <label>
+                  Image URL
+                  <input
+                    value={b.image || ""}
+                    onChange={(e) => patchBlock(b.id, { image: e.target.value })}
+                    placeholder="https://..."
+                  />
+                </label>
+                <label className="store-upload-btn">
+                  📷 Importer une image
+                  <input hidden type="file" accept="image/*" onChange={(e) => imageFiles(e, b)} />
+                </label>
+              </>
+            )}
+            {b.type === "gallery" && <GalleryEditor block={b} patchBlock={patchBlock} imageFiles={imageFiles} />}{" "}
+            {["hero", "cta", "whatsapp"].includes(b.type) && (
+              <label>
+                Texte du bouton
+                <input value={b.button || ""} onChange={(e) => patchBlock(b.id, { button: e.target.value })} />
+              </label>
+            )}
+            {["image", "cta", "video", "whatsapp"].includes(b.type) && (
+              <label>
+                {b.type === "video" ? "URL vidéo" : "Lien / URL"}
+                <input
+                  value={b.url || ""}
+                  onChange={(e) => patchBlock(b.id, { url: e.target.value })}
+                  placeholder={b.type === "video" ? "https://youtube.com/..." : "https://..."}
+                />
+              </label>
+            )}
+            <SectionDesignEditor block={b} patchBlock={patchBlock} />
+          </div>
+        ))}
+      </div>
+    </div>
+  );
 }

@@ -7,17 +7,24 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "format": "prettier --write \"**/*.{ts,tsx,js,mjs}\"",
+    "format:check": "prettier --check \"**/*.{ts,tsx,js,mjs}\""
   },
   "dependencies": {
     "@supabase/supabase-js": "2.57.4",
-    "openai": "4.104.0",
     "@types/node": "24.3.1",
     "@types/react": "19.1.12",
     "@types/react-dom": "19.1.9",
     "next": "15.5.24",
+    "openai": "4.104.0",
     "react": "19.1.1",
     "react-dom": "19.1.1",
     "typescript": "5.9.2"
+  },
+  "devDependencies": {
+    "prettier": "3.9.9",
+    "vitest": "3.2.7"
   }
 }

@@ -1,32 +1,594 @@
 "use client";
-import {useEffect,useRef,useState,type ReactNode} from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 
-type Props={mode:string;content:any;data:any;images:string[];sectionStyle:any;imageAlt:(x:string,i:number)=>string;whatsapp?:string;onCta?:()=>void};
-const CTA=({c,data,onCta}:{c:any;data:any;onCta?:()=>void})=>c.hero_show_cta===false?null:<a className="lp-cta hero-pro-cta" href="#order" onClick={onCta}>{c.cta||"اطلب الآن"} — {data.price} DH</a>;
-const Price=({c,data}:{c:any;data:any})=>c.hero_show_price===false?null:<div className="lp-price"><b>{data.price} DH</b>{data.oldPrice&&<s>{data.oldPrice} DH</s>}</div>;
-const Copy=({c,data,onCta,extra}:{c:any;data:any;onCta?:()=>void;extra?:ReactNode})=><div className="lp-copy hero-control-copy">{c.hero_show_badge!==false&&<span className="lp-badge">{c.hero_badge_text||"الدفع عند الاستلام"}</span>}<small className="lp-category">{c.product_category}</small><h1>{c.headline||data.name}</h1>{c.hero_show_subtitle!==false&&<p className="lp-sub">{c.subheadline||c.description}</p>}<Price c={c} data={data}/><CTA c={c} data={data} onCta={onCta}/>{extra}</div>;
-const Img=({src,alt,cls=""}:{src?:string;alt:string;cls?:string})=>src?<img className={"lp-hero-img hero-control-media "+cls} src={src} alt={alt} loading="eager" fetchPriority="high"/>:null;
-const HeroProductGallery=({images,c,imageAlt,cls=""}:{images:string[];c:any;imageAlt:(x:string,i:number)=>string;cls?:string})=>{const items=images.filter(Boolean).slice(0,10),mode=c.hero_gallery_mode||"fixed",[index,setIndex]=useState(0),delay=Math.max(1000,Math.min(15000,Number(c.hero_gallery_delay||3500))),speed=Math.max(150,Math.min(2000,Number(c.hero_gallery_speed||500))),loop=c.hero_gallery_loop!==false,autoplay=["autoplay","arrows-autoplay","fade","slide"].includes(mode);useEffect(()=>{if(!autoplay||items.length<2)return;const id=window.setInterval(()=>setIndex(i=>i+1<items.length?i+1:(loop?0:i)),delay);return()=>window.clearInterval(id)},[autoplay,items.length,delay,loop]);useEffect(()=>{if(index>=items.length)setIndex(0)},[items.length,index]);if(!items.length)return null;if(mode==="marquee")return <div className={"hero-product-gallery hero-gallery-marquee "+cls} style={{"--hero-gallery-speed":Math.max(5,Math.min(60,Number(c.hero_gallery_marquee_speed||18)))+"s"} as any}><div className="hero-gallery-marquee-track">{[...items,...items].map((x,i)=><img key={x+i} className="lp-hero-img hero-control-media" src={x} alt={imageAlt(x,i%items.length)}/>)}</div></div>;const go=(d:number)=>setIndex(i=>{const n=i+d;if(loop)return(n+items.length)%items.length;return Math.max(0,Math.min(items.length-1,n))});return <div className={"hero-product-gallery hero-gallery-"+mode+" "+cls} style={{"--hero-gallery-transition":speed+"ms"} as any}><div className="hero-gallery-stage">{items.map((x,i)=><img key={x+i} className={"lp-hero-img hero-control-media hero-gallery-image "+(i===index?"is-active":"")} src={x} alt={imageAlt(x,i)} loading={i===0?"eager":"lazy"} fetchPriority={i===0?"high":"auto"}/>)}</div>{items.length>1&&c.hero_gallery_arrows!==false&&!["autoplay","fade"].includes(mode)&&<><button type="button" className="hero-gallery-arrow prev" onClick={()=>go(-1)} aria-label="Image précédente">‹</button><button type="button" className="hero-gallery-arrow next" onClick={()=>go(1)} aria-label="Image suivante">›</button></>}{items.length>1&&c.hero_gallery_dots!==false&&<div className="hero-gallery-dots">{items.map((_,i)=><button type="button" key={i} className={i===index?"active":""} onClick={()=>setIndex(i)} aria-label={"Image "+(i+1)}/>)}</div>}{c.hero_gallery_thumbs===true&&items.length>1&&<div className="hero-gallery-thumbs">{items.map((x,i)=><button type="button" key={x+i} className={i===index?"active":""} onClick={()=>setIndex(i)}><img src={x} alt=""/></button>)}</div>}</div>};
-export default function HeroRenderer({mode,c:never,content,data,images,sectionStyle,imageAlt,whatsapp,onCta}:Props&{c?:never}){
- const c=content||{},m=mode||"conversion",motionRef=useRef<HTMLElement|null>(null),[progress,setProgress]=useState(0),wa=whatsapp?<a className="lp-whatsapp" target="_blank" rel="noreferrer" href={"https://wa.me/"+whatsapp+"?text="+encodeURIComponent("سلام، بغيت معلومات على "+data.name)}>واتساب</a>:null;
- useEffect(()=>{if(!m.startsWith("motion-"))return;let raf=0;const run=()=>{cancelAnimationFrame(raf);raf=requestAnimationFrame(()=>{const el=motionRef.current;if(!el)return;const r=el.getBoundingClientRect(),range=Math.max(1,r.height-innerHeight),p=Math.max(0,Math.min(1,-r.top/range));setProgress(p)})};run();addEventListener("scroll",run,{passive:true});addEventListener("resize",run);return()=>{cancelAnimationFrame(raf);removeEventListener("scroll",run);removeEventListener("resize",run)}},[m]);
- const scrolling=Boolean(c.hero_image_scroll)&&images.length>1,scrollSpeed=Math.max(5,Math.min(60,Number(c.hero_scroll_speed||18))),scrollDir=c.hero_scroll_direction==="right"?"right":"left"; const scrollGallery=scrolling?<div className={"hero-auto-scroll hero-auto-scroll-"+scrollDir+(c.hero_scroll_pause_hover===false?"":" hero-auto-scroll-pause")} style={{"--hero-scroll-speed":`${scrollSpeed}s`} as any}><div className="hero-auto-scroll-track">{[...images,...images].map((x,i)=><figure key={x+i}><img src={x} alt={imageAlt(x,i%images.length)}/></figure>)}</div></div>:null;  const shell=(body:ReactNode,cls="")=>{const heroClasses=["lp-hero","lp-hero-real","lp-hero-real-"+m,cls,"hero-architecture-"+(c.hero_architecture||"auto"),"hero-height-"+(c.hero_height||"compact"),"hero-title-"+(c.hero_title_size||"auto"),"hero-text-"+(c.hero_text_width||"medium"),"hero-align-"+(c.hero_text_align||"auto"),"hero-media-"+(c.hero_media_position||"auto"),"hero-fit-"+(c.hero_media_fit||"contain")].filter(Boolean).join(" ");const heroStyle={...sectionStyle("hero"),background:c.hero_bg_color||sectionStyle("hero")?.backgroundColor||undefined,backgroundColor:c.hero_bg_color||sectionStyle("hero")?.backgroundColor||undefined,"--hero-title-size":`${Number(c.hero_title_px||56)}px`,"--hero-title-size-tablet":`${Number(c.hero_title_px_tablet||44)}px`,"--hero-title-size-mobile":`${Number(c.hero_title_px_mobile||34)}px`,"--hero-subtitle-size":`${Number(c.hero_subtitle_px||18)}px`,"--hero-subtitle-size-tablet":`${Number(c.hero_subtitle_px_tablet||17)}px`,"--hero-subtitle-size-mobile":`${Number(c.hero_subtitle_px_mobile||16)}px`,"--hero-cta-font-size":`${Number(c.hero_cta_font_px||17)}px`,"--hero-cta-height":`${Number(c.hero_cta_height||56)}px`,"--hero-cta-radius":`${Number(c.hero_cta_radius||14)}px`,"--hero-cta-width":c.hero_cta_width==="full"?"100%":"auto","--hero-cta-bg":c.hero_cta_bg||"var(--lp-primary,#111827)","--hero-cta-color":c.hero_cta_color||"#fff","--hero-title-color":c.hero_title_color||"inherit","--hero-bg-color":c.hero_bg_color||"transparent","--hero-subtitle-color":c.hero_subtitle_color||"inherit","--hero-badge-bg":c.hero_badge_bg||"var(--lp-accent,#f59e0b)","--hero-badge-color":c.hero_badge_color||"#111","--hero-overlay":`${Math.max(0,Math.min(90,Number(c.hero_overlay??38)))/100}`,"--hero-pad-y":`${Number(c.hero_padding_y||72)}px`,"--hero-gap":`${Number(c.hero_gap||48)}px`,"--hero-media-width":`${Math.max(20,Math.min(100,Number(c.hero_media_width||100)))}%`,"--hero-media-height":`${Math.max(120,Math.min(1200,Number(c.hero_media_height||520)))}px`,"--hero-media-radius":`${Math.max(0,Math.min(100,Number(c.hero_media_radius||24)))}px`,"--hero-media-aspect":c.hero_media_aspect&&c.hero_media_aspect!=="auto"?String(c.hero_media_aspect).replace(":","/"):"auto"} as any;return <section ref={motionRef} className={heroClasses} style={heroStyle} data-hero-module={m} data-hero-architecture={c.hero_architecture||"auto"}>{body}{m!=="motion-scroll-gallery"&&scrollGallery}</section>};
- if(m==="motion-scroll-gallery")return shell(<div className="hero-motion-sticky"><div className="hero-motion-copy hero-control-copy"><small>SCROLL TO EXPLORE</small><h1>{c.headline||data.name}</h1><p>{c.subheadline||c.description}</p><Price c={c} data={data}/><CTA c={c} data={data} onCta={onCta}/></div><div className="hero-motion-track hero-control-media-wrap" style={{transform:`translate3d(-${progress*58}%,0,0)`}}>{images.slice(0,6).map((x,i)=><figure key={x+i}><img src={x} alt={imageAlt(x,i)}/><span>0{i+1}</span></figure>)}</div><div className="hero-motion-progress"><i style={{transform:`scaleX(${progress})`}}/></div></div>,"hero-motion");
- if(m==="motion-sticky-story")return shell(<div className="hero-story-sticky"><div className="hero-story-copy hero-control-copy"><small>PRODUCT STORY</small><h1>{c.headline||data.name}</h1><p>{c.subheadline||c.description}</p><Price c={c} data={data}/><CTA c={c} data={data} onCta={onCta}/></div><div className="hero-story-stack hero-control-media-wrap">{images.slice(0,4).map((x,i)=>{const active=Math.min(1,Math.max(0,progress*4-i));return <img key={x+i} src={x} alt={imageAlt(x,i)} style={{opacity:i===0?1:active,transform:`scale(${1.08-active*.08}) translateY(${(1-active)*24}px)`}}/>})}</div></div>,"hero-motion");
- if(m==="motion-parallax")return shell(<div className="hero-parallax"><div className="hero-parallax-media hero-control-media-wrap" style={{transform:`translate3d(0,${progress*90}px,0) scale(${1.08-progress*.08})`}}><Img src={images[0]} alt={imageAlt(images[0],0)}/></div><div className="hero-parallax-copy hero-control-copy" style={{transform:`translate3d(0,${progress*-55}px,0)`}}><Copy c={c} data={data} onCta={onCta} extra={wa}/></div></div>,"hero-motion");
- if(m==="motion-zoom")return shell(<div className="hero-zoom"><div className="hero-zoom-media hero-control-media-wrap" style={{transform:`scale(${1+progress*.35})`}}><Img src={images[0]} alt={imageAlt(images[0],0)}/></div><div className="hero-zoom-copy hero-control-copy" style={{opacity:Math.max(.25,1-progress*.75)}}><Copy c={c} data={data} onCta={onCta}/></div></div>,"hero-motion");
- if(m==="motion-video-full")return shell(<div className="hero-video-full hero-control-layout">{c.hero_video?<video src={c.hero_video} autoPlay muted loop playsInline preload="metadata" poster={images[0]}/>:<Img src={images[0]} alt={imageAlt(images[0],0)}/>}<div className="hero-video-shade"/><div className="hero-video-copy hero-control-copy"><Copy c={c} data={data} onCta={onCta} extra={wa}/></div></div>,"hero-motion");
- if(m==="motion-video-ugc")return shell(<div className="lp-wrap hero-video-ugc"><div className="hero-video-phone hero-control-media-wrap">{c.hero_video?<video src={c.hero_video} autoPlay muted loop playsInline controls preload="metadata" poster={images[0]}/>:<Img src={images[0]} alt={imageAlt(images[0],0)}/>}<span>UGC · VIDEO</span></div><div><div className="hero-stars">★★★★★ <small>Expérience réelle</small></div><h1>{c.headline||data.name}</h1><p>{c.subheadline||c.description}</p><Price c={c} data={data}/><CTA c={c} data={data} onCta={onCta}/>{wa}</div></div>,"hero-motion");
- if(m==="fullscreen")return shell(<><div className="hero-full-media hero-control-media-wrap"><Img src={images[0]} alt={imageAlt(images[0],0)}/></div><div className="lp-wrap hero-full-overlay hero-control-copy-wrap"><Copy c={c} data={data} onCta={onCta} extra={wa}/></div></>);
- if(m==="center-product")return shell(<div className="lp-wrap hero-center hero-control-layout"><Copy c={c} data={data} onCta={onCta}/><HeroProductGallery images={images} c={c} imageAlt={imageAlt}/><div className="hero-proof"><span>✓ Livraison Maroc</span><span>✓ Paiement à la livraison</span><span>✓ Commande sécurisée</span></div></div>);
- if(m==="gallery-commerce")return shell(<div className="lp-wrap hero-commerce"><div className="hero-commerce-gallery hero-control-media-wrap"><HeroProductGallery images={images} c={c} imageAlt={imageAlt}/></div><aside className="hero-control-copy-wrap"><Copy c={c} data={data} onCta={onCta} extra={<><div className="hero-mini-benefits">{(c.benefits||[]).slice(0,3).map((x:any,i:number)=><span key={i}>✓ {typeof x==="string"?x:x?.title}</span>)}</div>{wa}</>}/></aside></div>);
- if(m==="minimal")return shell(<div className="lp-wrap hero-minimal"><div><small>{c.product_category}</small><h1>{c.headline||data.name}</h1><p>{c.subheadline||c.description}</p><Price c={c} data={data}/><CTA c={c} data={data} onCta={onCta}/></div><HeroProductGallery images={images} c={c} imageAlt={imageAlt}/></div>);
- if(m==="editorial")return shell(<div className="lp-wrap hero-editorial"><div className="hero-editorial-index">01</div><HeroProductGallery images={images} c={c} imageAlt={imageAlt}/><div><small>{c.product_category}</small><h1>{c.headline||data.name}</h1><p className="lp-sub">{c.subheadline||c.description}</p><Price c={c} data={data}/><CTA c={c} data={data} onCta={onCta}/></div></div>);
- if(m==="form-integrated")return shell(<div className="lp-wrap hero-form"><Copy c={c} data={data} onCta={onCta}/><div className="hero-form-card"><b>Commande rapide</b><span>Nom complet</span><span>Téléphone</span><span>Ville</span><a href="#order">Continuer la commande →</a><small>Paiement à la livraison</small></div></div>);
- if(m==="background")return shell(<><div className="hero-bg hero-control-media-wrap"><Img src={images[0]} alt={imageAlt(images[0],0)}/></div><div className="lp-wrap hero-bg-copy hero-control-copy-wrap"><Copy c={c} data={data} onCta={onCta} extra={wa}/></div></>);
- if(m==="luxury")return shell(<div className="lp-wrap hero-luxury"><div className="hero-luxury-media hero-control-media-wrap"><HeroProductGallery images={images} c={c} imageAlt={imageAlt} cls="hero-luxury-product-gallery"/><span>COLLECTION</span></div><div className="hero-luxury-copy hero-control-copy-wrap"><small>PREMIUM SELECTION</small><h1>{c.headline||data.name}</h1><p>{c.subheadline||c.description}</p><Price c={c} data={data}/><CTA c={c} data={data} onCta={onCta}/></div></div>);
- if(m==="lifestyle")return shell(<div className="lp-wrap hero-ugc"><div className="hero-ugc-media hero-control-media-wrap"><Img src={images[0]} alt={imageAlt(images[0],0)}/><span className="hero-ugc-chip">UGC · REAL USE</span></div><div><div className="hero-stars">★★★★★ <small>Clients satisfaits</small></div><h1>{c.headline||data.name}</h1><p>{c.subheadline||c.description}</p><div className="hero-testimonial">“Simple, pratique et exactement ce qu’il me fallait.”</div><Price c={c} data={data}/><CTA c={c} data={data} onCta={onCta}/></div></div>);
- if(m==="mobile-first")return shell(<div className="hero-phone"><Img src={images[0]} alt={imageAlt(images[0],0)}/><span className="lp-badge">الدفع عند الاستلام</span><h1>{c.headline||data.name}</h1><Price c={c} data={data}/><div className="hero-mobile-benefits">{(c.benefits||[]).slice(0,2).map((x:any,i:number)=><span key={i}>✓ {typeof x==="string"?x:x?.title}</span>)}</div><CTA c={c} data={data} onCta={onCta}/>{wa}</div>);
- if(m==="split-product")return shell(<div className="lp-wrap hero-split"><div><Copy c={c} data={data} onCta={onCta} extra={<div className="hero-proof"><span>🚚 Livraison</span><span>💵 COD</span></div>}/></div><div className="hero-product-stage hero-control-media-wrap"><HeroProductGallery images={images} c={c} imageAlt={imageAlt}/></div></div>);
- return shell(<div className="lp-wrap hero-cod"><div><span className="hero-offer">OFFRE COD</span><h1>{c.headline||data.name}</h1><p>{c.subheadline||c.description}</p><div className="hero-cod-benefits">{(c.benefits||[]).slice(0,3).map((x:any,i:number)=><span key={i}>✓ {typeof x==="string"?x:x?.title}</span>)}</div></div><div className="hero-offer-card hero-control-media-wrap"><HeroProductGallery images={images} c={c} imageAlt={imageAlt}/><Price c={c} data={data}/><CTA c={c} data={data} onCta={onCta}/><small>🚚 Livraison partout au Maroc · 💵 Paiement à la livraison</small>{wa}</div></div>,"hero-conversion");
+type Props = {
+  mode: string;
+  content: any;
+  data: any;
+  images: string[];
+  sectionStyle: any;
+  imageAlt: (x: string, i: number) => string;
+  whatsapp?: string;
+  onCta?: () => void;
+};
+const CTA = ({ c, data, onCta }: { c: any; data: any; onCta?: () => void }) =>
+  c.hero_show_cta === false ? null : (
+    <a className="lp-cta hero-pro-cta" href="#order" onClick={onCta}>
+      {c.cta || "اطلب الآن"} — {data.price} DH
+    </a>
+  );
+const Price = ({ c, data }: { c: any; data: any }) =>
+  c.hero_show_price === false ? null : (
+    <div className="lp-price">
+      <b>{data.price} DH</b>
+      {data.oldPrice && <s>{data.oldPrice} DH</s>}
+    </div>
+  );
+const Copy = ({ c, data, onCta, extra }: { c: any; data: any; onCta?: () => void; extra?: ReactNode }) => (
+  <div className="lp-copy hero-control-copy">
+    {c.hero_show_badge !== false && <span className="lp-badge">{c.hero_badge_text || "الدفع عند الاستلام"}</span>}
+    <small className="lp-category">{c.product_category}</small>
+    <h1>{c.headline || data.name}</h1>
+    {c.hero_show_subtitle !== false && <p className="lp-sub">{c.subheadline || c.description}</p>}
+    <Price c={c} data={data} />
+    <CTA c={c} data={data} onCta={onCta} />
+    {extra}
+  </div>
+);
+const Img = ({ src, alt, cls = "" }: { src?: string; alt: string; cls?: string }) =>
+  src ? (
+    <img className={"lp-hero-img hero-control-media " + cls} src={src} alt={alt} loading="eager" fetchPriority="high" />
+  ) : null;
+const HeroProductGallery = ({
+  images,
+  c,
+  imageAlt,
+  cls = "",
+}: {
+  images: string[];
+  c: any;
+  imageAlt: (x: string, i: number) => string;
+  cls?: string;
+}) => {
+  const items = images.filter(Boolean).slice(0, 10),
+    mode = c.hero_gallery_mode || "fixed",
+    [index, setIndex] = useState(0),
+    delay = Math.max(1000, Math.min(15000, Number(c.hero_gallery_delay || 3500))),
+    speed = Math.max(150, Math.min(2000, Number(c.hero_gallery_speed || 500))),
+    loop = c.hero_gallery_loop !== false,
+    autoplay = ["autoplay", "arrows-autoplay", "fade", "slide"].includes(mode);
+  useEffect(() => {
+    if (!autoplay || items.length < 2) return;
+    const id = window.setInterval(() => setIndex((i) => (i + 1 < items.length ? i + 1 : loop ? 0 : i)), delay);
+    return () => window.clearInterval(id);
+  }, [autoplay, items.length, delay, loop]);
+  useEffect(() => {
+    if (index >= items.length) setIndex(0);
+  }, [items.length, index]);
+  if (!items.length) return null;
+  if (mode === "marquee")
+    return (
+      <div
+        className={"hero-product-gallery hero-gallery-marquee " + cls}
+        style={
+          { "--hero-gallery-speed": Math.max(5, Math.min(60, Number(c.hero_gallery_marquee_speed || 18))) + "s" } as any
+        }
+      >
+        <div className="hero-gallery-marquee-track">
+          {[...items, ...items].map((x, i) => (
+            <img key={x + i} className="lp-hero-img hero-control-media" src={x} alt={imageAlt(x, i % items.length)} />
+          ))}
+        </div>
+      </div>
+    );
+  const go = (d: number) =>
+    setIndex((i) => {
+      const n = i + d;
+      if (loop) return (n + items.length) % items.length;
+      return Math.max(0, Math.min(items.length - 1, n));
+    });
+  return (
+    <div
+      className={"hero-product-gallery hero-gallery-" + mode + " " + cls}
+      style={{ "--hero-gallery-transition": speed + "ms" } as any}
+    >
+      <div className="hero-gallery-stage">
+        {items.map((x, i) => (
+          <img
+            key={x + i}
+            className={"lp-hero-img hero-control-media hero-gallery-image " + (i === index ? "is-active" : "")}
+            src={x}
+            alt={imageAlt(x, i)}
+            loading={i === 0 ? "eager" : "lazy"}
+            fetchPriority={i === 0 ? "high" : "auto"}
+          />
+        ))}
+      </div>
+      {items.length > 1 && c.hero_gallery_arrows !== false && !["autoplay", "fade"].includes(mode) && (
+        <>
+          <button
+            type="button"
+            className="hero-gallery-arrow prev"
+            onClick={() => go(-1)}
+            aria-label="Image précédente"
+          >
+            ‹
+          </button>
+          <button type="button" className="hero-gallery-arrow next" onClick={() => go(1)} aria-label="Image suivante">
+            ›
+          </button>
+        </>
+      )}
+      {items.length > 1 && c.hero_gallery_dots !== false && (
+        <div className="hero-gallery-dots">
+          {items.map((_, i) => (
+            <button
+              type="button"
+              key={i}
+              className={i === index ? "active" : ""}
+              onClick={() => setIndex(i)}
+              aria-label={"Image " + (i + 1)}
+            />
+          ))}
+        </div>
+      )}
+      {c.hero_gallery_thumbs === true && items.length > 1 && (
+        <div className="hero-gallery-thumbs">
+          {items.map((x, i) => (
+            <button type="button" key={x + i} className={i === index ? "active" : ""} onClick={() => setIndex(i)}>
+              <img src={x} alt="" />
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+export default function HeroRenderer({
+  mode,
+  c: never,
+  content,
+  data,
+  images,
+  sectionStyle,
+  imageAlt,
+  whatsapp,
+  onCta,
+}: Props & { c?: never }) {
+  const c = content || {},
+    m = mode || "conversion",
+    motionRef = useRef<HTMLElement | null>(null),
+    [progress, setProgress] = useState(0),
+    wa = whatsapp ? (
+      <a
+        className="lp-whatsapp"
+        target="_blank"
+        rel="noreferrer"
+        href={"https://wa.me/" + whatsapp + "?text=" + encodeURIComponent("سلام، بغيت معلومات على " + data.name)}
+      >
+        واتساب
+      </a>
+    ) : null;
+  useEffect(() => {
+    if (!m.startsWith("motion-")) return;
+    let raf = 0;
+    const run = () => {
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(() => {
+        const el = motionRef.current;
+        if (!el) return;
+        const r = el.getBoundingClientRect(),
+          range = Math.max(1, r.height - innerHeight),
+          p = Math.max(0, Math.min(1, -r.top / range));
+        setProgress(p);
+      });
+    };
+    run();
+    addEventListener("scroll", run, { passive: true });
+    addEventListener("resize", run);
+    return () => {
+      cancelAnimationFrame(raf);
+      removeEventListener("scroll", run);
+      removeEventListener("resize", run);
+    };
+  }, [m]);
+  const scrolling = Boolean(c.hero_image_scroll) && images.length > 1,
+    scrollSpeed = Math.max(5, Math.min(60, Number(c.hero_scroll_speed || 18))),
+    scrollDir = c.hero_scroll_direction === "right" ? "right" : "left";
+  const scrollGallery = scrolling ? (
+    <div
+      className={
+        "hero-auto-scroll hero-auto-scroll-" +
+        scrollDir +
+        (c.hero_scroll_pause_hover === false ? "" : " hero-auto-scroll-pause")
+      }
+      style={{ "--hero-scroll-speed": `${scrollSpeed}s` } as any}
+    >
+      <div className="hero-auto-scroll-track">
+        {[...images, ...images].map((x, i) => (
+          <figure key={x + i}>
+            <img src={x} alt={imageAlt(x, i % images.length)} />
+          </figure>
+        ))}
+      </div>
+    </div>
+  ) : null;
+  const shell = (body: ReactNode, cls = "") => {
+    const heroClasses = [
+      "lp-hero",
+      "lp-hero-real",
+      "lp-hero-real-" + m,
+      cls,
+      "hero-architecture-" + (c.hero_architecture || "auto"),
+      "hero-height-" + (c.hero_height || "compact"),
+      "hero-title-" + (c.hero_title_size || "auto"),
+      "hero-text-" + (c.hero_text_width || "medium"),
+      "hero-align-" + (c.hero_text_align || "auto"),
+      "hero-media-" + (c.hero_media_position || "auto"),
+      "hero-fit-" + (c.hero_media_fit || "contain"),
+    ]
+      .filter(Boolean)
+      .join(" ");
+    const heroStyle = {
+      ...sectionStyle("hero"),
+      background: c.hero_bg_color || sectionStyle("hero")?.backgroundColor || undefined,
+      backgroundColor: c.hero_bg_color || sectionStyle("hero")?.backgroundColor || undefined,
+      "--hero-title-size": `${Number(c.hero_title_px || 56)}px`,
+      "--hero-title-size-tablet": `${Number(c.hero_title_px_tablet || 44)}px`,
+      "--hero-title-size-mobile": `${Number(c.hero_title_px_mobile || 34)}px`,
+      "--hero-subtitle-size": `${Number(c.hero_subtitle_px || 18)}px`,
+      "--hero-subtitle-size-tablet": `${Number(c.hero_subtitle_px_tablet || 17)}px`,
+      "--hero-subtitle-size-mobile": `${Number(c.hero_subtitle_px_mobile || 16)}px`,
+      "--hero-cta-font-size": `${Number(c.hero_cta_font_px || 17)}px`,
+      "--hero-cta-height": `${Number(c.hero_cta_height || 56)}px`,
+      "--hero-cta-radius": `${Number(c.hero_cta_radius || 14)}px`,
+      "--hero-cta-width": c.hero_cta_width === "full" ? "100%" : "auto",
+      "--hero-cta-bg": c.hero_cta_bg || "var(--lp-primary,#111827)",
+      "--hero-cta-color": c.hero_cta_color || "#fff",
+      "--hero-title-color": c.hero_title_color || "inherit",
+      "--hero-bg-color": c.hero_bg_color || "transparent",
+      "--hero-subtitle-color": c.hero_subtitle_color || "inherit",
+      "--hero-badge-bg": c.hero_badge_bg || "var(--lp-accent,#f59e0b)",
+      "--hero-badge-color": c.hero_badge_color || "#111",
+      "--hero-overlay": `${Math.max(0, Math.min(90, Number(c.hero_overlay ?? 38))) / 100}`,
+      "--hero-pad-y": `${Number(c.hero_padding_y || 72)}px`,
+      "--hero-gap": `${Number(c.hero_gap || 48)}px`,
+      "--hero-media-width": `${Math.max(20, Math.min(100, Number(c.hero_media_width || 100)))}%`,
+      "--hero-media-height": `${Math.max(120, Math.min(1200, Number(c.hero_media_height || 520)))}px`,
+      "--hero-media-radius": `${Math.max(0, Math.min(100, Number(c.hero_media_radius || 24)))}px`,
+      "--hero-media-aspect":
+        c.hero_media_aspect && c.hero_media_aspect !== "auto" ? String(c.hero_media_aspect).replace(":", "/") : "auto",
+    } as any;
+    return (
+      <section
+        ref={motionRef}
+        className={heroClasses}
+        style={heroStyle}
+        data-hero-module={m}
+        data-hero-architecture={c.hero_architecture || "auto"}
+      >
+        {body}
+        {m !== "motion-scroll-gallery" && scrollGallery}
+      </section>
+    );
+  };
+  if (m === "motion-scroll-gallery")
+    return shell(
+      <div className="hero-motion-sticky">
+        <div className="hero-motion-copy hero-control-copy">
+          <small>SCROLL TO EXPLORE</small>
+          <h1>{c.headline || data.name}</h1>
+          <p>{c.subheadline || c.description}</p>
+          <Price c={c} data={data} />
+          <CTA c={c} data={data} onCta={onCta} />
+        </div>
+        <div
+          className="hero-motion-track hero-control-media-wrap"
+          style={{ transform: `translate3d(-${progress * 58}%,0,0)` }}
+        >
+          {images.slice(0, 6).map((x, i) => (
+            <figure key={x + i}>
+              <img src={x} alt={imageAlt(x, i)} />
+              <span>0{i + 1}</span>
+            </figure>
+          ))}
+        </div>
+        <div className="hero-motion-progress">
+          <i style={{ transform: `scaleX(${progress})` }} />
+        </div>
+      </div>,
+      "hero-motion",
+    );
+  if (m === "motion-sticky-story")
+    return shell(
+      <div className="hero-story-sticky">
+        <div className="hero-story-copy hero-control-copy">
+          <small>PRODUCT STORY</small>
+          <h1>{c.headline || data.name}</h1>
+          <p>{c.subheadline || c.description}</p>
+          <Price c={c} data={data} />
+          <CTA c={c} data={data} onCta={onCta} />
+        </div>
+        <div className="hero-story-stack hero-control-media-wrap">
+          {images.slice(0, 4).map((x, i) => {
+            const active = Math.min(1, Math.max(0, progress * 4 - i));
+            return (
+              <img
+                key={x + i}
+                src={x}
+                alt={imageAlt(x, i)}
+                style={{
+                  opacity: i === 0 ? 1 : active,
+                  transform: `scale(${1.08 - active * 0.08}) translateY(${(1 - active) * 24}px)`,
+                }}
+              />
+            );
+          })}
+        </div>
+      </div>,
+      "hero-motion",
+    );
+  if (m === "motion-parallax")
+    return shell(
+      <div className="hero-parallax">
+        <div
+          className="hero-parallax-media hero-control-media-wrap"
+          style={{ transform: `translate3d(0,${progress * 90}px,0) scale(${1.08 - progress * 0.08})` }}
+        >
+          <Img src={images[0]} alt={imageAlt(images[0], 0)} />
+        </div>
+        <div
+          className="hero-parallax-copy hero-control-copy"
+          style={{ transform: `translate3d(0,${progress * -55}px,0)` }}
+        >
+          <Copy c={c} data={data} onCta={onCta} extra={wa} />
+        </div>
+      </div>,
+      "hero-motion",
+    );
+  if (m === "motion-zoom")
+    return shell(
+      <div className="hero-zoom">
+        <div className="hero-zoom-media hero-control-media-wrap" style={{ transform: `scale(${1 + progress * 0.35})` }}>
+          <Img src={images[0]} alt={imageAlt(images[0], 0)} />
+        </div>
+        <div className="hero-zoom-copy hero-control-copy" style={{ opacity: Math.max(0.25, 1 - progress * 0.75) }}>
+          <Copy c={c} data={data} onCta={onCta} />
+        </div>
+      </div>,
+      "hero-motion",
+    );
+  if (m === "motion-video-full")
+    return shell(
+      <div className="hero-video-full hero-control-layout">
+        {c.hero_video ? (
+          <video src={c.hero_video} autoPlay muted loop playsInline preload="metadata" poster={images[0]} />
+        ) : (
+          <Img src={images[0]} alt={imageAlt(images[0], 0)} />
+        )}
+        <div className="hero-video-shade" />
+        <div className="hero-video-copy hero-control-copy">
+          <Copy c={c} data={data} onCta={onCta} extra={wa} />
+        </div>
+      </div>,
+      "hero-motion",
+    );
+  if (m === "motion-video-ugc")
+    return shell(
+      <div className="lp-wrap hero-video-ugc">
+        <div className="hero-video-phone hero-control-media-wrap">
+          {c.hero_video ? (
+            <video src={c.hero_video} autoPlay muted loop playsInline controls preload="metadata" poster={images[0]} />
+          ) : (
+            <Img src={images[0]} alt={imageAlt(images[0], 0)} />
+          )}
+          <span>UGC · VIDEO</span>
+        </div>
+        <div>
+          <div className="hero-stars">
+            ★★★★★ <small>Expérience réelle</small>
+          </div>
+          <h1>{c.headline || data.name}</h1>
+          <p>{c.subheadline || c.description}</p>
+          <Price c={c} data={data} />
+          <CTA c={c} data={data} onCta={onCta} />
+          {wa}
+        </div>
+      </div>,
+      "hero-motion",
+    );
+  if (m === "fullscreen")
+    return shell(
+      <>
+        <div className="hero-full-media hero-control-media-wrap">
+          <Img src={images[0]} alt={imageAlt(images[0], 0)} />
+        </div>
+        <div className="lp-wrap hero-full-overlay hero-control-copy-wrap">
+          <Copy c={c} data={data} onCta={onCta} extra={wa} />
+        </div>
+      </>,
+    );
+  if (m === "center-product")
+    return shell(
+      <div className="lp-wrap hero-center hero-control-layout">
+        <Copy c={c} data={data} onCta={onCta} />
+        <HeroProductGallery images={images} c={c} imageAlt={imageAlt} />
+        <div className="hero-proof">
+          <span>✓ Livraison Maroc</span>
+          <span>✓ Paiement à la livraison</span>
+          <span>✓ Commande sécurisée</span>
+        </div>
+      </div>,
+    );
+  if (m === "gallery-commerce")
+    return shell(
+      <div className="lp-wrap hero-commerce">
+        <div className="hero-commerce-gallery hero-control-media-wrap">
+          <HeroProductGallery images={images} c={c} imageAlt={imageAlt} />
+        </div>
+        <aside className="hero-control-copy-wrap">
+          <Copy
+            c={c}
+            data={data}
+            onCta={onCta}
+            extra={
+              <>
+                <div className="hero-mini-benefits">
+                  {(c.benefits || []).slice(0, 3).map((x: any, i: number) => (
+                    <span key={i}>✓ {typeof x === "string" ? x : x?.title}</span>
+                  ))}
+                </div>
+                {wa}
+              </>
+            }
+          />
+        </aside>
+      </div>,
+    );
+  if (m === "minimal")
+    return shell(
+      <div className="lp-wrap hero-minimal">
+        <div>
+          <small>{c.product_category}</small>
+          <h1>{c.headline || data.name}</h1>
+          <p>{c.subheadline || c.description}</p>
+          <Price c={c} data={data} />
+          <CTA c={c} data={data} onCta={onCta} />
+        </div>
+        <HeroProductGallery images={images} c={c} imageAlt={imageAlt} />
+      </div>,
+    );
+  if (m === "editorial")
+    return shell(
+      <div className="lp-wrap hero-editorial">
+        <div className="hero-editorial-index">01</div>
+        <HeroProductGallery images={images} c={c} imageAlt={imageAlt} />
+        <div>
+          <small>{c.product_category}</small>
+          <h1>{c.headline || data.name}</h1>
+          <p className="lp-sub">{c.subheadline || c.description}</p>
+          <Price c={c} data={data} />
+          <CTA c={c} data={data} onCta={onCta} />
+        </div>
+      </div>,
+    );
+  if (m === "form-integrated")
+    return shell(
+      <div className="lp-wrap hero-form">
+        <Copy c={c} data={data} onCta={onCta} />
+        <div className="hero-form-card">
+          <b>Commande rapide</b>
+          <span>Nom complet</span>
+          <span>Téléphone</span>
+          <span>Ville</span>
+          <a href="#order">Continuer la commande →</a>
+          <small>Paiement à la livraison</small>
+        </div>
+      </div>,
+    );
+  if (m === "background")
+    return shell(
+      <>
+        <div className="hero-bg hero-control-media-wrap">
+          <Img src={images[0]} alt={imageAlt(images[0], 0)} />
+        </div>
+        <div className="lp-wrap hero-bg-copy hero-control-copy-wrap">
+          <Copy c={c} data={data} onCta={onCta} extra={wa} />
+        </div>
+      </>,
+    );
+  if (m === "luxury")
+    return shell(
+      <div className="lp-wrap hero-luxury">
+        <div className="hero-luxury-media hero-control-media-wrap">
+          <HeroProductGallery images={images} c={c} imageAlt={imageAlt} cls="hero-luxury-product-gallery" />
+          <span>COLLECTION</span>
+        </div>
+        <div className="hero-luxury-copy hero-control-copy-wrap">
+          <small>PREMIUM SELECTION</small>
+          <h1>{c.headline || data.name}</h1>
+          <p>{c.subheadline || c.description}</p>
+          <Price c={c} data={data} />
+          <CTA c={c} data={data} onCta={onCta} />
+        </div>
+      </div>,
+    );
+  if (m === "lifestyle")
+    return shell(
+      <div className="lp-wrap hero-ugc">
+        <div className="hero-ugc-media hero-control-media-wrap">
+          <Img src={images[0]} alt={imageAlt(images[0], 0)} />
+          <span className="hero-ugc-chip">UGC · REAL USE</span>
+        </div>
+        <div>
+          <div className="hero-stars">
+            ★★★★★ <small>Clients satisfaits</small>
+          </div>
+          <h1>{c.headline || data.name}</h1>
+          <p>{c.subheadline || c.description}</p>
+          <div className="hero-testimonial">“Simple, pratique et exactement ce qu’il me fallait.”</div>
+          <Price c={c} data={data} />
+          <CTA c={c} data={data} onCta={onCta} />
+        </div>
+      </div>,
+    );
+  if (m === "mobile-first")
+    return shell(
+      <div className="hero-phone">
+        <Img src={images[0]} alt={imageAlt(images[0], 0)} />
+        <span className="lp-badge">الدفع عند الاستلام</span>
+        <h1>{c.headline || data.name}</h1>
+        <Price c={c} data={data} />
+        <div className="hero-mobile-benefits">
+          {(c.benefits || []).slice(0, 2).map((x: any, i: number) => (
+            <span key={i}>✓ {typeof x === "string" ? x : x?.title}</span>
+          ))}
+        </div>
+        <CTA c={c} data={data} onCta={onCta} />
+        {wa}
+      </div>,
+    );
+  if (m === "split-product")
+    return shell(
+      <div className="lp-wrap hero-split">
+        <div>
+          <Copy
+            c={c}
+            data={data}
+            onCta={onCta}
+            extra={
+              <div className="hero-proof">
+                <span>🚚 Livraison</span>
+                <span>💵 COD</span>
+              </div>
+            }
+          />
+        </div>
+        <div className="hero-product-stage hero-control-media-wrap">
+          <HeroProductGallery images={images} c={c} imageAlt={imageAlt} />
+        </div>
+      </div>,
+    );
+  return shell(
+    <div className="lp-wrap hero-cod">
+      <div>
+        <span className="hero-offer">OFFRE COD</span>
+        <h1>{c.headline || data.name}</h1>
+        <p>{c.subheadline || c.description}</p>
+        <div className="hero-cod-benefits">
+          {(c.benefits || []).slice(0, 3).map((x: any, i: number) => (
+            <span key={i}>✓ {typeof x === "string" ? x : x?.title}</span>
+          ))}
+        </div>
+      </div>
+      <div className="hero-offer-card hero-control-media-wrap">
+        <HeroProductGallery images={images} c={c} imageAlt={imageAlt} />
+        <Price c={c} data={data} />
+        <CTA c={c} data={data} onCta={onCta} />
+        <small>🚚 Livraison partout au Maroc · 💵 Paiement à la livraison</small>
+        {wa}
+      </div>
+    </div>,
+    "hero-conversion",
+  );
 }

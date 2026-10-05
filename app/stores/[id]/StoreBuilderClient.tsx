@@ -1,32 +1,344 @@
-"use client";import Link from "next/link";import {useEffect,useRef,useState} from "react";import {PAGE_LIST,storeBuilderDefaults as defaults} from "../../../lib/store-builder-config";import StoreBuilderTopbar from "./components/StoreBuilderTopbar";import StorePreviewCanvas from "./components/StorePreviewCanvas";import StoreBuilderSidebar from "./components/StoreBuilderSidebar";import GeneralPanel from "./components/panels/GeneralPanel";import PublishPanel from "./components/panels/PublishPanel";import DesignPanel from "./components/panels/DesignPanel";import ProductsPanel from "./components/panels/ProductsPanel";import HomePanel from "./components/panels/HomePanel";import PagesSectionsPanel from "./components/panels/PagesSectionsPanel";import AdvancedPanel from "./components/panels/AdvancedPanel";import {normalizeStoreSettings} from "../../../lib/store-settings";import {createStoreBlock,duplicateStoreBlock,getHomeItems,hideHomeNativeSection,moveItem,moveItemBy,removeCustomSection} from "../../../lib/store-section-engine";
-export default function StoreBuilderClient({storeId}:{storeId:string}){const [store,setStore]=useState<any>(null),[settings,setSettings]=useState<any>(defaults),[products,setProducts]=useState<any[]>([]),[saving,setSaving]=useState(false),[copied,setCopied]=useState(false),[previewMode,setPreviewMode]=useState("desktop"),[advanced,setAdvanced]=useState(false),[productSearch,setProductSearch]=useState(""),[tab,setTab]=useState("general"),[editPage,setEditPage]=useState("home"),[previewKey,setPreviewKey]=useState(0),previewRef=useRef<HTMLIFrameElement>(null);
-useEffect(()=>{Promise.all([fetch("/api/stores/"+storeId,{cache:"no-store"}).then(r=>r.json()),fetch("/api/products?limit=100",{cache:"no-store"}).then(r=>r.json())]).then(([a,b])=>{if(a.store){setStore(a.store);setSettings(normalizeStoreSettings(a.store.settings))}setProducts(b.products||[])})},[storeId]);
-useEffect(()=>{if(!store)return;const t=setTimeout(()=>{previewRef.current?.contentWindow?.postMessage({type:"LANDPRO_STORE_PREVIEW",store:{...store,settings}},"*")},40);return()=>clearTimeout(t)},[store,settings,editPage,previewKey]);
-useEffect(()=>{const ready=(e:MessageEvent)=>{if(e.data?.type==="LANDPRO_PREVIEW_READY"&&store)previewRef.current?.contentWindow?.postMessage({type:"LANDPRO_STORE_PREVIEW",store:{...store,settings}},"*")};window.addEventListener("message",ready);return()=>window.removeEventListener("message",ready)},[store,settings]);
-async function uploadHeroImage(e:any){if(!store)return;const files=Array.from(e.target.files||[]) as File[];if(!files.length)return;try{const urls=await Promise.all(files.slice(0,6).map(async(file)=>{const form=new FormData();form.append("storeId",store.id);form.append("file",file);const r=await fetch("/api/store-media",{method:"POST",body:form}),x=await r.json();if(!r.ok)throw new Error(x.error||"Upload impossible");return String(x.url)}));setSettings((v:any)=>{const current=Array.isArray(v.heroImages)?v.heroImages.filter(Boolean):(v.heroImage?[v.heroImage]:[]);const heroImages=[...current,...urls].filter((x:string,i:number,a:string[])=>a.indexOf(x)===i).slice(0,6);return {...v,heroImage:heroImages[0]||"",heroImages}})}catch(err:any){alert(err.message||"Upload impossible")}finally{e.target.value=""}}
-function pageBlocks(){return Array.isArray(settings.pageSections?.[editPage])?settings.pageSections[editPage]:[]}
-function setPageBlocks(blocks:any[]){setSettings({...settings,pageSections:{...(settings.pageSections||{}),[editPage]:blocks}})}function homeItems(){return getHomeItems(settings)}function moveHomeItem(from:string,to:string){const a=moveItem(homeItems(),from,to);setSettings({...settings,homeLayoutOrder:a.map((v:any)=>v.id)})}
-function addBlock(type:string){const base:any=createStoreBlock(type,store?.name||"Ma boutique");if(editPage==="home"){const blocks=[...pageBlocks(),base];const current=Array.isArray(settings.homeLayoutOrder)?settings.homeLayoutOrder:homeItems().map((x:any)=>x.id);setSettings({...settings,pageSections:{...(settings.pageSections||{}),home:blocks},homeLayoutOrder:[...current,base.id]})}else setPageBlocks([...pageBlocks(),base])}
-function patchBlock(id:string,patch:any){setPageBlocks(pageBlocks().map((b:any)=>b.id===id?{...b,...patch}:b))}
-function removeBlock(id:string){if(!window.confirm("Supprimer définitivement cette section ?"))return;setSettings(removeCustomSection(settings,editPage,id))}
-function hideNativeSection(type:string){if(!window.confirm("Retirer cette section de la page d’accueil ? Tu pourras la réactiver depuis les réglages Accueil."))return;setSettings(hideHomeNativeSection(settings,type))}
-function duplicateBlock(b:any){const copy=duplicateStoreBlock(b);if(editPage==="home"){const blocks=[...pageBlocks(),copy];const current=Array.isArray(settings.homeLayoutOrder)?settings.homeLayoutOrder:homeItems().map((x:any)=>x.id);setSettings({...settings,pageSections:{...(settings.pageSections||{}),home:blocks},homeLayoutOrder:[...current,copy.id]})}else setPageBlocks([...pageBlocks(),copy])}
-function moveBlock(id:string,dir:number){const blocks=pageBlocks(),i=blocks.findIndex((b:any)=>b.id===id);setPageBlocks(moveItemBy(blocks,i,dir))}function dragBlock(from:string,to:string){setPageBlocks(moveItem(pageBlocks(),from,to))}
-async function imageFiles(e:any,b:any,gallery=false){if(!store)return;const files=Array.from(e.target.files||[]) as File[];if(!files.length)return;try{const urls=await Promise.all(files.slice(0,gallery?8:1).map(async(file)=>{const form=new FormData();form.append("storeId",store.id);form.append("file",file);const r=await fetch("/api/store-media",{method:"POST",body:form}),x=await r.json();if(!r.ok)throw new Error(x.error||"Upload impossible");return String(x.url)}));gallery?patchBlock(b.id,{images:[...(b.images||[]),...urls].slice(0,12)}):patchBlock(b.id,{image:urls[0]||""})}catch(err:any){alert(err.message||"Upload impossible")}finally{e.target.value=""}}
-async function copyUrl(){if(!store)return;const url=window.location.origin+"/store/"+store.slug;try{await navigator.clipboard.writeText(url);setCopied(true);setTimeout(()=>setCopied(false),1600)}catch{prompt("Copie l’URL de ta boutique :",url)}}
-function toggleProduct(id:string){const ids=[...(settings.selectedProductIds||[])];setSettings({...settings,selectedProductIds:ids.includes(id)?ids.filter((x:string)=>x!==id):[...ids,id]})}
-function moveProduct(id:string,dir:number){const ids=[...(settings.selectedProductIds||[])],i=ids.indexOf(id),j=i+dir;if(i<0||j<0||j>=ids.length)return;[ids[i],ids[j]]=[ids[j],ids[i]];setSettings({...settings,selectedProductIds:ids})}
-function sectionPos(id:string){const order=settings.sectionOrder||["hero","products","trust","faq","footer"];const i=order.indexOf(id);return i<0?50:i}
-function moveSection(id:string,dir:number){const order=[...(settings.sectionOrder||["hero","products","trust","faq","footer"])],i=order.indexOf(id),j=i+dir;if(i<0||j<0||j>=order.length)return;[order[i],order[j]]=[order[j],order[i]];setSettings({...settings,sectionOrder:order})}
-async function shareStore(){if(!store)return;const url=window.location.origin+"/store/"+store.slug;if(navigator.share){try{await navigator.share({title:store.name,url});return}catch{}}window.open("https://wa.me/?text="+encodeURIComponent(store.name+" "+url),"_blank")}
-async function save(status?:string){if(!store)return;setSaving(true);const r=await fetch("/api/stores/"+store.id,{method:"PATCH",headers:{"content-type":"application/json"},body:JSON.stringify({name:store.name,locale:store.locale,templateId:store.template_id,settings,status})}),x=await r.json();setSaving(false);if(!r.ok)return alert(x.error||"Erreur");setStore(x.store);setPreviewKey(k=>k+1);if(status==="PUBLISHED")alert("Boutique publiée. URL : "+window.location.origin+"/store/"+x.store.slug);}
-if(!store)return <main className="store-builder-loading">Chargement du Store Builder…</main>;
-return <main className="store-builder-shell"><StoreBuilderSidebar store={store} tab={tab} setTab={setTab} advanced={advanced} setAdvanced={setAdvanced}/><section className="store-builder-controls"><StoreBuilderTopbar store={store} saving={saving} copied={copied} onSave={()=>save()} onPublish={()=>save("PUBLISHED")} onCopy={copyUrl}/>{tab==="general"&&<GeneralPanel store={store} setStore={setStore} settings={settings} setSettings={setSettings}/>}
-{tab==="design"&&<DesignPanel store={store} setStore={setStore} settings={settings} setSettings={setSettings}/>}
-{tab==="home"&&<HomePanel settings={settings} setSettings={setSettings} uploadHeroImage={uploadHeroImage} moveSection={moveSection}/>}
-{tab==="catalog"&&<ProductsPanel settings={settings} setSettings={setSettings} products={products} productSearch={productSearch} setProductSearch={setProductSearch} toggleProduct={toggleProduct} moveProduct={moveProduct}/>}
-{tab==="visual"&&<PagesSectionsPanel editPage={editPage} setEditPage={setEditPage} homeItems={homeItems} moveHomeItem={moveHomeItem} hideNativeSection={hideNativeSection} removeBlock={removeBlock} pageBlocks={pageBlocks} addBlock={addBlock} patchBlock={patchBlock} moveBlock={moveBlock} duplicateBlock={duplicateBlock} dragBlock={dragBlock} imageFiles={imageFiles}/>}
-{tab==="publish"&&<PublishPanel store={store} products={products} settings={settings} saving={saving} copied={copied} setPreviewMode={setPreviewMode} onPublish={()=>save("PUBLISHED")} onCopy={copyUrl} onShare={shareStore}/>}
-{tab==="advanced"&&<AdvancedPanel settings={settings} setSettings={setSettings}/>}
-</section>
-<StorePreviewCanvas store={store} settings={settings} editPage={editPage} pageList={PAGE_LIST} previewMode={previewMode} setPreviewMode={setPreviewMode} previewKey={previewKey} setPreviewKey={setPreviewKey} previewRef={previewRef}/></main>}
+"use client";
+import Link from "next/link";
+import { useEffect, useRef, useState } from "react";
+import { PAGE_LIST, storeBuilderDefaults as defaults } from "../../../lib/store-builder-config";
+import StoreBuilderTopbar from "./components/StoreBuilderTopbar";
+import StorePreviewCanvas from "./components/StorePreviewCanvas";
+import StoreBuilderSidebar from "./components/StoreBuilderSidebar";
+import GeneralPanel from "./components/panels/GeneralPanel";
+import PublishPanel from "./components/panels/PublishPanel";
+import DesignPanel from "./components/panels/DesignPanel";
+import ProductsPanel from "./components/panels/ProductsPanel";
+import HomePanel from "./components/panels/HomePanel";
+import PagesSectionsPanel from "./components/panels/PagesSectionsPanel";
+import AdvancedPanel from "./components/panels/AdvancedPanel";
+import { normalizeStoreSettings } from "../../../lib/store-settings";
+import {
+  createStoreBlock,
+  duplicateStoreBlock,
+  getHomeItems,
+  hideHomeNativeSection,
+  moveItem,
+  moveItemBy,
+  removeCustomSection,
+} from "../../../lib/store-section-engine";
+export default function StoreBuilderClient({ storeId }: { storeId: string }) {
+  const [store, setStore] = useState<any>(null),
+    [settings, setSettings] = useState<any>(defaults),
+    [products, setProducts] = useState<any[]>([]),
+    [saving, setSaving] = useState(false),
+    [copied, setCopied] = useState(false),
+    [previewMode, setPreviewMode] = useState("desktop"),
+    [advanced, setAdvanced] = useState(false),
+    [productSearch, setProductSearch] = useState(""),
+    [tab, setTab] = useState("general"),
+    [editPage, setEditPage] = useState("home"),
+    [previewKey, setPreviewKey] = useState(0),
+    previewRef = useRef<HTMLIFrameElement>(null);
+  useEffect(() => {
+    Promise.all([
+      fetch("/api/stores/" + storeId, { cache: "no-store" }).then((r) => r.json()),
+      fetch("/api/products?limit=100", { cache: "no-store" }).then((r) => r.json()),
+    ]).then(([a, b]) => {
+      if (a.store) {
+        setStore(a.store);
+        setSettings(normalizeStoreSettings(a.store.settings));
+      }
+      setProducts(b.products || []);
+    });
+  }, [storeId]);
+  useEffect(() => {
+    if (!store) return;
+    const t = setTimeout(() => {
+      previewRef.current?.contentWindow?.postMessage(
+        { type: "LANDPRO_STORE_PREVIEW", store: { ...store, settings } },
+        "*",
+      );
+    }, 40);
+    return () => clearTimeout(t);
+  }, [store, settings, editPage, previewKey]);
+  useEffect(() => {
+    const ready = (e: MessageEvent) => {
+      if (e.data?.type === "LANDPRO_PREVIEW_READY" && store)
+        previewRef.current?.contentWindow?.postMessage(
+          { type: "LANDPRO_STORE_PREVIEW", store: { ...store, settings } },
+          "*",
+        );
+    };
+    window.addEventListener("message", ready);
+    return () => window.removeEventListener("message", ready);
+  }, [store, settings]);
+  async function uploadHeroImage(e: any) {
+    if (!store) return;
+    const files = Array.from(e.target.files || []) as File[];
+    if (!files.length) return;
+    try {
+      const urls = await Promise.all(
+        files.slice(0, 6).map(async (file) => {
+          const form = new FormData();
+          form.append("storeId", store.id);
+          form.append("file", file);
+          const r = await fetch("/api/store-media", { method: "POST", body: form }),
+            x = await r.json();
+          if (!r.ok) throw new Error(x.error || "Upload impossible");
+          return String(x.url);
+        }),
+      );
+      setSettings((v: any) => {
+        const current = Array.isArray(v.heroImages) ? v.heroImages.filter(Boolean) : v.heroImage ? [v.heroImage] : [];
+        const heroImages = [...current, ...urls]
+          .filter((x: string, i: number, a: string[]) => a.indexOf(x) === i)
+          .slice(0, 6);
+        return { ...v, heroImage: heroImages[0] || "", heroImages };
+      });
+    } catch (err: any) {
+      alert(err.message || "Upload impossible");
+    } finally {
+      e.target.value = "";
+    }
+  }
+  function pageBlocks() {
+    return Array.isArray(settings.pageSections?.[editPage]) ? settings.pageSections[editPage] : [];
+  }
+  function setPageBlocks(blocks: any[]) {
+    setSettings({ ...settings, pageSections: { ...(settings.pageSections || {}), [editPage]: blocks } });
+  }
+  function homeItems() {
+    return getHomeItems(settings);
+  }
+  function moveHomeItem(from: string, to: string) {
+    const a = moveItem(homeItems(), from, to);
+    setSettings({ ...settings, homeLayoutOrder: a.map((v: any) => v.id) });
+  }
+  function addBlock(type: string) {
+    const base: any = createStoreBlock(type, store?.name || "Ma boutique");
+    if (editPage === "home") {
+      const blocks = [...pageBlocks(), base];
+      const current = Array.isArray(settings.homeLayoutOrder)
+        ? settings.homeLayoutOrder
+        : homeItems().map((x: any) => x.id);
+      setSettings({
+        ...settings,
+        pageSections: { ...(settings.pageSections || {}), home: blocks },
+        homeLayoutOrder: [...current, base.id],
+      });
+    } else setPageBlocks([...pageBlocks(), base]);
+  }
+  function patchBlock(id: string, patch: any) {
+    setPageBlocks(pageBlocks().map((b: any) => (b.id === id ? { ...b, ...patch } : b)));
+  }
+  function removeBlock(id: string) {
+    if (!window.confirm("Supprimer définitivement cette section ?")) return;
+    setSettings(removeCustomSection(settings, editPage, id));
+  }
+  function hideNativeSection(type: string) {
+    if (
+      !window.confirm(
+        "Retirer cette section de la page d’accueil ? Tu pourras la réactiver depuis les réglages Accueil.",
+      )
+    )
+      return;
+    setSettings(hideHomeNativeSection(settings, type));
+  }
+  function duplicateBlock(b: any) {
+    const copy = duplicateStoreBlock(b);
+    if (editPage === "home") {
+      const blocks = [...pageBlocks(), copy];
+      const current = Array.isArray(settings.homeLayoutOrder)
+        ? settings.homeLayoutOrder
+        : homeItems().map((x: any) => x.id);
+      setSettings({
+        ...settings,
+        pageSections: { ...(settings.pageSections || {}), home: blocks },
+        homeLayoutOrder: [...current, copy.id],
+      });
+    } else setPageBlocks([...pageBlocks(), copy]);
+  }
+  function moveBlock(id: string, dir: number) {
+    const blocks = pageBlocks(),
+      i = blocks.findIndex((b: any) => b.id === id);
+    setPageBlocks(moveItemBy(blocks, i, dir));
+  }
+  function dragBlock(from: string, to: string) {
+    setPageBlocks(moveItem(pageBlocks(), from, to));
+  }
+  async function imageFiles(e: any, b: any, gallery = false) {
+    if (!store) return;
+    const files = Array.from(e.target.files || []) as File[];
+    if (!files.length) return;
+    try {
+      const urls = await Promise.all(
+        files.slice(0, gallery ? 8 : 1).map(async (file) => {
+          const form = new FormData();
+          form.append("storeId", store.id);
+          form.append("file", file);
+          const r = await fetch("/api/store-media", { method: "POST", body: form }),
+            x = await r.json();
+          if (!r.ok) throw new Error(x.error || "Upload impossible");
+          return String(x.url);
+        }),
+      );
+      gallery
+        ? patchBlock(b.id, { images: [...(b.images || []), ...urls].slice(0, 12) })
+        : patchBlock(b.id, { image: urls[0] || "" });
+    } catch (err: any) {
+      alert(err.message || "Upload impossible");
+    } finally {
+      e.target.value = "";
+    }
+  }
+  async function copyUrl() {
+    if (!store) return;
+    const url = window.location.origin + "/store/" + store.slug;
+    try {
+      await navigator.clipboard.writeText(url);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1600);
+    } catch {
+      prompt("Copie l’URL de ta boutique :", url);
+    }
+  }
+  function toggleProduct(id: string) {
+    const ids = [...(settings.selectedProductIds || [])];
+    setSettings({
+      ...settings,
+      selectedProductIds: ids.includes(id) ? ids.filter((x: string) => x !== id) : [...ids, id],
+    });
+  }
+  function moveProduct(id: string, dir: number) {
+    const ids = [...(settings.selectedProductIds || [])],
+      i = ids.indexOf(id),
+      j = i + dir;
+    if (i < 0 || j < 0 || j >= ids.length) return;
+    [ids[i], ids[j]] = [ids[j], ids[i]];
+    setSettings({ ...settings, selectedProductIds: ids });
+  }
+  function sectionPos(id: string) {
+    const order = settings.sectionOrder || ["hero", "products", "trust", "faq", "footer"];
+    const i = order.indexOf(id);
+    return i < 0 ? 50 : i;
+  }
+  function moveSection(id: string, dir: number) {
+    const order = [...(settings.sectionOrder || ["hero", "products", "trust", "faq", "footer"])],
+      i = order.indexOf(id),
+      j = i + dir;
+    if (i < 0 || j < 0 || j >= order.length) return;
+    [order[i], order[j]] = [order[j], order[i]];
+    setSettings({ ...settings, sectionOrder: order });
+  }
+  async function shareStore() {
+    if (!store) return;
+    const url = window.location.origin + "/store/" + store.slug;
+    if (navigator.share) {
+      try {
+        await navigator.share({ title: store.name, url });
+        return;
+      } catch {}
+    }
+    window.open("https://wa.me/?text=" + encodeURIComponent(store.name + " " + url), "_blank");
+  }
+  async function save(status?: string) {
+    if (!store) return;
+    setSaving(true);
+    const r = await fetch("/api/stores/" + store.id, {
+        method: "PATCH",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          name: store.name,
+          locale: store.locale,
+          templateId: store.template_id,
+          settings,
+          status,
+        }),
+      }),
+      x = await r.json();
+    setSaving(false);
+    if (!r.ok) return alert(x.error || "Erreur");
+    setStore(x.store);
+    setPreviewKey((k) => k + 1);
+    if (status === "PUBLISHED") alert("Boutique publiée. URL : " + window.location.origin + "/store/" + x.store.slug);
+  }
+  if (!store) return <main className="store-builder-loading">Chargement du Store Builder…</main>;
+  return (
+    <main className="store-builder-shell">
+      <StoreBuilderSidebar store={store} tab={tab} setTab={setTab} advanced={advanced} setAdvanced={setAdvanced} />
+      <section className="store-builder-controls">
+        <StoreBuilderTopbar
+          store={store}
+          saving={saving}
+          copied={copied}
+          onSave={() => save()}
+          onPublish={() => save("PUBLISHED")}
+          onCopy={copyUrl}
+        />
+        {tab === "general" && (
+          <GeneralPanel store={store} setStore={setStore} settings={settings} setSettings={setSettings} />
+        )}
+        {tab === "design" && (
+          <DesignPanel store={store} setStore={setStore} settings={settings} setSettings={setSettings} />
+        )}
+        {tab === "home" && (
+          <HomePanel
+            settings={settings}
+            setSettings={setSettings}
+            uploadHeroImage={uploadHeroImage}
+            moveSection={moveSection}
+          />
+        )}
+        {tab === "catalog" && (
+          <ProductsPanel
+            settings={settings}
+            setSettings={setSettings}
+            products={products}
+            productSearch={productSearch}
+            setProductSearch={setProductSearch}
+            toggleProduct={toggleProduct}
+            moveProduct={moveProduct}
+          />
+        )}
+        {tab === "visual" && (
+          <PagesSectionsPanel
+            editPage={editPage}
+            setEditPage={setEditPage}
+            homeItems={homeItems}
+            moveHomeItem={moveHomeItem}
+            hideNativeSection={hideNativeSection}
+            removeBlock={removeBlock}
+            pageBlocks={pageBlocks}
+            addBlock={addBlock}
+            patchBlock={patchBlock}
+            moveBlock={moveBlock}
+            duplicateBlock={duplicateBlock}
+            dragBlock={dragBlock}
+            imageFiles={imageFiles}
+          />
+        )}
+        {tab === "publish" && (
+          <PublishPanel
+            store={store}
+            products={products}
+            settings={settings}
+            saving={saving}
+            copied={copied}
+            setPreviewMode={setPreviewMode}
+            onPublish={() => save("PUBLISHED")}
+            onCopy={copyUrl}
+            onShare={shareStore}
+          />
+        )}
+        {tab === "advanced" && <AdvancedPanel settings={settings} setSettings={setSettings} />}
+      </section>
+      <StorePreviewCanvas
+        store={store}
+        settings={settings}
+        editPage={editPage}
+        pageList={PAGE_LIST}
+        previewMode={previewMode}
+        setPreviewMode={setPreviewMode}
+        previewKey={previewKey}
+        setPreviewKey={setPreviewKey}
+        previewRef={previewRef}
+      />
+    </main>
+  );
+}

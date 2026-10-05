@@ -1,37 +1,2041 @@
-"use client";import {useEffect,useMemo,useRef,useState} from "react";import {BUILDER_BREAKPOINTS,createBuilderV3} from "../../../lib/builder-v3";import {uploadImages} from "../../../lib/builder-images";import LandingClient from "../../landing/[slug]/LandingClient";import {LANDPRO_SECTIONS} from "../../../components/landpro/types";import {SECTION_LABELS} from "../../../components/landpro/registry";import LandproSectionEditor,{LandproTemplatePanel} from "./LandproSectionEditor";
-const BUILTIN_ADDABLE:string[]=["benefits","problem","features","how","trust","faq",...LANDPRO_SECTIONS];const library=["text","imageText","gallery","ctaBlock","vertical916",...BUILTIN_ADDABLE];const labels:any={...SECTION_LABELS,hero:"Hero",order:"Formulaire COD",benefits:"Bénéfices",problem:"Problème / Solution",features:"Caractéristiques",how:"Comment ça marche",trust:"Confiance",faq:"FAQ",text:"Texte",imageText:"Image + Texte",gallery:"Galerie",ctaBlock:"CTA",vertical916:"Média / Vidéo"};
-export default function BuilderV3({draft,editing,onChange,onSave,onClose,saveNotice}:{draft:any;editing:any;onChange:(v:any)=>void;onSave:(publish:boolean)=>void;onClose:()=>void;saveNotice?:string}){const [selected,setSelected]=useState("hero"),[viewport,setViewport]=useState<"desktop"|"tablet"|"mobile">("desktop"),[showLibrary,setShowLibrary]=useState(false),[history,setHistory]=useState<any[]>([]),[future,setFuture]=useState<any[]>([]),[uploading,setUploading]=useState(false),[settingsTab,setSettingsTab]=useState<"content"|"template"|"hero"|"footer"|"form">("content"),[heroTab,setHeroTab]=useState<"content"|"layout"|"media"|"visibility">("layout"),[heroAdvanced,setHeroAdvanced]=useState(false),[uiLibrary,setUiLibrary]=useState<any>({styles:[],patterns:[],colors:[],typography:[]});useEffect(()=>{fetch("/api/uiux-library").then(r=>r.ok?r.json():Promise.reject()).then(lib=>{setUiLibrary(lib);const hasLibrary=(draft.uiux_library?.styles||[]).length||(draft.uiux_library?.patterns||[]).length||(draft.uiux_library?.colors||[]).length||(draft.uiux_library?.typography||[]).length;if(!hasLibrary)onChange({...draft,uiux_library:lib})}).catch(()=>{})},[]);const drag=useRef<string|null>(null);const doc=useMemo(()=>createBuilderV3(draft),[draft]);const ds=draft.design_system||{},colors=ds.tokens?.colors||{},fonts=ds.tokens?.fonts||{};const commit=(next:any)=>{setHistory(h=>[...h.slice(-29),draft]);setFuture([]);onChange(next)};const patch=(k:string,v:any)=>commit({...draft,[k]:v,builder_v3:{...doc,viewport}});
-const setOrder=(order:string[])=>commit({...draft,section_order:order,builder_v3:{...doc,blocks:order.map(id=>doc.blocks.find(b=>b.id===id)||{id,type:id,visible:true,props:{}}),viewport}});
-const move=(from:string,to:string)=>{if(from===to)return;const a=[...(draft.section_order||doc.blocks.map(b=>b.id))],i=a.indexOf(from),j=a.indexOf(to);if(i<0||j<0)return;a.splice(j,0,a.splice(i,1)[0]);setOrder(a)};
-const add=(type:string)=>{const a=[...(draft.section_order||doc.blocks.map(b=>b.id))];if(BUILTIN_ADDABLE.includes(type)){if(!a.includes(type))a.push(type);commit({...draft,section_order:a,hidden_sections:(draft.hidden_sections||[]).filter((x:string)=>x!==type)});setSelected(type)}else{const id="custom-"+Date.now(),defaults:any={text:{type:"text",title:"Nouvelle section",text:"Ajoutez votre contenu ici."},imageText:{type:"imageText",title:"Image + Texte",text:"Ajoutez votre contenu ici.",image:""},gallery:{type:"gallery",title:"Galerie",images:[]},ctaBlock:{type:"ctaBlock",title:"Passez votre commande",text:"",button:draft.cta||"Commander maintenant"},vertical916:{type:"vertical916",title:"Média",text:"",media:"",mediaType:"image",device:"phone"}};a.push(id);commit({...draft,section_order:a,custom_sections:{...(draft.custom_sections||{}),[id]:defaults[type]||defaults.text}});setSelected(id)}setShowLibrary(false)};
-const toggleHidden=(id:string)=>{const h=new Set<string>(draft.hidden_sections||[]);if(h.has(id))h.delete(id);else h.add(id);commit({...draft,hidden_sections:Array.from(h)})};
-const remove=(id:string)=>{if(id==="hero"||id==="order")return;commit({...draft,section_order:(draft.section_order||[]).filter((x:string)=>x!==id)});setSelected("hero")};
-const duplicate=(id:string)=>{const src=doc.blocks.find(b=>b.id===id);if(!src||!id.startsWith("custom-"))return;const nid="custom-"+Date.now();commit({...draft,section_order:[...(draft.section_order||[]),nid],custom_sections:{...(draft.custom_sections||{}),[nid]:{...(draft.custom_sections?.[id]||{}),title:(draft.custom_sections?.[id]?.title||"Section")+" copie"}}});setSelected(nid)};
-const undo=()=>{const prev=history.at(-1);if(!prev)return;setHistory(h=>h.slice(0,-1));setFuture(f=>[draft,...f]);onChange(prev)};const redo=()=>{const next=future[0];if(!next)return;setFuture(f=>f.slice(1));setHistory(h=>[...h,draft]);onChange(next)};
-const uploadHeroSpecial=async(files:File[])=>{if(!files.length)return;setUploading(true);try{const urls=await uploadImages(files,12);if(urls.length){const current=[...(draft.hero_images||[])].filter(Boolean);patch("hero_images",Array.from(new Set([...current,...urls])))}}catch(e:any){alert(e.message||"Upload Hero impossible")}finally{setUploading(false)}};const removeHeroSpecial=(i:number)=>{const imgs=[...(draft.hero_images||[])];imgs.splice(i,1);patch("hero_images",imgs)};const setHeroSpecialMain=(i:number)=>{const imgs=[...(draft.hero_images||[])];if(!imgs[i])return;const [x]=imgs.splice(i,1);imgs.unshift(x);patch("hero_images",imgs)};const uploadHero=async(files:File[])=>{if(!files.length)return;setUploading(true);try{const urls=await uploadImages(files,12);if(urls.length){const current=[...(draft.images||draft.product_images||[])].filter(Boolean);patch("images",Array.from(new Set([...current,...urls])))}}catch(e:any){alert(e.message||"Upload impossible")}finally{setUploading(false)}};const uploadCustom=async(id:string,files:File[],mode:"single"|"gallery"|"media")=>{if(!files.length)return;setUploading(true);try{const urls=await uploadImages(files,mode==="gallery"?12:1);if(!urls.length)return;const b=draft.custom_sections?.[id]||{};const update=mode==="gallery"?{images:[...(b.images||[]),...urls]}:mode==="media"?{media:urls[0],mediaType:files[0]?.type.startsWith("video/")?"video":"image"}:{image:urls[0]};commit({...draft,custom_sections:{...(draft.custom_sections||{}),[id]:{...b,...update}}})}catch(e:any){alert(e.message||"Upload impossible")}finally{setUploading(false)}};const removeGalleryImage=(id:string,i:number)=>{const b=draft.custom_sections?.[id]||{},images=[...(b.images||[])];images.splice(i,1);commit({...draft,custom_sections:{...(draft.custom_sections||{}),[id]:{...b,images}}})};const setMainImage=(i:number)=>{const imgs=[...(draft.images||draft.product_images||[])];if(!imgs[i])return;const [x]=imgs.splice(i,1);imgs.unshift(x);patch("images",imgs)};const removeImage=(i:number)=>{const imgs=[...(draft.images||draft.product_images||[])];imgs.splice(i,1);patch("images",imgs)};const blocks=doc.blocks;
-const list=(key:string)=>Array.isArray(draft[key])?draft[key]:[];const cards=(key:string)=><div className="bv3-cards">{list(key).map((x:any,i:number)=><article key={i}><b>{typeof x==="string"?x:x?.title||x?.question||""}</b>{typeof x!=="string"&&x?.text&&<p>{x.text}</p>}</article>)}</div>;
-const render=(id:string)=>{if(id==="hero")return <section className="bv3-hero"><div className="bv3-hero-copy"><span className="bv3-kicker">COD MAROC</span><h1>{draft.headline||editing?.name}</h1><p>{draft.subheadline}</p><div className="bv3-price"><strong>{draft.price||0} DH</strong>{draft.oldPrice&&<s>{draft.oldPrice} DH</s>}</div><button>{draft.cta||"Commander maintenant"}</button></div><div className="bv3-hero-media">{(draft.images||draft.product_images||[])[0]?<img src={(draft.images||draft.product_images)[0]} alt=""/>:<span>Image produit</span>}</div></section>;
-if(id==="order")return <section className="bv3-order"><div><span className="bv3-kicker">COMMANDE</span><h2>{draft.order_title||"Commandez maintenant"}</h2><p>{draft.delivery||"Paiement à la livraison"}</p></div><div className="bv3-order-card"><input placeholder="Nom complet"/><input placeholder="Téléphone"/><input placeholder="Ville"/>{draft.order_show_address!==false&&<input placeholder="Adresse"/>}<div className="bv3-total"><span>Total</span><b>{Number(draft.price||0)+Number(draft.delivery_price||0)} DH</b></div><button>{draft.cta||"Commander maintenant"}</button></div></section>;
-if(id==="problem")return <section className="bv3-split"><div><span className="bv3-kicker">PROBLÈME</span><h2>{draft.problem_title||""}</h2><p>{draft.problem}</p></div><div className="bv3-solution"><span className="bv3-kicker">SOLUTION</span><p>{draft.solution}</p></div></section>;
-if(id==="benefits")return <section><span className="bv3-kicker">BÉNÉFICES</span><h2>{draft.benefits_title||""}</h2><p>{draft.description}</p>{cards("benefits")}</section>;
-if(id==="features")return <section><span className="bv3-kicker">CARACTÉRISTIQUES</span><h2>{draft.features_title||""}</h2>{cards("features")}</section>;
-if(id==="how")return <section><span className="bv3-kicker">ÉTAPES</span><h2>{draft.how_title||""}</h2><div className="bv3-steps">{list("how_steps").map((x:string,i:number)=><article key={i}><strong>{String(i+1).padStart(2,"0")}</strong><p>{x}</p></article>)}</div></section>;
-if(id==="trust")return <section><span className="bv3-kicker">CONFIANCE</span><h2>{draft.trust_title||""}</h2>{cards("trust_points")}</section>;
-if(id==="faq")return <section><span className="bv3-kicker">FAQ</span><h2>{draft.faq_title||""}</h2><div className="bv3-faq">{list("faq").map((x:any,i:number)=><details key={i}><summary>{typeof x==="string"?x:x.question}</summary>{typeof x!=="string"&&<p>{x.answer}</p>}</details>)}</div></section>;if(id.startsWith("custom-")){const b=draft.custom_sections?.[id]||{};if(b.type==="imageText")return <section className="bv3-split"><div>{b.image?<img className="bv3-custom-img" src={b.image} alt=""/>:<div className="bv3-media-empty">Image</div>}</div><div><h2>{b.title}</h2><p>{b.text}</p></div></section>;if(b.type==="gallery")return <section><h2>{b.title}</h2><div className="bv3-gallery">{(b.images||[]).map((x:string,i:number)=><img src={x} key={i} alt=""/>)}</div></section>;if(b.type==="ctaBlock")return <section className="bv3-cta"><h2>{b.title}</h2><p>{b.text}</p><button>{b.button}</button></section>;if(b.type==="vertical916")return <section><h2>{b.title}</h2><div className="bv3-device">{b.media?(b.mediaType==="video"?<video src={b.media} controls playsInline/>:<img src={b.media} alt=""/>):<span>Média</span>}</div><p>{b.text}</p></section>;return <section><h2>{b.title}</h2><p>{b.text}</p></section>}return <section><h2>{labels[id]||id}</h2></section>};
-return <div className="bv3"><header className="bv3-top"><div><b>LandPro Builder V3</b><small>UI/UX Pro Max · WYSIWYG</small></div><div className="bv3-view"><button disabled={!history.length} onClick={undo}>↶</button><button disabled={!future.length} onClick={redo}>↷</button><button onClick={()=>setViewport("desktop")}>Desktop</button><button onClick={()=>setViewport("tablet")}>Tablet</button><button onClick={()=>setViewport("mobile")}>Mobile</button></div><div>{saveNotice&&<span className="bv3-save-notice">{saveNotice}</span>}<button onClick={onClose}>Fermer</button><button onClick={()=>onSave(false)}>Enregistrer</button><button className="primary" onClick={()=>onSave(true)}>Publier</button></div></header><div className="bv3-body"><aside className="bv3-left"><h3>Structure</h3>{blocks.map(b=><div className={"bv3-structure-row"+(b.visible?"":" is-hidden")} style={b.visible?undefined:{opacity:.55}} draggable onDragStart={()=>drag.current=b.id} onDragOver={e=>e.preventDefault()} onDrop={()=>{if(drag.current)move(drag.current,b.id);drag.current=null}} key={b.id}><span>⋮⋮</span><button className={selected===b.id?"active":""} onClick={()=>setSelected(b.id)}>{labels[b.id]||labels[b.type]||b.type}</button>{b.id!=="hero"&&<button title={b.visible?"Masquer la section":"Afficher la section"} onClick={()=>toggleHidden(b.id)}>{b.visible?"👁":"⊘"}</button>}{b.id.startsWith("custom-")&&<button title="Dupliquer" onClick={()=>duplicate(b.id)}>⧉</button>}{b.id!=="hero"&&b.id!=="order"&&<button title="Supprimer" onClick={()=>remove(b.id)}>×</button>}</div>)}<button className="bv3-add" onClick={()=>setShowLibrary(v=>!v)}>+ Ajouter une section</button>{showLibrary&&<div className="bv3-library">{library.filter(id=>!BUILTIN_ADDABLE.includes(id)||!(draft.section_order||[]).includes(id)).map(id=><button key={id} onClick={()=>add(id)}>+ {labels[id]}</button>)}</div>}</aside><main className={"bv3-stage "+viewport}><div className="bv3-device-label">{viewport==="desktop"?"PC · 1440 px":viewport==="tablet"?"Tablette · 768 px":"Mobile · 390 px"}</div><div className="bv3-device-scroll"><div className="bv3-device-frame" data-device-width={viewport} style={{width:`${BUILDER_BREAKPOINTS[viewport]}px`}}><div className="bv3-runtime-preview"><LandingClient builderMode viewportMode={viewport} onSectionSelect={setSelected} initialSlug={editing?.slug||"builder-preview"} initialData={{id:editing?.id||"builder-v3-preview",name:editing?.name||draft.headline||"Produit",slug:editing?.slug||"builder-preview",locale:editing?.locale||"ar-MA",price:Number(draft.price||0),oldPrice:draft.oldPrice?Number(draft.oldPrice):null,images:draft.images||draft.product_images||[],content:{...draft,uiux_library:uiLibrary,design_system:{...(draft.design_system||{})}},whatsappPhone:editing?.whatsappPhone||editing?.whatsapp_phone||null,metaPixelId:null}}/></div></div></div></main><aside className="bv3-right"><h3>Propriétés · {labels[selected]||selected}</h3><div className="bv3-settings-tabs"><button className={settingsTab==="content"?"active":""} onClick={()=>setSettingsTab("content")}>Contenu</button><button className={settingsTab==="template"?"active":""} onClick={()=>setSettingsTab("template")}>Template</button><button className={settingsTab==="hero"?"active":""} onClick={()=>{setSettingsTab("hero");setSelected("hero")}}>Hero</button><button className={settingsTab==="footer"?"active":""} onClick={()=>setSettingsTab("footer")}>Footer</button><button className={settingsTab==="form"?"active":""} onClick={()=>setSettingsTab("form")}>Formulaire COD</button></div>{settingsTab==="template"&&<div className="bv3-template-panel"><LandproTemplatePanel draft={draft} commit={commit} patch={patch}/><label>Style visuel<select value={draft.builder_template||""} onChange={e=>patch("builder_template",e.target.value)}><option value="">UI/UX Pro Max automatique · {ds.style?.["Style Category"]||"recommandé"}</option>{uiLibrary.styles.map((x:any)=><option key={x.id||x.name} value={x.id||x.name}>{x.name}</option>)}</select></label><label>Landing Pattern<select value={draft.builder_pattern||""} onChange={e=>commit({...draft,builder_pattern:e.target.value,hero_architecture:"auto",section_architecture:"auto",builder_v3:{...doc,viewport}})}><option value="">Automatique · {ds.landing?.["Pattern Name"]||"recommandé"}</option>{uiLibrary.patterns.map((x:any)=><option key={x.id||x.name} value={x.id||x.name}>{x.name}</option>)}</select></label><label>Palette<select value={draft.builder_palette||""} onChange={e=>patch("builder_palette",e.target.value)}><option value="">Automatique · {ds.productType||"produit"}</option>{uiLibrary.colors.map((x:any)=><option key={x.name} value={x.name}>{x.name}</option>)}</select></label><label>Typographie<select value={draft.builder_typography||""} onChange={e=>patch("builder_typography",e.target.value)}><option value="">Automatique · {ds.typography?.["Font Pairing Name"]||"recommandée"}</option>{uiLibrary.typography.map((x:any)=><option key={x.name} value={x.name}>{x.name}</option>)}</select></label><div className="bv3-help">{uiLibrary.styles.length} styles · {uiLibrary.patterns.length} patterns · {uiLibrary.colors.length} palettes · {uiLibrary.typography.length} typographies chargés depuis UI/UX Pro Max.</div></div>}{settingsTab==="hero"&&<div className="bv3-template-panel bv3-hero-panel"><div className="bv3-help"><b>Hero Studio</b><br/>Réglages organisés par fonction. Le preview se met à jour immédiatement.</div><div className="bv3-hero-tabs"><button className={heroTab==="content"?"active":""} onClick={()=>setHeroTab("content")}>Contenu</button><button className={heroTab==="layout"?"active":""} onClick={()=>setHeroTab("layout")}>Layout</button><button className={heroTab==="media"?"active":""} onClick={()=>setHeroTab("media")}>Galerie produit</button><button className={heroTab==="visibility"?"active":""} onClick={()=>setHeroTab("visibility")}>Visibilité</button></div>
-{heroTab==="content"&&<div className="bv3-hero-subpanel"><label>Titre<input value={draft.headline||""} onChange={e=>patch("headline",e.target.value)}/></label><label>Sous-titre<textarea value={draft.subheadline||""} onChange={e=>patch("subheadline",e.target.value)}/></label><label>Prix<input type="number" value={draft.price||""} onChange={e=>patch("price",e.target.value)}/></label><label>Ancien prix<input type="number" value={draft.oldPrice||""} onChange={e=>patch("oldPrice",e.target.value)}/></label><label>CTA<input value={draft.cta||""} onChange={e=>patch("cta",e.target.value)}/></label></div>}
-{heroTab==="layout"&&<div className="bv3-hero-subpanel"><label>Module Hero<select value={draft.hero_module||"auto"} onChange={e=>patch("hero_module",e.target.value)}><option value="auto">Automatique UI/UX Pro Max</option><option value="split-product">Split Produit</option><option value="fullscreen">Fullscreen Image</option><option value="center-product">Produit Centré</option><option value="gallery-commerce">Galerie E-commerce</option><option value="minimal">Minimal</option><option value="editorial">Editorial Premium</option><option value="conversion">Conversion COD</option><option value="form-integrated">Formulaire intégré</option><option value="background">Image Background</option><option value="luxury">E-commerce Luxury</option><option value="lifestyle">UGC / Lifestyle</option><option value="mobile-first">Mobile First</option><optgroup label="Motion / Immersive"><option value="motion-scroll-gallery">Scroll Gallery</option><option value="motion-sticky-story">Sticky Image Story</option><option value="motion-parallax">Parallax Produit</option><option value="motion-zoom">Zoom au scroll</option><option value="motion-video-full">Vidéo Cinématique Fullscreen</option><option value="motion-video-ugc">Vidéo UGC Verticale</option></optgroup></select></label><label>Architecture<select value={draft.hero_architecture||"auto"} onChange={e=>patch("hero_architecture",e.target.value)}><option value="auto">Automatique</option><option value="conversion">Conversion</option><option value="editorial">Editorial</option><option value="impact">Impact</option><option value="centered">Centered</option><option value="split">Split</option></select></label><label>Hauteur Hero<select value={draft.hero_height||"compact"} onChange={e=>patch("hero_height",e.target.value)}><option value="compact">Compact</option><option value="balanced">Équilibré</option><option value="large">Grand</option><option value="screen">Plein écran</option></select></label><label>Taille du titre<select value={draft.hero_title_size||"auto"} onChange={e=>patch("hero_title_size",e.target.value)}><option value="auto">Automatique</option><option value="small">Petite</option><option value="medium">Moyenne</option><option value="large">Grande</option><option value="xl">Impact XL</option></select></label><label>Largeur du texte<select value={draft.hero_text_width||"medium"} onChange={e=>patch("hero_text_width",e.target.value)}><option value="narrow">Étroite</option><option value="medium">Moyenne</option><option value="wide">Large</option></select></label><label>Alignement<select value={draft.hero_text_align||"auto"} onChange={e=>patch("hero_text_align",e.target.value)}><option value="auto">Selon le module</option><option value="left">Gauche</option><option value="center">Centré</option><option value="right">Droite</option></select></label><label>Position média<select value={draft.hero_media_position||"auto"} onChange={e=>patch("hero_media_position",e.target.value)}><option value="auto">Selon le module</option><option value="left">Image à gauche</option><option value="right">Image à droite</option><option value="top">Image en haut</option><option value="background">Arrière-plan</option></select></label></div>}
-<button type="button" className="bv3-advanced-toggle" onClick={()=>setHeroAdvanced(v=>!v)}>{heroAdvanced?"Fermer les réglages avancés":"⚙ Réglages avancés · tailles & pixels"}</button>{heroAdvanced&&<div className="bv3-hero-advanced"><div className="bv3-help"><b>Hero Engine V2 · Réglages précis</b><br/>Valeurs indépendantes PC, tablette et mobile.</div><label>Texte badge<input value={draft.hero_badge_text||""} placeholder="الدفع عند الاستلام" onChange={e=>patch("hero_badge_text",e.target.value)}/></label><label>Couleur arrière-plan Hero<input type="color" value={draft.hero_bg_color||"#ffffff"} onChange={e=>patch("hero_bg_color",e.target.value)}/></label><label>Couleur titre<input type="color" value={draft.hero_title_color||"#111827"} onChange={e=>patch("hero_title_color",e.target.value)}/></label><label>Couleur sous-titre<input type="color" value={draft.hero_subtitle_color||"#475569"} onChange={e=>patch("hero_subtitle_color",e.target.value)}/></label><label>Fond bouton<input type="color" value={draft.hero_cta_bg||"#111827"} onChange={e=>patch("hero_cta_bg",e.target.value)}/></label><label>Texte bouton<input type="color" value={draft.hero_cta_color||"#ffffff"} onChange={e=>patch("hero_cta_color",e.target.value)}/></label><label>Fond badge<input type="color" value={draft.hero_badge_bg||"#f59e0b"} onChange={e=>patch("hero_badge_bg",e.target.value)}/></label><label>Texte badge<input type="color" value={draft.hero_badge_color||"#111111"} onChange={e=>patch("hero_badge_color",e.target.value)}/></label><label>Overlay image fond · {Number(draft.hero_overlay||38)}%<input type="range" min="0" max="90" value={Number(draft.hero_overlay||38)} onChange={e=>patch("hero_overlay",Number(e.target.value))}/></label><label>Titre PC · {Number(draft.hero_title_px||56)} px<input type="range" min="28" max="96" value={Number(draft.hero_title_px||56)} onChange={e=>patch("hero_title_px",Number(e.target.value))}/></label><label>Titre tablette · {Number(draft.hero_title_px_tablet||44)} px<input type="range" min="24" max="72" value={Number(draft.hero_title_px_tablet||44)} onChange={e=>patch("hero_title_px_tablet",Number(e.target.value))}/></label><label>Titre mobile · {Number(draft.hero_title_px_mobile||34)} px<input type="range" min="20" max="56" value={Number(draft.hero_title_px_mobile||34)} onChange={e=>patch("hero_title_px_mobile",Number(e.target.value))}/></label><label>Sous-titre PC · {Number(draft.hero_subtitle_px||18)} px<input type="range" min="12" max="32" value={Number(draft.hero_subtitle_px||18)} onChange={e=>patch("hero_subtitle_px",Number(e.target.value))}/></label><label>Sous-titre mobile · {Number(draft.hero_subtitle_px_mobile||16)} px<input type="range" min="11" max="26" value={Number(draft.hero_subtitle_px_mobile||16)} onChange={e=>patch("hero_subtitle_px_mobile",Number(e.target.value))}/></label><label>Texte bouton · {Number(draft.hero_cta_font_px||17)} px<input type="range" min="12" max="28" value={Number(draft.hero_cta_font_px||17)} onChange={e=>patch("hero_cta_font_px",Number(e.target.value))}/></label><label>Hauteur bouton · {Number(draft.hero_cta_height||56)} px<input type="range" min="40" max="84" value={Number(draft.hero_cta_height||56)} onChange={e=>patch("hero_cta_height",Number(e.target.value))}/></label><label>Arrondi bouton · {Number(draft.hero_cta_radius||14)} px<input type="range" min="0" max="40" value={Number(draft.hero_cta_radius||14)} onChange={e=>patch("hero_cta_radius",Number(e.target.value))}/></label><label>Largeur bouton<select value={draft.hero_cta_width||"auto"} onChange={e=>patch("hero_cta_width",e.target.value)}><option value="auto">Selon contenu</option><option value="full">Pleine largeur</option></select></label><label>Espacement vertical Hero · {Number(draft.hero_padding_y||72)} px<input type="range" min="20" max="160" value={Number(draft.hero_padding_y||72)} onChange={e=>patch("hero_padding_y",Number(e.target.value))}/></label><label>Espace texte / média · {Number(draft.hero_gap||48)} px<input type="range" min="8" max="120" value={Number(draft.hero_gap||48)} onChange={e=>patch("hero_gap",Number(e.target.value))}/></label></div>}{heroTab==="media"&&<div className="bv3-hero-subpanel"><div className="bv3-gallery-head"><div><b>Galerie produit Hero</b><span>Slider, autoplay, miniatures et défilement des images produit.</span></div><span className="bv3-gallery-count">{(draft.hero_images||[]).length} image(s)</span></div><label>Mode galerie<select value={draft.hero_gallery_mode||"fixed"} onChange={e=>patch("hero_gallery_mode",e.target.value)}><option value="fixed">Image fixe</option><option value="arrows">Slider + flèches</option><option value="autoplay">Défilement automatique</option><option value="arrows-autoplay">Flèches + autoplay</option><option value="fade">Fondu automatique</option><option value="slide">Slide horizontal</option><option value="thumbs">Carrousel + miniatures</option><option value="marquee">Défilement continu</option></select></label><label>Délai autoplay · {Number(draft.hero_gallery_delay||3500)} ms<input type="range" min="1000" max="10000" step="250" value={Number(draft.hero_gallery_delay||3500)} onChange={e=>patch("hero_gallery_delay",Number(e.target.value))}/></label><label>Vitesse transition · {Number(draft.hero_gallery_speed||500)} ms<input type="range" min="150" max="1500" step="50" value={Number(draft.hero_gallery_speed||500)} onChange={e=>patch("hero_gallery_speed",Number(e.target.value))}/></label><label className="builder-toggle"><input type="checkbox" checked={draft.hero_gallery_loop!==false} onChange={e=>patch("hero_gallery_loop",e.target.checked)}/> Boucle infinie</label><label className="builder-toggle"><input type="checkbox" checked={draft.hero_gallery_arrows!==false} onChange={e=>patch("hero_gallery_arrows",e.target.checked)}/> Afficher flèches</label><label className="builder-toggle"><input type="checkbox" checked={draft.hero_gallery_dots!==false} onChange={e=>patch("hero_gallery_dots",e.target.checked)}/> Afficher points</label><label className="builder-toggle"><input type="checkbox" checked={draft.hero_gallery_thumbs===true||(draft.hero_gallery_mode==="thumbs")} onChange={e=>patch("hero_gallery_thumbs",e.target.checked)}/> Afficher miniatures</label><label>Ajustement image<select value={draft.hero_media_fit||"contain"} onChange={e=>patch("hero_media_fit",e.target.value)}><option value="contain">Produit entier · contain</option><option value="cover">Remplir · cover</option></select></label><label>Largeur image · {Number(draft.hero_media_width||100)}%<input type="range" min="20" max="100" step="1" value={Number(draft.hero_media_width||100)} onChange={e=>patch("hero_media_width",Number(e.target.value))}/></label><label>Hauteur image · {Number(draft.hero_media_height||520)} px<input type="range" min="120" max="1000" step="10" value={Number(draft.hero_media_height||520)} onChange={e=>patch("hero_media_height",Number(e.target.value))}/></label><label>Format / ratio<select value={draft.hero_media_aspect||"auto"} onChange={e=>patch("hero_media_aspect",e.target.value)}><option value="auto">Automatique</option><option value="1:1">Carré · 1:1</option><option value="4:5">Portrait · 4:5</option><option value="3:4">Portrait · 3:4</option><option value="4:3">Paysage · 4:3</option><option value="16:9">Large · 16:9</option></select></label><label>Arrondi image · {Number(draft.hero_media_radius||24)} px<input type="range" min="0" max="60" step="2" value={Number(draft.hero_media_radius||24)} onChange={e=>patch("hero_media_radius",Number(e.target.value))}/></label><div className="bv3-help"><b>Images spéciales Hero</b><br/>Ajoutez au moins 2 images pour activer un défilement continu.</div><label className="bv3-upload">Uploader images Hero<input type="file" accept="image/*" multiple disabled={uploading} onChange={e=>uploadHeroSpecial(Array.from(e.target.files||[]))}/><span>{uploading?"Chargement…":"Choisir images Hero"}</span></label><div className="bv3-media-grid">{(draft.hero_images||[]).map((x:string,i:number)=><div key={x+i} className={i===0?"main":""}><img src={x} alt=""/><div><button type="button" onClick={()=>setHeroSpecialMain(i)}>{i===0?"Principale Hero":"Mettre principale"}</button><button type="button" onClick={()=>removeHeroSpecial(i)}>×</button></div></div>)}</div><label className="bv3-check bv3-scroll-toggle"><input type="checkbox" checked={draft.hero_image_scroll===true} onChange={e=>patch("hero_image_scroll",e.target.checked)}/><span><b>Activer défilement images</b><small>{(draft.hero_images||[]).length<2?"Ajoutez au moins 2 images Hero":"Carousel prêt · "+(draft.hero_images||[]).length+" images"}</small></span></label><div className={draft.hero_image_scroll===true?"bv3-scroll-settings active":"bv3-scroll-settings"}><label>Direction<select disabled={draft.hero_image_scroll!==true} value={draft.hero_scroll_direction||"left"} onChange={e=>patch("hero_scroll_direction",e.target.value)}><option value="left">← Vers la gauche</option><option value="right">Vers la droite →</option></select></label><label>Vitesse · {Number(draft.hero_scroll_speed||18)} s<input disabled={draft.hero_image_scroll!==true} type="range" min="5" max="60" step="1" value={Number(draft.hero_scroll_speed||18)} onChange={e=>patch("hero_scroll_speed",Number(e.target.value))}/></label><label className="bv3-check"><input disabled={draft.hero_image_scroll!==true} type="checkbox" checked={draft.hero_scroll_pause_hover!==false} onChange={e=>patch("hero_scroll_pause_hover",e.target.checked)}/> Pause au survol</label></div></div>}
-{heroTab==="visibility"&&<div className="bv3-hero-subpanel"><label className="bv3-check"><input type="checkbox" checked={draft.hero_show_subtitle!==false} onChange={e=>patch("hero_show_subtitle",e.target.checked)}/> Afficher sous-titre</label><label className="bv3-check"><input type="checkbox" checked={draft.hero_show_price!==false} onChange={e=>patch("hero_show_price",e.target.checked)}/> Afficher prix</label><label className="bv3-check"><input type="checkbox" checked={draft.hero_show_cta!==false} onChange={e=>patch("hero_show_cta",e.target.checked)}/> Afficher CTA</label><label className="bv3-check"><input type="checkbox" checked={draft.hero_show_badge!==false} onChange={e=>patch("hero_show_badge",e.target.checked)}/> Afficher badge COD</label><button type="button" onClick={()=>commit({...draft,hero_height:"compact",hero_title_size:"auto",hero_text_width:"medium",hero_text_align:"auto",hero_media_position:"auto",hero_media_fit:"contain",hero_media_width:100,hero_media_height:520,hero_media_aspect:"auto",hero_media_radius:24,hero_image_scroll:false,hero_show_subtitle:true,hero_show_price:true,hero_show_cta:true,hero_show_badge:true})}>Réinitialiser Hero</button></div>}</div>}{settingsTab==="footer"&&<div className="bv3-template-panel bv3-footer-panel"><div className="bv3-help"><b>Footer Studio</b><br/>Personnalisez le footer comme le Hero. Le preview se met à jour immédiatement.</div><label>Couleur arrière-plan<input type="color" value={draft.footer_bg_color||"#cbdcf8"} onChange={e=>patch("footer_bg_color",e.target.value)}/></label><label>Couleur texte<input type="color" value={draft.footer_text_color||"#0f172a"} onChange={e=>patch("footer_text_color",e.target.value)}/></label><label>Couleur liens<input type="color" value={draft.footer_link_color||"#0f172a"} onChange={e=>patch("footer_link_color",e.target.value)}/></label><label>Taille nom produit · {Number(draft.footer_title_px||28)} px<input type="range" min="14" max="56" value={Number(draft.footer_title_px||28)} onChange={e=>patch("footer_title_px",Number(e.target.value))}/></label><label>Taille texte · {Number(draft.footer_text_px||15)} px<input type="range" min="11" max="24" value={Number(draft.footer_text_px||15)} onChange={e=>patch("footer_text_px",Number(e.target.value))}/></label><label>Espacement vertical · {Number(draft.footer_padding_y||48)} px<input type="range" min="16" max="120" value={Number(draft.footer_padding_y||48)} onChange={e=>patch("footer_padding_y",Number(e.target.value))}/></label><label>Alignement<select value={draft.footer_align||"center"} onChange={e=>patch("footer_align",e.target.value)}><option value="left">Gauche</option><option value="center">Centré</option><option value="right">Droite</option></select></label><label className="bv3-check"><input type="checkbox" checked={draft.footer_show_brand!==false} onChange={e=>patch("footer_show_brand",e.target.checked)}/> Afficher nom produit</label><label className="bv3-check"><input type="checkbox" checked={draft.footer_show_trust!==false} onChange={e=>patch("footer_show_trust",e.target.checked)}/> Afficher Livraison / COD</label><label className="bv3-check"><input type="checkbox" checked={draft.footer_show_links!==false} onChange={e=>patch("footer_show_links",e.target.checked)}/> Afficher liens</label><label className="bv3-check"><input type="checkbox" checked={draft.footer_show_copyright!==false} onChange={e=>patch("footer_show_copyright",e.target.checked)}/> Afficher copyright</label></div>}{settingsTab==="form"&&<div className="bv3-template-panel"><label>Style formulaire<select value={draft.order_form_style||"classic"} onChange={e=>patch("order_form_style",e.target.value)}><option value="classic">Classique</option><option value="compact">Compact</option><option value="card">Carte</option><option value="minimal">Minimal</option></select></label><label>Architecture<select value={draft.order_form_architecture||"auto"} onChange={e=>patch("order_form_architecture",e.target.value)}><option value="auto">UI/UX Pro Max automatique</option><option value="compact">Compact 2 colonnes</option><option value="trust">Centré confiance</option><option value="editorial">Editorial</option></select></label><label className="bv3-check"><input type="checkbox" checked={draft.order_show_address!==false} onChange={e=>patch("order_show_address",e.target.checked)}/> Afficher adresse</label><label className="bv3-check"><input type="checkbox" checked={draft.order_whatsapp!==false} onChange={e=>patch("order_whatsapp",e.target.checked)}/> Bouton WhatsApp</label><label className="bv3-check"><input type="checkbox" checked={draft.order_pump!==false} onChange={e=>patch("order_pump",e.target.checked)}/> Animation CTA</label><div className="bv3-help"><b>Prix par quantité</b><br/>Ajoutez librement vos offres. Le prix saisi est le prix total de l’offre et sera recalculé côté serveur lors de la commande.</div>{(()=>{const offers=(Array.isArray(draft.quantity_offers)&&draft.quantity_offers.length?draft.quantity_offers:[{qty:1,label:"1 pièce",price:Number(draft.price||0)}]).map((x:any)=>({...x,qty:Number(x.qty)||1}));const updateOffer=(i:number,key:string,value:any)=>{const next=offers.map((x:any,j:number)=>j===i?{...x,[key]:value}:x);patch("quantity_offers",next)};const removeOffer=(i:number)=>{const next=offers.filter((_:any,j:number)=>j!==i);patch("quantity_offers",next);if(Number(draft.quantity_default_qty||1)===Number(offers[i]?.qty))patch("quantity_default_qty",Number(next[0]?.qty||1))};const moveOffer=(i:number,d:number)=>{const j=i+d;if(j<0||j>=offers.length)return;const next=[...offers],[x]=next.splice(i,1);next.splice(j,0,x);patch("quantity_offers",next)};return <div className="bv3-offers-editor">{offers.map((o:any,i:number)=><div className="bv3-quantity-price" key={i}><div className="bv3-offer-head"><b>Offre {i+1}</b><div><button type="button" disabled={i===0} onClick={()=>moveOffer(i,-1)}>↑</button><button type="button" disabled={i===offers.length-1} onClick={()=>moveOffer(i,1)}>↓</button><button type="button" disabled={offers.length===1} onClick={()=>removeOffer(i)}>×</button></div></div><label>Quantité<input type="number" min="1" max="10" step="1" value={o.qty} onChange={e=>updateOffer(i,"qty",Math.min(10,Math.max(1,Number(e.target.value)||1)))}/></label><label>Libellé<input value={o.label||""} placeholder={o.qty+" pièces"} onChange={e=>updateOffer(i,"label",e.target.value)}/></label><label>Prix total<input type="number" min="0" step="1" value={o.price??""} onChange={e=>updateOffer(i,"price",e.target.value===""?"":Number(e.target.value))}/></label><label className="bv3-check"><input type="radio" name="default-quantity-offer" checked={Number(draft.quantity_default_qty||offers[0]?.qty||1)===Number(o.qty)} onChange={()=>patch("quantity_default_qty",Number(o.qty))}/> Offre sélectionnée par défaut</label></div>)}<button type="button" onClick={()=>{const used=new Set(offers.map((x:any)=>Number(x.qty)));let qty=1;while(used.has(qty)&&qty<10)qty++;patch("quantity_offers",[...offers,{qty,label:qty===1?"1 pièce":qty+" pièces",price:Number(draft.price||0)*qty}])}}>+ Ajouter une offre</button><button type="button" onClick={()=>{patch("quantity_offers",[]);patch("quantity_default_qty",1)}}>Réinitialiser · Prix × quantité</button></div>})()}</div>}<div style={{display:settingsTab==="content"?"contents":"none"}}>
-{selected==="hero"&&<><label>Titre<input value={draft.headline||""} onChange={e=>patch("headline",e.target.value)}/></label><label>Sous-titre<textarea value={draft.subheadline||""} onChange={e=>patch("subheadline",e.target.value)}/></label><label>Prix<input type="number" value={draft.price||""} onChange={e=>patch("price",e.target.value)}/></label><label>Ancien prix<input type="number" value={draft.oldPrice||""} onChange={e=>patch("oldPrice",e.target.value)}/></label><label>CTA<input value={draft.cta||""} onChange={e=>patch("cta",e.target.value)}/></label><label>Image principale<input value={(draft.images||draft.product_images||[])[0]||""} placeholder="URL image" onChange={e=>{const imgs=[...(draft.images||draft.product_images||[])];imgs[0]=e.target.value;patch("images",imgs)}}/></label><label className="bv3-upload">Charger depuis ordinateur<input type="file" accept="image/*" multiple disabled={uploading} onChange={e=>uploadHero(Array.from(e.target.files||[]))}/><span>{uploading?"Chargement…":"Choisir plusieurs images"}</span></label><div className="bv3-media-grid">{(draft.images||draft.product_images||[]).map((x:string,i:number)=><div key={x+i} className={i===0?"main":""}><img src={x} alt=""/><div><button type="button" onClick={()=>setMainImage(i)}>{i===0?"Principale":"Mettre principale"}</button><button type="button" onClick={()=>removeImage(i)}>×</button></div></div>)}</div></>}
-{selected==="benefits"&&<><label>Titre<input value={draft.benefits_title||""} onChange={e=>patch("benefits_title",e.target.value)}/></label><label>Description<textarea value={draft.description||""} onChange={e=>patch("description",e.target.value)}/></label><label>Bénéfices · 1 par ligne<textarea value={list("benefits").join("\n")} onChange={e=>patch("benefits",e.target.value.split("\n").filter(Boolean))}/></label></>}
-{selected==="features"&&<><label>Titre<input value={draft.features_title||""} onChange={e=>patch("features_title",e.target.value)}/></label><label>Caractéristiques · 1 par ligne<textarea value={list("features").join("\n")} onChange={e=>patch("features",e.target.value.split("\n").filter(Boolean))}/></label></>}
-{selected==="how"&&<><label>Titre<input value={draft.how_title||""} onChange={e=>patch("how_title",e.target.value)}/></label><label>Étapes · 1 par ligne<textarea value={list("how_steps").join("\n")} onChange={e=>patch("how_steps",e.target.value.split("\n").filter(Boolean))}/></label></>}
-{selected==="problem"&&<><label>Titre<input value={draft.problem_title||""} onChange={e=>patch("problem_title",e.target.value)}/></label><label>Problème<textarea value={draft.problem||""} onChange={e=>patch("problem",e.target.value)}/></label><label>Solution<textarea value={draft.solution||""} onChange={e=>patch("solution",e.target.value)}/></label></>}
-{selected==="order"&&<><label>Titre<input value={draft.order_title||""} onChange={e=>patch("order_title",e.target.value)}/></label><label>Texte livraison<input value={draft.delivery||""} onChange={e=>patch("delivery",e.target.value)}/></label><label>CTA<input value={draft.cta||""} onChange={e=>patch("cta",e.target.value)}/></label><label className="bv3-check"><input type="checkbox" checked={draft.order_show_address!==false} onChange={e=>patch("order_show_address",e.target.checked)}/> Afficher adresse</label></>}
-{selected==="trust"&&<><label>Titre<input value={draft.trust_title||""} onChange={e=>patch("trust_title",e.target.value)}/></label><label>Points confiance · 1 par ligne<textarea value={list("trust_points").join("\n")} onChange={e=>patch("trust_points",e.target.value.split("\n").filter(Boolean))}/></label></>}
-{selected.startsWith("custom-")&&(()=>{const b=draft.custom_sections?.[selected]||{};const cp=(k:string,v:any)=>commit({...draft,custom_sections:{...(draft.custom_sections||{}),[selected]:{...b,[k]:v}}});return <><label>Titre<input value={b.title||""} onChange={e=>cp("title",e.target.value)}/></label><label>Texte<textarea value={b.text||""} onChange={e=>cp("text",e.target.value)}/></label>{b.type==="imageText"&&<><label>Image<input value={b.image||""} onChange={e=>cp("image",e.target.value)}/></label><label className="bv3-upload">Charger image locale<input type="file" accept="image/*" disabled={uploading} onChange={e=>uploadCustom(selected,Array.from(e.target.files||[]),"single")}/><span>{uploading?"Chargement…":"Choisir une image"}</span></label>{b.image&&<img className="bv3-media-preview" src={b.image} alt=""/>}</>}
-{b.type==="gallery"&&<><label className="bv3-upload">Ajouter des images<input type="file" accept="image/*" multiple disabled={uploading} onChange={e=>uploadCustom(selected,Array.from(e.target.files||[]),"gallery")}/><span>{uploading?"Chargement…":"Choisir plusieurs images"}</span></label><div className="bv3-media-grid">{(b.images||[]).map((x:string,i:number)=><div key={x+i}><img src={x} alt=""/><div><button type="button" onClick={()=>removeGalleryImage(selected,i)}>Supprimer</button></div></div>)}</div></>}
-{b.type==="vertical916"&&<><label>Média<input value={b.media||""} onChange={e=>cp("media",e.target.value)}/></label><label className="bv3-upload">Charger image ou vidéo<input type="file" accept="image/*,video/*" disabled={uploading} onChange={e=>uploadCustom(selected,Array.from(e.target.files||[]),"media")}/><span>{uploading?"Chargement…":"Choisir image / vidéo"}</span></label><label>Largeur maximale<input type="number" min="160" max="1600" value={b.mediaWidth||""} placeholder="430" onChange={e=>cp("mediaWidth",e.target.value?Number(e.target.value):null)}/></label><label>Hauteur<input type="number" min="120" max="1600" value={b.mediaHeight||""} placeholder="Auto selon ratio" onChange={e=>cp("mediaHeight",e.target.value?Number(e.target.value):null)}/></label><label>Ratio<select value={b.mediaRatio||"device"} onChange={e=>cp("mediaRatio",e.target.value)}><option value="device">Selon appareil</option><option value="auto">Auto</option><option value="1 / 1">1:1</option><option value="4 / 3">4:3</option><option value="16 / 9">16:9</option><option value="9 / 16">9:16</option></select></label><label>Affichage<select value={b.mediaFit||"cover"} onChange={e=>cp("mediaFit",e.target.value)}><option value="cover">Cover · remplir</option><option value="contain">Contain · média entier</option><option value="fill">Fill · étirer</option></select></label><label>Alignement<select value={b.mediaAlign||"center"} onChange={e=>cp("mediaAlign",e.target.value)}><option value="left">Gauche</option><option value="center">Centre</option><option value="right">Droite</option></select></label><div className="bv3-help"><b>Responsive par appareil</b><br/>Laissez vide pour reprendre les dimensions générales ci-dessus.</div><label>Largeur tablette<input type="number" min="160" max="1200" value={b.mediaWidthTablet||""} placeholder="Hérite de la largeur générale" onChange={e=>cp("mediaWidthTablet",e.target.value?Number(e.target.value):null)}/></label><label>Hauteur tablette<input type="number" min="120" max="1600" value={b.mediaHeightTablet||""} placeholder="Auto" onChange={e=>cp("mediaHeightTablet",e.target.value?Number(e.target.value):null)}/></label><label>Largeur mobile<input type="number" min="120" max="800" value={b.mediaWidthMobile||""} placeholder="100% si vide" onChange={e=>cp("mediaWidthMobile",e.target.value?Number(e.target.value):null)}/></label><label>Hauteur mobile<input type="number" min="120" max="1400" value={b.mediaHeightMobile||""} placeholder="Auto" onChange={e=>cp("mediaHeightMobile",e.target.value?Number(e.target.value):null)}/></label>{b.mediaType==="video"&&<><label className="bv3-check"><input type="checkbox" checked={b.videoAutoplay===true} onChange={e=>cp("videoAutoplay",e.target.checked)}/> Autoplay</label><label className="bv3-check"><input type="checkbox" checked={b.videoMuted!==false} onChange={e=>cp("videoMuted",e.target.checked)}/> Muet</label><label className="bv3-check"><input type="checkbox" checked={b.videoLoop===true} onChange={e=>cp("videoLoop",e.target.checked)}/> Boucle</label><label className="bv3-check"><input type="checkbox" checked={b.videoControls!==false} onChange={e=>cp("videoControls",e.target.checked)}/> Contrôles vidéo</label></>}{b.media&&(b.mediaType==="video"?<video className="bv3-media-preview" src={b.media} controls/>:<img className="bv3-media-preview" src={b.media} alt=""/>)}</>}
-{b.type==="ctaBlock"&&<label>Bouton<input value={b.button||""} onChange={e=>cp("button",e.target.value)}/></label>}</>})()}{(LANDPRO_SECTIONS as readonly string[]).includes(selected)&&<LandproSectionEditor draft={draft} selected={selected} patch={patch}/>}{selected==="faq"&&<><label>Titre<input value={draft.faq_title||""} onChange={e=>patch("faq_title",e.target.value)}/></label><div className="bv3-faq-editor">{list("faq").map((item:any,i:number)=>{const obj=typeof item==="string"?{question:item,answer:""}:item||{};const update=(k:string,v:string)=>{const next=list("faq").map((x:any,j:number)=>j===i?{...(typeof x==="string"?{question:x,answer:""}:x),[k]:v}:x);patch("faq",next)};return <div className="bv3-faq-item" key={i}><div><b>Question {i+1}</b><button type="button" onClick={()=>patch("faq",list("faq").filter((_:any,j:number)=>j!==i))}>×</button></div><label>Question<input value={obj.question||""} onChange={e=>update("question",e.target.value)}/></label><label>Réponse<textarea value={obj.answer||""} onChange={e=>update("answer",e.target.value)}/></label></div>})}<button type="button" className="bv3-add-faq" onClick={()=>patch("faq",[...list("faq"),{question:"Nouvelle question",answer:"Nouvelle réponse"}])}>+ Ajouter une question</button></div></>}
-<hr/><b>Design System</b><small>{ds.productType||"UI/UX Pro Max"}</small><small>{ds.style?.["Style Category"]||""}</small><small>{ds.landing?.["Pattern Name"]||""}</small></div></aside></div></div>}
+"use client";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { BUILDER_BREAKPOINTS, createBuilderV3 } from "../../../lib/builder-v3";
+import { uploadImages } from "../../../lib/builder-images";
+import LandingClient from "../../landing/[slug]/LandingClient";
+import { LANDPRO_SECTIONS } from "../../../components/landpro/types";
+import { SECTION_LABELS } from "../../../components/landpro/registry";
+import LandproSectionEditor, { LandproTemplatePanel } from "./LandproSectionEditor";
+const BUILTIN_ADDABLE: string[] = ["benefits", "problem", "features", "how", "trust", "faq", ...LANDPRO_SECTIONS];
+const library = ["text", "imageText", "gallery", "ctaBlock", "vertical916", ...BUILTIN_ADDABLE];
+const labels: any = {
+  ...SECTION_LABELS,
+  hero: "Hero",
+  order: "Formulaire COD",
+  benefits: "Bénéfices",
+  problem: "Problème / Solution",
+  features: "Caractéristiques",
+  how: "Comment ça marche",
+  trust: "Confiance",
+  faq: "FAQ",
+  text: "Texte",
+  imageText: "Image + Texte",
+  gallery: "Galerie",
+  ctaBlock: "CTA",
+  vertical916: "Média / Vidéo",
+};
+export default function BuilderV3({
+  draft,
+  editing,
+  onChange,
+  onSave,
+  onClose,
+  saveNotice,
+}: {
+  draft: any;
+  editing: any;
+  onChange: (v: any) => void;
+  onSave: (publish: boolean) => void;
+  onClose: () => void;
+  saveNotice?: string;
+}) {
+  const [selected, setSelected] = useState("hero"),
+    [viewport, setViewport] = useState<"desktop" | "tablet" | "mobile">("desktop"),
+    [showLibrary, setShowLibrary] = useState(false),
+    [history, setHistory] = useState<any[]>([]),
+    [future, setFuture] = useState<any[]>([]),
+    [uploading, setUploading] = useState(false),
+    [settingsTab, setSettingsTab] = useState<"content" | "template" | "hero" | "footer" | "form">("content"),
+    [heroTab, setHeroTab] = useState<"content" | "layout" | "media" | "visibility">("layout"),
+    [heroAdvanced, setHeroAdvanced] = useState(false),
+    [uiLibrary, setUiLibrary] = useState<any>({ styles: [], patterns: [], colors: [], typography: [] });
+  useEffect(() => {
+    fetch("/api/uiux-library")
+      .then((r) => (r.ok ? r.json() : Promise.reject()))
+      .then((lib) => {
+        setUiLibrary(lib);
+        const hasLibrary =
+          (draft.uiux_library?.styles || []).length ||
+          (draft.uiux_library?.patterns || []).length ||
+          (draft.uiux_library?.colors || []).length ||
+          (draft.uiux_library?.typography || []).length;
+        if (!hasLibrary) onChange({ ...draft, uiux_library: lib });
+      })
+      .catch(() => {});
+  }, []);
+  const drag = useRef<string | null>(null);
+  const doc = useMemo(() => createBuilderV3(draft), [draft]);
+  const ds = draft.design_system || {},
+    colors = ds.tokens?.colors || {},
+    fonts = ds.tokens?.fonts || {};
+  const commit = (next: any) => {
+    setHistory((h) => [...h.slice(-29), draft]);
+    setFuture([]);
+    onChange(next);
+  };
+  const patch = (k: string, v: any) => commit({ ...draft, [k]: v, builder_v3: { ...doc, viewport } });
+  const setOrder = (order: string[]) =>
+    commit({
+      ...draft,
+      section_order: order,
+      builder_v3: {
+        ...doc,
+        blocks: order.map((id) => doc.blocks.find((b) => b.id === id) || { id, type: id, visible: true, props: {} }),
+        viewport,
+      },
+    });
+  const move = (from: string, to: string) => {
+    if (from === to) return;
+    const a = [...(draft.section_order || doc.blocks.map((b) => b.id))],
+      i = a.indexOf(from),
+      j = a.indexOf(to);
+    if (i < 0 || j < 0) return;
+    a.splice(j, 0, a.splice(i, 1)[0]);
+    setOrder(a);
+  };
+  const add = (type: string) => {
+    const a = [...(draft.section_order || doc.blocks.map((b) => b.id))];
+    if (BUILTIN_ADDABLE.includes(type)) {
+      if (!a.includes(type)) a.push(type);
+      commit({
+        ...draft,
+        section_order: a,
+        hidden_sections: (draft.hidden_sections || []).filter((x: string) => x !== type),
+      });
+      setSelected(type);
+    } else {
+      const id = "custom-" + Date.now(),
+        defaults: any = {
+          text: { type: "text", title: "Nouvelle section", text: "Ajoutez votre contenu ici." },
+          imageText: { type: "imageText", title: "Image + Texte", text: "Ajoutez votre contenu ici.", image: "" },
+          gallery: { type: "gallery", title: "Galerie", images: [] },
+          ctaBlock: {
+            type: "ctaBlock",
+            title: "Passez votre commande",
+            text: "",
+            button: draft.cta || "Commander maintenant",
+          },
+          vertical916: {
+            type: "vertical916",
+            title: "Média",
+            text: "",
+            media: "",
+            mediaType: "image",
+            device: "phone",
+          },
+        };
+      a.push(id);
+      commit({
+        ...draft,
+        section_order: a,
+        custom_sections: { ...(draft.custom_sections || {}), [id]: defaults[type] || defaults.text },
+      });
+      setSelected(id);
+    }
+    setShowLibrary(false);
+  };
+  const toggleHidden = (id: string) => {
+    const h = new Set<string>(draft.hidden_sections || []);
+    if (h.has(id)) h.delete(id);
+    else h.add(id);
+    commit({ ...draft, hidden_sections: Array.from(h) });
+  };
+  const remove = (id: string) => {
+    if (id === "hero" || id === "order") return;
+    commit({ ...draft, section_order: (draft.section_order || []).filter((x: string) => x !== id) });
+    setSelected("hero");
+  };
+  const duplicate = (id: string) => {
+    const src = doc.blocks.find((b) => b.id === id);
+    if (!src || !id.startsWith("custom-")) return;
+    const nid = "custom-" + Date.now();
+    commit({
+      ...draft,
+      section_order: [...(draft.section_order || []), nid],
+      custom_sections: {
+        ...(draft.custom_sections || {}),
+        [nid]: {
+          ...(draft.custom_sections?.[id] || {}),
+          title: (draft.custom_sections?.[id]?.title || "Section") + " copie",
+        },
+      },
+    });
+    setSelected(nid);
+  };
+  const undo = () => {
+    const prev = history.at(-1);
+    if (!prev) return;
+    setHistory((h) => h.slice(0, -1));
+    setFuture((f) => [draft, ...f]);
+    onChange(prev);
+  };
+  const redo = () => {
+    const next = future[0];
+    if (!next) return;
+    setFuture((f) => f.slice(1));
+    setHistory((h) => [...h, draft]);
+    onChange(next);
+  };
+  const uploadHeroSpecial = async (files: File[]) => {
+    if (!files.length) return;
+    setUploading(true);
+    try {
+      const urls = await uploadImages(files, 12);
+      if (urls.length) {
+        const current = [...(draft.hero_images || [])].filter(Boolean);
+        patch("hero_images", Array.from(new Set([...current, ...urls])));
+      }
+    } catch (e: any) {
+      alert(e.message || "Upload Hero impossible");
+    } finally {
+      setUploading(false);
+    }
+  };
+  const removeHeroSpecial = (i: number) => {
+    const imgs = [...(draft.hero_images || [])];
+    imgs.splice(i, 1);
+    patch("hero_images", imgs);
+  };
+  const setHeroSpecialMain = (i: number) => {
+    const imgs = [...(draft.hero_images || [])];
+    if (!imgs[i]) return;
+    const [x] = imgs.splice(i, 1);
+    imgs.unshift(x);
+    patch("hero_images", imgs);
+  };
+  const uploadHero = async (files: File[]) => {
+    if (!files.length) return;
+    setUploading(true);
+    try {
+      const urls = await uploadImages(files, 12);
+      if (urls.length) {
+        const current = [...(draft.images || draft.product_images || [])].filter(Boolean);
+        patch("images", Array.from(new Set([...current, ...urls])));
+      }
+    } catch (e: any) {
+      alert(e.message || "Upload impossible");
+    } finally {
+      setUploading(false);
+    }
+  };
+  const uploadCustom = async (id: string, files: File[], mode: "single" | "gallery" | "media") => {
+    if (!files.length) return;
+    setUploading(true);
+    try {
+      const urls = await uploadImages(files, mode === "gallery" ? 12 : 1);
+      if (!urls.length) return;
+      const b = draft.custom_sections?.[id] || {};
+      const update =
+        mode === "gallery"
+          ? { images: [...(b.images || []), ...urls] }
+          : mode === "media"
+            ? { media: urls[0], mediaType: files[0]?.type.startsWith("video/") ? "video" : "image" }
+            : { image: urls[0] };
+      commit({ ...draft, custom_sections: { ...(draft.custom_sections || {}), [id]: { ...b, ...update } } });
+    } catch (e: any) {
+      alert(e.message || "Upload impossible");
+    } finally {
+      setUploading(false);
+    }
+  };
+  const removeGalleryImage = (id: string, i: number) => {
+    const b = draft.custom_sections?.[id] || {},
+      images = [...(b.images || [])];
+    images.splice(i, 1);
+    commit({ ...draft, custom_sections: { ...(draft.custom_sections || {}), [id]: { ...b, images } } });
+  };
+  const setMainImage = (i: number) => {
+    const imgs = [...(draft.images || draft.product_images || [])];
+    if (!imgs[i]) return;
+    const [x] = imgs.splice(i, 1);
+    imgs.unshift(x);
+    patch("images", imgs);
+  };
+  const removeImage = (i: number) => {
+    const imgs = [...(draft.images || draft.product_images || [])];
+    imgs.splice(i, 1);
+    patch("images", imgs);
+  };
+  const blocks = doc.blocks;
+  const list = (key: string) => (Array.isArray(draft[key]) ? draft[key] : []);
+  const cards = (key: string) => (
+    <div className="bv3-cards">
+      {list(key).map((x: any, i: number) => (
+        <article key={i}>
+          <b>{typeof x === "string" ? x : x?.title || x?.question || ""}</b>
+          {typeof x !== "string" && x?.text && <p>{x.text}</p>}
+        </article>
+      ))}
+    </div>
+  );
+  const render = (id: string) => {
+    if (id === "hero")
+      return (
+        <section className="bv3-hero">
+          <div className="bv3-hero-copy">
+            <span className="bv3-kicker">COD MAROC</span>
+            <h1>{draft.headline || editing?.name}</h1>
+            <p>{draft.subheadline}</p>
+            <div className="bv3-price">
+              <strong>{draft.price || 0} DH</strong>
+              {draft.oldPrice && <s>{draft.oldPrice} DH</s>}
+            </div>
+            <button>{draft.cta || "Commander maintenant"}</button>
+          </div>
+          <div className="bv3-hero-media">
+            {(draft.images || draft.product_images || [])[0] ? (
+              <img src={(draft.images || draft.product_images)[0]} alt="" />
+            ) : (
+              <span>Image produit</span>
+            )}
+          </div>
+        </section>
+      );
+    if (id === "order")
+      return (
+        <section className="bv3-order">
+          <div>
+            <span className="bv3-kicker">COMMANDE</span>
+            <h2>{draft.order_title || "Commandez maintenant"}</h2>
+            <p>{draft.delivery || "Paiement à la livraison"}</p>
+          </div>
+          <div className="bv3-order-card">
+            <input placeholder="Nom complet" />
+            <input placeholder="Téléphone" />
+            <input placeholder="Ville" />
+            {draft.order_show_address !== false && <input placeholder="Adresse" />}
+            <div className="bv3-total">
+              <span>Total</span>
+              <b>{Number(draft.price || 0) + Number(draft.delivery_price || 0)} DH</b>
+            </div>
+            <button>{draft.cta || "Commander maintenant"}</button>
+          </div>
+        </section>
+      );
+    if (id === "problem")
+      return (
+        <section className="bv3-split">
+          <div>
+            <span className="bv3-kicker">PROBLÈME</span>
+            <h2>{draft.problem_title || ""}</h2>
+            <p>{draft.problem}</p>
+          </div>
+          <div className="bv3-solution">
+            <span className="bv3-kicker">SOLUTION</span>
+            <p>{draft.solution}</p>
+          </div>
+        </section>
+      );
+    if (id === "benefits")
+      return (
+        <section>
+          <span className="bv3-kicker">BÉNÉFICES</span>
+          <h2>{draft.benefits_title || ""}</h2>
+          <p>{draft.description}</p>
+          {cards("benefits")}
+        </section>
+      );
+    if (id === "features")
+      return (
+        <section>
+          <span className="bv3-kicker">CARACTÉRISTIQUES</span>
+          <h2>{draft.features_title || ""}</h2>
+          {cards("features")}
+        </section>
+      );
+    if (id === "how")
+      return (
+        <section>
+          <span className="bv3-kicker">ÉTAPES</span>
+          <h2>{draft.how_title || ""}</h2>
+          <div className="bv3-steps">
+            {list("how_steps").map((x: string, i: number) => (
+              <article key={i}>
+                <strong>{String(i + 1).padStart(2, "0")}</strong>
+                <p>{x}</p>
+              </article>
+            ))}
+          </div>
+        </section>
+      );
+    if (id === "trust")
+      return (
+        <section>
+          <span className="bv3-kicker">CONFIANCE</span>
+          <h2>{draft.trust_title || ""}</h2>
+          {cards("trust_points")}
+        </section>
+      );
+    if (id === "faq")
+      return (
+        <section>
+          <span className="bv3-kicker">FAQ</span>
+          <h2>{draft.faq_title || ""}</h2>
+          <div className="bv3-faq">
+            {list("faq").map((x: any, i: number) => (
+              <details key={i}>
+                <summary>{typeof x === "string" ? x : x.question}</summary>
+                {typeof x !== "string" && <p>{x.answer}</p>}
+              </details>
+            ))}
+          </div>
+        </section>
+      );
+    if (id.startsWith("custom-")) {
+      const b = draft.custom_sections?.[id] || {};
+      if (b.type === "imageText")
+        return (
+          <section className="bv3-split">
+            <div>
+              {b.image ? (
+                <img className="bv3-custom-img" src={b.image} alt="" />
+              ) : (
+                <div className="bv3-media-empty">Image</div>
+              )}
+            </div>
+            <div>
+              <h2>{b.title}</h2>
+              <p>{b.text}</p>
+            </div>
+          </section>
+        );
+      if (b.type === "gallery")
+        return (
+          <section>
+            <h2>{b.title}</h2>
+            <div className="bv3-gallery">
+              {(b.images || []).map((x: string, i: number) => (
+                <img src={x} key={i} alt="" />
+              ))}
+            </div>
+          </section>
+        );
+      if (b.type === "ctaBlock")
+        return (
+          <section className="bv3-cta">
+            <h2>{b.title}</h2>
+            <p>{b.text}</p>
+            <button>{b.button}</button>
+          </section>
+        );
+      if (b.type === "vertical916")
+        return (
+          <section>
+            <h2>{b.title}</h2>
+            <div className="bv3-device">
+              {b.media ? (
+                b.mediaType === "video" ? (
+                  <video src={b.media} controls playsInline />
+                ) : (
+                  <img src={b.media} alt="" />
+                )
+              ) : (
+                <span>Média</span>
+              )}
+            </div>
+            <p>{b.text}</p>
+          </section>
+        );
+      return (
+        <section>
+          <h2>{b.title}</h2>
+          <p>{b.text}</p>
+        </section>
+      );
+    }
+    return (
+      <section>
+        <h2>{labels[id] || id}</h2>
+      </section>
+    );
+  };
+  return (
+    <div className="bv3">
+      <header className="bv3-top">
+        <div>
+          <b>LandPro Builder V3</b>
+          <small>UI/UX Pro Max · WYSIWYG</small>
+        </div>
+        <div className="bv3-view">
+          <button disabled={!history.length} onClick={undo}>
+            ↶
+          </button>
+          <button disabled={!future.length} onClick={redo}>
+            ↷
+          </button>
+          <button onClick={() => setViewport("desktop")}>Desktop</button>
+          <button onClick={() => setViewport("tablet")}>Tablet</button>
+          <button onClick={() => setViewport("mobile")}>Mobile</button>
+        </div>
+        <div>
+          {saveNotice && <span className="bv3-save-notice">{saveNotice}</span>}
+          <button onClick={onClose}>Fermer</button>
+          <button onClick={() => onSave(false)}>Enregistrer</button>
+          <button className="primary" onClick={() => onSave(true)}>
+            Publier
+          </button>
+        </div>
+      </header>
+      <div className="bv3-body">
+        <aside className="bv3-left">
+          <h3>Structure</h3>
+          {blocks.map((b) => (
+            <div
+              className={"bv3-structure-row" + (b.visible ? "" : " is-hidden")}
+              style={b.visible ? undefined : { opacity: 0.55 }}
+              draggable
+              onDragStart={() => (drag.current = b.id)}
+              onDragOver={(e) => e.preventDefault()}
+              onDrop={() => {
+                if (drag.current) move(drag.current, b.id);
+                drag.current = null;
+              }}
+              key={b.id}
+            >
+              <span>⋮⋮</span>
+              <button className={selected === b.id ? "active" : ""} onClick={() => setSelected(b.id)}>
+                {labels[b.id] || labels[b.type] || b.type}
+              </button>
+              {b.id !== "hero" && (
+                <button
+                  title={b.visible ? "Masquer la section" : "Afficher la section"}
+                  onClick={() => toggleHidden(b.id)}
+                >
+                  {b.visible ? "👁" : "⊘"}
+                </button>
+              )}
+              {b.id.startsWith("custom-") && (
+                <button title="Dupliquer" onClick={() => duplicate(b.id)}>
+                  ⧉
+                </button>
+              )}
+              {b.id !== "hero" && b.id !== "order" && (
+                <button title="Supprimer" onClick={() => remove(b.id)}>
+                  ×
+                </button>
+              )}
+            </div>
+          ))}
+          <button className="bv3-add" onClick={() => setShowLibrary((v) => !v)}>
+            + Ajouter une section
+          </button>
+          {showLibrary && (
+            <div className="bv3-library">
+              {library
+                .filter((id) => !BUILTIN_ADDABLE.includes(id) || !(draft.section_order || []).includes(id))
+                .map((id) => (
+                  <button key={id} onClick={() => add(id)}>
+                    + {labels[id]}
+                  </button>
+                ))}
+            </div>
+          )}
+        </aside>
+        <main className={"bv3-stage " + viewport}>
+          <div className="bv3-device-label">
+            {viewport === "desktop" ? "PC · 1440 px" : viewport === "tablet" ? "Tablette · 768 px" : "Mobile · 390 px"}
+          </div>
+          <div className="bv3-device-scroll">
+            <div
+              className="bv3-device-frame"
+              data-device-width={viewport}
+              style={{ width: `${BUILDER_BREAKPOINTS[viewport]}px` }}
+            >
+              <div className="bv3-runtime-preview">
+                <LandingClient
+                  builderMode
+                  viewportMode={viewport}
+                  onSectionSelect={setSelected}
+                  initialSlug={editing?.slug || "builder-preview"}
+                  initialData={{
+                    id: editing?.id || "builder-v3-preview",
+                    name: editing?.name || draft.headline || "Produit",
+                    slug: editing?.slug || "builder-preview",
+                    locale: editing?.locale || "ar-MA",
+                    price: Number(draft.price || 0),
+                    oldPrice: draft.oldPrice ? Number(draft.oldPrice) : null,
+                    images: draft.images || draft.product_images || [],
+                    content: { ...draft, uiux_library: uiLibrary, design_system: { ...(draft.design_system || {}) } },
+                    whatsappPhone: editing?.whatsappPhone || editing?.whatsapp_phone || null,
+                    metaPixelId: null,
+                  }}
+                />
+              </div>
+            </div>
+          </div>
+        </main>
+        <aside className="bv3-right">
+          <h3>Propriétés · {labels[selected] || selected}</h3>
+          <div className="bv3-settings-tabs">
+            <button className={settingsTab === "content" ? "active" : ""} onClick={() => setSettingsTab("content")}>
+              Contenu
+            </button>
+            <button className={settingsTab === "template" ? "active" : ""} onClick={() => setSettingsTab("template")}>
+              Template
+            </button>
+            <button
+              className={settingsTab === "hero" ? "active" : ""}
+              onClick={() => {
+                setSettingsTab("hero");
+                setSelected("hero");
+              }}
+            >
+              Hero
+            </button>
+            <button className={settingsTab === "footer" ? "active" : ""} onClick={() => setSettingsTab("footer")}>
+              Footer
+            </button>
+            <button className={settingsTab === "form" ? "active" : ""} onClick={() => setSettingsTab("form")}>
+              Formulaire COD
+            </button>
+          </div>
+          {settingsTab === "template" && (
+            <div className="bv3-template-panel">
+              <LandproTemplatePanel draft={draft} commit={commit} patch={patch} />
+              <label>
+                Style visuel
+                <select
+                  value={draft.builder_template || ""}
+                  onChange={(e) => patch("builder_template", e.target.value)}
+                >
+                  <option value="">UI/UX Pro Max automatique · {ds.style?.["Style Category"] || "recommandé"}</option>
+                  {uiLibrary.styles.map((x: any) => (
+                    <option key={x.id || x.name} value={x.id || x.name}>
+                      {x.name}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label>
+                Landing Pattern
+                <select
+                  value={draft.builder_pattern || ""}
+                  onChange={(e) =>
+                    commit({
+                      ...draft,
+                      builder_pattern: e.target.value,
+                      hero_architecture: "auto",
+                      section_architecture: "auto",
+                      builder_v3: { ...doc, viewport },
+                    })
+                  }
+                >
+                  <option value="">Automatique · {ds.landing?.["Pattern Name"] || "recommandé"}</option>
+                  {uiLibrary.patterns.map((x: any) => (
+                    <option key={x.id || x.name} value={x.id || x.name}>
+                      {x.name}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label>
+                Palette
+                <select value={draft.builder_palette || ""} onChange={(e) => patch("builder_palette", e.target.value)}>
+                  <option value="">Automatique · {ds.productType || "produit"}</option>
+                  {uiLibrary.colors.map((x: any) => (
+                    <option key={x.name} value={x.name}>
+                      {x.name}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label>
+                Typographie
+                <select
+                  value={draft.builder_typography || ""}
+                  onChange={(e) => patch("builder_typography", e.target.value)}
+                >
+                  <option value="">Automatique · {ds.typography?.["Font Pairing Name"] || "recommandée"}</option>
+                  {uiLibrary.typography.map((x: any) => (
+                    <option key={x.name} value={x.name}>
+                      {x.name}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <div className="bv3-help">
+                {uiLibrary.styles.length} styles · {uiLibrary.patterns.length} patterns · {uiLibrary.colors.length}{" "}
+                palettes · {uiLibrary.typography.length} typographies chargés depuis UI/UX Pro Max.
+              </div>
+            </div>
+          )}
+          {settingsTab === "hero" && (
+            <div className="bv3-template-panel bv3-hero-panel">
+              <div className="bv3-help">
+                <b>Hero Studio</b>
+                <br />
+                Réglages organisés par fonction. Le preview se met à jour immédiatement.
+              </div>
+              <div className="bv3-hero-tabs">
+                <button className={heroTab === "content" ? "active" : ""} onClick={() => setHeroTab("content")}>
+                  Contenu
+                </button>
+                <button className={heroTab === "layout" ? "active" : ""} onClick={() => setHeroTab("layout")}>
+                  Layout
+                </button>
+                <button className={heroTab === "media" ? "active" : ""} onClick={() => setHeroTab("media")}>
+                  Galerie produit
+                </button>
+                <button className={heroTab === "visibility" ? "active" : ""} onClick={() => setHeroTab("visibility")}>
+                  Visibilité
+                </button>
+              </div>
+              {heroTab === "content" && (
+                <div className="bv3-hero-subpanel">
+                  <label>
+                    Titre
+                    <input value={draft.headline || ""} onChange={(e) => patch("headline", e.target.value)} />
+                  </label>
+                  <label>
+                    Sous-titre
+                    <textarea value={draft.subheadline || ""} onChange={(e) => patch("subheadline", e.target.value)} />
+                  </label>
+                  <label>
+                    Prix
+                    <input type="number" value={draft.price || ""} onChange={(e) => patch("price", e.target.value)} />
+                  </label>
+                  <label>
+                    Ancien prix
+                    <input
+                      type="number"
+                      value={draft.oldPrice || ""}
+                      onChange={(e) => patch("oldPrice", e.target.value)}
+                    />
+                  </label>
+                  <label>
+                    CTA
+                    <input value={draft.cta || ""} onChange={(e) => patch("cta", e.target.value)} />
+                  </label>
+                </div>
+              )}
+              {heroTab === "layout" && (
+                <div className="bv3-hero-subpanel">
+                  <label>
+                    Module Hero
+                    <select value={draft.hero_module || "auto"} onChange={(e) => patch("hero_module", e.target.value)}>
+                      <option value="auto">Automatique UI/UX Pro Max</option>
+                      <option value="split-product">Split Produit</option>
+                      <option value="fullscreen">Fullscreen Image</option>
+                      <option value="center-product">Produit Centré</option>
+                      <option value="gallery-commerce">Galerie E-commerce</option>
+                      <option value="minimal">Minimal</option>
+                      <option value="editorial">Editorial Premium</option>
+                      <option value="conversion">Conversion COD</option>
+                      <option value="form-integrated">Formulaire intégré</option>
+                      <option value="background">Image Background</option>
+                      <option value="luxury">E-commerce Luxury</option>
+                      <option value="lifestyle">UGC / Lifestyle</option>
+                      <option value="mobile-first">Mobile First</option>
+                      <optgroup label="Motion / Immersive">
+                        <option value="motion-scroll-gallery">Scroll Gallery</option>
+                        <option value="motion-sticky-story">Sticky Image Story</option>
+                        <option value="motion-parallax">Parallax Produit</option>
+                        <option value="motion-zoom">Zoom au scroll</option>
+                        <option value="motion-video-full">Vidéo Cinématique Fullscreen</option>
+                        <option value="motion-video-ugc">Vidéo UGC Verticale</option>
+                      </optgroup>
+                    </select>
+                  </label>
+                  <label>
+                    Architecture
+                    <select
+                      value={draft.hero_architecture || "auto"}
+                      onChange={(e) => patch("hero_architecture", e.target.value)}
+                    >
+                      <option value="auto">Automatique</option>
+                      <option value="conversion">Conversion</option>
+                      <option value="editorial">Editorial</option>
+                      <option value="impact">Impact</option>
+                      <option value="centered">Centered</option>
+                      <option value="split">Split</option>
+                    </select>
+                  </label>
+                  <label>
+                    Hauteur Hero
+                    <select
+                      value={draft.hero_height || "compact"}
+                      onChange={(e) => patch("hero_height", e.target.value)}
+                    >
+                      <option value="compact">Compact</option>
+                      <option value="balanced">Équilibré</option>
+                      <option value="large">Grand</option>
+                      <option value="screen">Plein écran</option>
+                    </select>
+                  </label>
+                  <label>
+                    Taille du titre
+                    <select
+                      value={draft.hero_title_size || "auto"}
+                      onChange={(e) => patch("hero_title_size", e.target.value)}
+                    >
+                      <option value="auto">Automatique</option>
+                      <option value="small">Petite</option>
+                      <option value="medium">Moyenne</option>
+                      <option value="large">Grande</option>
+                      <option value="xl">Impact XL</option>
+                    </select>
+                  </label>
+                  <label>
+                    Largeur du texte
+                    <select
+                      value={draft.hero_text_width || "medium"}
+                      onChange={(e) => patch("hero_text_width", e.target.value)}
+                    >
+                      <option value="narrow">Étroite</option>
+                      <option value="medium">Moyenne</option>
+                      <option value="wide">Large</option>
+                    </select>
+                  </label>
+                  <label>
+                    Alignement
+                    <select
+                      value={draft.hero_text_align || "auto"}
+                      onChange={(e) => patch("hero_text_align", e.target.value)}
+                    >
+                      <option value="auto">Selon le module</option>
+                      <option value="left">Gauche</option>
+                      <option value="center">Centré</option>
+                      <option value="right">Droite</option>
+                    </select>
+                  </label>
+                  <label>
+                    Position média
+                    <select
+                      value={draft.hero_media_position || "auto"}
+                      onChange={(e) => patch("hero_media_position", e.target.value)}
+                    >
+                      <option value="auto">Selon le module</option>
+                      <option value="left">Image à gauche</option>
+                      <option value="right">Image à droite</option>
+                      <option value="top">Image en haut</option>
+                      <option value="background">Arrière-plan</option>
+                    </select>
+                  </label>
+                </div>
+              )}
+              <button type="button" className="bv3-advanced-toggle" onClick={() => setHeroAdvanced((v) => !v)}>
+                {heroAdvanced ? "Fermer les réglages avancés" : "⚙ Réglages avancés · tailles & pixels"}
+              </button>
+              {heroAdvanced && (
+                <div className="bv3-hero-advanced">
+                  <div className="bv3-help">
+                    <b>Hero Engine V2 · Réglages précis</b>
+                    <br />
+                    Valeurs indépendantes PC, tablette et mobile.
+                  </div>
+                  <label>
+                    Texte badge
+                    <input
+                      value={draft.hero_badge_text || ""}
+                      placeholder="الدفع عند الاستلام"
+                      onChange={(e) => patch("hero_badge_text", e.target.value)}
+                    />
+                  </label>
+                  <label>
+                    Couleur arrière-plan Hero
+                    <input
+                      type="color"
+                      value={draft.hero_bg_color || "#ffffff"}
+                      onChange={(e) => patch("hero_bg_color", e.target.value)}
+                    />
+                  </label>
+                  <label>
+                    Couleur titre
+                    <input
+                      type="color"
+                      value={draft.hero_title_color || "#111827"}
+                      onChange={(e) => patch("hero_title_color", e.target.value)}
+                    />
+                  </label>
+                  <label>
+                    Couleur sous-titre
+                    <input
+                      type="color"
+                      value={draft.hero_subtitle_color || "#475569"}
+                      onChange={(e) => patch("hero_subtitle_color", e.target.value)}
+                    />
+                  </label>
+                  <label>
+                    Fond bouton
+                    <input
+                      type="color"
+                      value={draft.hero_cta_bg || "#111827"}
+                      onChange={(e) => patch("hero_cta_bg", e.target.value)}
+                    />
+                  </label>
+                  <label>
+                    Texte bouton
+                    <input
+                      type="color"
+                      value={draft.hero_cta_color || "#ffffff"}
+                      onChange={(e) => patch("hero_cta_color", e.target.value)}
+                    />
+                  </label>
+                  <label>
+                    Fond badge
+                    <input
+                      type="color"
+                      value={draft.hero_badge_bg || "#f59e0b"}
+                      onChange={(e) => patch("hero_badge_bg", e.target.value)}
+                    />
+                  </label>
+                  <label>
+                    Texte badge
+                    <input
+                      type="color"
+                      value={draft.hero_badge_color || "#111111"}
+                      onChange={(e) => patch("hero_badge_color", e.target.value)}
+                    />
+                  </label>
+                  <label>
+                    Overlay image fond · {Number(draft.hero_overlay || 38)}%
+                    <input
+                      type="range"
+                      min="0"
+                      max="90"
+                      value={Number(draft.hero_overlay || 38)}
+                      onChange={(e) => patch("hero_overlay", Number(e.target.value))}
+                    />
+                  </label>
+                  <label>
+                    Titre PC · {Number(draft.hero_title_px || 56)} px
+                    <input
+                      type="range"
+                      min="28"
+                      max="96"
+                      value={Number(draft.hero_title_px || 56)}
+                      onChange={(e) => patch("hero_title_px", Number(e.target.value))}
+                    />
+                  </label>
+                  <label>
+                    Titre tablette · {Number(draft.hero_title_px_tablet || 44)} px
+                    <input
+                      type="range"
+                      min="24"
+                      max="72"
+                      value={Number(draft.hero_title_px_tablet || 44)}
+                      onChange={(e) => patch("hero_title_px_tablet", Number(e.target.value))}
+                    />
+                  </label>
+                  <label>
+                    Titre mobile · {Number(draft.hero_title_px_mobile || 34)} px
+                    <input
+                      type="range"
+                      min="20"
+                      max="56"
+                      value={Number(draft.hero_title_px_mobile || 34)}
+                      onChange={(e) => patch("hero_title_px_mobile", Number(e.target.value))}
+                    />
+                  </label>
+                  <label>
+                    Sous-titre PC · {Number(draft.hero_subtitle_px || 18)} px
+                    <input
+                      type="range"
+                      min="12"
+                      max="32"
+                      value={Number(draft.hero_subtitle_px || 18)}
+                      onChange={(e) => patch("hero_subtitle_px", Number(e.target.value))}
+                    />
+                  </label>
+                  <label>
+                    Sous-titre mobile · {Number(draft.hero_subtitle_px_mobile || 16)} px
+                    <input
+                      type="range"
+                      min="11"
+                      max="26"
+                      value={Number(draft.hero_subtitle_px_mobile || 16)}
+                      onChange={(e) => patch("hero_subtitle_px_mobile", Number(e.target.value))}
+                    />
+                  </label>
+                  <label>
+                    Texte bouton · {Number(draft.hero_cta_font_px || 17)} px
+                    <input
+                      type="range"
+                      min="12"
+                      max="28"
+                      value={Number(draft.hero_cta_font_px || 17)}
+                      onChange={(e) => patch("hero_cta_font_px", Number(e.target.value))}
+                    />
+                  </label>
+                  <label>
+                    Hauteur bouton · {Number(draft.hero_cta_height || 56)} px
+                    <input
+                      type="range"
+                      min="40"
+                      max="84"
+                      value={Number(draft.hero_cta_height || 56)}
+                      onChange={(e) => patch("hero_cta_height", Number(e.target.value))}
+                    />
+                  </label>
+                  <label>
+                    Arrondi bouton · {Number(draft.hero_cta_radius || 14)} px
+                    <input
+                      type="range"
+                      min="0"
+                      max="40"
+                      value={Number(draft.hero_cta_radius || 14)}
+                      onChange={(e) => patch("hero_cta_radius", Number(e.target.value))}
+                    />
+                  </label>
+                  <label>
+                    Largeur bouton
+                    <select
+                      value={draft.hero_cta_width || "auto"}
+                      onChange={(e) => patch("hero_cta_width", e.target.value)}
+                    >
+                      <option value="auto">Selon contenu</option>
+                      <option value="full">Pleine largeur</option>
+                    </select>
+                  </label>
+                  <label>
+                    Espacement vertical Hero · {Number(draft.hero_padding_y || 72)} px
+                    <input
+                      type="range"
+                      min="20"
+                      max="160"
+                      value={Number(draft.hero_padding_y || 72)}
+                      onChange={(e) => patch("hero_padding_y", Number(e.target.value))}
+                    />
+                  </label>
+                  <label>
+                    Espace texte / média · {Number(draft.hero_gap || 48)} px
+                    <input
+                      type="range"
+                      min="8"
+                      max="120"
+                      value={Number(draft.hero_gap || 48)}
+                      onChange={(e) => patch("hero_gap", Number(e.target.value))}
+                    />
+                  </label>
+                </div>
+              )}
+              {heroTab === "media" && (
+                <div className="bv3-hero-subpanel">
+                  <div className="bv3-gallery-head">
+                    <div>
+                      <b>Galerie produit Hero</b>
+                      <span>Slider, autoplay, miniatures et défilement des images produit.</span>
+                    </div>
+                    <span className="bv3-gallery-count">{(draft.hero_images || []).length} image(s)</span>
+                  </div>
+                  <label>
+                    Mode galerie
+                    <select
+                      value={draft.hero_gallery_mode || "fixed"}
+                      onChange={(e) => patch("hero_gallery_mode", e.target.value)}
+                    >
+                      <option value="fixed">Image fixe</option>
+                      <option value="arrows">Slider + flèches</option>
+                      <option value="autoplay">Défilement automatique</option>
+                      <option value="arrows-autoplay">Flèches + autoplay</option>
+                      <option value="fade">Fondu automatique</option>
+                      <option value="slide">Slide horizontal</option>
+                      <option value="thumbs">Carrousel + miniatures</option>
+                      <option value="marquee">Défilement continu</option>
+                    </select>
+                  </label>
+                  <label>
+                    Délai autoplay · {Number(draft.hero_gallery_delay || 3500)} ms
+                    <input
+                      type="range"
+                      min="1000"
+                      max="10000"
+                      step="250"
+                      value={Number(draft.hero_gallery_delay || 3500)}
+                      onChange={(e) => patch("hero_gallery_delay", Number(e.target.value))}
+                    />
+                  </label>
+                  <label>
+                    Vitesse transition · {Number(draft.hero_gallery_speed || 500)} ms
+                    <input
+                      type="range"
+                      min="150"
+                      max="1500"
+                      step="50"
+                      value={Number(draft.hero_gallery_speed || 500)}
+                      onChange={(e) => patch("hero_gallery_speed", Number(e.target.value))}
+                    />
+                  </label>
+                  <label className="builder-toggle">
+                    <input
+                      type="checkbox"
+                      checked={draft.hero_gallery_loop !== false}
+                      onChange={(e) => patch("hero_gallery_loop", e.target.checked)}
+                    />{" "}
+                    Boucle infinie
+                  </label>
+                  <label className="builder-toggle">
+                    <input
+                      type="checkbox"
+                      checked={draft.hero_gallery_arrows !== false}
+                      onChange={(e) => patch("hero_gallery_arrows", e.target.checked)}
+                    />{" "}
+                    Afficher flèches
+                  </label>
+                  <label className="builder-toggle">
+                    <input
+                      type="checkbox"
+                      checked={draft.hero_gallery_dots !== false}
+                      onChange={(e) => patch("hero_gallery_dots", e.target.checked)}
+                    />{" "}
+                    Afficher points
+                  </label>
+                  <label className="builder-toggle">
+                    <input
+                      type="checkbox"
+                      checked={draft.hero_gallery_thumbs === true || draft.hero_gallery_mode === "thumbs"}
+                      onChange={(e) => patch("hero_gallery_thumbs", e.target.checked)}
+                    />{" "}
+                    Afficher miniatures
+                  </label>
+                  <label>
+                    Ajustement image
+                    <select
+                      value={draft.hero_media_fit || "contain"}
+                      onChange={(e) => patch("hero_media_fit", e.target.value)}
+                    >
+                      <option value="contain">Produit entier · contain</option>
+                      <option value="cover">Remplir · cover</option>
+                    </select>
+                  </label>
+                  <label>
+                    Largeur image · {Number(draft.hero_media_width || 100)}%
+                    <input
+                      type="range"
+                      min="20"
+                      max="100"
+                      step="1"
+                      value={Number(draft.hero_media_width || 100)}
+                      onChange={(e) => patch("hero_media_width", Number(e.target.value))}
+                    />
+                  </label>
+                  <label>
+                    Hauteur image · {Number(draft.hero_media_height || 520)} px
+                    <input
+                      type="range"
+                      min="120"
+                      max="1000"
+                      step="10"
+                      value={Number(draft.hero_media_height || 520)}
+                      onChange={(e) => patch("hero_media_height", Number(e.target.value))}
+                    />
+                  </label>
+                  <label>
+                    Format / ratio
+                    <select
+                      value={draft.hero_media_aspect || "auto"}
+                      onChange={(e) => patch("hero_media_aspect", e.target.value)}
+                    >
+                      <option value="auto">Automatique</option>
+                      <option value="1:1">Carré · 1:1</option>
+                      <option value="4:5">Portrait · 4:5</option>
+                      <option value="3:4">Portrait · 3:4</option>
+                      <option value="4:3">Paysage · 4:3</option>
+                      <option value="16:9">Large · 16:9</option>
+                    </select>
+                  </label>
+                  <label>
+                    Arrondi image · {Number(draft.hero_media_radius || 24)} px
+                    <input
+                      type="range"
+                      min="0"
+                      max="60"
+                      step="2"
+                      value={Number(draft.hero_media_radius || 24)}
+                      onChange={(e) => patch("hero_media_radius", Number(e.target.value))}
+                    />
+                  </label>
+                  <div className="bv3-help">
+                    <b>Images spéciales Hero</b>
+                    <br />
+                    Ajoutez au moins 2 images pour activer un défilement continu.
+                  </div>
+                  <label className="bv3-upload">
+                    Uploader images Hero
+                    <input
+                      type="file"
+                      accept="image/*"
+                      multiple
+                      disabled={uploading}
+                      onChange={(e) => uploadHeroSpecial(Array.from(e.target.files || []))}
+                    />
+                    <span>{uploading ? "Chargement…" : "Choisir images Hero"}</span>
+                  </label>
+                  <div className="bv3-media-grid">
+                    {(draft.hero_images || []).map((x: string, i: number) => (
+                      <div key={x + i} className={i === 0 ? "main" : ""}>
+                        <img src={x} alt="" />
+                        <div>
+                          <button type="button" onClick={() => setHeroSpecialMain(i)}>
+                            {i === 0 ? "Principale Hero" : "Mettre principale"}
+                          </button>
+                          <button type="button" onClick={() => removeHeroSpecial(i)}>
+                            ×
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  <label className="bv3-check bv3-scroll-toggle">
+                    <input
+                      type="checkbox"
+                      checked={draft.hero_image_scroll === true}
+                      onChange={(e) => patch("hero_image_scroll", e.target.checked)}
+                    />
+                    <span>
+                      <b>Activer défilement images</b>
+                      <small>
+                        {(draft.hero_images || []).length < 2
+                          ? "Ajoutez au moins 2 images Hero"
+                          : "Carousel prêt · " + (draft.hero_images || []).length + " images"}
+                      </small>
+                    </span>
+                  </label>
+                  <div
+                    className={draft.hero_image_scroll === true ? "bv3-scroll-settings active" : "bv3-scroll-settings"}
+                  >
+                    <label>
+                      Direction
+                      <select
+                        disabled={draft.hero_image_scroll !== true}
+                        value={draft.hero_scroll_direction || "left"}
+                        onChange={(e) => patch("hero_scroll_direction", e.target.value)}
+                      >
+                        <option value="left">← Vers la gauche</option>
+                        <option value="right">Vers la droite →</option>
+                      </select>
+                    </label>
+                    <label>
+                      Vitesse · {Number(draft.hero_scroll_speed || 18)} s
+                      <input
+                        disabled={draft.hero_image_scroll !== true}
+                        type="range"
+                        min="5"
+                        max="60"
+                        step="1"
+                        value={Number(draft.hero_scroll_speed || 18)}
+                        onChange={(e) => patch("hero_scroll_speed", Number(e.target.value))}
+                      />
+                    </label>
+                    <label className="bv3-check">
+                      <input
+                        disabled={draft.hero_image_scroll !== true}
+                        type="checkbox"
+                        checked={draft.hero_scroll_pause_hover !== false}
+                        onChange={(e) => patch("hero_scroll_pause_hover", e.target.checked)}
+                      />{" "}
+                      Pause au survol
+                    </label>
+                  </div>
+                </div>
+              )}
+              {heroTab === "visibility" && (
+                <div className="bv3-hero-subpanel">
+                  <label className="bv3-check">
+                    <input
+                      type="checkbox"
+                      checked={draft.hero_show_subtitle !== false}
+                      onChange={(e) => patch("hero_show_subtitle", e.target.checked)}
+                    />{" "}
+                    Afficher sous-titre
+                  </label>
+                  <label className="bv3-check">
+                    <input
+                      type="checkbox"
+                      checked={draft.hero_show_price !== false}
+                      onChange={(e) => patch("hero_show_price", e.target.checked)}
+                    />{" "}
+                    Afficher prix
+                  </label>
+                  <label className="bv3-check">
+                    <input
+                      type="checkbox"
+                      checked={draft.hero_show_cta !== false}
+                      onChange={(e) => patch("hero_show_cta", e.target.checked)}
+                    />{" "}
+                    Afficher CTA
+                  </label>
+                  <label className="bv3-check">
+                    <input
+                      type="checkbox"
+                      checked={draft.hero_show_badge !== false}
+                      onChange={(e) => patch("hero_show_badge", e.target.checked)}
+                    />{" "}
+                    Afficher badge COD
+                  </label>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      commit({
+                        ...draft,
+                        hero_height: "compact",
+                        hero_title_size: "auto",
+                        hero_text_width: "medium",
+                        hero_text_align: "auto",
+                        hero_media_position: "auto",
+                        hero_media_fit: "contain",
+                        hero_media_width: 100,
+                        hero_media_height: 520,
+                        hero_media_aspect: "auto",
+                        hero_media_radius: 24,
+                        hero_image_scroll: false,
+                        hero_show_subtitle: true,
+                        hero_show_price: true,
+                        hero_show_cta: true,
+                        hero_show_badge: true,
+                      })
+                    }
+                  >
+                    Réinitialiser Hero
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
+          {settingsTab === "footer" && (
+            <div className="bv3-template-panel bv3-footer-panel">
+              <div className="bv3-help">
+                <b>Footer Studio</b>
+                <br />
+                Personnalisez le footer comme le Hero. Le preview se met à jour immédiatement.
+              </div>
+              <label>
+                Couleur arrière-plan
+                <input
+                  type="color"
+                  value={draft.footer_bg_color || "#cbdcf8"}
+                  onChange={(e) => patch("footer_bg_color", e.target.value)}
+                />
+              </label>
+              <label>
+                Couleur texte
+                <input
+                  type="color"
+                  value={draft.footer_text_color || "#0f172a"}
+                  onChange={(e) => patch("footer_text_color", e.target.value)}
+                />
+              </label>
+              <label>
+                Couleur liens
+                <input
+                  type="color"
+                  value={draft.footer_link_color || "#0f172a"}
+                  onChange={(e) => patch("footer_link_color", e.target.value)}
+                />
+              </label>
+              <label>
+                Taille nom produit · {Number(draft.footer_title_px || 28)} px
+                <input
+                  type="range"
+                  min="14"
+                  max="56"
+                  value={Number(draft.footer_title_px || 28)}
+                  onChange={(e) => patch("footer_title_px", Number(e.target.value))}
+                />
+              </label>
+              <label>
+                Taille texte · {Number(draft.footer_text_px || 15)} px
+                <input
+                  type="range"
+                  min="11"
+                  max="24"
+                  value={Number(draft.footer_text_px || 15)}
+                  onChange={(e) => patch("footer_text_px", Number(e.target.value))}
+                />
+              </label>
+              <label>
+                Espacement vertical · {Number(draft.footer_padding_y || 48)} px
+                <input
+                  type="range"
+                  min="16"
+                  max="120"
+                  value={Number(draft.footer_padding_y || 48)}
+                  onChange={(e) => patch("footer_padding_y", Number(e.target.value))}
+                />
+              </label>
+              <label>
+                Alignement
+                <select value={draft.footer_align || "center"} onChange={(e) => patch("footer_align", e.target.value)}>
+                  <option value="left">Gauche</option>
+                  <option value="center">Centré</option>
+                  <option value="right">Droite</option>
+                </select>
+              </label>
+              <label className="bv3-check">
+                <input
+                  type="checkbox"
+                  checked={draft.footer_show_brand !== false}
+                  onChange={(e) => patch("footer_show_brand", e.target.checked)}
+                />{" "}
+                Afficher nom produit
+              </label>
+              <label className="bv3-check">
+                <input
+                  type="checkbox"
+                  checked={draft.footer_show_trust !== false}
+                  onChange={(e) => patch("footer_show_trust", e.target.checked)}
+                />{" "}
+                Afficher Livraison / COD
+              </label>
+              <label className="bv3-check">
+                <input
+                  type="checkbox"
+                  checked={draft.footer_show_links !== false}
+                  onChange={(e) => patch("footer_show_links", e.target.checked)}
+                />{" "}
+                Afficher liens
+              </label>
+              <label className="bv3-check">
+                <input
+                  type="checkbox"
+                  checked={draft.footer_show_copyright !== false}
+                  onChange={(e) => patch("footer_show_copyright", e.target.checked)}
+                />{" "}
+                Afficher copyright
+              </label>
+            </div>
+          )}
+          {settingsTab === "form" && (
+            <div className="bv3-template-panel">
+              <label>
+                Style formulaire
+                <select
+                  value={draft.order_form_style || "classic"}
+                  onChange={(e) => patch("order_form_style", e.target.value)}
+                >
+                  <option value="classic">Classique</option>
+                  <option value="compact">Compact</option>
+                  <option value="card">Carte</option>
+                  <option value="minimal">Minimal</option>
+                </select>
+              </label>
+              <label>
+                Architecture
+                <select
+                  value={draft.order_form_architecture || "auto"}
+                  onChange={(e) => patch("order_form_architecture", e.target.value)}
+                >
+                  <option value="auto">UI/UX Pro Max automatique</option>
+                  <option value="compact">Compact 2 colonnes</option>
+                  <option value="trust">Centré confiance</option>
+                  <option value="editorial">Editorial</option>
+                </select>
+              </label>
+              <label className="bv3-check">
+                <input
+                  type="checkbox"
+                  checked={draft.order_show_address !== false}
+                  onChange={(e) => patch("order_show_address", e.target.checked)}
+                />{" "}
+                Afficher adresse
+              </label>
+              <label className="bv3-check">
+                <input
+                  type="checkbox"
+                  checked={draft.order_whatsapp !== false}
+                  onChange={(e) => patch("order_whatsapp", e.target.checked)}
+                />{" "}
+                Bouton WhatsApp
+              </label>
+              <label className="bv3-check">
+                <input
+                  type="checkbox"
+                  checked={draft.order_pump !== false}
+                  onChange={(e) => patch("order_pump", e.target.checked)}
+                />{" "}
+                Animation CTA
+              </label>
+              <div className="bv3-help">
+                <b>Prix par quantité</b>
+                <br />
+                Ajoutez librement vos offres. Le prix saisi est le prix total de l’offre et sera recalculé côté serveur
+                lors de la commande.
+              </div>
+              {(() => {
+                const offers = (
+                  Array.isArray(draft.quantity_offers) && draft.quantity_offers.length
+                    ? draft.quantity_offers
+                    : [{ qty: 1, label: "1 pièce", price: Number(draft.price || 0) }]
+                ).map((x: any) => ({ ...x, qty: Number(x.qty) || 1 }));
+                const updateOffer = (i: number, key: string, value: any) => {
+                  const next = offers.map((x: any, j: number) => (j === i ? { ...x, [key]: value } : x));
+                  patch("quantity_offers", next);
+                };
+                const removeOffer = (i: number) => {
+                  const next = offers.filter((_: any, j: number) => j !== i);
+                  patch("quantity_offers", next);
+                  if (Number(draft.quantity_default_qty || 1) === Number(offers[i]?.qty))
+                    patch("quantity_default_qty", Number(next[0]?.qty || 1));
+                };
+                const moveOffer = (i: number, d: number) => {
+                  const j = i + d;
+                  if (j < 0 || j >= offers.length) return;
+                  const next = [...offers],
+                    [x] = next.splice(i, 1);
+                  next.splice(j, 0, x);
+                  patch("quantity_offers", next);
+                };
+                return (
+                  <div className="bv3-offers-editor">
+                    {offers.map((o: any, i: number) => (
+                      <div className="bv3-quantity-price" key={i}>
+                        <div className="bv3-offer-head">
+                          <b>Offre {i + 1}</b>
+                          <div>
+                            <button type="button" disabled={i === 0} onClick={() => moveOffer(i, -1)}>
+                              ↑
+                            </button>
+                            <button type="button" disabled={i === offers.length - 1} onClick={() => moveOffer(i, 1)}>
+                              ↓
+                            </button>
+                            <button type="button" disabled={offers.length === 1} onClick={() => removeOffer(i)}>
+                              ×
+                            </button>
+                          </div>
+                        </div>
+                        <label>
+                          Quantité
+                          <input
+                            type="number"
+                            min="1"
+                            max="10"
+                            step="1"
+                            value={o.qty}
+                            onChange={(e) =>
+                              updateOffer(i, "qty", Math.min(10, Math.max(1, Number(e.target.value) || 1)))
+                            }
+                          />
+                        </label>
+                        <label>
+                          Libellé
+                          <input
+                            value={o.label || ""}
+                            placeholder={o.qty + " pièces"}
+                            onChange={(e) => updateOffer(i, "label", e.target.value)}
+                          />
+                        </label>
+                        <label>
+                          Prix total
+                          <input
+                            type="number"
+                            min="0"
+                            step="1"
+                            value={o.price ?? ""}
+                            onChange={(e) =>
+                              updateOffer(i, "price", e.target.value === "" ? "" : Number(e.target.value))
+                            }
+                          />
+                        </label>
+                        <label className="bv3-check">
+                          <input
+                            type="radio"
+                            name="default-quantity-offer"
+                            checked={Number(draft.quantity_default_qty || offers[0]?.qty || 1) === Number(o.qty)}
+                            onChange={() => patch("quantity_default_qty", Number(o.qty))}
+                          />{" "}
+                          Offre sélectionnée par défaut
+                        </label>
+                      </div>
+                    ))}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const used = new Set(offers.map((x: any) => Number(x.qty)));
+                        let qty = 1;
+                        while (used.has(qty) && qty < 10) qty++;
+                        patch("quantity_offers", [
+                          ...offers,
+                          {
+                            qty,
+                            label: qty === 1 ? "1 pièce" : qty + " pièces",
+                            price: Number(draft.price || 0) * qty,
+                          },
+                        ]);
+                      }}
+                    >
+                      + Ajouter une offre
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        patch("quantity_offers", []);
+                        patch("quantity_default_qty", 1);
+                      }}
+                    >
+                      Réinitialiser · Prix × quantité
+                    </button>
+                  </div>
+                );
+              })()}
+            </div>
+          )}
+          <div style={{ display: settingsTab === "content" ? "contents" : "none" }}>
+            {selected === "hero" && (
+              <>
+                <label>
+                  Titre
+                  <input value={draft.headline || ""} onChange={(e) => patch("headline", e.target.value)} />
+                </label>
+                <label>
+                  Sous-titre
+                  <textarea value={draft.subheadline || ""} onChange={(e) => patch("subheadline", e.target.value)} />
+                </label>
+                <label>
+                  Prix
+                  <input type="number" value={draft.price || ""} onChange={(e) => patch("price", e.target.value)} />
+                </label>
+                <label>
+                  Ancien prix
+                  <input
+                    type="number"
+                    value={draft.oldPrice || ""}
+                    onChange={(e) => patch("oldPrice", e.target.value)}
+                  />
+                </label>
+                <label>
+                  CTA
+                  <input value={draft.cta || ""} onChange={(e) => patch("cta", e.target.value)} />
+                </label>
+                <label>
+                  Image principale
+                  <input
+                    value={(draft.images || draft.product_images || [])[0] || ""}
+                    placeholder="URL image"
+                    onChange={(e) => {
+                      const imgs = [...(draft.images || draft.product_images || [])];
+                      imgs[0] = e.target.value;
+                      patch("images", imgs);
+                    }}
+                  />
+                </label>
+                <label className="bv3-upload">
+                  Charger depuis ordinateur
+                  <input
+                    type="file"
+                    accept="image/*"
+                    multiple
+                    disabled={uploading}
+                    onChange={(e) => uploadHero(Array.from(e.target.files || []))}
+                  />
+                  <span>{uploading ? "Chargement…" : "Choisir plusieurs images"}</span>
+                </label>
+                <div className="bv3-media-grid">
+                  {(draft.images || draft.product_images || []).map((x: string, i: number) => (
+                    <div key={x + i} className={i === 0 ? "main" : ""}>
+                      <img src={x} alt="" />
+                      <div>
+                        <button type="button" onClick={() => setMainImage(i)}>
+                          {i === 0 ? "Principale" : "Mettre principale"}
+                        </button>
+                        <button type="button" onClick={() => removeImage(i)}>
+                          ×
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </>
+            )}
+            {selected === "benefits" && (
+              <>
+                <label>
+                  Titre
+                  <input value={draft.benefits_title || ""} onChange={(e) => patch("benefits_title", e.target.value)} />
+                </label>
+                <label>
+                  Description
+                  <textarea value={draft.description || ""} onChange={(e) => patch("description", e.target.value)} />
+                </label>
+                <label>
+                  Bénéfices · 1 par ligne
+                  <textarea
+                    value={list("benefits").join("\n")}
+                    onChange={(e) => patch("benefits", e.target.value.split("\n").filter(Boolean))}
+                  />
+                </label>
+              </>
+            )}
+            {selected === "features" && (
+              <>
+                <label>
+                  Titre
+                  <input value={draft.features_title || ""} onChange={(e) => patch("features_title", e.target.value)} />
+                </label>
+                <label>
+                  Caractéristiques · 1 par ligne
+                  <textarea
+                    value={list("features").join("\n")}
+                    onChange={(e) => patch("features", e.target.value.split("\n").filter(Boolean))}
+                  />
+                </label>
+              </>
+            )}
+            {selected === "how" && (
+              <>
+                <label>
+                  Titre
+                  <input value={draft.how_title || ""} onChange={(e) => patch("how_title", e.target.value)} />
+                </label>
+                <label>
+                  Étapes · 1 par ligne
+                  <textarea
+                    value={list("how_steps").join("\n")}
+                    onChange={(e) => patch("how_steps", e.target.value.split("\n").filter(Boolean))}
+                  />
+                </label>
+              </>
+            )}
+            {selected === "problem" && (
+              <>
+                <label>
+                  Titre
+                  <input value={draft.problem_title || ""} onChange={(e) => patch("problem_title", e.target.value)} />
+                </label>
+                <label>
+                  Problème
+                  <textarea value={draft.problem || ""} onChange={(e) => patch("problem", e.target.value)} />
+                </label>
+                <label>
+                  Solution
+                  <textarea value={draft.solution || ""} onChange={(e) => patch("solution", e.target.value)} />
+                </label>
+              </>
+            )}
+            {selected === "order" && (
+              <>
+                <label>
+                  Titre
+                  <input value={draft.order_title || ""} onChange={(e) => patch("order_title", e.target.value)} />
+                </label>
+                <label>
+                  Texte livraison
+                  <input value={draft.delivery || ""} onChange={(e) => patch("delivery", e.target.value)} />
+                </label>
+                <label>
+                  CTA
+                  <input value={draft.cta || ""} onChange={(e) => patch("cta", e.target.value)} />
+                </label>
+                <label className="bv3-check">
+                  <input
+                    type="checkbox"
+                    checked={draft.order_show_address !== false}
+                    onChange={(e) => patch("order_show_address", e.target.checked)}
+                  />{" "}
+                  Afficher adresse
+                </label>
+              </>
+            )}
+            {selected === "trust" && (
+              <>
+                <label>
+                  Titre
+                  <input value={draft.trust_title || ""} onChange={(e) => patch("trust_title", e.target.value)} />
+                </label>
+                <label>
+                  Points confiance · 1 par ligne
+                  <textarea
+                    value={list("trust_points").join("\n")}
+                    onChange={(e) => patch("trust_points", e.target.value.split("\n").filter(Boolean))}
+                  />
+                </label>
+              </>
+            )}
+            {selected.startsWith("custom-") &&
+              (() => {
+                const b = draft.custom_sections?.[selected] || {};
+                const cp = (k: string, v: any) =>
+                  commit({
+                    ...draft,
+                    custom_sections: { ...(draft.custom_sections || {}), [selected]: { ...b, [k]: v } },
+                  });
+                return (
+                  <>
+                    <label>
+                      Titre
+                      <input value={b.title || ""} onChange={(e) => cp("title", e.target.value)} />
+                    </label>
+                    <label>
+                      Texte
+                      <textarea value={b.text || ""} onChange={(e) => cp("text", e.target.value)} />
+                    </label>
+                    {b.type === "imageText" && (
+                      <>
+                        <label>
+                          Image
+                          <input value={b.image || ""} onChange={(e) => cp("image", e.target.value)} />
+                        </label>
+                        <label className="bv3-upload">
+                          Charger image locale
+                          <input
+                            type="file"
+                            accept="image/*"
+                            disabled={uploading}
+                            onChange={(e) => uploadCustom(selected, Array.from(e.target.files || []), "single")}
+                          />
+                          <span>{uploading ? "Chargement…" : "Choisir une image"}</span>
+                        </label>
+                        {b.image && <img className="bv3-media-preview" src={b.image} alt="" />}
+                      </>
+                    )}
+                    {b.type === "gallery" && (
+                      <>
+                        <label className="bv3-upload">
+                          Ajouter des images
+                          <input
+                            type="file"
+                            accept="image/*"
+                            multiple
+                            disabled={uploading}
+                            onChange={(e) => uploadCustom(selected, Array.from(e.target.files || []), "gallery")}
+                          />
+                          <span>{uploading ? "Chargement…" : "Choisir plusieurs images"}</span>
+                        </label>
+                        <div className="bv3-media-grid">
+                          {(b.images || []).map((x: string, i: number) => (
+                            <div key={x + i}>
+                              <img src={x} alt="" />
+                              <div>
+                                <button type="button" onClick={() => removeGalleryImage(selected, i)}>
+                                  Supprimer
+                                </button>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </>
+                    )}
+                    {b.type === "vertical916" && (
+                      <>
+                        <label>
+                          Média
+                          <input value={b.media || ""} onChange={(e) => cp("media", e.target.value)} />
+                        </label>
+                        <label className="bv3-upload">
+                          Charger image ou vidéo
+                          <input
+                            type="file"
+                            accept="image/*,video/*"
+                            disabled={uploading}
+                            onChange={(e) => uploadCustom(selected, Array.from(e.target.files || []), "media")}
+                          />
+                          <span>{uploading ? "Chargement…" : "Choisir image / vidéo"}</span>
+                        </label>
+                        <label>
+                          Largeur maximale
+                          <input
+                            type="number"
+                            min="160"
+                            max="1600"
+                            value={b.mediaWidth || ""}
+                            placeholder="430"
+                            onChange={(e) => cp("mediaWidth", e.target.value ? Number(e.target.value) : null)}
+                          />
+                        </label>
+                        <label>
+                          Hauteur
+                          <input
+                            type="number"
+                            min="120"
+                            max="1600"
+                            value={b.mediaHeight || ""}
+                            placeholder="Auto selon ratio"
+                            onChange={(e) => cp("mediaHeight", e.target.value ? Number(e.target.value) : null)}
+                          />
+                        </label>
+                        <label>
+                          Ratio
+                          <select value={b.mediaRatio || "device"} onChange={(e) => cp("mediaRatio", e.target.value)}>
+                            <option value="device">Selon appareil</option>
+                            <option value="auto">Auto</option>
+                            <option value="1 / 1">1:1</option>
+                            <option value="4 / 3">4:3</option>
+                            <option value="16 / 9">16:9</option>
+                            <option value="9 / 16">9:16</option>
+                          </select>
+                        </label>
+                        <label>
+                          Affichage
+                          <select value={b.mediaFit || "cover"} onChange={(e) => cp("mediaFit", e.target.value)}>
+                            <option value="cover">Cover · remplir</option>
+                            <option value="contain">Contain · média entier</option>
+                            <option value="fill">Fill · étirer</option>
+                          </select>
+                        </label>
+                        <label>
+                          Alignement
+                          <select value={b.mediaAlign || "center"} onChange={(e) => cp("mediaAlign", e.target.value)}>
+                            <option value="left">Gauche</option>
+                            <option value="center">Centre</option>
+                            <option value="right">Droite</option>
+                          </select>
+                        </label>
+                        <div className="bv3-help">
+                          <b>Responsive par appareil</b>
+                          <br />
+                          Laissez vide pour reprendre les dimensions générales ci-dessus.
+                        </div>
+                        <label>
+                          Largeur tablette
+                          <input
+                            type="number"
+                            min="160"
+                            max="1200"
+                            value={b.mediaWidthTablet || ""}
+                            placeholder="Hérite de la largeur générale"
+                            onChange={(e) => cp("mediaWidthTablet", e.target.value ? Number(e.target.value) : null)}
+                          />
+                        </label>
+                        <label>
+                          Hauteur tablette
+                          <input
+                            type="number"
+                            min="120"
+                            max="1600"
+                            value={b.mediaHeightTablet || ""}
+                            placeholder="Auto"
+                            onChange={(e) => cp("mediaHeightTablet", e.target.value ? Number(e.target.value) : null)}
+                          />
+                        </label>
+                        <label>
+                          Largeur mobile
+                          <input
+                            type="number"
+                            min="120"
+                            max="800"
+                            value={b.mediaWidthMobile || ""}
+                            placeholder="100% si vide"
+                            onChange={(e) => cp("mediaWidthMobile", e.target.value ? Number(e.target.value) : null)}
+                          />
+                        </label>
+                        <label>
+                          Hauteur mobile
+                          <input
+                            type="number"
+                            min="120"
+                            max="1400"
+                            value={b.mediaHeightMobile || ""}
+                            placeholder="Auto"
+                            onChange={(e) => cp("mediaHeightMobile", e.target.value ? Number(e.target.value) : null)}
+                          />
+                        </label>
+                        {b.mediaType === "video" && (
+                          <>
+                            <label className="bv3-check">
+                              <input
+                                type="checkbox"
+                                checked={b.videoAutoplay === true}
+                                onChange={(e) => cp("videoAutoplay", e.target.checked)}
+                              />{" "}
+                              Autoplay
+                            </label>
+                            <label className="bv3-check">
+                              <input
+                                type="checkbox"
+                                checked={b.videoMuted !== false}
+                                onChange={(e) => cp("videoMuted", e.target.checked)}
+                              />{" "}
+                              Muet
+                            </label>
+                            <label className="bv3-check">
+                              <input
+                                type="checkbox"
+                                checked={b.videoLoop === true}
+                                onChange={(e) => cp("videoLoop", e.target.checked)}
+                              />{" "}
+                              Boucle
+                            </label>
+                            <label className="bv3-check">
+                              <input
+                                type="checkbox"
+                                checked={b.videoControls !== false}
+                                onChange={(e) => cp("videoControls", e.target.checked)}
+                              />{" "}
+                              Contrôles vidéo
+                            </label>
+                          </>
+                        )}
+                        {b.media &&
+                          (b.mediaType === "video" ? (
+                            <video className="bv3-media-preview" src={b.media} controls />
+                          ) : (
+                            <img className="bv3-media-preview" src={b.media} alt="" />
+                          ))}
+                      </>
+                    )}
+                    {b.type === "ctaBlock" && (
+                      <label>
+                        Bouton
+                        <input value={b.button || ""} onChange={(e) => cp("button", e.target.value)} />
+                      </label>
+                    )}
+                  </>
+                );
+              })()}
+            {(LANDPRO_SECTIONS as readonly string[]).includes(selected) && (
+              <LandproSectionEditor draft={draft} selected={selected} patch={patch} />
+            )}
+            {selected === "faq" && (
+              <>
+                <label>
+                  Titre
+                  <input value={draft.faq_title || ""} onChange={(e) => patch("faq_title", e.target.value)} />
+                </label>
+                <div className="bv3-faq-editor">
+                  {list("faq").map((item: any, i: number) => {
+                    const obj = typeof item === "string" ? { question: item, answer: "" } : item || {};
+                    const update = (k: string, v: string) => {
+                      const next = list("faq").map((x: any, j: number) =>
+                        j === i ? { ...(typeof x === "string" ? { question: x, answer: "" } : x), [k]: v } : x,
+                      );
+                      patch("faq", next);
+                    };
+                    return (
+                      <div className="bv3-faq-item" key={i}>
+                        <div>
+                          <b>Question {i + 1}</b>
+                          <button
+                            type="button"
+                            onClick={() =>
+                              patch(
+                                "faq",
+                                list("faq").filter((_: any, j: number) => j !== i),
+                              )
+                            }
+                          >
+                            ×
+                          </button>
+                        </div>
+                        <label>
+                          Question
+                          <input value={obj.question || ""} onChange={(e) => update("question", e.target.value)} />
+                        </label>
+                        <label>
+                          Réponse
+                          <textarea value={obj.answer || ""} onChange={(e) => update("answer", e.target.value)} />
+                        </label>
+                      </div>
+                    );
+                  })}
+                  <button
+                    type="button"
+                    className="bv3-add-faq"
+                    onClick={() =>
+                      patch("faq", [...list("faq"), { question: "Nouvelle question", answer: "Nouvelle réponse" }])
+                    }
+                  >
+                    + Ajouter une question
+                  </button>
+                </div>
+              </>
+            )}
+            <hr />
+            <b>Design System</b>
+            <small>{ds.productType || "UI/UX Pro Max"}</small>
+            <small>{ds.style?.["Style Category"] || ""}</small>
+            <small>{ds.landing?.["Pattern Name"] || ""}</small>
+          </div>
+        </aside>
+      </div>
+    </div>
+  );
+}

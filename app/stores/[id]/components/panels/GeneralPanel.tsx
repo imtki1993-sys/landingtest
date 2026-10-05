@@ -1,4 +1,27 @@
 "use client";
-export default function GeneralPanel({store,setStore,settings,setSettings}:any){
- return <div className="store-settings-card"><h2>Informations boutique</h2><label>Nom<input value={store.name} onChange={e=>setStore({...store,name:e.target.value})}/></label><label>Langue<select value={store.locale} onChange={e=>setStore({...store,locale:e.target.value})}><option value="darija">Darija Maroc</option><option value="ar">العربية</option><option value="fr">Français</option></select></label><label>Annonce<input value={settings.announcement} onChange={e=>setSettings({...settings,announcement:e.target.value})}/></label></div>
+export default function GeneralPanel({ store, setStore, settings, setSettings }: any) {
+  return (
+    <div className="store-settings-card">
+      <h2>Informations boutique</h2>
+      <label>
+        Nom
+        <input value={store.name} onChange={(e) => setStore({ ...store, name: e.target.value })} />
+      </label>
+      <label>
+        Langue
+        <select value={store.locale} onChange={(e) => setStore({ ...store, locale: e.target.value })}>
+          <option value="darija">Darija Maroc</option>
+          <option value="ar">العربية</option>
+          <option value="fr">Français</option>
+        </select>
+      </label>
+      <label>
+        Annonce
+        <input
+          value={settings.announcement}
+          onChange={(e) => setSettings({ ...settings, announcement: e.target.value })}
+        />
+      </label>
+    </div>
+  );
 }

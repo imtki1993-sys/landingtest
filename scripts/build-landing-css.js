@@ -17,7 +17,9 @@ const PUBLIC_FILES = [
 const OUT = path.join(ROOT, "app/landing-public.css");
 
 let postcss;
-try { postcss = require("postcss"); } catch {
+try {
+  postcss = require("postcss");
+} catch {
   console.warn("[landing-css] postcss introuvable : app/landing-public.css conservé tel quel.");
   process.exit(0);
 }
@@ -36,15 +38,25 @@ const pre = [...prefixes];
 const allowed = (c) => tokens.has(c) || pre.some((p) => c.startsWith(p));
 
 const root = postcss.parse(fs.readFileSync(path.join(ROOT, "app/globals.css"), "utf8"));
-let kept = 0, dropped = 0;
+let kept = 0,
+  dropped = 0;
 root.walkAtRules("import", (a) => a.remove()); // polices chargées sans bloquer par app/landing/layout.tsx
 root.walkRules((r) => {
   if (r.parent && r.parent.type === "atrule" && /keyframes/i.test(r.parent.name)) return;
   const sels = r.selectors.filter((sel) => (sel.match(/\.([A-Za-z_][\w-]*)/g) || []).every((c) => allowed(c.slice(1))));
-  if (!sels.length) { r.remove(); dropped++; } else { r.selectors = sels; kept++; }
+  if (!sels.length) {
+    r.remove();
+    dropped++;
+  } else {
+    r.selectors = sels;
+    kept++;
+  }
 });
-root.walkAtRules((a) => { if (a.nodes && !a.nodes.length) a.remove(); });
+root.walkAtRules((a) => {
+  if (a.nodes && !a.nodes.length) a.remove();
+});
 
-const header = "/* FICHIER GÉNÉRÉ par scripts/build-landing-css.js depuis globals.css — ne pas modifier à la main.\n   Contient uniquement les règles utilisables par les pages publiques (landing pages, boutiques). */\n";
+const header =
+  "/* FICHIER GÉNÉRÉ par scripts/build-landing-css.js depuis globals.css — ne pas modifier à la main.\n   Contient uniquement les règles utilisables par les pages publiques (landing pages, boutiques). */\n";
 fs.writeFileSync(OUT, header + root.toString());
 console.log(`[landing-css] ${kept} règles gardées, ${dropped} retirées → app/landing-public.css`);
