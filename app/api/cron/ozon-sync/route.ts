@@ -1,3 +1,4 @@
+import { publicMessage } from "../../../../lib/public-error";
 import { reportError } from "../../../../lib/monitoring";
 import { NextResponse } from "next/server";
 import { serviceDb, syncOzonOrder } from "../../../../lib/ozon";
@@ -91,6 +92,6 @@ export async function GET(req: Request) {
     return NextResponse.json({ ok: true, queued, checked, updated, failed, at: new Date().toISOString() });
   } catch (e: any) {
     reportError(e, "api/cron/ozon-sync");
-    return NextResponse.json({ error: e.message }, { status: 500 });
+    return NextResponse.json({ error: publicMessage(e) }, { status: 500 });
   }
 }

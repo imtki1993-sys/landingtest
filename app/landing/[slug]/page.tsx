@@ -1,4 +1,5 @@
 import LandingClient from "./LandingClient";
+import DocumentLang from "../../../components/public/DocumentLang";
 import type { Metadata } from "next";
 import { getPublicLanding } from "../../../lib/public-landing";
 
@@ -61,7 +62,12 @@ export default async function LandingPage({
   try {
     const data = await getPublicLanding(slug);
     if (!data) return <div className="lp-loading">Page introuvable</div>;
-    return <LandingClient initialSlug={slug} initialData={data} />;
+    return (
+      <>
+        <DocumentLang locale={(data as any).locale} />
+        <LandingClient initialSlug={slug} initialData={data} />
+      </>
+    );
   } catch {
     return <div className="lp-loading">Page indisponible</div>;
   }

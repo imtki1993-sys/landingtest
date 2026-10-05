@@ -10,7 +10,8 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "format": "prettier --write \"**/*.{ts,tsx,js,mjs}\"",
-    "format:check": "prettier --check \"**/*.{ts,tsx,js,mjs}\""
+    "format:check": "prettier --check \"**/*.{ts,tsx,js,mjs}\"",
+    "lint": "eslint ."
   },
   "dependencies": {
     "@supabase/supabase-js": "2.57.4",
@@ -24,6 +25,9 @@
     "typescript": "5.9.2"
   },
   "devDependencies": {
+    "@typescript-eslint/parser": "8.71.0",
+    "eslint": "9.39.5",
+    "eslint-plugin-react-hooks": "5.2.0",
     "prettier": "3.9.9",
     "vitest": "3.2.7"
   }

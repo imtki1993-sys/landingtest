@@ -1,3 +1,4 @@
+import { publicMessage } from "../../../../lib/public-error";
 import { reportError } from "../../../../lib/monitoring";
 import { withLandingInvalidation } from "../../../../lib/landing-cache";
 import { NextResponse } from "next/server";
@@ -99,7 +100,8 @@ async function PUTHandler(req: Request) {
     reportError(e, "api/pages/external");
     return NextResponse.json(
       {
-        error: e.name === "AbortError" ? "La landing met trop de temps à répondre" : e.message || "Analyse impossible",
+        error:
+          e.name === "AbortError" ? "La landing met trop de temps à répondre" : publicMessage(e, "Analyse impossible"),
       },
       { status: e.message === "Non autorisé" ? 401 : 500 },
     );
@@ -158,7 +160,7 @@ async function POSTHandler(req: Request) {
     return NextResponse.json({ page: data }, { status: 201 });
   } catch (e: any) {
     reportError(e, "api/pages/external");
-    return NextResponse.json({ error: e.message }, { status: e.message === "Non autorisé" ? 401 : 500 });
+    return NextResponse.json({ error: publicMessage(e) }, { status: e.message === "Non autorisé" ? 401 : 500 });
   }
 }
 

@@ -1,3 +1,4 @@
+import { publicMessage } from "../../../lib/public-error";
 import { reportError } from "../../../lib/monitoring";
 import { generateProfessionalStore } from "../../../lib/store-ai-generator";
 import { NextResponse } from "next/server";
@@ -44,7 +45,7 @@ export async function GET(req: Request) {
     return NextResponse.json({ stores });
   } catch (e: any) {
     reportError(e, "api/stores");
-    return NextResponse.json({ error: e.message, stores: [] }, { status: 500 });
+    return NextResponse.json({ error: publicMessage(e), stores: [] }, { status: 500 });
   }
 }
 export async function POST(req: Request) {
@@ -146,6 +147,6 @@ export async function POST(req: Request) {
     return NextResponse.json({ store: data }, { status: 201 });
   } catch (e: any) {
     reportError(e, "api/stores");
-    return NextResponse.json({ error: e.message }, { status: 500 });
+    return NextResponse.json({ error: publicMessage(e) }, { status: 500 });
   }
 }

@@ -1,3 +1,4 @@
+import { publicMessage } from "../../../lib/public-error";
 import { reportError } from "../../../lib/monitoring";
 import { NextResponse } from "next/server";
 import { authContext } from "../../../lib/server-auth";
@@ -177,6 +178,6 @@ export async function POST(req: Request) {
     });
   } catch (e: any) {
     reportError(e, "api/product-import");
-    return NextResponse.json({ error: e?.message || "Import fournisseur impossible" }, { status: 500 });
+    return NextResponse.json({ error: publicMessage(e, "Import fournisseur impossible") }, { status: 500 });
   }
 }

@@ -1,3 +1,4 @@
+import { publicMessage } from "../../../lib/public-error";
 import { reportError } from "../../../lib/monitoring";
 import { NextResponse } from "next/server";
 import { authContext } from "../../../lib/server-auth";
@@ -19,7 +20,7 @@ export async function GET(req: Request) {
     return NextResponse.json({ domains: data || [], vercelConfigured: !!process.env.VERCEL_TOKEN });
   } catch (e: any) {
     reportError(e, "api/domains");
-    return NextResponse.json({ error: e.message, domains: [] }, { status: 500 });
+    return NextResponse.json({ error: publicMessage(e), domains: [] }, { status: 500 });
   }
 }
 export async function POST(req: Request) {
@@ -76,6 +77,6 @@ export async function POST(req: Request) {
     return NextResponse.json({ domain: data, vercel: vx, dnsRequired: !verified }, { status: 201 });
   } catch (e: any) {
     reportError(e, "api/domains");
-    return NextResponse.json({ error: e.message }, { status: 500 });
+    return NextResponse.json({ error: publicMessage(e) }, { status: 500 });
   }
 }

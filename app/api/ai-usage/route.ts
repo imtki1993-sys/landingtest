@@ -1,3 +1,4 @@
+import { publicMessage } from "../../../lib/public-error";
 import { reportError } from "../../../lib/monitoring";
 import { NextResponse } from "next/server";
 import { authContext } from "../../../lib/server-auth";
@@ -32,6 +33,6 @@ export async function GET(req: Request) {
     });
   } catch (e: any) {
     reportError(e, "api/ai-usage");
-    return NextResponse.json({ error: e?.message || "Erreur statistiques IA" }, { status: 401 });
+    return NextResponse.json({ error: publicMessage(e, "Erreur statistiques IA") }, { status: 401 });
   }
 }

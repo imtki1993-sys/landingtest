@@ -1,3 +1,4 @@
+import { publicMessage } from "../../../lib/public-error";
 import { reportError } from "../../../lib/monitoring";
 import { NextResponse, after } from "next/server";
 import { createClient } from "@supabase/supabase-js";
@@ -158,7 +159,7 @@ export async function GET(req: Request) {
     });
   } catch (e: any) {
     reportError(e, "api/orders");
-    return NextResponse.json({ error: e.message, orders: [] }, { status: 500 });
+    return NextResponse.json({ error: publicMessage(e), orders: [] }, { status: 500 });
   }
 }
 export async function POST(req: Request) {
@@ -221,7 +222,9 @@ export async function POST(req: Request) {
     const m = String(e.message || "");
     const limited = /order_limit_reached|subscription_inactive/.test(m);
     return NextResponse.json(
-      { error: m === "order_limit_reached" ? "Limite mensuelle de commandes atteinte pour ce plan." : m },
+      {
+        error: m === "order_limit_reached" ? "Limite mensuelle de commandes atteinte pour ce plan." : publicMessage(e),
+      },
       { status: limited ? 403 : 500 },
     );
   }

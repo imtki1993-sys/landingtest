@@ -1,3 +1,4 @@
+import { publicMessage } from "../../../../lib/public-error";
 import { reportError } from "../../../../lib/monitoring";
 import { withLandingInvalidation } from "../../../../lib/landing-cache";
 import { NextResponse } from "next/server";
@@ -38,7 +39,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
     });
   } catch (e: any) {
     reportError(e, "api/pages/[id]");
-    return NextResponse.json({ error: e.message }, { status: e.message === "Non autorisé" ? 401 : 500 });
+    return NextResponse.json({ error: publicMessage(e) }, { status: e.message === "Non autorisé" ? 401 : 500 });
   }
 }
 
@@ -147,7 +148,7 @@ async function PATCHHandler(req: Request, { params }: { params: Promise<{ id: st
     return NextResponse.json(data);
   } catch (e: any) {
     reportError(e, "api/pages/[id]");
-    return NextResponse.json({ error: e.message }, { status: e.message === "Non autorisé" ? 401 : 500 });
+    return NextResponse.json({ error: publicMessage(e) }, { status: e.message === "Non autorisé" ? 401 : 500 });
   }
 }
 
@@ -168,7 +169,7 @@ async function DELETEHandler(req: Request, { params }: { params: Promise<{ id: s
     return NextResponse.json({ ok: true, archived: true });
   } catch (e: any) {
     reportError(e, "api/pages/[id]");
-    return NextResponse.json({ error: e.message }, { status: e.message === "Non autorisé" ? 401 : 500 });
+    return NextResponse.json({ error: publicMessage(e) }, { status: e.message === "Non autorisé" ? 401 : 500 });
   }
 }
 

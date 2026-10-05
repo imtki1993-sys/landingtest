@@ -1,3 +1,4 @@
+import { publicMessage } from "../../../lib/public-error";
 import { reportError } from "../../../lib/monitoring";
 import { withLandingInvalidation } from "../../../lib/landing-cache";
 import { NextResponse } from "next/server";
@@ -34,7 +35,10 @@ export async function GET(req: Request) {
     });
   } catch (e: any) {
     reportError(e, "api/pages");
-    return NextResponse.json({ error: e.message, pages: [] }, { status: e.message === "Non autorisé" ? 401 : 500 });
+    return NextResponse.json(
+      { error: publicMessage(e), pages: [] },
+      { status: e.message === "Non autorisé" ? 401 : 500 },
+    );
   }
 }
 async function POSTHandler(req: Request) {
@@ -241,7 +245,7 @@ async function POSTHandler(req: Request) {
     );
   } catch (e: any) {
     reportError(e, "api/pages");
-    return NextResponse.json({ error: e.message }, { status: e.message === "Non autorisé" ? 401 : 500 });
+    return NextResponse.json({ error: publicMessage(e) }, { status: e.message === "Non autorisé" ? 401 : 500 });
   }
 }
 export const POST = withLandingInvalidation(POSTHandler);
