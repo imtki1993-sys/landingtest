@@ -25,7 +25,14 @@ export interface LandproTemplateProps {
   onSubmit?: (e: React.FormEvent<HTMLFormElement>, qty: number) => void;
 }
 
-export default function LandproTemplate({ data, preview = false, demo = false, builderMode = false, onSectionSelect, onSubmit }: LandproTemplateProps) {
+export default function LandproTemplate({
+  data,
+  preview = false,
+  demo = false,
+  builderMode = false,
+  onSectionSelect,
+  onSubmit,
+}: LandproTemplateProps) {
   const vm = useMemo(() => buildVM(data, { demo }), [data, demo]);
   const [qty, setQty] = useState(vm.defaultQty);
   const [variant, setVariant] = useState(0);
@@ -55,10 +62,20 @@ export default function LandproTemplate({ data, preview = false, demo = false, b
   const block = (key: string, node: React.ReactNode) => {
     const hidden = vm.hidden.has(key);
     if (!builderMode) return hidden ? null : <React.Fragment key={key}>{node}</React.Fragment>;
-    const label = key.startsWith("custom-") ? "Bloc personnalisé" : SECTION_LABELS[key as keyof typeof SECTION_LABELS] || key;
+    const label = key.startsWith("custom-")
+      ? "Bloc personnalisé"
+      : SECTION_LABELS[key as keyof typeof SECTION_LABELS] || key;
     return (
-      <div key={key} data-lpx-section={key} className={cx("block", hidden && "is-hidden")} onClick={() => onSectionSelect?.(key)}>
-        <span className={cx("block-tag")}>{label}{hidden ? " · masquée" : ""}</span>
+      <div
+        key={key}
+        data-lpx-section={key}
+        className={cx("block", hidden && "is-hidden")}
+        onClick={() => onSectionSelect?.(key)}
+      >
+        <span className={cx("block-tag")}>
+          {label}
+          {hidden ? " · masquée" : ""}
+        </span>
         {node}
       </div>
     );
@@ -69,7 +86,13 @@ export default function LandproTemplate({ data, preview = false, demo = false, b
     if (isEmpty(key, vm)) {
       return builderMode ? (
         <section className={cx("section")}>
-          <div className={cx("container")}><div className={cx("empty")}><b>{SECTION_LABELS[key as keyof typeof SECTION_LABELS] || key}</b><br />{EMPTY_HINT[key] || "Section vide."}</div></div>
+          <div className={cx("container")}>
+            <div className={cx("empty")}>
+              <b>{SECTION_LABELS[key as keyof typeof SECTION_LABELS] || key}</b>
+              <br />
+              {EMPTY_HINT[key] || "Section vide."}
+            </div>
+          </div>
         </section>
       ) : null;
     }
@@ -79,7 +102,9 @@ export default function LandproTemplate({ data, preview = false, demo = false, b
   return (
     <div className={cx("root")}>
       <div
-        className={["lpx", builderMode ? "lpx-builder" : "", theme.glow ? "lpx-glow" : "", `lpx-tpl-${vm.t.id}`].filter(Boolean).join(" ")}
+        className={["lpx", builderMode ? "lpx-builder" : "", theme.glow ? "lpx-glow" : "", `lpx-tpl-${vm.t.id}`]
+          .filter(Boolean)
+          .join(" ")}
         style={{ ...style, ["--font" as string]: fonts[theme.font], ["--heading" as string]: fonts[theme.heading] }}
         dir={vm.rtl ? "rtl" : "ltr"}
         lang={vm.lang}
@@ -90,28 +115,38 @@ export default function LandproTemplate({ data, preview = false, demo = false, b
           <div className={cx("container")}>
             <span className={cx("header-name")}>{vm.name}</span>
             <div className={cx("header-actions")}>
-              <button type="button" className={cx("btn")} onClick={scrollToOrder}>{vm.cta}</button>
+              <button type="button" className={cx("btn")} onClick={scrollToOrder}>
+                {vm.cta}
+              </button>
             </div>
           </div>
         </header>
 
-        {keys.filter((k) => k !== "announcement").map((key) => {
-          const node = sectionNode(key);
-          if (node === null && !builderMode) return null;
-          return block(key, node);
-        })}
+        {keys
+          .filter((k) => k !== "announcement")
+          .map((key) => {
+            const node = sectionNode(key);
+            if (node === null && !builderMode) return null;
+            return block(key, node);
+          })}
 
         <footer className={cx("lp-footer")}>
           <div className={cx("container")}>
-            <p>© {new Date().getFullYear()} {vm.name}</p>
+            <p>
+              © {new Date().getFullYear()} {vm.name}
+            </p>
             <p>{vm.delivery}</p>
           </div>
         </footer>
 
         {vm.price > 0 && (
           <div className={cx("sticky-cta")}>
-            <span className={cx("p")}>{formatPrice((vm.offers.find((o) => o.qty === qty)?.price) ?? vm.price, vm.currency)}</span>
-            <button type="button" className={cx("btn pulse")} onClick={scrollToOrder}>{vm.cta}</button>
+            <span className={cx("p")}>
+              {formatPrice(vm.offers.find((o) => o.qty === qty)?.price ?? vm.price, vm.currency)}
+            </span>
+            <button type="button" className={cx("btn pulse")} onClick={scrollToOrder}>
+              {vm.cta}
+            </button>
           </div>
         )}
       </div>

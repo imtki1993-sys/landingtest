@@ -6,7 +6,14 @@ import type { LandingV4Data } from "./landpro/types";
 
 export type { LandingV4Data };
 
-export default function LandingTemplateV4({ data, preview = false, demo = false, builderMode = false, onSectionSelect, onSubmit }: {
+export default function LandingTemplateV4({
+  data,
+  preview = false,
+  demo = false,
+  builderMode = false,
+  onSectionSelect,
+  onSubmit,
+}: {
   data: LandingV4Data;
   preview?: boolean;
   demo?: boolean;

@@ -19,7 +19,13 @@ export type LandingTemplatePreset = {
 };
 
 const formStyleFor = (variant: string): LandingTemplatePreset["formStyle"] =>
-  variant === "luxury" || variant === "editorial" ? "premium" : variant === "oneScreen" || variant === "flash" ? "compact" : variant === "marketplace" ? "cards" : "classic";
+  variant === "luxury" || variant === "editorial"
+    ? "premium"
+    : variant === "oneScreen" || variant === "flash"
+      ? "compact"
+      : variant === "marketplace"
+        ? "cards"
+        : "classic";
 
 export const LANDING_TEMPLATE_PRESETS: LandingTemplatePreset[] = TEMPLATES.map((t) => ({
   id: t.id,
@@ -36,7 +42,10 @@ export const LANDING_TEMPLATE_PRESETS: LandingTemplatePreset[] = TEMPLATES.map((
   locale: t.lang === "ar" ? "ar-MA" : "fr",
 }));
 
-export const LANDING_TEMPLATE_CATEGORIES = ["Tous", ...Array.from(new Set(LANDING_TEMPLATE_PRESETS.map((x) => x.category)))];
+export const LANDING_TEMPLATE_CATEGORIES = [
+  "Tous",
+  ...Array.from(new Set(LANDING_TEMPLATE_PRESETS.map((x) => x.category))),
+];
 
 export const landingTemplate = (id: string): LandingTemplatePreset => {
   const t = getTemplate(id);

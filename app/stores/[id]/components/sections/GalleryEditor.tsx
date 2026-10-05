@@ -1,2 +1,25 @@
 "use client";
-export default function GalleryEditor({block,patchBlock,imageFiles}:any){const b=block;return <><label className="store-upload-btn">▦ Ajouter des photos<input hidden multiple type="file" accept="image/*" onChange={e=>imageFiles(e,b,true)}/></label><div className="store-mini-gallery">{(b.images||[]).map((im:string,n:number)=><span key={n}><img src={im} alt=""/><button type="button" onClick={()=>patchBlock(b.id,{images:(b.images||[]).filter((_:any,k:number)=>k!==n)})}>×</button></span>)}</div></>}
+export default function GalleryEditor({ block, patchBlock, imageFiles }: any) {
+  const b = block;
+  return (
+    <>
+      <label className="store-upload-btn">
+        ▦ Ajouter des photos
+        <input hidden multiple type="file" accept="image/*" onChange={(e) => imageFiles(e, b, true)} />
+      </label>
+      <div className="store-mini-gallery">
+        {(b.images || []).map((im: string, n: number) => (
+          <span key={n}>
+            <img src={im} alt="" />
+            <button
+              type="button"
+              onClick={() => patchBlock(b.id, { images: (b.images || []).filter((_: any, k: number) => k !== n) })}
+            >
+              ×
+            </button>
+          </span>
+        ))}
+      </div>
+    </>
+  );
+}

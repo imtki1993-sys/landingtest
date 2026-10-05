@@ -1,5 +1,59 @@
-import {reportError} from "../../../lib/monitoring";
-import {NextResponse} from "next/server";import {createClient} from "@supabase/supabase-js";
-function db(){const u=process.env.NEXT_PUBLIC_SUPABASE_URL,k=process.env.SUPABASE_SECRET_KEY;if(!u||!k)throw new Error("Supabase env missing");return createClient(u,k,{auth:{persistSession:false}})}
-const allowed=new Set(["page_view","cta_click","whatsapp_click","form_start","form_submit","scroll_50","scroll_100"]);
-export async function POST(req:Request){try{const b=await req.json(),event=String(b.event||"").toLowerCase();if(!allowed.has(event))return NextResponse.json({ok:false},{status:400});const s=db();const {data:lp}=await s.from("landing_pages").select("id,workspace_id").eq("slug",String(b.slug||"")).is("archived_at",null).maybeSingle();if(!lp)return NextResponse.json({ok:false},{status:404});const ua=req.headers.get("user-agent")||"",device=/mobile|android|iphone/i.test(ua)?"mobile":/ipad|tablet/i.test(ua)?"tablet":"desktop";const u=new URL(req.url);const {error}=await s.from("analytics_events").insert({workspace_id:lp.workspace_id,landing_page_id:lp.id,event,occurred_at:new Date().toISOString(),session_id:String(b.session_id||"").slice(0,100)||null,visitor_id:String(b.visitor_id||"").slice(0,100)||null,path:String(b.path||"").slice(0,500)||null,referrer:String(b.referrer||"").slice(0,1000)||null,utm_source:b.utm_source||null,utm_medium:b.utm_medium||null,utm_campaign:b.utm_campaign||null,utm_content:b.utm_content||null,utm_term:b.utm_term||null,fbclid:b.fbclid||null,device,metadata:{source:"landing_motor"}});if(error)throw error;return NextResponse.json({ok:true})}catch(e:any){reportError(e,"api/track");return NextResponse.json({error:e.message},{status:500})}}
+import { reportError } from "../../../lib/monitoring";
+import { NextResponse } from "next/server";
+import { createClient } from "@supabase/supabase-js";
+function db() {
+  const u = process.env.NEXT_PUBLIC_SUPABASE_URL,
+    k = process.env.SUPABASE_SECRET_KEY;
+  if (!u || !k) throw new Error("Supabase env missing");
+  return createClient(u, k, { auth: { persistSession: false } });
+}
+const allowed = new Set([
+  "page_view",
+  "cta_click",
+  "whatsapp_click",
+  "form_start",
+  "form_submit",
+  "scroll_50",
+  "scroll_100",
+]);
+export async function POST(req: Request) {
+  try {
+    const b = await req.json(),
+      event = String(b.event || "").toLowerCase();
+    if (!allowed.has(event)) return NextResponse.json({ ok: false }, { status: 400 });
+    const s = db();
+    const { data: lp } = await s
+      .from("landing_pages")
+      .select("id,workspace_id")
+      .eq("slug", String(b.slug || ""))
+      .is("archived_at", null)
+      .maybeSingle();
+    if (!lp) return NextResponse.json({ ok: false }, { status: 404 });
+    const ua = req.headers.get("user-agent") || "",
+      device = /mobile|android|iphone/i.test(ua) ? "mobile" : /ipad|tablet/i.test(ua) ? "tablet" : "desktop";
+    const u = new URL(req.url);
+    const { error } = await s.from("analytics_events").insert({
+      workspace_id: lp.workspace_id,
+      landing_page_id: lp.id,
+      event,
+      occurred_at: new Date().toISOString(),
+      session_id: String(b.session_id || "").slice(0, 100) || null,
+      visitor_id: String(b.visitor_id || "").slice(0, 100) || null,
+      path: String(b.path || "").slice(0, 500) || null,
+      referrer: String(b.referrer || "").slice(0, 1000) || null,
+      utm_source: b.utm_source || null,
+      utm_medium: b.utm_medium || null,
+      utm_campaign: b.utm_campaign || null,
+      utm_content: b.utm_content || null,
+      utm_term: b.utm_term || null,
+      fbclid: b.fbclid || null,
+      device,
+      metadata: { source: "landing_motor" },
+    });
+    if (error) throw error;
+    return NextResponse.json({ ok: true });
+  } catch (e: any) {
+    reportError(e, "api/track");
+    return NextResponse.json({ error: e.message }, { status: 500 });
+  }
+}

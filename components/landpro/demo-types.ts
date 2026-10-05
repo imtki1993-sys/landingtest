@@ -70,4 +70,3 @@ export interface DemoProduct {
   /** Traductions optionnelles */
   i18n?: Partial<Record<Lang, Partial<DemoCopy>>>;
 }
-

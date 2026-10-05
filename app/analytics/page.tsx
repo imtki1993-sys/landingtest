@@ -1,11 +1,292 @@
-"use client";import Link from "next/link";import SaaSSidebar from "../components/SaaSSidebar";import SaaSTopbar from "../components/SaaSTopbar";import {useEffect,useState} from "react";
-export default function Analytics(){const [d,setD]=useState<any>(null),[days,setDays]=useState(30),[from,setFrom]=useState(""),[to,setTo]=useState(""),[product,setProduct]=useState(""),[products,setProducts]=useState<any[]>([]),[pageSize,setPageSize]=useState(10),[page,setPage]=useState(1);useEffect(()=>{fetch("/api/products?limit=100",{cache:"no-store"}).then(r=>r.json()).then(x=>setProducts(x.products||[]))},[]);useEffect(()=>{const q=new URLSearchParams({days:String(days)});if(from)q.set("from",from);if(to)q.set("to",to);if(product)q.set("product_id",product);fetch("/api/analytics?"+q.toString(),{cache:"no-store"}).then(r=>r.json()).then(setD)},[days,from,to,product]);const rows=d?.landings||[],totalPages=Math.max(1,Math.ceil(rows.length/pageSize)),visibleRows=rows.slice((page-1)*pageSize,page*pageSize),t=d?.totals||{},pct=(v:any)=>Number(v||0).toFixed(1)+"%";return <main className="dash-shell has-shared-topbar"><SaaSTopbar/><SaaSSidebar/><section className="dash-content pages-dashboard analytics-dashboard"><header className="dash-header"><div><span className="eyebrow">FUNNEL COD</span><h1>Analytics</h1><p>Du visiteur jusqu’à la livraison finale.</p></div><div className="analytics-filters"><select value={days} onChange={e=>{setDays(Number(e.target.value));setFrom("");setTo("")}}><option value="7">7 jours</option><option value="30">30 jours</option><option value="90">90 jours</option></select><input aria-label="Date début" type="date" value={from} onChange={e=>setFrom(e.target.value)}/><span>→</span><input aria-label="Date fin" type="date" value={to} onChange={e=>setTo(e.target.value)}/><select value={product} onChange={e=>setProduct(e.target.value)}><option value="">Tous les produits</option>{products.map((p:any)=><option key={p.id} value={p.id}>{p.name}</option>)}</select>{(from||to||product)&&<button onClick={()=>{setFrom("");setTo("");setProduct("");setDays(30)}}>Réinitialiser</button>}</div></header><div className="analytics-kpis">
-<article className="kpi-views"><i>◉</i><div><small>Visites</small><b>{t.views||0}</b><span>{t.visitors||0} visiteurs uniques</span></div></article>
-<article className="kpi-forms"><i>✎</i><div><small>Formulaires</small><b>{t.formStarts||0}</b><span>Débuts de formulaire</span></div></article>
-<article className="kpi-orders"><i>▣</i><div><small>Commandes</small><b>{t.orders||0}</b><span>{pct(t.conversion)} conversion</span></div></article>
-<article className="kpi-confirmed"><i>✓</i><div><small>Confirmées</small><b>{t.confirmed||0}</b><span>{pct(t.confirmationRate)} des commandes</span></div></article>
-<article className="kpi-shipped"><i>➜</i><div><small>Envoyées</small><b>{t.shipped||0}</b><span>Ozon Express</span></div></article>
-<article className="kpi-delivered"><i>◆</i><div><small>Livrées</small><b>{t.delivered||0}</b><span>{pct(t.deliveryRate)} des expédiées</span></div></article>
-<article className="kpi-returns"><i>↩</i><div><small>Retours</small><b>{t.returned||0}</b><span>{pct(t.returnRate)} des expédiées</span></div></article>
-<article className="kpi-revenue"><i>↗</i><div><small>Chiffre d’affaires</small><b>{Number(t.revenue||0).toFixed(0)} <em>MAD</em></b><span>Livré : {Number(t.deliveredRevenue||0).toFixed(0)} MAD</span></div></article>
-</div><div className="analytics-visual-grid"><section className="analytics-chart-card"><div className="analytics-card-head"><div><small>ÉVOLUTION</small><b>Visites et commandes</b></div><span>{days} derniers jours</span></div><div className="analytics-trend-chart"><div className="analytics-grid-lines"></div><div className="analytics-trend visits"></div><div className="analytics-trend orders"></div><div className="analytics-chart-labels"><span>Début</span><span>Milieu</span><span>Aujourd’hui</span></div></div><div className="analytics-chart-legend"><span><i></i> Visites</span><span><i></i> Commandes</span></div></section><section className="analytics-source-card"><div className="analytics-card-head"><div><small>ACQUISITION</small><b>Sources de trafic</b></div></div><div className="analytics-source-body"><div className="analytics-source-donut"><div><b>{t.views||0}</b><small>Visites</small></div></div><div className="analytics-source-list"><span><i></i>Direct / autres <b>{t.views||0}</b></span><span><i></i>Formulaires <b>{t.formStarts||0}</b></span><span><i></i>Commandes <b>{t.orders||0}</b></span></div></div></section></div><div className="pages-panel"><div className="pages-toolbar"><div><b>Performance par landing page</b><span>{days} derniers jours</span></div></div><div className="orders-table-wrap analytics-table-wrap"><table className="orders-table analytics-table"><thead><tr><th>Landing</th><th>Visites</th><th>Formulaires</th><th>Commandes</th><th>Conversion</th><th>Confirmées</th><th>Envoyées</th><th>Livrées</th><th>Retours</th><th>CA</th></tr></thead><tbody>{visibleRows.map((r:any,i:number)=><tr key={r.landing_page_id||i}><td><b>{r.landing_pages?.name||"Sans landing"}</b></td><td>{r.views}</td><td>{r.form_starts}</td><td>{r.orders}</td><td>{pct(r.conversion)}</td><td>{r.confirmed} <small>{pct(r.confirmation_rate)}</small></td><td>{r.shipped}</td><td>{r.delivered} <small>{pct(r.delivery_rate)}</small></td><td>{r.returned} <small>{pct(r.return_rate)}</small></td><td><b>{Number(r.revenue||0).toFixed(0)} MAD</b><small>livré {Number(r.delivered_revenue||0).toFixed(0)}</small></td></tr>)}</tbody></table></div>{d&&!d.landings?.length&&<p>Aucune donnée pour cette période.</p>}<div className="analytics-pagination"><div><span>Afficher</span><select value={pageSize} onChange={e=>{setPageSize(Number(e.target.value));setPage(1)}}><option value="10">10</option><option value="20">20</option><option value="50">50</option></select><span>par page · {rows.length} résultats</span></div><div><button disabled={page<=1} onClick={()=>setPage(p=>Math.max(1,p-1))}>‹</button><span>Page {page} / {totalPages}</span><button disabled={page>=totalPages} onClick={()=>setPage(p=>Math.min(totalPages,p+1))}>›</button></div></div></div></section></main>}
+"use client";
+import Link from "next/link";
+import SaaSSidebar from "../components/SaaSSidebar";
+import SaaSTopbar from "../components/SaaSTopbar";
+import { useEffect, useState } from "react";
+export default function Analytics() {
+  const [d, setD] = useState<any>(null),
+    [days, setDays] = useState(30),
+    [from, setFrom] = useState(""),
+    [to, setTo] = useState(""),
+    [product, setProduct] = useState(""),
+    [products, setProducts] = useState<any[]>([]),
+    [pageSize, setPageSize] = useState(10),
+    [page, setPage] = useState(1);
+  useEffect(() => {
+    fetch("/api/products?limit=100", { cache: "no-store" })
+      .then((r) => r.json())
+      .then((x) => setProducts(x.products || []));
+  }, []);
+  useEffect(() => {
+    const q = new URLSearchParams({ days: String(days) });
+    if (from) q.set("from", from);
+    if (to) q.set("to", to);
+    if (product) q.set("product_id", product);
+    fetch("/api/analytics?" + q.toString(), { cache: "no-store" })
+      .then((r) => r.json())
+      .then(setD);
+  }, [days, from, to, product]);
+  const rows = d?.landings || [],
+    totalPages = Math.max(1, Math.ceil(rows.length / pageSize)),
+    visibleRows = rows.slice((page - 1) * pageSize, page * pageSize),
+    t = d?.totals || {},
+    pct = (v: any) => Number(v || 0).toFixed(1) + "%";
+  return (
+    <main className="dash-shell has-shared-topbar">
+      <SaaSTopbar />
+      <SaaSSidebar />
+      <section className="dash-content pages-dashboard analytics-dashboard">
+        <header className="dash-header">
+          <div>
+            <span className="eyebrow">FUNNEL COD</span>
+            <h1>Analytics</h1>
+            <p>Du visiteur jusqu’à la livraison finale.</p>
+          </div>
+          <div className="analytics-filters">
+            <select
+              value={days}
+              onChange={(e) => {
+                setDays(Number(e.target.value));
+                setFrom("");
+                setTo("");
+              }}
+            >
+              <option value="7">7 jours</option>
+              <option value="30">30 jours</option>
+              <option value="90">90 jours</option>
+            </select>
+            <input aria-label="Date début" type="date" value={from} onChange={(e) => setFrom(e.target.value)} />
+            <span>→</span>
+            <input aria-label="Date fin" type="date" value={to} onChange={(e) => setTo(e.target.value)} />
+            <select value={product} onChange={(e) => setProduct(e.target.value)}>
+              <option value="">Tous les produits</option>
+              {products.map((p: any) => (
+                <option key={p.id} value={p.id}>
+                  {p.name}
+                </option>
+              ))}
+            </select>
+            {(from || to || product) && (
+              <button
+                onClick={() => {
+                  setFrom("");
+                  setTo("");
+                  setProduct("");
+                  setDays(30);
+                }}
+              >
+                Réinitialiser
+              </button>
+            )}
+          </div>
+        </header>
+        <div className="analytics-kpis">
+          <article className="kpi-views">
+            <i>◉</i>
+            <div>
+              <small>Visites</small>
+              <b>{t.views || 0}</b>
+              <span>{t.visitors || 0} visiteurs uniques</span>
+            </div>
+          </article>
+          <article className="kpi-forms">
+            <i>✎</i>
+            <div>
+              <small>Formulaires</small>
+              <b>{t.formStarts || 0}</b>
+              <span>Débuts de formulaire</span>
+            </div>
+          </article>
+          <article className="kpi-orders">
+            <i>▣</i>
+            <div>
+              <small>Commandes</small>
+              <b>{t.orders || 0}</b>
+              <span>{pct(t.conversion)} conversion</span>
+            </div>
+          </article>
+          <article className="kpi-confirmed">
+            <i>✓</i>
+            <div>
+              <small>Confirmées</small>
+              <b>{t.confirmed || 0}</b>
+              <span>{pct(t.confirmationRate)} des commandes</span>
+            </div>
+          </article>
+          <article className="kpi-shipped">
+            <i>➜</i>
+            <div>
+              <small>Envoyées</small>
+              <b>{t.shipped || 0}</b>
+              <span>Ozon Express</span>
+            </div>
+          </article>
+          <article className="kpi-delivered">
+            <i>◆</i>
+            <div>
+              <small>Livrées</small>
+              <b>{t.delivered || 0}</b>
+              <span>{pct(t.deliveryRate)} des expédiées</span>
+            </div>
+          </article>
+          <article className="kpi-returns">
+            <i>↩</i>
+            <div>
+              <small>Retours</small>
+              <b>{t.returned || 0}</b>
+              <span>{pct(t.returnRate)} des expédiées</span>
+            </div>
+          </article>
+          <article className="kpi-revenue">
+            <i>↗</i>
+            <div>
+              <small>Chiffre d’affaires</small>
+              <b>
+                {Number(t.revenue || 0).toFixed(0)} <em>MAD</em>
+              </b>
+              <span>Livré : {Number(t.deliveredRevenue || 0).toFixed(0)} MAD</span>
+            </div>
+          </article>
+        </div>
+        <div className="analytics-visual-grid">
+          <section className="analytics-chart-card">
+            <div className="analytics-card-head">
+              <div>
+                <small>ÉVOLUTION</small>
+                <b>Visites et commandes</b>
+              </div>
+              <span>{days} derniers jours</span>
+            </div>
+            <div className="analytics-trend-chart">
+              <div className="analytics-grid-lines"></div>
+              <div className="analytics-trend visits"></div>
+              <div className="analytics-trend orders"></div>
+              <div className="analytics-chart-labels">
+                <span>Début</span>
+                <span>Milieu</span>
+                <span>Aujourd’hui</span>
+              </div>
+            </div>
+            <div className="analytics-chart-legend">
+              <span>
+                <i></i> Visites
+              </span>
+              <span>
+                <i></i> Commandes
+              </span>
+            </div>
+          </section>
+          <section className="analytics-source-card">
+            <div className="analytics-card-head">
+              <div>
+                <small>ACQUISITION</small>
+                <b>Sources de trafic</b>
+              </div>
+            </div>
+            <div className="analytics-source-body">
+              <div className="analytics-source-donut">
+                <div>
+                  <b>{t.views || 0}</b>
+                  <small>Visites</small>
+                </div>
+              </div>
+              <div className="analytics-source-list">
+                <span>
+                  <i></i>Direct / autres <b>{t.views || 0}</b>
+                </span>
+                <span>
+                  <i></i>Formulaires <b>{t.formStarts || 0}</b>
+                </span>
+                <span>
+                  <i></i>Commandes <b>{t.orders || 0}</b>
+                </span>
+              </div>
+            </div>
+          </section>
+        </div>
+        <div className="pages-panel">
+          <div className="pages-toolbar">
+            <div>
+              <b>Performance par landing page</b>
+              <span>{days} derniers jours</span>
+            </div>
+          </div>
+          <div className="orders-table-wrap analytics-table-wrap">
+            <table className="orders-table analytics-table">
+              <thead>
+                <tr>
+                  <th>Landing</th>
+                  <th>Visites</th>
+                  <th>Formulaires</th>
+                  <th>Commandes</th>
+                  <th>Conversion</th>
+                  <th>Confirmées</th>
+                  <th>Envoyées</th>
+                  <th>Livrées</th>
+                  <th>Retours</th>
+                  <th>CA</th>
+                </tr>
+              </thead>
+              <tbody>
+                {visibleRows.map((r: any, i: number) => (
+                  <tr key={r.landing_page_id || i}>
+                    <td>
+                      <b>{r.landing_pages?.name || "Sans landing"}</b>
+                    </td>
+                    <td>{r.views}</td>
+                    <td>{r.form_starts}</td>
+                    <td>{r.orders}</td>
+                    <td>{pct(r.conversion)}</td>
+                    <td>
+                      {r.confirmed} <small>{pct(r.confirmation_rate)}</small>
+                    </td>
+                    <td>{r.shipped}</td>
+                    <td>
+                      {r.delivered} <small>{pct(r.delivery_rate)}</small>
+                    </td>
+                    <td>
+                      {r.returned} <small>{pct(r.return_rate)}</small>
+                    </td>
+                    <td>
+                      <b>{Number(r.revenue || 0).toFixed(0)} MAD</b>
+                      <small>livré {Number(r.delivered_revenue || 0).toFixed(0)}</small>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          {d && !d.landings?.length && <p>Aucune donnée pour cette période.</p>}
+          <div className="analytics-pagination">
+            <div>
+              <span>Afficher</span>
+              <select
+                value={pageSize}
+                onChange={(e) => {
+                  setPageSize(Number(e.target.value));
+                  setPage(1);
+                }}
+              >
+                <option value="10">10</option>
+                <option value="20">20</option>
+                <option value="50">50</option>
+              </select>
+              <span>par page · {rows.length} résultats</span>
+            </div>
+            <div>
+              <button disabled={page <= 1} onClick={() => setPage((p) => Math.max(1, p - 1))}>
+                ‹
+              </button>
+              <span>
+                Page {page} / {totalPages}
+              </span>
+              <button disabled={page >= totalPages} onClick={() => setPage((p) => Math.min(totalPages, p + 1))}>
+                ›
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  );
+}

@@ -1,63 +1,118 @@
-import {reportError} from "../../../lib/monitoring";
-import {NextResponse} from "next/server";
-import {authContext} from "../../../lib/server-auth";
+import { reportError } from "../../../lib/monitoring";
+import { NextResponse } from "next/server";
+import { authContext } from "../../../lib/server-auth";
 import OpenAI from "openai";
-import {decryptIntegrationSecret} from "../../../lib/integration-secrets";
-import {getLandingBenchmarkBlueprint,getLandingBenchmarkNiche} from "../../../lib/landing-benchmark-blueprints";
+import { decryptIntegrationSecret } from "../../../lib/integration-secrets";
+import { getLandingBenchmarkBlueprint, getLandingBenchmarkNiche } from "../../../lib/landing-benchmark-blueprints";
 
-function parseJson(s:string){return JSON.parse(s.replace(/```json|```/g,"").trim())}
-const themeRules:Record<string,string>={
-"cod-s11":"conversion produit gagnant, direct, démonstration et offre COD",
-"cod-auto-moto":"auto/moto, robuste, pratique, sécurité et usage quotidien",
-"cod-electronics":"technologique, moderne, bénéfices clairs sans inventer de spécifications",
-"cod-beauty":"élégant, rassurant, routine beauté sans promesses non prouvées",
-"cod-health":"rassurant et confort, aucune promesse médicale",
-"cod-home":"pratique, maison, gain de temps et simplicité",
-"cod-fashion":"éditorial, tendance, style et usage",
-"cod-sport":"énergique, performance d'usage sans promesses médicales",
-"cod-kids":"familial, rassurant, simple, sans allégation de sécurité non fournie",
-"cod-luxury":"premium, sobre, élégant, valeur perçue",
-"cod-decor":"chaleureux, décoration, ambiance et artisanat sans inventer l'origine"
+function parseJson(s: string) {
+  return JSON.parse(s.replace(/```json|```/g, "").trim());
+}
+const themeRules: Record<string, string> = {
+  "cod-s11": "conversion produit gagnant, direct, démonstration et offre COD",
+  "cod-auto-moto": "auto/moto, robuste, pratique, sécurité et usage quotidien",
+  "cod-electronics": "technologique, moderne, bénéfices clairs sans inventer de spécifications",
+  "cod-beauty": "élégant, rassurant, routine beauté sans promesses non prouvées",
+  "cod-health": "rassurant et confort, aucune promesse médicale",
+  "cod-home": "pratique, maison, gain de temps et simplicité",
+  "cod-fashion": "éditorial, tendance, style et usage",
+  "cod-sport": "énergique, performance d'usage sans promesses médicales",
+  "cod-kids": "familial, rassurant, simple, sans allégation de sécurité non fournie",
+  "cod-luxury": "premium, sobre, élégant, valeur perçue",
+  "cod-decor": "chaleureux, décoration, ambiance et artisanat sans inventer l'origine",
 };
 
-export async function POST(req:Request){
- try{
-  const p=await req.json(),section=p.section||"all",niche=String(p.niche||p.theme||"ecommerce"),language=p.language||"Darija Maroc";
-  if(!p.name)return NextResponse.json({error:"Nom du produit requis"},{status:400});
-  const {s,workspaceId,user}=await authContext(req);
-  const {data:integration,error:integrationError}=await s.from("workspace_integrations").select("openai_api_key_enc").eq("workspace_id",workspaceId).maybeSingle();
-  if(integrationError)throw integrationError;
-  const key=decryptIntegrationSecret(integration?.openai_api_key_enc);
-  if(!key)return NextResponse.json({error:"Configure ta propre clé Meta Model API dans Paramètres > Intégrations."},{status:503});
-  const client=new OpenAI({baseURL:"https://api.meta.ai/v1",apiKey:key});
-  const brief=String(p.description||"aucun").trim().slice(0,3500);
-  const blueprint=getLandingBenchmarkBlueprint(niche),nicheInfo=getLandingBenchmarkNiche(niche);
-  if(!blueprint||!nicheInfo)return NextResponse.json({error:"Niche UI/UX Pro Max invalide"},{status:400});
-  const uiux=`UI/UX Pro Max blueprint obligatoire: ${JSON.stringify(blueprint)}. Référence: ${nicheInfo.referencePath}. Respecte cette architecture et adapte le contenu au produit COD sans inventer de faits.`;
-  const facts=`Produit: ${p.name}. Prix: ${p.price??"non fourni"} MAD. Ancien prix: ${p.oldPrice||"non fourni"}. Faits produit: ${brief}. Niche: ${niche}. Langue: ${language}.`;
-  const schemas:Record<string,string>={
-   hero:'{"headline":"","subheadline":"","cta":"","delivery":""}',
-   benefits:'{"description":"","benefits":["","","",""]}',
-   problem:'{"problem":"","solution":"","problem_title":"","problem_text":""}',
-   features:'{"features_title":"","features":["","",""]}',
-   how:'{"how_title":"","how_steps":["","",""]}',
-   trust:'{"trust_title":"","trust_points":["","",""]}',
-   faq:'{"faq":[{"question":"","answer":""},{"question":"","answer":""},{"question":"","answer":""}]}',
-   all:'{"headline":"","subheadline":"","description":"","benefits":["","","",""],"cta":"","delivery":"","problem":"","solution":"","problem_title":"","problem_text":"","features_title":"","features":["","",""],"how_title":"","how_steps":["","",""],"trust_title":"","trust_points":["","",""],"faq":[{"question":"","answer":""},{"question":"","answer":""},{"question":"","answer":""}]}'
-  };
-  const prompt=`Landing COD Maroc. ${uiux}  Écris uniquement le contenu demandé, sans HTML/CSS. Utilise seulement les faits fournis; n’invente aucune caractéristique, certification, statistique, témoignage, garantie, résultat ou urgence. Santé/sport: aucune promesse médicale. Darija: alphabet arabe naturel. Ton adapté au thème. ${facts} Section: "${section}". Réponds UNIQUEMENT avec ce JSON valide: ${schemas[section]||schemas.all}`;
-  const images=Array.isArray(p.images)?p.images.filter((x:any)=>typeof x==="string"&&/^https?:\/\//.test(x)).slice(0,5):[];
-  let ai:any;
-  if(images.length){
-   try{
-    const input:any=[{role:"user",content:[{type:"input_text",text:prompt+" Analyse aussi les photos produit fournies uniquement pour les détails visuellement vérifiables; n’invente rien."},...images.map((image_url:string)=>({type:"input_image",image_url}))]}];
-    ai=await client.responses.create({model:"muse-spark-1.3-contributor",input,reasoning:{effort:"low"},store:false});
-   }catch{
-    ai=await client.responses.create({model:"muse-spark-1.3-contributor",input:prompt,reasoning:{effort:"low"},store:false});
-   }
-  }else ai=await client.responses.create({model:"muse-spark-1.3-contributor",input:prompt,reasoning:{effort:"low"},store:false});
-  const content=parseJson(ai.output_text);
-  const usage=(ai as any).usage||null;
-  return NextResponse.json({content,section,usage,designSystem:{source:"ui-ux-pro-max-100",niche:nicheInfo,blueprint}});
- }catch(e:any){reportError(e,"api/ai-content");return NextResponse.json({error:e?.message||"Erreur génération contenu"},{status:500})}
+export async function POST(req: Request) {
+  try {
+    const p = await req.json(),
+      section = p.section || "all",
+      niche = String(p.niche || p.theme || "ecommerce"),
+      language = p.language || "Darija Maroc";
+    if (!p.name) return NextResponse.json({ error: "Nom du produit requis" }, { status: 400 });
+    const { s, workspaceId, user } = await authContext(req);
+    const { data: integration, error: integrationError } = await s
+      .from("workspace_integrations")
+      .select("openai_api_key_enc")
+      .eq("workspace_id", workspaceId)
+      .maybeSingle();
+    if (integrationError) throw integrationError;
+    const key = decryptIntegrationSecret(integration?.openai_api_key_enc);
+    if (!key)
+      return NextResponse.json(
+        { error: "Configure ta propre clé Meta Model API dans Paramètres > Intégrations." },
+        { status: 503 },
+      );
+    const client = new OpenAI({ baseURL: "https://api.meta.ai/v1", apiKey: key });
+    const brief = String(p.description || "aucun")
+      .trim()
+      .slice(0, 3500);
+    const blueprint = getLandingBenchmarkBlueprint(niche),
+      nicheInfo = getLandingBenchmarkNiche(niche);
+    if (!blueprint || !nicheInfo) return NextResponse.json({ error: "Niche UI/UX Pro Max invalide" }, { status: 400 });
+    const uiux = `UI/UX Pro Max blueprint obligatoire: ${JSON.stringify(blueprint)}. Référence: ${nicheInfo.referencePath}. Respecte cette architecture et adapte le contenu au produit COD sans inventer de faits.`;
+    const facts = `Produit: ${p.name}. Prix: ${p.price ?? "non fourni"} MAD. Ancien prix: ${p.oldPrice || "non fourni"}. Faits produit: ${brief}. Niche: ${niche}. Langue: ${language}.`;
+    const schemas: Record<string, string> = {
+      hero: '{"headline":"","subheadline":"","cta":"","delivery":""}',
+      benefits: '{"description":"","benefits":["","","",""]}',
+      problem: '{"problem":"","solution":"","problem_title":"","problem_text":""}',
+      features: '{"features_title":"","features":["","",""]}',
+      how: '{"how_title":"","how_steps":["","",""]}',
+      trust: '{"trust_title":"","trust_points":["","",""]}',
+      faq: '{"faq":[{"question":"","answer":""},{"question":"","answer":""},{"question":"","answer":""}]}',
+      all: '{"headline":"","subheadline":"","description":"","benefits":["","","",""],"cta":"","delivery":"","problem":"","solution":"","problem_title":"","problem_text":"","features_title":"","features":["","",""],"how_title":"","how_steps":["","",""],"trust_title":"","trust_points":["","",""],"faq":[{"question":"","answer":""},{"question":"","answer":""},{"question":"","answer":""}]}',
+    };
+    const prompt = `Landing COD Maroc. ${uiux}  Écris uniquement le contenu demandé, sans HTML/CSS. Utilise seulement les faits fournis; n’invente aucune caractéristique, certification, statistique, témoignage, garantie, résultat ou urgence. Santé/sport: aucune promesse médicale. Darija: alphabet arabe naturel. Ton adapté au thème. ${facts} Section: "${section}". Réponds UNIQUEMENT avec ce JSON valide: ${schemas[section] || schemas.all}`;
+    const images = Array.isArray(p.images)
+      ? p.images.filter((x: any) => typeof x === "string" && /^https?:\/\//.test(x)).slice(0, 5)
+      : [];
+    let ai: any;
+    if (images.length) {
+      try {
+        const input: any = [
+          {
+            role: "user",
+            content: [
+              {
+                type: "input_text",
+                text:
+                  prompt +
+                  " Analyse aussi les photos produit fournies uniquement pour les détails visuellement vérifiables; n’invente rien.",
+              },
+              ...images.map((image_url: string) => ({ type: "input_image", image_url })),
+            ],
+          },
+        ];
+        ai = await client.responses.create({
+          model: "muse-spark-1.3-contributor",
+          input,
+          reasoning: { effort: "low" },
+          store: false,
+        });
+      } catch {
+        ai = await client.responses.create({
+          model: "muse-spark-1.3-contributor",
+          input: prompt,
+          reasoning: { effort: "low" },
+          store: false,
+        });
+      }
+    } else
+      ai = await client.responses.create({
+        model: "muse-spark-1.3-contributor",
+        input: prompt,
+        reasoning: { effort: "low" },
+        store: false,
+      });
+    const content = parseJson(ai.output_text);
+    const usage = (ai as any).usage || null;
+    return NextResponse.json({
+      content,
+      section,
+      usage,
+      designSystem: { source: "ui-ux-pro-max-100", niche: nicheInfo, blueprint },
+    });
+  } catch (e: any) {
+    reportError(e, "api/ai-content");
+    return NextResponse.json({ error: e?.message || "Erreur génération contenu" }, { status: 500 });
+  }
 }

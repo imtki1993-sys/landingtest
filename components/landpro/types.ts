@@ -28,16 +28,44 @@ export interface Theme {
 }
 
 export type HeroVariant =
-  | "split" | "centered" | "fullbleed" | "luxury" | "ugc" | "problem" | "flash" | "video"
-  | "beforeAfter" | "whatsapp" | "editorial" | "neon" | "sport" | "marketplace" | "minimal" | "oneScreen";
+  | "split"
+  | "centered"
+  | "fullbleed"
+  | "luxury"
+  | "ugc"
+  | "problem"
+  | "flash"
+  | "video"
+  | "beforeAfter"
+  | "whatsapp"
+  | "editorial"
+  | "neon"
+  | "sport"
+  | "marketplace"
+  | "minimal"
+  | "oneScreen";
 
 /** Sections natives de l'éditeur (déjà connues de BuilderV3). */
 export const CORE_SECTIONS = ["hero", "order", "benefits", "problem", "features", "how", "trust", "faq"] as const;
 
 /** Sections ajoutées par le moteur LandPro. */
 export const LANDPRO_SECTIONS = [
-  "announcement", "showcase", "story", "before_after", "stats", "ugc", "reviews", "comparison",
-  "specs", "variants", "offers", "countdown", "video", "whatsapp", "guarantee", "final_cta",
+  "announcement",
+  "showcase",
+  "story",
+  "before_after",
+  "stats",
+  "ugc",
+  "reviews",
+  "comparison",
+  "specs",
+  "variants",
+  "offers",
+  "countdown",
+  "video",
+  "whatsapp",
+  "guarantee",
+  "final_cta",
 ] as const;
 
 export type CoreSection = (typeof CORE_SECTIONS)[number];
@@ -53,7 +81,14 @@ export interface TemplateDef {
   lang: "fr" | "ar";
   demoProduct: string;
   theme: Theme;
-  hero: { variant: HeroVariant; eyebrow?: string; title: string; highlight?: string; subtitle?: string; badge?: string };
+  hero: {
+    variant: HeroVariant;
+    eyebrow?: string;
+    title: string;
+    highlight?: string;
+    subtitle?: string;
+    badge?: string;
+  };
   sections: SectionKey[]; // sans "hero" : il est toujours ajouté en tête
   options?: { countdownMinutes?: number; orderMode?: "form" | "whatsapp" | "both"; announcement?: string };
 }

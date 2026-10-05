@@ -1,27 +1,999 @@
 "use client";
-import {useParams} from "next/navigation";import {useEffect,useRef,useState} from "react";import HeroRenderer from "./HeroRenderer";import LandingTemplateV4 from "../../../components/LandingTemplateV4";
-export default function LandingClient({initialData,initialSlug,builderMode=false,onSectionSelect,viewportMode}:{initialData?:any;initialSlug?:string;builderMode?:boolean;onSectionSelect?:(id:string)=>void;viewportMode?:"desktop"|"tablet"|"mobile"}){const params=useParams<{slug:string}>(),slug=initialSlug||(typeof params?.slug==="string"?params.slug:"");const [data,setData]=useState<any>(initialData||null),[sent,setSent]=useState(false),[error,setError]=useState(""),[slide,setSlide]=useState(0),[qty,setQty]=useState(1);const slider=useRef<HTMLDivElement>(null);const trackedForm=useRef(false);function goSlide(i:number){if(!images.length)return;const next=(i+images.length)%images.length;setSlide(next);const el=slider.current,target=el?.children[next] as HTMLElement|undefined;if(el&&target)el.scrollTo({left:target.offsetLeft,behavior:"smooth"})}function moveSlide(d:number){goSlide(slide+d)}function syncSlide(){const el=slider.current;if(!el||!images.length)return;const center=el.scrollLeft+el.clientWidth/2;let best=0,dist=Infinity;Array.from(el.children).forEach((node:any,i)=>{const d=Math.abs(node.offsetLeft+node.clientWidth/2-center);if(d<dist){dist=d;best=i}});if(best!==slide)setSlide(best)}
-useEffect(()=>{if(builderMode&&initialData){setData(initialData);return}},[builderMode,initialData]);useEffect(()=>{if(initialData||!slug)return;const preview=new URLSearchParams(location.search).get("preview")==="1";fetch("/api/landing/"+slug+(preview?"?preview=1":"")).then(async r=>{const x=await r.json();if(!r.ok)throw new Error(x.error||"Page introuvable");return x}).then(setData).catch(e=>setError(e.message))},[slug,initialData]);useEffect(()=>{if(builderMode||!data?.id)return;const q=new URLSearchParams(location.search),sid=sessionStorage.getItem("lm_sid")||crypto.randomUUID(),vid=localStorage.getItem("lm_vid")||crypto.randomUUID();sessionStorage.setItem("lm_sid",sid);localStorage.setItem("lm_vid",vid);const track=(event:string)=>fetch("/api/track",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({slug,event,session_id:sid,visitor_id:vid,path:location.pathname,referrer:document.referrer,utm_source:q.get("utm_source"),utm_medium:q.get("utm_medium"),utm_campaign:q.get("utm_campaign"),utm_content:q.get("utm_content"),utm_term:q.get("utm_term"),fbclid:q.get("fbclid")}),keepalive:true}).catch(()=>{});(window as any).lmTrack=track;track("PAGE_VIEW");if(data.metaPixelId){const w:any=window;if(!w.fbq){const f:any=function(){f.callMethod?f.callMethod.apply(f,arguments):f.queue.push(arguments)};f.queue=[];f.loaded=true;f.version="2.0";w.fbq=f;const s=document.createElement("script");s.async=true;s.src="https://connect.facebook.net/en_US/fbevents.js";document.head.appendChild(s)}w.fbq("init",data.metaPixelId);w.fbq("track","PageView")}const onScroll=()=>{const max=document.documentElement.scrollHeight-innerHeight,p=max>0?scrollY/max:0;if(p>=.5&&!sessionStorage.getItem("lm_s50")){sessionStorage.setItem("lm_s50","1");track("SCROLL_50")}if(p>=.98&&!sessionStorage.getItem("lm_s100")){sessionStorage.setItem("lm_s100","1");track("SCROLL_100")}};addEventListener("scroll",onScroll,{passive:true});return()=>removeEventListener("scroll",onScroll)},[data?.id]);async function submit(e:React.FormEvent<HTMLFormElement>){e.preventDefault();setError("");(window as any).lmTrack?.("FORM_SUBMIT");const f=new FormData(e.currentTarget),r=await fetch("/api/orders",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({slug,name:f.get("name"),phone:f.get("phone"),city:f.get("city"),address:f.get("address"),quantity:qty})});if(r.ok){const result=await r.json().catch(()=>({}));setSent(true);const eventId=result?.order_id?"order_"+result.order_id:undefined;(window as any).fbq?.("track","Lead");if(eventId)(window as any).fbq?.("track","Purchase",{value:Number(result?.total??total),currency:String(result?.currency||"MAD")},{eventID:eventId});const confirmedTotal=Number(result?.total??total),msg=encodeURIComponent("سلام، بغيت نأكد الطلب ديالي:\nالمنتج: "+(data?.name||slug)+"\nالاسم: "+f.get("name")+"\nالهاتف: "+f.get("phone")+"\nالمدينة: "+f.get("city")+"\nالكمية: "+qty+"\nالمجموع: "+confirmedTotal+" DH");if(data?.whatsappPhone)window.open("https://wa.me/"+data.whatsappPhone+"?text="+msg,"_blank")}else setError("تعذر تسجيل الطلب. حاول مرة أخرى.")}
-async function submitV4(e:React.FormEvent<HTMLFormElement>,v4qty:number){e.preventDefault();setError("");(window as any).lmTrack?.("FORM_SUBMIT");const f=new FormData(e.currentTarget),r=await fetch("/api/orders",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({slug,name:f.get("name"),phone:f.get("phone"),city:f.get("city"),address:f.get("address"),quantity:v4qty})});if(r.ok){const result=await r.json().catch(()=>({}));setSent(true);(window as any).fbq?.("track","Lead");if(result?.order_id)(window as any).fbq?.("track","Purchase",{value:Number(result?.total||0),currency:String(result?.currency||"MAD")},{eventID:"order_"+result.order_id});if(data?.whatsappPhone){const msg=encodeURIComponent("سلام، بغيت نأكد الطلب ديالي:\nالمنتج: "+(data?.name||slug)+"\nالاسم: "+f.get("name")+"\nالهاتف: "+f.get("phone")+"\nالمدينة: "+f.get("city")+"\nالكمية: "+v4qty+"\nالمجموع: "+Number(result?.total||0)+" DH");window.open("https://wa.me/"+data.whatsappPhone+"?text="+msg,"_blank")}}else setError("تعذر تسجيل الطلب. حاول مرة أخرى.")}
-useEffect(()=>{if(!data)return;const dc=data.content||{},os=Array.isArray(dc.quantity_offers)?dc.quantity_offers:[],wanted=Number(dc.quantity_default_qty||os[0]?.qty||1);if(Number.isFinite(wanted)&&wanted>=1)setQty(Math.min(10,wanted))},[data?.id,data?.content?.quantity_default_qty]);if(!data)return <div className="lp-loading">Chargement...</div>;if(data.error)return <div className="lp-loading">Page introuvable</div>;const c=data.content||{},images=data.images||[],theme=c.visual_theme||c.design_profile||"general",shipping=Number(c.delivery_price||0),offers=Array.isArray(c.quantity_offers)?c.quantity_offers.filter((x:any)=>Number(x.qty)>0&&Number(x.price)>=0):[],selectedOffer=offers.find((x:any)=>Number(x.qty)===qty),itemsTotal=selectedOffer?Number(selectedOffer.price):Number(data.price||0)*qty,total=itemsTotal+shipping,cities=["Casablanca","Rabat","Salé","Marrakech","Fès","Tanger","Agadir","Meknès","Oujda","Kénitra","Tétouan","Temara","Safi","El Jadida","Mohammedia","Béni Mellal","Khouribga","Nador","Settat","Berrechid","Larache","Ksar El Kebir","Taza","Essaouira","Dakhla","Laâyoune","Guelmim","Inezgane","Aït Melloul","Ouarzazate"];
-const imageAlt=(x:string,i=0)=>c.image_alts?.[x]||data.name+" "+(i+1);const v4TemplateId=String(c.landing_template_id||"");if(v4TemplateId){const v4Data={templateId:v4TemplateId,name:data.name,description:c.description||"",price:Number(data.price||0),oldPrice:data.oldPrice||data.compare_at_price||"",images,content:c,locale:data.locale,whatsappPhone:data.whatsappPhone||""};return <div data-preview-viewport={builderMode?viewportMode:undefined} className={"landing-v4-runtime"+(builderMode?" lpx-builder-runtime":"")} dir={String(data.locale||"").startsWith("ar")?"rtl":"ltr"}>{sent&&!builderMode&&<div className="v4-runtime-success">✅ تم تسجيل طلبك بنجاح</div>}{error&&!builderMode&&<div className="v4-runtime-error">{error}</div>}<LandingTemplateV4 data={v4Data} preview={builderMode} builderMode={builderMode} onSectionSelect={onSectionSelect} onSubmit={submitV4}/></div>}const autoGallery=["cod-beauty","cod-decor"].includes(theme)?"mosaic":["cod-electronics","cod-auto-moto","cod-luxury"].includes(theme)?"thumbs":theme==="cod-fashion"?"editorial":theme==="cod-home"?"lifestyle":"carousel",galleryStyle=c.gallery_style&&c.gallery_style!=="auto"?c.gallery_style:autoGallery;const order=Array.isArray(c.section_order)&&c.section_order.length?c.section_order:(Array.isArray(c.design_system?.blueprint?.sections)?c.design_system.blueprint.sections:["hero","order","benefits","features","trust","faq"]),hidden=new Set(Array.isArray(c.hidden_sections)?c.hidden_sections:[]);const sectionStyle=(k:string)=>{const s=c.section_styles?.[k]||{};return {backgroundColor:s.background||undefined,color:s.color||undefined,textAlign:s.align||undefined,paddingTop:s.padding?Number(s.padding):undefined,paddingBottom:s.padding?Number(s.padding):undefined} as any};const ds=c.design_system||{},uiuxId=String(ds.style?.["Style ID"]||c.design_profile||"uiux-pro-max").replace(/[^a-z0-9-]/gi,"-").toLowerCase();
-const runtimeLibrary=(c.uiux_library&&((c.uiux_library.styles||[]).length||(c.uiux_library.patterns||[]).length||(c.uiux_library.colors||[]).length||(c.uiux_library.typography||[]).length))?c.uiux_library:(ds.library||{}),pattern=String(c.builder_pattern||ds.tokens?.pattern||ds.landing?.["Pattern ID"]||"hero-features-cta"),baseStyleName=String(ds.style?.["Style Category"]||""),styleName=String(c.builder_template||baseStyleName),library=runtimeLibrary,chosenStyle=(library.styles||[]).find((x:any)=>x.id===c.builder_template||x.name===c.builder_template),chosenPattern=(library.patterns||[]).find((x:any)=>x.id===c.builder_pattern||x.name===c.builder_pattern),chosenPalette=(library.colors||[]).find((x:any)=>x.name===c.builder_palette),chosenTypography=(library.typography||[]).find((x:any)=>x.name===c.builder_typography),slugify=(v:string)=>v.toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,""),styleKey=slugify(String(chosenStyle?.id||styleName||"default")),patternKey=slugify(String(chosenPattern?.id||pattern||"default")),typographyKey=slugify(String(c.builder_typography||chosenTypography?.name||"default"));
-const styleVars=String(chosenStyle?.variables||""),styleRadius=(styleVars.match(/border-radius:\s*([^,]+)/i)?.[1]||ds.tokens?.radius||"12px").trim(),styleSignal=(styleName+" "+String(chosenStyle?.keywords||"")+" "+String(chosenStyle?.effects||"")).toLowerCase(),patternSignal=(pattern+" "+String(chosenPattern?.name||"")+" "+String(chosenPattern?.keywords||"")+" "+String(chosenPattern?.sections||"")).toLowerCase();
-const styleFamily=/glass/.test(styleSignal)?"glass":/neumorph|soft ui/.test(styleSignal)?"neumorph":/brutal/.test(styleSignal)?"brutal":/luxury|editorial|serif/.test(styleSignal)?"editorial":/bold|maximal|vibrant/.test(styleSignal)?"bold":/minimal|swiss|flat|clean/.test(styleSignal)?"minimal":/retro|vintage/.test(styleSignal)?"retro":/futur|cyber|tech|data/.test(styleSignal)?"tech":"standard";
-const autoHero=/story|editorial|luxury/i.test(patternSignal+" "+styleSignal)?"editorial":/demo|interactive|motion|bold|vibrant/i.test(patternSignal+" "+styleSignal)?"impact":/minimal|direct|swiss/i.test(patternSignal+" "+styleSignal)?"centered":/split|feature|comparison/i.test(patternSignal)?"split":"conversion";
-const heroMode=c.hero_module&&c.hero_module!=="auto"?c.hero_module:(c.hero_architecture&&c.hero_architecture!=="auto"?c.hero_architecture:autoHero);
-const autoCard=/glass|tech|data/i.test(styleName)?"technical":/luxury|editorial/i.test(styleName)?"editorial":/soft|neumorph/i.test(styleName)?"soft":"conversion";
-const patternFamily=/story|editorial/i.test(patternSignal)?"story":/split|comparison/i.test(patternSignal)?"split":/feature|benefit/i.test(patternSignal)?"feature":/minimal|direct/i.test(patternSignal)?"minimal":/social|trust|testimonial/i.test(patternSignal)?"social":/long|conversion|sales/i.test(patternSignal)?"conversion":"standard";
-const cardMode=c.section_architecture&&c.section_architecture!=="auto"?c.section_architecture:autoCard;
-const autoForm=/luxury|editorial/i.test(styleName)?"editorial":/minimal|tech|data/i.test(styleName)?"compact":"trust";
-const formMode=c.order_form_architecture&&c.order_form_architecture!=="auto"?c.order_form_architecture:autoForm;
-const locale=String(data.locale||"");const isAr=locale.startsWith("ar");const labels=isAr?{problem:"المشكلة والحل",benefits:"علاش تختار هاد المنتج؟",faq:"الأسئلة الشائعة",order:"أكد الطلب ديالك"}:{problem:"Problème / Solution",benefits:"Pourquoi choisir ce produit ?",faq:"Questions fréquentes",order:"Confirmez votre commande"};const sections:any={
-hero:<HeroRenderer key="hero" mode={heroMode} content={c} data={data} images={Array.isArray(c.hero_images)&&c.hero_images.length?c.hero_images:images} sectionStyle={sectionStyle} imageAlt={imageAlt} whatsapp={data?.whatsappPhone} onCta={()=>{(window as any).lmTrack?.("CTA_CLICK")}}/>,
-order:<section className="lp-order lp-order-after-hero" style={sectionStyle("order")} id="order" key="order"><div className="lp-wrap"><div className={"lp-form lp-form-"+(c.order_form_style||"classic")+" lp-form-architecture-"+formMode}><h2>{labels.order}</h2><p>{c.delivery}</p>{sent?<div className="lp-success">✅ تم تسجيل طلبك بنجاح</div>:<form onSubmit={submit} onFocus={()=>{if(!trackedForm.current){trackedForm.current=true;(window as any).lmTrack?.("FORM_START");(window as any).fbq?.("track","InitiateCheckout")}}}><input name="name" required minLength={2} placeholder="الاسم الكامل"/><input name="phone" required inputMode="tel" pattern="(?:0|212|\\+212)?[5-7][0-9]{8}" title="مثال: 0612345678" placeholder="رقم الهاتف 06/07..."/><input name="city" required list="morocco-cities" placeholder="المدينة"/><datalist id="morocco-cities">{cities.map(x=><option key={x} value={x}/>)}</datalist>{c.order_show_address!==false&&<input name="address" placeholder="العنوان (اختياري)"/>}{offers.length>0&&<div className="lp-quantity-offers">{offers.map((o:any,i:number)=><button type="button" key={i} className={qty===Number(o.qty)?"active":""} onClick={()=>setQty(Number(o.qty))}><span>{o.label||o.qty+" pièces"}</span><b>{o.price} DH</b>{Number(o.qty)>1&&<small>{Math.round(Number(o.price)/Number(o.qty))} DH / pièce</small>}</button>)}</div>}<div className="lp-qty"><button type="button" onClick={()=>setQty(Math.max(1,qty-1))}>−</button><b>{qty}</b><button type="button" onClick={()=>setQty(Math.min(10,qty+1))}>+</button></div><div className="lp-order-total"><span>المجموع</span><b>{total} DH</b>{shipping>0&&<small>التوصيل: {shipping} DH</small>}</div>{error&&<p>{error}</p>}<button className={"lp-cta "+(c.order_pump===false?"":"lp-pump")}>{c.cta||"اطلب الآن"} — {total} DH</button>{c.order_whatsapp!==false&&data?.whatsappPhone&&<a className="lp-form-whatsapp" target="_blank" rel="noreferrer" href={"https://wa.me/"+data.whatsappPhone+"?text="+encodeURIComponent("سلام، بغيت نطلب "+data.name+" — الكمية: "+qty+" — المجموع: "+total+" DH")} onClick={()=>{(window as any).lmTrack?.("WHATSAPP_CLICK")}}><svg viewBox="0 0 32 32" aria-hidden="true"><path fill="currentColor" d="M16 3C8.83 3 3 8.7 3 15.72c0 2.47.72 4.88 2.08 6.94L3.7 29l6.55-1.7A13.15 13.15 0 0 0 16 28.44c7.17 0 13-5.7 13-12.72S23.17 3 16 3Zm0 23.3c-1.82 0-3.61-.48-5.17-1.39l-.37-.22-3.89 1.01.83-3.78-.24-.38a10.43 10.43 0 0 1-1.64-5.82C5.52 9.87 10.22 5.1 16 5.1s10.48 4.77 10.48 10.62S21.78 26.3 16 26.3Zm5.75-7.91c-.31-.15-1.86-.9-2.15-1-.29-.1-.5-.15-.71.15-.21.31-.81 1-.99 1.2-.18.21-.37.23-.68.08-.31-.15-1.32-.48-2.51-1.52-.93-.81-1.56-1.82-1.74-2.13-.18-.31-.02-.47.14-.62.14-.14.31-.36.47-.54.16-.18.21-.31.31-.51.1-.21.05-.38-.03-.54-.08-.15-.71-1.68-.97-2.3-.26-.62-.52-.53-.71-.54h-.61c-.21 0-.55.08-.84.38-.29.31-1.1 1.06-1.1 2.58s1.13 2.99 1.29 3.2c.16.21 2.22 3.32 5.38 4.66.75.32 1.34.51 1.8.65.76.24 1.44.2 1.99.12.61-.09 1.86-.75 2.12-1.47.26-.72.26-1.33.18-1.46-.08-.13-.29-.21-.6-.36Z"/></svg><span>طلب عبر واتساب</span></a>}</form>}</div></div></section>,
-benefits:<section className="lp-section" style={sectionStyle("benefits")} key="benefits"><div className="lp-wrap"><div className="lp-section-kicker">★</div><h2>{labels.benefits}</h2><div className={"lp-benefits lp-benefits-architecture-"+cardMode}>{(c.benefits||[]).map((x:string,i:number)=><div className="lp-benefit" key={i}><span>✓</span>{x}</div>)}</div><p className="lp-desc">{c.description}</p></div></section>,
-problem:(c.problem_text||c.problem||c.solution)?<section className="lp-story" style={sectionStyle("problem")} key="problem"><div className="lp-wrap"><h2>{c.problem_title||labels.problem}</h2>{(c.problem_text||c.problem)&&<p>{c.problem_text||c.problem}</p>}{c.solution&&<p>{c.solution}</p>}</div></section>:null,
-features:c.features?.length?<section className="lp-section" style={sectionStyle("features")} key="features"><div className="lp-wrap"><div className="lp-section-kicker">+</div><h2>{c.features_title}</h2><div className={"lp-feature-grid lp-features-architecture-"+cardMode}>{c.features.map((f:any,i:number)=>{const o=typeof f==="string"?{title:f,text:""}:(f||{});return <article className={"lp-feature-card lp-feature-card-"+cardMode} key={i}><b>{o.title||o.text}</b>{o.title&&o.text&&<p>{o.text}</p>}</article>})}</div></div></section>:null,
-how:c.how_steps?.length?<section className="lp-how" style={sectionStyle("how")} key="how"><div className="lp-wrap"><div className="lp-section-kicker">01</div><h2>{c.how_title}</h2><div className="lp-steps">{c.how_steps.map((x:string,i:number)=><div key={i}><strong>{i+1}</strong><p>{x}</p></div>)}</div></div></section>:null,
-trust:c.trust_points?.length?<section className="lp-trust" style={sectionStyle("trust")} key="trust"><div className="lp-wrap"><h2>{c.trust_title}</h2><div className="lp-trust-grid">{c.trust_points.map((x:string,i:number)=><div key={i}>✓ {x}</div>)}</div></div></section>:null,
-faq:c.faq?.length?<section className="lp-section" style={sectionStyle("faq")} key="faq"><div className="lp-wrap"><h2>{labels.faq}</h2>{c.faq.map((f:any,i:number)=>{const o=typeof f==="string"?{question:f,answer:""}:(f||{});return <div className="lp-faq" key={i}><b>{o.question}</b>{o.answer&&<p>{o.answer}</p>}</div>})}</div></section>:null};
-const templateId=slugify(String(c.landing_template_id||c.builder_template||"default")),templateFamily=slugify(String(c.landing_template_family||"conversion"));const runtimeViewport=builderMode?viewportMode:undefined;return <div data-preview-viewport={runtimeViewport} data-landing-template={templateId} className={"lp landing-benchmark landing-template landing-template-"+templateId+" landing-family-"+templateFamily+" "+(c.landing_template_dark?"landing-template-dark ":"")+"benchmark-"+uiuxId+" benchmark-hero-"+heroMode+" benchmark-cards-"+cardMode+" section-architecture-"+cardMode+" uiux-style-"+styleKey+" uiux-family-"+styleFamily+" uiux-pattern-"+patternKey+" uiux-pattern-family-"+patternFamily+" uiux-typography-"+typographyKey} dir={isAr?"rtl":"ltr"} style={{"--lp-primary":chosenPalette?.primary||ds.tokens?.colors?.primary||undefined,"--lp-secondary":chosenPalette?.secondary||ds.tokens?.colors?.secondary||undefined,"--lp-accent":chosenPalette?.accent||ds.tokens?.colors?.accent||undefined,"--lp-bg":chosenPalette?.background||ds.tokens?.colors?.background||undefined,"--lp-fg":chosenPalette?.foreground||ds.tokens?.colors?.foreground||undefined,"--lp-card":chosenPalette?.card||ds.tokens?.colors?.card||undefined,"--lp-border":chosenPalette?.border||ds.tokens?.colors?.border||undefined,"--lp-radius":styleRadius,"--lp-heading-font":chosenTypography?.heading||ds.tokens?.fonts?.heading||undefined,"--lp-body-font":chosenTypography?.body||ds.tokens?.fonts?.body||undefined,"--lp-style-primary":chosenStyle?.primaryColors||undefined,"--lp-style-secondary":chosenStyle?.secondaryColors||undefined,"--lp-template-accent":c.landing_template_accent||undefined} as any}>{(()=>{const aliases:any={hero:"hero",banner:"hero",headline:"hero",features:"features",feature:"features",benefits:"benefits",benefit:"benefits",problem:"problem",solution:"problem",how:"how",steps:"how",trust:"trust",social:"trust",testimonials:"trust",testimonial:"trust",faq:"faq",order:"order",form:"order",cta:"order"};const patternOrder=String(chosenPattern?.sections||"").split(/\s*(?:>|→|,|\||;)\s*/).map((x:string)=>aliases[slugify(x)]).filter(Boolean);const base=[...order];const effective=c.builder_pattern&&patternOrder.length?[...Array.from(new Set(patternOrder)),...base.filter((x:string)=>!patternOrder.includes(x))]:base;return effective.filter((k:string)=>!hidden.has(k)).map((k:string)=>sections[k]||(k.startsWith("custom-")&&c.custom_sections?.[k]?(()=>{const b=c.custom_sections[k],t=b.type||"text";if(t==="imageText")return <section className="lp-section lp-custom lp-image-text" style={sectionStyle(k)} key={k}><div className="lp-wrap lp-image-text-grid">{b.image&&<img src={b.image} alt={b.title||""} loading="lazy" decoding="async"/>}<div><h2>{b.title}</h2><p className="lp-desc">{b.text}</p></div></div></section>;if(t==="gallery")return <section className="lp-section lp-custom" style={sectionStyle(k)} key={k}><div className="lp-wrap"><h2>{b.title}</h2><div className="lp-custom-gallery">{(b.images||[]).map((x:string,i:number)=><img src={x} alt="" key={i} loading="lazy" decoding="async"/>)}</div></div></section>;if(t==="faqBlock")return <section className="lp-section lp-custom" style={sectionStyle(k)} key={k}><div className="lp-wrap"><h2>{b.title}</h2>{(b.items||[]).map((x:any,i:number)=><div className="lp-faq" key={i}><b>{x.question}</b><p>{x.answer}</p></div>)}</div></section>;if(t==="vertical916"){const device=b.device||"phone",defaultRatio=device==="laptop"?"16 / 9":device==="tablet"?"4 / 3":"9 / 16",ratio=b.mediaRatio==="auto"?"auto":b.mediaRatio&&b.mediaRatio!=="device"?b.mediaRatio:defaultRatio,fit=b.mediaFit||"cover",align=b.mediaAlign||"center",defaultWidth=device==="laptop"?"100%":device==="tablet"?"min(100%, 820px)":"min(100%, 430px)",maxWidth=b.mediaWidth?`min(100%, ${b.mediaWidth}px)`:defaultWidth,margin=align==="left"?"0 auto 0 0":align==="right"?"0 0 0 auto":"0 auto",responsiveStyle={"--media-max-width":maxWidth,"--media-height":b.mediaHeight?`${b.mediaHeight}px`:"auto","--media-tablet-width":b.mediaWidthTablet?`min(100%, ${b.mediaWidthTablet}px)`:maxWidth,"--media-tablet-height":b.mediaHeightTablet?`${b.mediaHeightTablet}px`:(b.mediaHeight?`${b.mediaHeight}px`:"auto"),"--media-mobile-width":b.mediaWidthMobile?`min(100%, ${b.mediaWidthMobile}px)`:"100%","--media-mobile-height":b.mediaHeightMobile?`${b.mediaHeightMobile}px`:"auto",margin} as any;return <section className={"lp-section lp-custom lp-device-media lp-device-"+device} style={sectionStyle(k)} key={k}><div className="lp-wrap"><div className="lp-responsive-media-shell" style={responsiveStyle}><div className="lp-responsive-media-frame" style={{aspectRatio:ratio==="auto"?undefined:ratio,overflow:"hidden",borderRadius:0,background:"#111",border:"none",boxSizing:"border-box"}}>{b.mediaType==="video"?<video src={b.media||""} controls={b.videoControls!==false} autoPlay={b.videoAutoplay===true} muted={b.videoMuted!==false} loop={b.videoLoop===true} playsInline preload="metadata" style={{width:"100%",height:"100%",objectFit:fit}}/>:b.media?<img src={b.media} alt={b.title||""} loading="lazy" decoding="async" style={{width:"100%",height:"100%",objectFit:fit}}/>:null}</div>{b.title&&<h2>{b.title}</h2>}{b.text&&<p className="lp-desc">{b.text}</p>}{b.button&&<a className="lp-cta" href="#order">{b.button}</a>}</div></div></section>}if(t==="ctaBlock")return <section className="lp-custom-cta" style={sectionStyle(k)} key={k}><div className="lp-wrap"><h2>{b.title}</h2><p>{b.text}</p><a className="lp-cta" href="#order">{b.button||c.cta||"Commander maintenant"}</a></div></section>;return <section className="lp-section lp-custom" style={sectionStyle(k)} key={k}><div className="lp-wrap"><h2>{b.title}</h2><p className="lp-desc">{b.text}</p></div></section>})():null))})()}{(()=>{const lang=String(data.locale||"").toLowerCase();const isFr=lang.startsWith("fr");const isAr=lang==="ar"||lang.startsWith("ar-");const copy=isFr?{delivery:"Livraison partout au Maroc",payment:"Paiement à la livraison",privacy:"Politique de confidentialité",terms:"Conditions d’utilisation",contact:"Contact",rights:"Tous droits réservés"}:isAr?{delivery:"التوصيل إلى جميع أنحاء المغرب",payment:"الدفع عند الاستلام",privacy:"سياسة الخصوصية",terms:"شروط الاستخدام",contact:"اتصل بنا",rights:"جميع الحقوق محفوظة"}:{delivery:"التوصيل لجميع المدن فالمغرب",payment:"الخلص ملي يوصلك الطلب",privacy:"سياسة الخصوصية",terms:"شروط الاستعمال",contact:"تواصل معنا",rights:"جميع الحقوق محفوظة"};const footerStyle={"--footer-bg":c.footer_bg_color||"#cbdcf8","--footer-text":c.footer_text_color||"#0f172a","--footer-link":c.footer_link_color||c.footer_text_color||"#0f172a","--footer-title-size":`${Number(c.footer_title_px||28)}px`,"--footer-text-size":`${Number(c.footer_text_px||15)}px`,"--footer-pad-y":`${Number(c.footer_padding_y||48)}px`,"--footer-align":c.footer_align||"center"} as any;return <footer className="lp-footer lp-footer-studio" style={footerStyle}><div className="lp-wrap">{c.footer_show_brand!==false&&<strong className="lp-footer-brand">{data.name}</strong>}{c.footer_show_trust!==false&&<div className="lp-footer-trust"><span>🚚 {copy.delivery}</span><span>💵 {copy.payment}</span></div>}{c.footer_show_links!==false&&<nav className="lp-footer-links" aria-label="Footer"><a href="#privacy">{copy.privacy}</a><a href="#terms">{copy.terms}</a>{data?.whatsappPhone&&<a target="_blank" rel="noreferrer" href={"https://wa.me/"+data.whatsappPhone}>{copy.contact}</a>}</nav>}{c.footer_show_copyright!==false&&<small>© {new Date().getFullYear()} {data.name} — {copy.rights}</small>}</div></footer>})()}{data?.whatsappPhone&&<a className="lp-whatsapp-float lp-whatsapp-float-legacy" aria-label="WhatsApp" target="_blank" rel="noreferrer" href={"https://wa.me/"+data.whatsappPhone+"?text="+encodeURIComponent("سلام، بغيت معلومات على "+data.name)}><span className="wa-icon"><svg viewBox="0 0 32 32" aria-hidden="true"><path fill="currentColor" d="M16 3C8.83 3 3 8.7 3 15.72c0 2.47.72 4.88 2.08 6.94L3.7 29l6.55-1.7A13.15 13.15 0 0 0 16 28.44c7.17 0 13-5.7 13-12.72S23.17 3 16 3Zm0 23.3c-1.82 0-3.61-.48-5.17-1.39l-.37-.22-3.89 1.01.83-3.78-.24-.38a10.43 10.43 0 0 1-1.64-5.82C5.52 9.87 10.22 5.1 16 5.1s10.48 4.77 10.48 10.62S21.78 26.3 16 26.3Zm5.75-7.91c-.31-.15-1.86-.9-2.15-1-.29-.1-.5-.15-.71.15-.21.31-.81 1-.99 1.2-.18.21-.37.23-.68.08-.31-.15-1.32-.48-2.51-1.52-.93-.81-1.56-1.82-1.74-2.13-.18-.31-.02-.47.14-.62.14-.14.31-.36.47-.54.16-.18.21-.31.31-.51.1-.21.05-.38-.03-.54-.08-.15-.71-1.68-.97-2.3-.26-.62-.52-.53-.71-.54h-.61c-.21 0-.55.08-.84.38-.29.31-1.1 1.06-1.1 2.58s1.13 2.99 1.29 3.2c.16.21 2.22 3.32 5.38 4.66.75.32 1.34.51 1.8.65.76.24 1.44.2 1.99.12.61-.09 1.86-.75 2.12-1.47.26-.72.26-1.33.18-1.46-.08-.13-.29-.21-.6-.36Z"/></svg></span></a>}{!hidden.has("order")&&<div className="lp-sticky"><a href="#order">{c.cta||"اطلب الآن"} — {data.price} DH</a></div>}</div>}
+import { useParams } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
+import HeroRenderer from "./HeroRenderer";
+import LandingTemplateV4 from "../../../components/LandingTemplateV4";
+export default function LandingClient({
+  initialData,
+  initialSlug,
+  builderMode = false,
+  onSectionSelect,
+  viewportMode,
+}: {
+  initialData?: any;
+  initialSlug?: string;
+  builderMode?: boolean;
+  onSectionSelect?: (id: string) => void;
+  viewportMode?: "desktop" | "tablet" | "mobile";
+}) {
+  const params = useParams<{ slug: string }>(),
+    slug = initialSlug || (typeof params?.slug === "string" ? params.slug : "");
+  const [data, setData] = useState<any>(initialData || null),
+    [sent, setSent] = useState(false),
+    [error, setError] = useState(""),
+    [slide, setSlide] = useState(0),
+    [qty, setQty] = useState(1);
+  const slider = useRef<HTMLDivElement>(null);
+  const trackedForm = useRef(false);
+  function goSlide(i: number) {
+    if (!images.length) return;
+    const next = (i + images.length) % images.length;
+    setSlide(next);
+    const el = slider.current,
+      target = el?.children[next] as HTMLElement | undefined;
+    if (el && target) el.scrollTo({ left: target.offsetLeft, behavior: "smooth" });
+  }
+  function moveSlide(d: number) {
+    goSlide(slide + d);
+  }
+  function syncSlide() {
+    const el = slider.current;
+    if (!el || !images.length) return;
+    const center = el.scrollLeft + el.clientWidth / 2;
+    let best = 0,
+      dist = Infinity;
+    Array.from(el.children).forEach((node: any, i) => {
+      const d = Math.abs(node.offsetLeft + node.clientWidth / 2 - center);
+      if (d < dist) {
+        dist = d;
+        best = i;
+      }
+    });
+    if (best !== slide) setSlide(best);
+  }
+  useEffect(() => {
+    if (builderMode && initialData) {
+      setData(initialData);
+      return;
+    }
+  }, [builderMode, initialData]);
+  useEffect(() => {
+    if (initialData || !slug) return;
+    const preview = new URLSearchParams(location.search).get("preview") === "1";
+    fetch("/api/landing/" + slug + (preview ? "?preview=1" : ""))
+      .then(async (r) => {
+        const x = await r.json();
+        if (!r.ok) throw new Error(x.error || "Page introuvable");
+        return x;
+      })
+      .then(setData)
+      .catch((e) => setError(e.message));
+  }, [slug, initialData]);
+  useEffect(() => {
+    if (builderMode || !data?.id) return;
+    const q = new URLSearchParams(location.search),
+      sid = sessionStorage.getItem("lm_sid") || crypto.randomUUID(),
+      vid = localStorage.getItem("lm_vid") || crypto.randomUUID();
+    sessionStorage.setItem("lm_sid", sid);
+    localStorage.setItem("lm_vid", vid);
+    const track = (event: string) =>
+      fetch("/api/track", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          slug,
+          event,
+          session_id: sid,
+          visitor_id: vid,
+          path: location.pathname,
+          referrer: document.referrer,
+          utm_source: q.get("utm_source"),
+          utm_medium: q.get("utm_medium"),
+          utm_campaign: q.get("utm_campaign"),
+          utm_content: q.get("utm_content"),
+          utm_term: q.get("utm_term"),
+          fbclid: q.get("fbclid"),
+        }),
+        keepalive: true,
+      }).catch(() => {});
+    (window as any).lmTrack = track;
+    track("PAGE_VIEW");
+    if (data.metaPixelId) {
+      const w: any = window;
+      if (!w.fbq) {
+        const f: any = function () {
+          f.callMethod ? f.callMethod.apply(f, arguments) : f.queue.push(arguments);
+        };
+        f.queue = [];
+        f.loaded = true;
+        f.version = "2.0";
+        w.fbq = f;
+        const s = document.createElement("script");
+        s.async = true;
+        s.src = "https://connect.facebook.net/en_US/fbevents.js";
+        document.head.appendChild(s);
+      }
+      w.fbq("init", data.metaPixelId);
+      w.fbq("track", "PageView");
+    }
+    const onScroll = () => {
+      const max = document.documentElement.scrollHeight - innerHeight,
+        p = max > 0 ? scrollY / max : 0;
+      if (p >= 0.5 && !sessionStorage.getItem("lm_s50")) {
+        sessionStorage.setItem("lm_s50", "1");
+        track("SCROLL_50");
+      }
+      if (p >= 0.98 && !sessionStorage.getItem("lm_s100")) {
+        sessionStorage.setItem("lm_s100", "1");
+        track("SCROLL_100");
+      }
+    };
+    addEventListener("scroll", onScroll, { passive: true });
+    return () => removeEventListener("scroll", onScroll);
+  }, [data?.id]);
+  async function submit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    setError("");
+    (window as any).lmTrack?.("FORM_SUBMIT");
+    const f = new FormData(e.currentTarget),
+      r = await fetch("/api/orders", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          slug,
+          name: f.get("name"),
+          phone: f.get("phone"),
+          city: f.get("city"),
+          address: f.get("address"),
+          quantity: qty,
+        }),
+      });
+    if (r.ok) {
+      const result = await r.json().catch(() => ({}));
+      setSent(true);
+      const eventId = result?.order_id ? "order_" + result.order_id : undefined;
+      (window as any).fbq?.("track", "Lead");
+      if (eventId)
+        (window as any).fbq?.(
+          "track",
+          "Purchase",
+          { value: Number(result?.total ?? total), currency: String(result?.currency || "MAD") },
+          { eventID: eventId },
+        );
+      const confirmedTotal = Number(result?.total ?? total),
+        msg = encodeURIComponent(
+          "سلام، بغيت نأكد الطلب ديالي:\nالمنتج: " +
+            (data?.name || slug) +
+            "\nالاسم: " +
+            f.get("name") +
+            "\nالهاتف: " +
+            f.get("phone") +
+            "\nالمدينة: " +
+            f.get("city") +
+            "\nالكمية: " +
+            qty +
+            "\nالمجموع: " +
+            confirmedTotal +
+            " DH",
+        );
+      if (data?.whatsappPhone) window.open("https://wa.me/" + data.whatsappPhone + "?text=" + msg, "_blank");
+    } else setError("تعذر تسجيل الطلب. حاول مرة أخرى.");
+  }
+  async function submitV4(e: React.FormEvent<HTMLFormElement>, v4qty: number) {
+    e.preventDefault();
+    setError("");
+    (window as any).lmTrack?.("FORM_SUBMIT");
+    const f = new FormData(e.currentTarget),
+      r = await fetch("/api/orders", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          slug,
+          name: f.get("name"),
+          phone: f.get("phone"),
+          city: f.get("city"),
+          address: f.get("address"),
+          quantity: v4qty,
+        }),
+      });
+    if (r.ok) {
+      const result = await r.json().catch(() => ({}));
+      setSent(true);
+      (window as any).fbq?.("track", "Lead");
+      if (result?.order_id)
+        (window as any).fbq?.(
+          "track",
+          "Purchase",
+          { value: Number(result?.total || 0), currency: String(result?.currency || "MAD") },
+          { eventID: "order_" + result.order_id },
+        );
+      if (data?.whatsappPhone) {
+        const msg = encodeURIComponent(
+          "سلام، بغيت نأكد الطلب ديالي:\nالمنتج: " +
+            (data?.name || slug) +
+            "\nالاسم: " +
+            f.get("name") +
+            "\nالهاتف: " +
+            f.get("phone") +
+            "\nالمدينة: " +
+            f.get("city") +
+            "\nالكمية: " +
+            v4qty +
+            "\nالمجموع: " +
+            Number(result?.total || 0) +
+            " DH",
+        );
+        window.open("https://wa.me/" + data.whatsappPhone + "?text=" + msg, "_blank");
+      }
+    } else setError("تعذر تسجيل الطلب. حاول مرة أخرى.");
+  }
+  useEffect(() => {
+    if (!data) return;
+    const dc = data.content || {},
+      os = Array.isArray(dc.quantity_offers) ? dc.quantity_offers : [],
+      wanted = Number(dc.quantity_default_qty || os[0]?.qty || 1);
+    if (Number.isFinite(wanted) && wanted >= 1) setQty(Math.min(10, wanted));
+  }, [data?.id, data?.content?.quantity_default_qty]);
+  if (!data) return <div className="lp-loading">Chargement...</div>;
+  if (data.error) return <div className="lp-loading">Page introuvable</div>;
+  const c = data.content || {},
+    images = data.images || [],
+    theme = c.visual_theme || c.design_profile || "general",
+    shipping = Number(c.delivery_price || 0),
+    offers = Array.isArray(c.quantity_offers)
+      ? c.quantity_offers.filter((x: any) => Number(x.qty) > 0 && Number(x.price) >= 0)
+      : [],
+    selectedOffer = offers.find((x: any) => Number(x.qty) === qty),
+    itemsTotal = selectedOffer ? Number(selectedOffer.price) : Number(data.price || 0) * qty,
+    total = itemsTotal + shipping,
+    cities = [
+      "Casablanca",
+      "Rabat",
+      "Salé",
+      "Marrakech",
+      "Fès",
+      "Tanger",
+      "Agadir",
+      "Meknès",
+      "Oujda",
+      "Kénitra",
+      "Tétouan",
+      "Temara",
+      "Safi",
+      "El Jadida",
+      "Mohammedia",
+      "Béni Mellal",
+      "Khouribga",
+      "Nador",
+      "Settat",
+      "Berrechid",
+      "Larache",
+      "Ksar El Kebir",
+      "Taza",
+      "Essaouira",
+      "Dakhla",
+      "Laâyoune",
+      "Guelmim",
+      "Inezgane",
+      "Aït Melloul",
+      "Ouarzazate",
+    ];
+  const imageAlt = (x: string, i = 0) => c.image_alts?.[x] || data.name + " " + (i + 1);
+  const v4TemplateId = String(c.landing_template_id || "");
+  if (v4TemplateId) {
+    const v4Data = {
+      templateId: v4TemplateId,
+      name: data.name,
+      description: c.description || "",
+      price: Number(data.price || 0),
+      oldPrice: data.oldPrice || data.compare_at_price || "",
+      images,
+      content: c,
+      locale: data.locale,
+      whatsappPhone: data.whatsappPhone || "",
+    };
+    return (
+      <div
+        data-preview-viewport={builderMode ? viewportMode : undefined}
+        className={"landing-v4-runtime" + (builderMode ? " lpx-builder-runtime" : "")}
+        dir={String(data.locale || "").startsWith("ar") ? "rtl" : "ltr"}
+      >
+        {sent && !builderMode && <div className="v4-runtime-success">✅ تم تسجيل طلبك بنجاح</div>}
+        {error && !builderMode && <div className="v4-runtime-error">{error}</div>}
+        <LandingTemplateV4
+          data={v4Data}
+          preview={builderMode}
+          builderMode={builderMode}
+          onSectionSelect={onSectionSelect}
+          onSubmit={submitV4}
+        />
+      </div>
+    );
+  }
+  const autoGallery = ["cod-beauty", "cod-decor"].includes(theme)
+      ? "mosaic"
+      : ["cod-electronics", "cod-auto-moto", "cod-luxury"].includes(theme)
+        ? "thumbs"
+        : theme === "cod-fashion"
+          ? "editorial"
+          : theme === "cod-home"
+            ? "lifestyle"
+            : "carousel",
+    galleryStyle = c.gallery_style && c.gallery_style !== "auto" ? c.gallery_style : autoGallery;
+  const order =
+      Array.isArray(c.section_order) && c.section_order.length
+        ? c.section_order
+        : Array.isArray(c.design_system?.blueprint?.sections)
+          ? c.design_system.blueprint.sections
+          : ["hero", "order", "benefits", "features", "trust", "faq"],
+    hidden = new Set(Array.isArray(c.hidden_sections) ? c.hidden_sections : []);
+  const sectionStyle = (k: string) => {
+    const s = c.section_styles?.[k] || {};
+    return {
+      backgroundColor: s.background || undefined,
+      color: s.color || undefined,
+      textAlign: s.align || undefined,
+      paddingTop: s.padding ? Number(s.padding) : undefined,
+      paddingBottom: s.padding ? Number(s.padding) : undefined,
+    } as any;
+  };
+  const ds = c.design_system || {},
+    uiuxId = String(ds.style?.["Style ID"] || c.design_profile || "uiux-pro-max")
+      .replace(/[^a-z0-9-]/gi, "-")
+      .toLowerCase();
+  const runtimeLibrary =
+      c.uiux_library &&
+      ((c.uiux_library.styles || []).length ||
+        (c.uiux_library.patterns || []).length ||
+        (c.uiux_library.colors || []).length ||
+        (c.uiux_library.typography || []).length)
+        ? c.uiux_library
+        : ds.library || {},
+    pattern = String(c.builder_pattern || ds.tokens?.pattern || ds.landing?.["Pattern ID"] || "hero-features-cta"),
+    baseStyleName = String(ds.style?.["Style Category"] || ""),
+    styleName = String(c.builder_template || baseStyleName),
+    library = runtimeLibrary,
+    chosenStyle = (library.styles || []).find((x: any) => x.id === c.builder_template || x.name === c.builder_template),
+    chosenPattern = (library.patterns || []).find(
+      (x: any) => x.id === c.builder_pattern || x.name === c.builder_pattern,
+    ),
+    chosenPalette = (library.colors || []).find((x: any) => x.name === c.builder_palette),
+    chosenTypography = (library.typography || []).find((x: any) => x.name === c.builder_typography),
+    slugify = (v: string) =>
+      v
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-|-$/g, ""),
+    styleKey = slugify(String(chosenStyle?.id || styleName || "default")),
+    patternKey = slugify(String(chosenPattern?.id || pattern || "default")),
+    typographyKey = slugify(String(c.builder_typography || chosenTypography?.name || "default"));
+  const styleVars = String(chosenStyle?.variables || ""),
+    styleRadius = (styleVars.match(/border-radius:\s*([^,]+)/i)?.[1] || ds.tokens?.radius || "12px").trim(),
+    styleSignal = (
+      styleName +
+      " " +
+      String(chosenStyle?.keywords || "") +
+      " " +
+      String(chosenStyle?.effects || "")
+    ).toLowerCase(),
+    patternSignal = (
+      pattern +
+      " " +
+      String(chosenPattern?.name || "") +
+      " " +
+      String(chosenPattern?.keywords || "") +
+      " " +
+      String(chosenPattern?.sections || "")
+    ).toLowerCase();
+  const styleFamily = /glass/.test(styleSignal)
+    ? "glass"
+    : /neumorph|soft ui/.test(styleSignal)
+      ? "neumorph"
+      : /brutal/.test(styleSignal)
+        ? "brutal"
+        : /luxury|editorial|serif/.test(styleSignal)
+          ? "editorial"
+          : /bold|maximal|vibrant/.test(styleSignal)
+            ? "bold"
+            : /minimal|swiss|flat|clean/.test(styleSignal)
+              ? "minimal"
+              : /retro|vintage/.test(styleSignal)
+                ? "retro"
+                : /futur|cyber|tech|data/.test(styleSignal)
+                  ? "tech"
+                  : "standard";
+  const autoHero = /story|editorial|luxury/i.test(patternSignal + " " + styleSignal)
+    ? "editorial"
+    : /demo|interactive|motion|bold|vibrant/i.test(patternSignal + " " + styleSignal)
+      ? "impact"
+      : /minimal|direct|swiss/i.test(patternSignal + " " + styleSignal)
+        ? "centered"
+        : /split|feature|comparison/i.test(patternSignal)
+          ? "split"
+          : "conversion";
+  const heroMode =
+    c.hero_module && c.hero_module !== "auto"
+      ? c.hero_module
+      : c.hero_architecture && c.hero_architecture !== "auto"
+        ? c.hero_architecture
+        : autoHero;
+  const autoCard = /glass|tech|data/i.test(styleName)
+    ? "technical"
+    : /luxury|editorial/i.test(styleName)
+      ? "editorial"
+      : /soft|neumorph/i.test(styleName)
+        ? "soft"
+        : "conversion";
+  const patternFamily = /story|editorial/i.test(patternSignal)
+    ? "story"
+    : /split|comparison/i.test(patternSignal)
+      ? "split"
+      : /feature|benefit/i.test(patternSignal)
+        ? "feature"
+        : /minimal|direct/i.test(patternSignal)
+          ? "minimal"
+          : /social|trust|testimonial/i.test(patternSignal)
+            ? "social"
+            : /long|conversion|sales/i.test(patternSignal)
+              ? "conversion"
+              : "standard";
+  const cardMode = c.section_architecture && c.section_architecture !== "auto" ? c.section_architecture : autoCard;
+  const autoForm = /luxury|editorial/i.test(styleName)
+    ? "editorial"
+    : /minimal|tech|data/i.test(styleName)
+      ? "compact"
+      : "trust";
+  const formMode =
+    c.order_form_architecture && c.order_form_architecture !== "auto" ? c.order_form_architecture : autoForm;
+  const locale = String(data.locale || "");
+  const isAr = locale.startsWith("ar");
+  const labels = isAr
+    ? { problem: "المشكلة والحل", benefits: "علاش تختار هاد المنتج؟", faq: "الأسئلة الشائعة", order: "أكد الطلب ديالك" }
+    : {
+        problem: "Problème / Solution",
+        benefits: "Pourquoi choisir ce produit ?",
+        faq: "Questions fréquentes",
+        order: "Confirmez votre commande",
+      };
+  const sections: any = {
+    hero: (
+      <HeroRenderer
+        key="hero"
+        mode={heroMode}
+        content={c}
+        data={data}
+        images={Array.isArray(c.hero_images) && c.hero_images.length ? c.hero_images : images}
+        sectionStyle={sectionStyle}
+        imageAlt={imageAlt}
+        whatsapp={data?.whatsappPhone}
+        onCta={() => {
+          (window as any).lmTrack?.("CTA_CLICK");
+        }}
+      />
+    ),
+    order: (
+      <section className="lp-order lp-order-after-hero" style={sectionStyle("order")} id="order" key="order">
+        <div className="lp-wrap">
+          <div className={"lp-form lp-form-" + (c.order_form_style || "classic") + " lp-form-architecture-" + formMode}>
+            <h2>{labels.order}</h2>
+            <p>{c.delivery}</p>
+            {sent ? (
+              <div className="lp-success">✅ تم تسجيل طلبك بنجاح</div>
+            ) : (
+              <form
+                onSubmit={submit}
+                onFocus={() => {
+                  if (!trackedForm.current) {
+                    trackedForm.current = true;
+                    (window as any).lmTrack?.("FORM_START");
+                    (window as any).fbq?.("track", "InitiateCheckout");
+                  }
+                }}
+              >
+                <input name="name" required minLength={2} placeholder="الاسم الكامل" />
+                <input
+                  name="phone"
+                  required
+                  inputMode="tel"
+                  pattern="(?:0|212|\\+212)?[5-7][0-9]{8}"
+                  title="مثال: 0612345678"
+                  placeholder="رقم الهاتف 06/07..."
+                />
+                <input name="city" required list="morocco-cities" placeholder="المدينة" />
+                <datalist id="morocco-cities">
+                  {cities.map((x) => (
+                    <option key={x} value={x} />
+                  ))}
+                </datalist>
+                {c.order_show_address !== false && <input name="address" placeholder="العنوان (اختياري)" />}
+                {offers.length > 0 && (
+                  <div className="lp-quantity-offers">
+                    {offers.map((o: any, i: number) => (
+                      <button
+                        type="button"
+                        key={i}
+                        className={qty === Number(o.qty) ? "active" : ""}
+                        onClick={() => setQty(Number(o.qty))}
+                      >
+                        <span>{o.label || o.qty + " pièces"}</span>
+                        <b>{o.price} DH</b>
+                        {Number(o.qty) > 1 && <small>{Math.round(Number(o.price) / Number(o.qty))} DH / pièce</small>}
+                      </button>
+                    ))}
+                  </div>
+                )}
+                <div className="lp-qty">
+                  <button type="button" onClick={() => setQty(Math.max(1, qty - 1))}>
+                    −
+                  </button>
+                  <b>{qty}</b>
+                  <button type="button" onClick={() => setQty(Math.min(10, qty + 1))}>
+                    +
+                  </button>
+                </div>
+                <div className="lp-order-total">
+                  <span>المجموع</span>
+                  <b>{total} DH</b>
+                  {shipping > 0 && <small>التوصيل: {shipping} DH</small>}
+                </div>
+                {error && <p>{error}</p>}
+                <button className={"lp-cta " + (c.order_pump === false ? "" : "lp-pump")}>
+                  {c.cta || "اطلب الآن"} — {total} DH
+                </button>
+                {c.order_whatsapp !== false && data?.whatsappPhone && (
+                  <a
+                    className="lp-form-whatsapp"
+                    target="_blank"
+                    rel="noreferrer"
+                    href={
+                      "https://wa.me/" +
+                      data.whatsappPhone +
+                      "?text=" +
+                      encodeURIComponent(
+                        "سلام، بغيت نطلب " + data.name + " — الكمية: " + qty + " — المجموع: " + total + " DH",
+                      )
+                    }
+                    onClick={() => {
+                      (window as any).lmTrack?.("WHATSAPP_CLICK");
+                    }}
+                  >
+                    <svg viewBox="0 0 32 32" aria-hidden="true">
+                      <path
+                        fill="currentColor"
+                        d="M16 3C8.83 3 3 8.7 3 15.72c0 2.47.72 4.88 2.08 6.94L3.7 29l6.55-1.7A13.15 13.15 0 0 0 16 28.44c7.17 0 13-5.7 13-12.72S23.17 3 16 3Zm0 23.3c-1.82 0-3.61-.48-5.17-1.39l-.37-.22-3.89 1.01.83-3.78-.24-.38a10.43 10.43 0 0 1-1.64-5.82C5.52 9.87 10.22 5.1 16 5.1s10.48 4.77 10.48 10.62S21.78 26.3 16 26.3Zm5.75-7.91c-.31-.15-1.86-.9-2.15-1-.29-.1-.5-.15-.71.15-.21.31-.81 1-.99 1.2-.18.21-.37.23-.68.08-.31-.15-1.32-.48-2.51-1.52-.93-.81-1.56-1.82-1.74-2.13-.18-.31-.02-.47.14-.62.14-.14.31-.36.47-.54.16-.18.21-.31.31-.51.1-.21.05-.38-.03-.54-.08-.15-.71-1.68-.97-2.3-.26-.62-.52-.53-.71-.54h-.61c-.21 0-.55.08-.84.38-.29.31-1.1 1.06-1.1 2.58s1.13 2.99 1.29 3.2c.16.21 2.22 3.32 5.38 4.66.75.32 1.34.51 1.8.65.76.24 1.44.2 1.99.12.61-.09 1.86-.75 2.12-1.47.26-.72.26-1.33.18-1.46-.08-.13-.29-.21-.6-.36Z"
+                      />
+                    </svg>
+                    <span>طلب عبر واتساب</span>
+                  </a>
+                )}
+              </form>
+            )}
+          </div>
+        </div>
+      </section>
+    ),
+    benefits: (
+      <section className="lp-section" style={sectionStyle("benefits")} key="benefits">
+        <div className="lp-wrap">
+          <div className="lp-section-kicker">★</div>
+          <h2>{labels.benefits}</h2>
+          <div className={"lp-benefits lp-benefits-architecture-" + cardMode}>
+            {(c.benefits || []).map((x: string, i: number) => (
+              <div className="lp-benefit" key={i}>
+                <span>✓</span>
+                {x}
+              </div>
+            ))}
+          </div>
+          <p className="lp-desc">{c.description}</p>
+        </div>
+      </section>
+    ),
+    problem:
+      c.problem_text || c.problem || c.solution ? (
+        <section className="lp-story" style={sectionStyle("problem")} key="problem">
+          <div className="lp-wrap">
+            <h2>{c.problem_title || labels.problem}</h2>
+            {(c.problem_text || c.problem) && <p>{c.problem_text || c.problem}</p>}
+            {c.solution && <p>{c.solution}</p>}
+          </div>
+        </section>
+      ) : null,
+    features: c.features?.length ? (
+      <section className="lp-section" style={sectionStyle("features")} key="features">
+        <div className="lp-wrap">
+          <div className="lp-section-kicker">+</div>
+          <h2>{c.features_title}</h2>
+          <div className={"lp-feature-grid lp-features-architecture-" + cardMode}>
+            {c.features.map((f: any, i: number) => {
+              const o = typeof f === "string" ? { title: f, text: "" } : f || {};
+              return (
+                <article className={"lp-feature-card lp-feature-card-" + cardMode} key={i}>
+                  <b>{o.title || o.text}</b>
+                  {o.title && o.text && <p>{o.text}</p>}
+                </article>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+    ) : null,
+    how: c.how_steps?.length ? (
+      <section className="lp-how" style={sectionStyle("how")} key="how">
+        <div className="lp-wrap">
+          <div className="lp-section-kicker">01</div>
+          <h2>{c.how_title}</h2>
+          <div className="lp-steps">
+            {c.how_steps.map((x: string, i: number) => (
+              <div key={i}>
+                <strong>{i + 1}</strong>
+                <p>{x}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+    ) : null,
+    trust: c.trust_points?.length ? (
+      <section className="lp-trust" style={sectionStyle("trust")} key="trust">
+        <div className="lp-wrap">
+          <h2>{c.trust_title}</h2>
+          <div className="lp-trust-grid">
+            {c.trust_points.map((x: string, i: number) => (
+              <div key={i}>✓ {x}</div>
+            ))}
+          </div>
+        </div>
+      </section>
+    ) : null,
+    faq: c.faq?.length ? (
+      <section className="lp-section" style={sectionStyle("faq")} key="faq">
+        <div className="lp-wrap">
+          <h2>{labels.faq}</h2>
+          {c.faq.map((f: any, i: number) => {
+            const o = typeof f === "string" ? { question: f, answer: "" } : f || {};
+            return (
+              <div className="lp-faq" key={i}>
+                <b>{o.question}</b>
+                {o.answer && <p>{o.answer}</p>}
+              </div>
+            );
+          })}
+        </div>
+      </section>
+    ) : null,
+  };
+  const templateId = slugify(String(c.landing_template_id || c.builder_template || "default")),
+    templateFamily = slugify(String(c.landing_template_family || "conversion"));
+  const runtimeViewport = builderMode ? viewportMode : undefined;
+  return (
+    <div
+      data-preview-viewport={runtimeViewport}
+      data-landing-template={templateId}
+      className={
+        "lp landing-benchmark landing-template landing-template-" +
+        templateId +
+        " landing-family-" +
+        templateFamily +
+        " " +
+        (c.landing_template_dark ? "landing-template-dark " : "") +
+        "benchmark-" +
+        uiuxId +
+        " benchmark-hero-" +
+        heroMode +
+        " benchmark-cards-" +
+        cardMode +
+        " section-architecture-" +
+        cardMode +
+        " uiux-style-" +
+        styleKey +
+        " uiux-family-" +
+        styleFamily +
+        " uiux-pattern-" +
+        patternKey +
+        " uiux-pattern-family-" +
+        patternFamily +
+        " uiux-typography-" +
+        typographyKey
+      }
+      dir={isAr ? "rtl" : "ltr"}
+      style={
+        {
+          "--lp-primary": chosenPalette?.primary || ds.tokens?.colors?.primary || undefined,
+          "--lp-secondary": chosenPalette?.secondary || ds.tokens?.colors?.secondary || undefined,
+          "--lp-accent": chosenPalette?.accent || ds.tokens?.colors?.accent || undefined,
+          "--lp-bg": chosenPalette?.background || ds.tokens?.colors?.background || undefined,
+          "--lp-fg": chosenPalette?.foreground || ds.tokens?.colors?.foreground || undefined,
+          "--lp-card": chosenPalette?.card || ds.tokens?.colors?.card || undefined,
+          "--lp-border": chosenPalette?.border || ds.tokens?.colors?.border || undefined,
+          "--lp-radius": styleRadius,
+          "--lp-heading-font": chosenTypography?.heading || ds.tokens?.fonts?.heading || undefined,
+          "--lp-body-font": chosenTypography?.body || ds.tokens?.fonts?.body || undefined,
+          "--lp-style-primary": chosenStyle?.primaryColors || undefined,
+          "--lp-style-secondary": chosenStyle?.secondaryColors || undefined,
+          "--lp-template-accent": c.landing_template_accent || undefined,
+        } as any
+      }
+    >
+      {(() => {
+        const aliases: any = {
+          hero: "hero",
+          banner: "hero",
+          headline: "hero",
+          features: "features",
+          feature: "features",
+          benefits: "benefits",
+          benefit: "benefits",
+          problem: "problem",
+          solution: "problem",
+          how: "how",
+          steps: "how",
+          trust: "trust",
+          social: "trust",
+          testimonials: "trust",
+          testimonial: "trust",
+          faq: "faq",
+          order: "order",
+          form: "order",
+          cta: "order",
+        };
+        const patternOrder = String(chosenPattern?.sections || "")
+          .split(/\s*(?:>|→|,|\||;)\s*/)
+          .map((x: string) => aliases[slugify(x)])
+          .filter(Boolean);
+        const base = [...order];
+        const effective =
+          c.builder_pattern && patternOrder.length
+            ? [...Array.from(new Set(patternOrder)), ...base.filter((x: string) => !patternOrder.includes(x))]
+            : base;
+        return effective
+          .filter((k: string) => !hidden.has(k))
+          .map(
+            (k: string) =>
+              sections[k] ||
+              (k.startsWith("custom-") && c.custom_sections?.[k]
+                ? (() => {
+                    const b = c.custom_sections[k],
+                      t = b.type || "text";
+                    if (t === "imageText")
+                      return (
+                        <section className="lp-section lp-custom lp-image-text" style={sectionStyle(k)} key={k}>
+                          <div className="lp-wrap lp-image-text-grid">
+                            {b.image && <img src={b.image} alt={b.title || ""} loading="lazy" decoding="async" />}
+                            <div>
+                              <h2>{b.title}</h2>
+                              <p className="lp-desc">{b.text}</p>
+                            </div>
+                          </div>
+                        </section>
+                      );
+                    if (t === "gallery")
+                      return (
+                        <section className="lp-section lp-custom" style={sectionStyle(k)} key={k}>
+                          <div className="lp-wrap">
+                            <h2>{b.title}</h2>
+                            <div className="lp-custom-gallery">
+                              {(b.images || []).map((x: string, i: number) => (
+                                <img src={x} alt="" key={i} loading="lazy" decoding="async" />
+                              ))}
+                            </div>
+                          </div>
+                        </section>
+                      );
+                    if (t === "faqBlock")
+                      return (
+                        <section className="lp-section lp-custom" style={sectionStyle(k)} key={k}>
+                          <div className="lp-wrap">
+                            <h2>{b.title}</h2>
+                            {(b.items || []).map((x: any, i: number) => (
+                              <div className="lp-faq" key={i}>
+                                <b>{x.question}</b>
+                                <p>{x.answer}</p>
+                              </div>
+                            ))}
+                          </div>
+                        </section>
+                      );
+                    if (t === "vertical916") {
+                      const device = b.device || "phone",
+                        defaultRatio = device === "laptop" ? "16 / 9" : device === "tablet" ? "4 / 3" : "9 / 16",
+                        ratio =
+                          b.mediaRatio === "auto"
+                            ? "auto"
+                            : b.mediaRatio && b.mediaRatio !== "device"
+                              ? b.mediaRatio
+                              : defaultRatio,
+                        fit = b.mediaFit || "cover",
+                        align = b.mediaAlign || "center",
+                        defaultWidth =
+                          device === "laptop" ? "100%" : device === "tablet" ? "min(100%, 820px)" : "min(100%, 430px)",
+                        maxWidth = b.mediaWidth ? `min(100%, ${b.mediaWidth}px)` : defaultWidth,
+                        margin = align === "left" ? "0 auto 0 0" : align === "right" ? "0 0 0 auto" : "0 auto",
+                        responsiveStyle = {
+                          "--media-max-width": maxWidth,
+                          "--media-height": b.mediaHeight ? `${b.mediaHeight}px` : "auto",
+                          "--media-tablet-width": b.mediaWidthTablet ? `min(100%, ${b.mediaWidthTablet}px)` : maxWidth,
+                          "--media-tablet-height": b.mediaHeightTablet
+                            ? `${b.mediaHeightTablet}px`
+                            : b.mediaHeight
+                              ? `${b.mediaHeight}px`
+                              : "auto",
+                          "--media-mobile-width": b.mediaWidthMobile ? `min(100%, ${b.mediaWidthMobile}px)` : "100%",
+                          "--media-mobile-height": b.mediaHeightMobile ? `${b.mediaHeightMobile}px` : "auto",
+                          margin,
+                        } as any;
+                      return (
+                        <section
+                          className={"lp-section lp-custom lp-device-media lp-device-" + device}
+                          style={sectionStyle(k)}
+                          key={k}
+                        >
+                          <div className="lp-wrap">
+                            <div className="lp-responsive-media-shell" style={responsiveStyle}>
+                              <div
+                                className="lp-responsive-media-frame"
+                                style={{
+                                  aspectRatio: ratio === "auto" ? undefined : ratio,
+                                  overflow: "hidden",
+                                  borderRadius: 0,
+                                  background: "#111",
+                                  border: "none",
+                                  boxSizing: "border-box",
+                                }}
+                              >
+                                {b.mediaType === "video" ? (
+                                  <video
+                                    src={b.media || ""}
+                                    controls={b.videoControls !== false}
+                                    autoPlay={b.videoAutoplay === true}
+                                    muted={b.videoMuted !== false}
+                                    loop={b.videoLoop === true}
+                                    playsInline
+                                    preload="metadata"
+                                    style={{ width: "100%", height: "100%", objectFit: fit }}
+                                  />
+                                ) : b.media ? (
+                                  <img
+                                    src={b.media}
+                                    alt={b.title || ""}
+                                    loading="lazy"
+                                    decoding="async"
+                                    style={{ width: "100%", height: "100%", objectFit: fit }}
+                                  />
+                                ) : null}
+                              </div>
+                              {b.title && <h2>{b.title}</h2>}
+                              {b.text && <p className="lp-desc">{b.text}</p>}
+                              {b.button && (
+                                <a className="lp-cta" href="#order">
+                                  {b.button}
+                                </a>
+                              )}
+                            </div>
+                          </div>
+                        </section>
+                      );
+                    }
+                    if (t === "ctaBlock")
+                      return (
+                        <section className="lp-custom-cta" style={sectionStyle(k)} key={k}>
+                          <div className="lp-wrap">
+                            <h2>{b.title}</h2>
+                            <p>{b.text}</p>
+                            <a className="lp-cta" href="#order">
+                              {b.button || c.cta || "Commander maintenant"}
+                            </a>
+                          </div>
+                        </section>
+                      );
+                    return (
+                      <section className="lp-section lp-custom" style={sectionStyle(k)} key={k}>
+                        <div className="lp-wrap">
+                          <h2>{b.title}</h2>
+                          <p className="lp-desc">{b.text}</p>
+                        </div>
+                      </section>
+                    );
+                  })()
+                : null),
+          );
+      })()}
+      {(() => {
+        const lang = String(data.locale || "").toLowerCase();
+        const isFr = lang.startsWith("fr");
+        const isAr = lang === "ar" || lang.startsWith("ar-");
+        const copy = isFr
+          ? {
+              delivery: "Livraison partout au Maroc",
+              payment: "Paiement à la livraison",
+              privacy: "Politique de confidentialité",
+              terms: "Conditions d’utilisation",
+              contact: "Contact",
+              rights: "Tous droits réservés",
+            }
+          : isAr
+            ? {
+                delivery: "التوصيل إلى جميع أنحاء المغرب",
+                payment: "الدفع عند الاستلام",
+                privacy: "سياسة الخصوصية",
+                terms: "شروط الاستخدام",
+                contact: "اتصل بنا",
+                rights: "جميع الحقوق محفوظة",
+              }
+            : {
+                delivery: "التوصيل لجميع المدن فالمغرب",
+                payment: "الخلص ملي يوصلك الطلب",
+                privacy: "سياسة الخصوصية",
+                terms: "شروط الاستعمال",
+                contact: "تواصل معنا",
+                rights: "جميع الحقوق محفوظة",
+              };
+        const footerStyle = {
+          "--footer-bg": c.footer_bg_color || "#cbdcf8",
+          "--footer-text": c.footer_text_color || "#0f172a",
+          "--footer-link": c.footer_link_color || c.footer_text_color || "#0f172a",
+          "--footer-title-size": `${Number(c.footer_title_px || 28)}px`,
+          "--footer-text-size": `${Number(c.footer_text_px || 15)}px`,
+          "--footer-pad-y": `${Number(c.footer_padding_y || 48)}px`,
+          "--footer-align": c.footer_align || "center",
+        } as any;
+        return (
+          <footer className="lp-footer lp-footer-studio" style={footerStyle}>
+            <div className="lp-wrap">
+              {c.footer_show_brand !== false && <strong className="lp-footer-brand">{data.name}</strong>}
+              {c.footer_show_trust !== false && (
+                <div className="lp-footer-trust">
+                  <span>🚚 {copy.delivery}</span>
+                  <span>💵 {copy.payment}</span>
+                </div>
+              )}
+              {c.footer_show_links !== false && (
+                <nav className="lp-footer-links" aria-label="Footer">
+                  <a href="#privacy">{copy.privacy}</a>
+                  <a href="#terms">{copy.terms}</a>
+                  {data?.whatsappPhone && (
+                    <a target="_blank" rel="noreferrer" href={"https://wa.me/" + data.whatsappPhone}>
+                      {copy.contact}
+                    </a>
+                  )}
+                </nav>
+              )}
+              {c.footer_show_copyright !== false && (
+                <small>
+                  © {new Date().getFullYear()} {data.name} — {copy.rights}
+                </small>
+              )}
+            </div>
+          </footer>
+        );
+      })()}
+      {data?.whatsappPhone && (
+        <a
+          className="lp-whatsapp-float lp-whatsapp-float-legacy"
+          aria-label="WhatsApp"
+          target="_blank"
+          rel="noreferrer"
+          href={
+            "https://wa.me/" + data.whatsappPhone + "?text=" + encodeURIComponent("سلام، بغيت معلومات على " + data.name)
+          }
+        >
+          <span className="wa-icon">
+            <svg viewBox="0 0 32 32" aria-hidden="true">
+              <path
+                fill="currentColor"
+                d="M16 3C8.83 3 3 8.7 3 15.72c0 2.47.72 4.88 2.08 6.94L3.7 29l6.55-1.7A13.15 13.15 0 0 0 16 28.44c7.17 0 13-5.7 13-12.72S23.17 3 16 3Zm0 23.3c-1.82 0-3.61-.48-5.17-1.39l-.37-.22-3.89 1.01.83-3.78-.24-.38a10.43 10.43 0 0 1-1.64-5.82C5.52 9.87 10.22 5.1 16 5.1s10.48 4.77 10.48 10.62S21.78 26.3 16 26.3Zm5.75-7.91c-.31-.15-1.86-.9-2.15-1-.29-.1-.5-.15-.71.15-.21.31-.81 1-.99 1.2-.18.21-.37.23-.68.08-.31-.15-1.32-.48-2.51-1.52-.93-.81-1.56-1.82-1.74-2.13-.18-.31-.02-.47.14-.62.14-.14.31-.36.47-.54.16-.18.21-.31.31-.51.1-.21.05-.38-.03-.54-.08-.15-.71-1.68-.97-2.3-.26-.62-.52-.53-.71-.54h-.61c-.21 0-.55.08-.84.38-.29.31-1.1 1.06-1.1 2.58s1.13 2.99 1.29 3.2c.16.21 2.22 3.32 5.38 4.66.75.32 1.34.51 1.8.65.76.24 1.44.2 1.99.12.61-.09 1.86-.75 2.12-1.47.26-.72.26-1.33.18-1.46-.08-.13-.29-.21-.6-.36Z"
+              />
+            </svg>
+          </span>
+        </a>
+      )}
+      {!hidden.has("order") && (
+        <div className="lp-sticky">
+          <a href="#order">
+            {c.cta || "اطلب الآن"} — {data.price} DH
+          </a>
+        </div>
+      )}
+    </div>
+  );
+}

@@ -1,5 +1,200 @@
 "use client";
-export default function HomePanel({settings,setSettings,uploadHeroImage,moveSection}:any){
- const patch=(v:any)=>setSettings({...settings,...v}),order=settings.sectionOrder||["hero","products","trust","faq","footer"],visibleOrder=order.filter((x:string)=>x!=="hero");
- return <div className="store-settings-card"><div className="store-step-head"><span>4</span><div><h2>Page d’accueil</h2><p>Personnalise les blocs essentiels. Le template garde une mise en page professionnelle.</p></div></div><div className="store-home-block"><div className="store-block-title"><b>▣ Bannière principale</b><small>Titre, texte, bouton et image</small></div><label>Titre<input value={settings.heroTitle} onChange={e=>patch({heroTitle:e.target.value})}/></label><label>Description<textarea value={settings.heroText} onChange={e=>patch({heroText:e.target.value})}/></label><label>Bouton<input value={settings.heroButton} onChange={e=>patch({heroButton:e.target.value})}/></label><label>Image Hero URL<input value={settings.heroImage||""} onChange={e=>patch({heroImage:e.target.value})} placeholder="https://..."/></label><label>Importer une image<input type="file" multiple accept="image/jpeg,image/png,image/webp,image/avif" onChange={uploadHeroImage}/></label>{settings.heroImage&&<button type="button" onClick={()=>patch({heroImage:""})}>Supprimer l’image Hero</button>}<div className="store-font-grid">{Array.isArray(settings.heroImages)&&settings.heroImages.length>0&&<div className="store-hero-image-list">{settings.heroImages.map((url:string,i:number)=><div key={url+i}><img src={url} alt=""/><button type="button" onClick={()=>setSettings((v:any)=>{const heroImages=(v.heroImages||[]).filter((_:any,j:number)=>j!==i);return {...v,heroImages,heroImage:heroImages[0]||""}})}>×</button></div>)}</div>}<div className="store-font-grid"><label>Transition<select value={settings.heroTransition||"fade"} onChange={e=>patch({heroTransition:e.target.value})}><option value="fade">Fondu</option><option value="slide">Glissement</option></select></label><label>Durée par image<input type="range" min="3" max="10" value={settings.heroSlideDuration||5} onChange={e=>patch({heroSlideDuration:Number(e.target.value)})}/><small>{settings.heroSlideDuration||5}s</small></label></div><label>Effet Hero<select value={settings.heroEffect||"zoom"} onChange={e=>patch({heroEffect:e.target.value})}><option value="none">Aucun</option><option value="zoom">Zoom subtil</option><option value="float">Mouvement doux</option><option value="parallax">Parallax léger</option></select></label><label>Position image<select value={settings.heroPosition||"center"} onChange={e=>patch({heroPosition:e.target.value})}><option value="center">Centre</option><option value="top">Haut</option><option value="bottom">Bas</option><option value="left">Gauche</option><option value="right">Droite</option></select></label><label>Couleur overlay<input type="color" value={settings.heroOverlayColor||"#111827"} onChange={e=>patch({heroOverlayColor:e.target.value})}/></label><label>Intensité overlay<input type="range" min="0" max="85" value={settings.heroOverlay??45} onChange={e=>patch({heroOverlay:Number(e.target.value)})}/><small>{settings.heroOverlay??45}%</small></label><label>Hauteur PC<input type="range" min="320" max="760" step="20" value={settings.heroHeightDesktop||520} onChange={e=>patch({heroHeightDesktop:Number(e.target.value)})}/><small>{settings.heroHeightDesktop||520}px</small></label><label>Hauteur mobile<input type="range" min="280" max="620" step="20" value={settings.heroHeightMobile||420} onChange={e=>patch({heroHeightMobile:Number(e.target.value)})}/><small>{settings.heroHeightMobile||420}px</small></label></div></div><h3>Blocs de la boutique</h3><div className="store-section-list">{visibleOrder.map((id:string,idx:number)=>{const blockMap:any={products:["Produits populaires","showProducts"],trust:["Avantages COD","showTrust"],faq:["FAQ","showFaq"],footer:["Footer","showFooter"]},meta=blockMap[id];if(!meta)return null;return <div className="store-section-row" key={id}><span>☷</span><b>{meta[0]}</b><label><input type="checkbox" checked={!!settings[meta[1]]} onChange={e=>patch({[meta[1]]:e.target.checked})}/>{settings[meta[1]]?"Visible":"Masqué"}</label><button onClick={()=>moveSection(id,-1)} disabled={idx===0}>↑</button><button onClick={()=>moveSection(id,1)} disabled={idx===visibleOrder.length-1}>↓</button></div>})}</div><label className="store-toggle store-announcement-toggle"><span>Barre d’annonce</span><input type="checkbox" checked={!!settings.showAnnouncement} onChange={e=>patch({showAnnouncement:e.target.checked})}/></label></div>
+export default function HomePanel({ settings, setSettings, uploadHeroImage, moveSection }: any) {
+  const patch = (v: any) => setSettings({ ...settings, ...v }),
+    order = settings.sectionOrder || ["hero", "products", "trust", "faq", "footer"],
+    visibleOrder = order.filter((x: string) => x !== "hero");
+  return (
+    <div className="store-settings-card">
+      <div className="store-step-head">
+        <span>4</span>
+        <div>
+          <h2>Page d’accueil</h2>
+          <p>Personnalise les blocs essentiels. Le template garde une mise en page professionnelle.</p>
+        </div>
+      </div>
+      <div className="store-home-block">
+        <div className="store-block-title">
+          <b>▣ Bannière principale</b>
+          <small>Titre, texte, bouton et image</small>
+        </div>
+        <label>
+          Titre
+          <input value={settings.heroTitle} onChange={(e) => patch({ heroTitle: e.target.value })} />
+        </label>
+        <label>
+          Description
+          <textarea value={settings.heroText} onChange={(e) => patch({ heroText: e.target.value })} />
+        </label>
+        <label>
+          Bouton
+          <input value={settings.heroButton} onChange={(e) => patch({ heroButton: e.target.value })} />
+        </label>
+        <label>
+          Image Hero URL
+          <input
+            value={settings.heroImage || ""}
+            onChange={(e) => patch({ heroImage: e.target.value })}
+            placeholder="https://..."
+          />
+        </label>
+        <label>
+          Importer une image
+          <input type="file" multiple accept="image/jpeg,image/png,image/webp,image/avif" onChange={uploadHeroImage} />
+        </label>
+        {settings.heroImage && (
+          <button type="button" onClick={() => patch({ heroImage: "" })}>
+            Supprimer l’image Hero
+          </button>
+        )}
+        <div className="store-font-grid">
+          {Array.isArray(settings.heroImages) && settings.heroImages.length > 0 && (
+            <div className="store-hero-image-list">
+              {settings.heroImages.map((url: string, i: number) => (
+                <div key={url + i}>
+                  <img src={url} alt="" />
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setSettings((v: any) => {
+                        const heroImages = (v.heroImages || []).filter((_: any, j: number) => j !== i);
+                        return { ...v, heroImages, heroImage: heroImages[0] || "" };
+                      })
+                    }
+                  >
+                    ×
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+          <div className="store-font-grid">
+            <label>
+              Transition
+              <select
+                value={settings.heroTransition || "fade"}
+                onChange={(e) => patch({ heroTransition: e.target.value })}
+              >
+                <option value="fade">Fondu</option>
+                <option value="slide">Glissement</option>
+              </select>
+            </label>
+            <label>
+              Durée par image
+              <input
+                type="range"
+                min="3"
+                max="10"
+                value={settings.heroSlideDuration || 5}
+                onChange={(e) => patch({ heroSlideDuration: Number(e.target.value) })}
+              />
+              <small>{settings.heroSlideDuration || 5}s</small>
+            </label>
+          </div>
+          <label>
+            Effet Hero
+            <select value={settings.heroEffect || "zoom"} onChange={(e) => patch({ heroEffect: e.target.value })}>
+              <option value="none">Aucun</option>
+              <option value="zoom">Zoom subtil</option>
+              <option value="float">Mouvement doux</option>
+              <option value="parallax">Parallax léger</option>
+            </select>
+          </label>
+          <label>
+            Position image
+            <select value={settings.heroPosition || "center"} onChange={(e) => patch({ heroPosition: e.target.value })}>
+              <option value="center">Centre</option>
+              <option value="top">Haut</option>
+              <option value="bottom">Bas</option>
+              <option value="left">Gauche</option>
+              <option value="right">Droite</option>
+            </select>
+          </label>
+          <label>
+            Couleur overlay
+            <input
+              type="color"
+              value={settings.heroOverlayColor || "#111827"}
+              onChange={(e) => patch({ heroOverlayColor: e.target.value })}
+            />
+          </label>
+          <label>
+            Intensité overlay
+            <input
+              type="range"
+              min="0"
+              max="85"
+              value={settings.heroOverlay ?? 45}
+              onChange={(e) => patch({ heroOverlay: Number(e.target.value) })}
+            />
+            <small>{settings.heroOverlay ?? 45}%</small>
+          </label>
+          <label>
+            Hauteur PC
+            <input
+              type="range"
+              min="320"
+              max="760"
+              step="20"
+              value={settings.heroHeightDesktop || 520}
+              onChange={(e) => patch({ heroHeightDesktop: Number(e.target.value) })}
+            />
+            <small>{settings.heroHeightDesktop || 520}px</small>
+          </label>
+          <label>
+            Hauteur mobile
+            <input
+              type="range"
+              min="280"
+              max="620"
+              step="20"
+              value={settings.heroHeightMobile || 420}
+              onChange={(e) => patch({ heroHeightMobile: Number(e.target.value) })}
+            />
+            <small>{settings.heroHeightMobile || 420}px</small>
+          </label>
+        </div>
+      </div>
+      <h3>Blocs de la boutique</h3>
+      <div className="store-section-list">
+        {visibleOrder.map((id: string, idx: number) => {
+          const blockMap: any = {
+              products: ["Produits populaires", "showProducts"],
+              trust: ["Avantages COD", "showTrust"],
+              faq: ["FAQ", "showFaq"],
+              footer: ["Footer", "showFooter"],
+            },
+            meta = blockMap[id];
+          if (!meta) return null;
+          return (
+            <div className="store-section-row" key={id}>
+              <span>☷</span>
+              <b>{meta[0]}</b>
+              <label>
+                <input
+                  type="checkbox"
+                  checked={!!settings[meta[1]]}
+                  onChange={(e) => patch({ [meta[1]]: e.target.checked })}
+                />
+                {settings[meta[1]] ? "Visible" : "Masqué"}
+              </label>
+              <button onClick={() => moveSection(id, -1)} disabled={idx === 0}>
+                ↑
+              </button>
+              <button onClick={() => moveSection(id, 1)} disabled={idx === visibleOrder.length - 1}>
+                ↓
+              </button>
+            </div>
+          );
+        })}
+      </div>
+      <label className="store-toggle store-announcement-toggle">
+        <span>Barre d’annonce</span>
+        <input
+          type="checkbox"
+          checked={!!settings.showAnnouncement}
+          onChange={(e) => patch({ showAnnouncement: e.target.checked })}
+        />
+      </label>
+    </div>
+  );
 }

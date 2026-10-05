@@ -167,5 +167,4 @@ export const ui = {
 
 export type UI = (typeof ui)["fr"];
 
-export const formatPrice = (n: number, currency = "DH") =>
-  `${Number(n || 0).toLocaleString("fr-FR")} ${currency}`;
+export const formatPrice = (n: number, currency = "DH") => `${Number(n || 0).toLocaleString("fr-FR")} ${currency}`;
