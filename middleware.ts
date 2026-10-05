@@ -4,7 +4,9 @@ function isPublic(req:NextRequest){const p=req.nextUrl.pathname;if(PUBLIC_GET.so
 async function valid(token:string|undefined){if(!token)return false;const u=process.env.NEXT_PUBLIC_SUPABASE_URL,k=process.env.SUPABASE_SECRET_KEY;if(!u||!k)return false;try{const r=await fetch(u+"/auth/v1/user",{headers:{apikey:k,Authorization:"Bearer "+token},cache:"no-store"});return r.ok}catch{return false}}
 async function refresh(req:NextRequest){const rt=req.cookies.get("lm_refresh")?.value,u=process.env.NEXT_PUBLIC_SUPABASE_URL,k=process.env.SUPABASE_SECRET_KEY;if(!rt||!u||!k)return null;try{const r=await fetch(u+"/auth/v1/token?grant_type=refresh_token",{method:"POST",headers:{apikey:k,"Content-Type":"application/json"},body:JSON.stringify({refresh_token:rt}),cache:"no-store"});if(!r.ok)return null;return await r.json()}catch{return null}}
 export async function middleware(req:NextRequest){const host=(req.headers.get("host")||"").split(":")[0].toLowerCase(),path=req.nextUrl.pathname;
-if(path.startsWith("/_next/")||path.includes("."))return NextResponse.next();
+// Fichiers statiques uniquement : un chemin /api/ contenant un point (ex. /api/products/123.json)
+// ne doit jamais sauter la vérification de connexion.
+if(path.startsWith("/_next/")||(!path.startsWith("/api/")&&/\.[a-z0-9]{1,8}$/i.test(path)))return NextResponse.next();
 const own=[process.env.VERCEL_PROJECT_PRODUCTION_URL,"landpro.online","www.landpro.online","localhost"].filter(Boolean).map(x=>String(x).replace(/^https?:\/\//,""));
 const isLandingSubdomain=host.endsWith(".landpro.online")&&host!=="www.landpro.online";
 if(isLandingSubdomain&&!path.startsWith("/api/")){const subdomain=host.slice(0,-".landpro.online".length);if(subdomain&&subdomain!=="www"){const url=req.nextUrl.clone();url.pathname="/landing/"+subdomain;return NextResponse.rewrite(url)}}
