@@ -1,4 +1,4 @@
-"use client";import Link from "next/link";import SaaSSidebar from "./components/SaaSSidebar";import SaaSTopbar from "./components/SaaSTopbar";import {useEffect,useState} from "react";
+"use client";import "./globals.css";import Link from "next/link";import SaaSSidebar from "./components/SaaSSidebar";import SaaSTopbar from "./components/SaaSTopbar";import {useEffect,useState} from "react";
 const Icon=({children}:{children:string})=><span className="dash-icon">{children}</span>;
 const money=(n:any)=>Number(n||0).toLocaleString("fr-MA",{maximumFractionDigits:0})+" DH";
 const pct=(n:any)=>Number(n||0).toLocaleString("fr-MA",{maximumFractionDigits:1})+"%";
