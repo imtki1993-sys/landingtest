@@ -21,8 +21,7 @@ export async function generateMetadata({params,searchParams}:{params:Promise<{sl
  }catch{return {title:"Commander"}}
 }
 
-export const dynamic="force-dynamic";
-export const revalidate=0;
+export const dynamic="force-dynamic"; // rendu par requête (aperçu ?preview=1), données en cache (lib/public-landing.ts)
 
 export default async function LandingPage({params,searchParams}:{params:Promise<{slug:string}>,searchParams:Promise<{preview?:string}>}){
  const {slug}=await params,{preview}=await searchParams;

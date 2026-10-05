@@ -1,3 +1,5 @@
+import {reportError} from "../../../../lib/monitoring";
+import {withLandingInvalidation} from "../../../../lib/landing-cache";
 import {NextResponse} from "next/server";
 import {authContext} from "../../../../lib/server-auth";
 import {normalizeProductOptions,normalizeProductVariants} from "../../../../lib/product-variants";
@@ -9,7 +11,7 @@ import {normalizeProductOptions,normalizeProductVariants} from "../../../../lib/
 const unauthorized=(e:any)=>/Non autorisé|approbation|Workspace introuvable|Profil introuvable/.test(String(e?.message||""));
 const fail=(e:any)=>unauthorized(e)
  ?NextResponse.json({error:"Non autorisé"},{status:401})
- :(console.error("[api/products/[id]]",e),NextResponse.json({error:"Erreur serveur"},{status:500}));
+ :(reportError(e,"api/products/[id]"),NextResponse.json({error:"Erreur serveur"},{status:500}));
 
 export async function GET(req:Request,{params}:{params:Promise<{id:string}>}){try{
  const {id}=await params,{s,workspaceId}=await authContext(req);
@@ -17,9 +19,9 @@ export async function GET(req:Request,{params}:{params:Promise<{id:string}>}){tr
  if(error)throw error;
  if(!data)return NextResponse.json({error:"Produit introuvable"},{status:404});
  return NextResponse.json({product:{...data,stock:(data.specifications as any)?.stock??null}});
-}catch(e:any){return fail(e)}}
+}catch(e:any){reportError(e,"api/products/[id]");return fail(e)}}
 
-export async function PATCH(req:Request,{params}:{params:Promise<{id:string}>}){try{
+async function PATCHHandler(req:Request,{params}:{params:Promise<{id:string}>}){try{
  const {id}=await params,{s,workspaceId}=await authContext(req),b=await req.json();
  const {data:old,error:oldError}=await s.from("products").select("specifications").eq("id",id).eq("workspace_id",workspaceId).maybeSingle();
  if(oldError)throw oldError;
@@ -37,9 +39,9 @@ export async function PATCH(req:Request,{params}:{params:Promise<{id:string}>}){
  const {data,error}=await s.from("products").update(patch).eq("id",id).eq("workspace_id",workspaceId).select().single();
  if(error)throw error;
  return NextResponse.json({product:data});
-}catch(e:any){return fail(e)}}
+}catch(e:any){reportError(e,"api/products/[id]");return fail(e)}}
 
-export async function DELETE(req:Request,{params}:{params:Promise<{id:string}>}){try{
+async function DELETEHandler(req:Request,{params}:{params:Promise<{id:string}>}){try{
  const {id}=await params,{s,workspaceId}=await authContext(req);
  const {data:product,error:findError}=await s.from("products").select("id").eq("id",id).eq("workspace_id",workspaceId).maybeSingle();
  if(findError)throw findError;
@@ -50,4 +52,7 @@ export async function DELETE(req:Request,{params}:{params:Promise<{id:string}>})
  const {error}=await s.from("products").update({is_active:false,archived_at:now}).eq("id",id).eq("workspace_id",workspaceId);
  if(error)throw error;
  return NextResponse.json({ok:true,landing_pages_deleted:true});
-}catch(e:any){return fail(e)}}
+}catch(e:any){reportError(e,"api/products/[id]");return fail(e)}}
+
+export const PATCH=withLandingInvalidation(PATCHHandler);
+export const DELETE=withLandingInvalidation(DELETEHandler);

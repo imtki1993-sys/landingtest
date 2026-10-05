@@ -1,2 +1,3 @@
+import {reportError} from "../../../../lib/monitoring";
 import {NextResponse} from "next/server";import {authContext} from "../../../../lib/server-auth";
-export async function GET(req:Request){try{const a=await authContext(req);return NextResponse.json({is_platform_admin:a.isPlatformAdmin,role:a.role,workspace_id:a.workspaceId})}catch(e:any){return NextResponse.json({error:e.message},{status:401})}}
+export async function GET(req:Request){try{const a=await authContext(req);return NextResponse.json({is_platform_admin:a.isPlatformAdmin,role:a.role,workspace_id:a.workspaceId})}catch(e:any){reportError(e,"api/auth/context");return NextResponse.json({error:e.message},{status:401})}}
