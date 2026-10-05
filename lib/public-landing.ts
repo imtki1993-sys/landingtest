@@ -1,3 +1,4 @@
+import {cache} from "react";
 import {adminDb} from "./server-auth";
 import {resolvePublishedMetaPixel} from "./meta-pixel";
 
@@ -23,6 +24,5 @@ async function loadPublicLanding(slug:string){
  return {id:lp.id,name:activeProduct?.name||lp.name,price:activeProduct?.price,oldPrice:activeProduct?.compare_at_price,description:activeProduct?.description,locale:lp.locale,content,images:(activeSeo as any)?.images||activeProduct?.image_urls||[],whatsappPhone:String(whatsapp).replace(/\D/g,""),metaPixelId:publishedPixel};
 }
 
-export function getPublicLanding(slug:string){
- return loadPublicLanding(slug);
-}
+// cache() : generateMetadata et la page partagent la même lecture (une seule série de requêtes).
+export const getPublicLanding=cache((slug:string)=>loadPublicLanding(slug));
