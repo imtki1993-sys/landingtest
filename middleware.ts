@@ -27,8 +27,17 @@ function isPublic(req: NextRequest) {
     return true;
   return false;
 }
+// Jetons déjà validés auprès de Supabase, mémorisés 60 s par instance : évite un
+// aller-retour réseau à chaque requête du tableau de bord. Les routes API revérifient
+// de toute façon le compte (authContext) ; seuls les jetons valides sont mémorisés.
+const VALID_TTL_MS = 60_000;
+const validTokens = new Map<string, number>();
+
 async function valid(token: string | undefined) {
   if (!token) return false;
+  const now = Date.now();
+  const until = validTokens.get(token);
+  if (until && until > now) return true;
   const u = process.env.NEXT_PUBLIC_SUPABASE_URL,
     k = process.env.SUPABASE_SECRET_KEY;
   if (!u || !k) return false;
@@ -37,6 +46,10 @@ async function valid(token: string | undefined) {
       headers: { apikey: k, Authorization: "Bearer " + token },
       cache: "no-store",
     });
+    if (r.ok) {
+      if (validTokens.size > 500) validTokens.clear();
+      validTokens.set(token, now + VALID_TTL_MS);
+    } else validTokens.delete(token);
     return r.ok;
   } catch {
     return false;

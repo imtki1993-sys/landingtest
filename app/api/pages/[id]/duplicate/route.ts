@@ -1,3 +1,4 @@
+import { publicMessage } from "../../../../../lib/public-error";
 import { reportError } from "../../../../../lib/monitoring";
 import { withLandingInvalidation } from "../../../../../lib/landing-cache";
 import { NextResponse } from "next/server";
@@ -62,7 +63,12 @@ async function POSTHandler(req: Request, { params }: { params: Promise<{ id: str
     const m = e.message || "Duplication impossible",
       limited = /landing_limit_reached|subscription_inactive|subscription_missing/.test(m);
     return NextResponse.json(
-      { error: m === "landing_limit_reached" ? "Limite de landing pages atteinte pour ce plan." : m },
+      {
+        error:
+          m === "landing_limit_reached"
+            ? "Limite de landing pages atteinte pour ce plan."
+            : publicMessage(e, "Duplication impossible"),
+      },
       { status: limited ? 403 : 500 },
     );
   }

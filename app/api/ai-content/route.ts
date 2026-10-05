@@ -1,3 +1,4 @@
+import { publicMessage } from "../../../lib/public-error";
 import { reportError } from "../../../lib/monitoring";
 import { NextResponse } from "next/server";
 import { authContext } from "../../../lib/server-auth";
@@ -113,6 +114,6 @@ export async function POST(req: Request) {
     });
   } catch (e: any) {
     reportError(e, "api/ai-content");
-    return NextResponse.json({ error: e?.message || "Erreur génération contenu" }, { status: 500 });
+    return NextResponse.json({ error: publicMessage(e, "Erreur génération contenu") }, { status: 500 });
   }
 }

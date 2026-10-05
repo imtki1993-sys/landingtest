@@ -1,3 +1,4 @@
+import { publicMessage } from "../../../../../lib/public-error";
 import { reportError } from "../../../../../lib/monitoring";
 import { NextResponse } from "next/server";
 import { authContext } from "../../../../../lib/server-auth";
@@ -52,7 +53,7 @@ async function fetchCities(clientId: string, apiKey: string) {
       last = { status: r.status, data, url };
     } catch (e: any) {
       reportError(e, "api/delivery-companies/[id]/ozon-test");
-      last = { error: e?.message || String(e), url };
+      last = { error: publicMessage(e), url };
     }
   }
   return { ok: false, last };
@@ -87,6 +88,9 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
     });
   } catch (e: any) {
     reportError(e, "api/delivery-companies/[id]/ozon-test");
-    return NextResponse.json({ error: e?.name === "TimeoutError" ? "Ozon API timeout" : e.message }, { status: 500 });
+    return NextResponse.json(
+      { error: e?.name === "TimeoutError" ? "Ozon API timeout" : publicMessage(e) },
+      { status: 500 },
+    );
   }
 }

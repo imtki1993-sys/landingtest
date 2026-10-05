@@ -1,3 +1,4 @@
+import { publicMessage } from "../../../../lib/public-error";
 import { reportError } from "../../../../lib/monitoring";
 import { NextResponse } from "next/server";
 import { authContext } from "../../../../lib/server-auth";
@@ -42,7 +43,7 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
     });
   } catch (e: any) {
     reportError(e, "api/delivery-companies/[id]");
-    return NextResponse.json({ error: e.message }, { status: 500 });
+    return NextResponse.json({ error: publicMessage(e) }, { status: 500 });
   }
 }
 export async function POST(req: Request, { params }: { params: Promise<{ id: string }> }) {
@@ -74,6 +75,6 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
     });
   } catch (e: any) {
     reportError(e, "api/delivery-companies/[id]");
-    return NextResponse.json({ error: e.message }, { status: 500 });
+    return NextResponse.json({ error: publicMessage(e) }, { status: 500 });
   }
 }

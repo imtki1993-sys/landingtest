@@ -1,6 +1,7 @@
 import { adminDb } from "../../../../lib/server-auth";
 import { cookies } from "next/headers";
 import Storefront from "../Storefront";
+import DocumentLang from "../../../../components/public/DocumentLang";
 import type { Metadata } from "next";
 import { cache } from "react";
 const storeMeta = cache(async (slug: string) => {
@@ -92,7 +93,12 @@ export default async function StorePage({
         .limit(100),
     ]);
     store.settings = { ...(store.settings || {}), contactEmail: workspace?.settings?.contact_email || "" };
-    return <Storefront store={store} products={products || []} page={(page || []).join("/") || "home"} />;
+    return (
+      <>
+        <DocumentLang locale={(store as any).published_locale || (store as any).locale} />
+        <Storefront store={store} products={products || []} page={(page || []).join("/") || "home"} />
+      </>
+    );
   } catch {
     return <div className="public-store-missing">Boutique indisponible</div>;
   }

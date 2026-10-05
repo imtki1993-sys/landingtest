@@ -1,3 +1,4 @@
+import { publicMessage } from "../../../../lib/public-error";
 import { reportError } from "../../../../lib/monitoring";
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
@@ -32,6 +33,6 @@ export async function POST(req: Request) {
     return res;
   } catch (e: any) {
     reportError(e, "api/auth/signup");
-    return NextResponse.json({ error: e.message || "Erreur inscription" }, { status: 500 });
+    return NextResponse.json({ error: publicMessage(e, "Erreur inscription") }, { status: 500 });
   }
 }

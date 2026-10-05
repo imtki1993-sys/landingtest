@@ -1,3 +1,4 @@
+import { publicMessage } from "../../../../lib/public-error";
 import { reportError } from "../../../../lib/monitoring";
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
@@ -17,6 +18,6 @@ export async function POST(req: Request) {
     return NextResponse.json({ ok: true, message: "Si ce compte existe, un email de réinitialisation a été envoyé." });
   } catch (e: any) {
     reportError(e, "api/auth/forgot-password");
-    return NextResponse.json({ error: e.message || "Erreur" }, { status: 500 });
+    return NextResponse.json({ error: publicMessage(e, "Erreur") }, { status: 500 });
   }
 }

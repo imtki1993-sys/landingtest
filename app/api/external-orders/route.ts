@@ -1,3 +1,4 @@
+import { publicMessage } from "../../../lib/public-error";
 import { reportError } from "../../../lib/monitoring";
 import { NextResponse } from "next/server";
 import { adminDb } from "../../../lib/server-auth";
@@ -129,6 +130,6 @@ export async function POST(req: Request) {
     );
   } catch (e: any) {
     reportError(e, "api/external-orders");
-    return NextResponse.json({ error: e.message || "Erreur de commande externe" }, { status: 500, headers: cors });
+    return NextResponse.json({ error: publicMessage(e, "Erreur de commande externe") }, { status: 500, headers: cors });
   }
 }

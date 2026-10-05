@@ -1,3 +1,4 @@
+import { publicMessage } from "../../../../lib/public-error";
 import { reportError } from "../../../../lib/monitoring";
 import { NextResponse } from "next/server";
 import { authContext } from "../../../../lib/server-auth";
@@ -21,7 +22,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
     return NextResponse.json({ store: data });
   } catch (e: any) {
     reportError(e, "api/stores/[id]");
-    return NextResponse.json({ error: e.message }, { status: 404 });
+    return NextResponse.json({ error: publicMessage(e) }, { status: 404 });
   }
 }
 export async function PATCH(req: Request, { params }: { params: Promise<{ id: string }> }) {
@@ -95,7 +96,7 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
     return NextResponse.json({ store: data });
   } catch (e: any) {
     reportError(e, "api/stores/[id]");
-    return NextResponse.json({ error: e.message }, { status: 500 });
+    return NextResponse.json({ error: publicMessage(e) }, { status: 500 });
   }
 }
 export async function DELETE(req: Request, { params }: { params: Promise<{ id: string }> }) {
@@ -114,6 +115,6 @@ export async function DELETE(req: Request, { params }: { params: Promise<{ id: s
     return NextResponse.json({ ok: true, id });
   } catch (e: any) {
     reportError(e, "api/stores/[id]");
-    return NextResponse.json({ error: e.message || "Suppression impossible" }, { status: 500 });
+    return NextResponse.json({ error: publicMessage(e, "Suppression impossible") }, { status: 500 });
   }
 }

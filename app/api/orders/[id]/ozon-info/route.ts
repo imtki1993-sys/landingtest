@@ -1,3 +1,4 @@
+import { publicMessage } from "../../../../../lib/public-error";
 import { reportError } from "../../../../../lib/monitoring";
 import { NextResponse } from "next/server";
 import { authContext } from "../../../../../lib/server-auth";
@@ -36,6 +37,9 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
     });
   } catch (e: any) {
     reportError(e, "api/orders/[id]/ozon-info");
-    return NextResponse.json({ error: e?.name === "TimeoutError" ? "Ozon API timeout" : e.message }, { status: 500 });
+    return NextResponse.json(
+      { error: e?.name === "TimeoutError" ? "Ozon API timeout" : publicMessage(e) },
+      { status: 500 },
+    );
   }
 }

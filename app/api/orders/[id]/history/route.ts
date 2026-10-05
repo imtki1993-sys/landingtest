@@ -1,3 +1,4 @@
+import { publicMessage } from "../../../../../lib/public-error";
 import { reportError } from "../../../../../lib/monitoring";
 import { NextResponse } from "next/server";
 import { authContext } from "../../../../../lib/server-auth";
@@ -16,6 +17,6 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
     return NextResponse.json({ history: data || [] });
   } catch (e: any) {
     reportError(e, "api/orders/[id]/history");
-    return NextResponse.json({ error: e.message, history: [] }, { status: 500 });
+    return NextResponse.json({ error: publicMessage(e), history: [] }, { status: 500 });
   }
 }

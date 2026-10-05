@@ -1,3 +1,4 @@
+import { publicMessage } from "../../../lib/public-error";
 import { reportError } from "../../../lib/monitoring";
 import { NextResponse } from "next/server";
 import { adminDb } from "../../../lib/server-auth";
@@ -115,6 +116,6 @@ export async function POST(req: Request) {
     return NextResponse.json(result, { status: 201 });
   } catch (e: any) {
     reportError(e, "api/store-order");
-    return NextResponse.json({ error: e.message || "Erreur de commande" }, { status: 500 });
+    return NextResponse.json({ error: publicMessage(e, "Erreur de commande") }, { status: 500 });
   }
 }

@@ -1,3 +1,4 @@
+import { publicMessage } from "../../../lib/public-error";
 import { reportError } from "../../../lib/monitoring";
 import { NextResponse } from "next/server";
 import { adminDb } from "../../../lib/server-auth";
@@ -55,6 +56,6 @@ export async function POST(req: Request) {
     return NextResponse.json({ ok: true });
   } catch (e: any) {
     reportError(e, "api/store-contact");
-    return NextResponse.json({ error: e.message || "Envoi impossible" }, { status: 500 });
+    return NextResponse.json({ error: publicMessage(e, "Envoi impossible") }, { status: 500 });
   }
 }

@@ -1,3 +1,4 @@
+import { publicMessage } from "../../../lib/public-error";
 import { reportError } from "../../../lib/monitoring";
 import { NextResponse } from "next/server";
 import fs from "node:fs";
@@ -82,6 +83,6 @@ export async function GET() {
     });
   } catch (e: any) {
     reportError(e, "api/uiux-library");
-    return NextResponse.json({ error: e.message }, { status: 500 });
+    return NextResponse.json({ error: publicMessage(e) }, { status: 500 });
   }
 }

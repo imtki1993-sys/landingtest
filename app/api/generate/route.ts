@@ -1,3 +1,4 @@
+import { publicMessage } from "../../../lib/public-error";
 import { reportError } from "../../../lib/monitoring";
 import { withLandingInvalidation } from "../../../lib/landing-cache";
 import { NextResponse } from "next/server";
@@ -191,7 +192,7 @@ Retourne UNIQUEMENT un JSON valide avec exactement ces clés:
     });
   } catch (e: any) {
     reportError(e, "api/generate");
-    return NextResponse.json({ error: e?.message || "Erreur génération IA" }, { status: 500 });
+    return NextResponse.json({ error: publicMessage(e, "Erreur génération IA") }, { status: 500 });
   }
 }
 

@@ -1,3 +1,4 @@
+import { publicMessage } from "../../../lib/public-error";
 import { reportError } from "../../../lib/monitoring";
 import { NextResponse } from "next/server";
 import { authContext } from "../../../lib/server-auth";
@@ -36,6 +37,6 @@ export async function POST(req: Request) {
     return NextResponse.json({ url: data.publicUrl, path });
   } catch (e: any) {
     reportError(e, "api/store-media");
-    return NextResponse.json({ error: e.message || "Upload impossible" }, { status: 500 });
+    return NextResponse.json({ error: publicMessage(e, "Upload impossible") }, { status: 500 });
   }
 }

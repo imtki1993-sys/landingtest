@@ -1,3 +1,4 @@
+import { publicMessage } from "../../../lib/public-error";
 import { reportError } from "../../../lib/monitoring";
 import { withLandingInvalidation } from "../../../lib/landing-cache";
 import { NextResponse } from "next/server";
@@ -21,7 +22,7 @@ export async function GET(req: Request) {
     return NextResponse.json({ workspace: w, pixel: p });
   } catch (e: any) {
     reportError(e, "api/settings");
-    return NextResponse.json({ error: e.message }, { status: 500 });
+    return NextResponse.json({ error: publicMessage(e) }, { status: 500 });
   }
 }
 async function PATCHHandler(req: Request) {
@@ -76,7 +77,7 @@ async function PATCHHandler(req: Request) {
     return NextResponse.json({ ok: true });
   } catch (e: any) {
     reportError(e, "api/settings");
-    return NextResponse.json({ error: e.message }, { status: 500 });
+    return NextResponse.json({ error: publicMessage(e) }, { status: 500 });
   }
 }
 export const PATCH = withLandingInvalidation(PATCHHandler);
