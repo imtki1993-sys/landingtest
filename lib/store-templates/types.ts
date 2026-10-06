@@ -50,7 +50,18 @@ export type SxFooterLayout = "columns" | "wordmark" | "centered" | "cta" | "mini
 export type SxShopLayout = "sidebar" | "topbar" | "banner";
 export type SxProductLayout = "split" | "stack" | "centered" | "panel";
 export type SxPageLayout = "simple" | "banner" | "split";
+export type SxHeaderLayout =
+  | "classic" // logo, menu au centre, icônes + bouton
+  | "centered" // menu à gauche, logo au centre
+  | "editorial" // grand logo, menu numéroté, liens texte
+  | "pill" // barre flottante arrondie
+  | "stacked" // recherche + logo, puis barre de catégories
+  | "menu" // bouton « Menu » et menu plein écran
+  | "split" // menu de part et d'autre du logo centré
+  | "search" // champ de recherche dans le header
+  | "utility"; // bandeau d'infos au-dessus du header
 export interface SxLayout {
+  header: SxHeaderLayout;
   card: SxCardLayout;
   faq: SxFaqLayout;
   footer: SxFooterLayout;
