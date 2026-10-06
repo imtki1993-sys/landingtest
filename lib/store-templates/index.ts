@@ -3,6 +3,7 @@
 import type { SxBlock, SxCopy, SxHeroVariant, SxLayout, SxSectionType, SxSettings, StoreTemplate } from "./types";
 import { SERIE_1 } from "./serie1";
 import { SERIE_2 } from "./serie2";
+import { SERIE_3 } from "./serie3";
 import { SUR_MESURE } from "./sur-mesure";
 import { DEFAULT_FAQ } from "./shared-copy";
 import { storeBuilderDefaults } from "../store-builder-config";
@@ -13,6 +14,7 @@ export * from "./types";
 export const STORE_SERIES: { id: number; label: string; templates: StoreTemplate[] }[] = [
   { id: 1, label: "Série 1", templates: SERIE_1 },
   { id: 2, label: "Série 2", templates: SERIE_2 },
+  { id: 3, label: "Série 3", templates: SERIE_3 },
   // templates créés à partir d'une maquette envoyée à part (hors séries de 15)
   { id: 90, label: "Sur mesure", templates: SUR_MESURE },
 ];
@@ -63,6 +65,10 @@ export const SECTION_LABELS: Record<SxSectionType, string> = {
   expert: "Expert + chiffres",
   highlights: "Cartes points forts",
   map: "Carte & adresse",
+  deals: "Offres du jour",
+  mosaic: "Mosaïque de bannières",
+  specs: "Caractéristiques",
+  gallery: "Bande de photos",
 };
 
 /** Toutes les sections connues du template (ordre par défaut + celles masquées par défaut). */
@@ -94,6 +100,10 @@ export const ADDABLE_SECTIONS: SxSectionType[] = [
   "expert",
   "highlights",
   "map",
+  "deals",
+  "mosaic",
+  "specs",
+  "gallery",
 ];
 const ALL_TYPES = new Set<string>(Object.keys(SECTION_LABELS));
 
@@ -155,7 +165,7 @@ export function sectionContent(t: StoreTemplate, locale: unknown, key: string, s
 }
 
 /** Variantes de hero adaptées à un header transparent (posé sur une photo ou un aplat sombre). */
-const OVERLAY_HEROES = new Set([
+export const OVERLAY_HEROES = new Set([
   "giant",
   "photo-dark",
   "color-block",
@@ -168,6 +178,14 @@ const OVERLAY_HEROES = new Set([
   "dark-split",
   "estate",
   "clinic",
+  "luxe-dark",
+  "diagonal",
+  "smoke",
+  "bold-photo",
+  "night-photo",
+  "neon",
+  "giant-behind",
+  "orange-orb",
 ]);
 
 /**
@@ -217,6 +235,16 @@ export const LAYOUT_CHOICES: Record<keyof SxLayout, [string, string][]> = {
     ["notch", "Carte à encoche"],
     ["listing", "Annonce horizontale"],
     ["post", "Article avec étiquette"],
+    ["cut", "Coin coupé"],
+    ["heart", "Blanche + cœur"],
+    ["market", "Marché (bouton contour)"],
+    ["glass", "Verre sombre"],
+    ["dark-icon", "Sombre + bouton panier"],
+    ["tyre", "Bordée, deux boutons"],
+    ["circle", "Disque coloré"],
+    ["gray-round", "Grise arrondie"],
+    ["outline-cart", "Badge + panier contour"],
+    ["price-badge", "Pastel + prix en pastille"],
   ],
   faq: [
     ["split", "Deux colonnes"],
@@ -234,6 +262,7 @@ export const LAYOUT_CHOICES: Record<keyof SxLayout, [string, string][]> = {
     ["split", "Deux panneaux"],
     ["bar", "Barre + réseaux"],
     ["photo", "Sombre + photo"],
+    ["mega", "Colonnes + garanties"],
   ],
   shop: [
     ["sidebar", "Filtres sur le côté"],
@@ -287,6 +316,26 @@ export const HERO_CHOICES: [SxHeroVariant, string][] = [
   ["school", "École (titre souligné + collage)"],
   ["estate", "Photo plein cadre + chiffres"],
   ["clinic", "Photo arrondie + pastilles"],
+  ["frost", "Bleu glacier + produit flottant"],
+  ["luxe-dark", "Luxe sombre + doré"],
+  ["slider-beige", "Bannière beige à flèches"],
+  ["neon", "Néon + cartes en verre"],
+  ["portrait-dark", "Portrait sombre"],
+  ["diagonal", "Découpe en biais"],
+  ["ghost-word", "Mot géant transparent"],
+  ["smoke", "Photo plein cadre"],
+  ["circle-product", "Produit dans un disque"],
+  ["center-product", "Épuré centré"],
+  ["bold-photo", "Photo sport très grasse"],
+  ["brutal", "Typographie brute"],
+  ["spec-tech", "High-tech + caractéristiques"],
+  ["badge-split", "Clair + pastille promo"],
+  ["minimal-gray", "Gris minimal"],
+  ["giant-behind", "Mot géant derrière la photo"],
+  ["night-photo", "Photo de nuit"],
+  ["red-panel", "Carte + panneau en biais"],
+  ["brand-giant", "Nom géant sur l'image"],
+  ["orange-orb", "Disque orange + chiffres"],
 ];
 
 /** Remplace {products} / {categories} par les vrais nombres de la boutique. */

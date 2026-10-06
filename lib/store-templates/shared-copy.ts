@@ -44,6 +44,24 @@ export const SHARED_FR: Blocks = {
   categories: { title: "Acheter par catégorie" },
   products: {},
   catalog: { title: "Tous les produits" },
+  deals: { eyebrow: "Offres du jour", title: "Les bonnes affaires du jour", button: "Commander" },
+  mosaic: {
+    items: [
+      { value: "Nouveau", title: "Les nouveautés", text: "Découvrez les derniers arrivages.", image: "" },
+      { value: "Sélection", title: "Nos coups de cœur", text: "Les produits que nos clients préfèrent.", image: "" },
+      { value: "Offre", title: "Petits prix", text: "Des produits utiles à prix doux.", image: "" },
+    ],
+  },
+  specs: {
+    title: "En bref",
+    items: [
+      { title: "Livraison", value: "Partout au Maroc" },
+      { title: "Paiement", value: "À la livraison" },
+      { title: "Échange", value: "Facile" },
+      { title: "Service client", value: "WhatsApp" },
+    ],
+  },
+  gallery: { title: "Nos produits en images", text: "Un aperçu de la boutique." },
 };
 
 export const SHARED_AR: Blocks = {
@@ -87,6 +105,24 @@ export const SHARED_AR: Blocks = {
   categories: { title: "تسوق حسب التصنيف" },
   products: {},
   catalog: { title: "جميع المنتجات" },
+  deals: { eyebrow: "عروض اليوم", title: "همزات اليوم", button: "اطلب دابا" },
+  mosaic: {
+    items: [
+      { value: "جديد", title: "الجديد عندنا", text: "اكتشف آخر السلعة اللي وصلات.", image: "" },
+      { value: "اختيار", title: "اللي عجبونا", text: "المنتجات اللي كيبغيوها الزبناء.", image: "" },
+      { value: "عرض", title: "أثمنة مزيانة", text: "منتجات مفيدة بثمن مناسب.", image: "" },
+    ],
+  },
+  specs: {
+    title: "باختصار",
+    items: [
+      { title: "التوصيل", value: "لجميع المدن" },
+      { title: "الدفع", value: "عند الاستلام" },
+      { title: "التبديل", value: "ساهل" },
+      { title: "خدمة الزبناء", value: "واتساب" },
+    ],
+  },
+  gallery: { title: "منتجاتنا بالصور", text: "نظرة على المتجر." },
 };
 
 export const DEFAULT_FAQ = {
