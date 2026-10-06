@@ -2,6 +2,8 @@
 // Pages internes des templates de boutique : Boutique, Produit, Livraison & paiement,
 // Contact, FAQ et pages légales. Chaque template choisit sa mise en page (t.layout).
 import React, { useEffect, useMemo, useState } from "react";
+import { MapFrame, mapDirectionsUrl } from "./SeriesMap";
+import { sectionContent } from "../../lib/store-templates";
 import {
   FaqBlock,
   Icon,
@@ -561,7 +563,11 @@ export function ContactPage({ ctx }: { ctx: SxCtx }) {
   const { cfg, store, txt } = ctx;
   const [state, setState] = useState<"idle" | "busy" | "sent">("idle");
   const [error, setError] = useState("");
-  const whatsapp = String(cfg.whatsapp || "").replace(/\D/g, "");
+  const whatsapp = String(cfg.whatsapp || store.workspace_whatsapp || "").replace(/\D/g, "");
+  // adresse de la section « Carte & adresse » de l'accueil : reprise sur la page Contact
+  const address = String(
+    sectionContent(ctx.t, store.locale, "map", cfg.storeTemplateId === ctx.t.id ? cfg.sx : undefined).address || "",
+  ).trim();
   async function submit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const form = e.currentTarget,
@@ -663,6 +669,15 @@ export function ContactPage({ ctx }: { ctx: SxCtx }) {
                 </small>
               </span>
             </div>
+            {address && (
+              <a className="sx-contact-card" href={mapDirectionsUrl(address)} target="_blank" rel="noreferrer">
+                <Icon name="pin" />
+                <span>
+                  <b>{tr(ctx, "Adresse", "العنوان")}</b>
+                  <small>{address}</small>
+                </span>
+              </a>
+            )}
             <a className="sx-contact-card" href={ctx.base + "/faq"}>
               <Icon name="chat" />
               <span>
@@ -672,6 +687,11 @@ export function ContactPage({ ctx }: { ctx: SxCtx }) {
             </a>
           </aside>
         </div>
+        {address && (
+          <div className="sx-wrap sx-contact-map">
+            <MapFrame address={address} title={tr(ctx, "Notre adresse", "العنوان ديالنا")} />
+          </div>
+        )}
       </section>
     </>
   );

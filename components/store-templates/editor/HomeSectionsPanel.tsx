@@ -40,6 +40,7 @@ const SECTION_HELP: Partial<Record<SxSectionType, string>> = {
   services: "Un service par élément ; un élément avec un chiffre devient la carte colorée.",
   expert: "1er élément = la personne (nom, rôle, texte) ; les suivants = chiffres sur la photo.",
   highlights: "4 cartes : image + titre, carte colorée (étiquette + texte), grande photo, chiffre.",
+  map: "Carte Google Maps de votre adresse, reprise aussi sur la page Contact. Sans adresse, la section est masquée.",
 };
 const CUSTOM_TYPES: [string, string][] = [
   ["text", "Texte"],
@@ -440,6 +441,28 @@ function SectionFields({
             withImage={type === "highlights"}
             storeId={storeId}
             products={products}
+          />
+        </>
+      )}
+      {type === "map" && (
+        <>
+          <TextField
+            label="Adresse (rue, quartier, ville)"
+            value={block.address}
+            onChange={(v) => onChange({ address: v })}
+            placeholder="Ex. 12 rue Ibn Batouta, Maârif, Casablanca"
+          />
+          {f("eyebrow", "Petit titre")}
+          {f("title", "Titre")}
+          {f("text", "Texte", true)}
+          {f("button", "Bouton (itinéraire)")}
+          <span className="sxe-label">Infos pratiques (horaires, téléphone, parking…)</span>
+          <ItemsEditor
+            items={block.items || []}
+            onChange={(items) => onChange({ items })}
+            storeId={storeId}
+            products={products}
+            addLabel="+ Ajouter une info"
           />
         </>
       )}

@@ -30,7 +30,8 @@ export type SxSectionType =
   | "statement" // phrase de présentation + photo + chiffres
   | "services" // grille de services avec icônes + carte chiffre
   | "expert" // carte profil + grande photo avec chiffres
-  | "highlights"; // rangée de cartes : image, carte colorée, photo, chiffre + graphique
+  | "highlights" // rangée de cartes : image, carte colorée, photo, chiffre + graphique
+  | "map"; // carte Google Maps + adresse, horaires et bouton itinéraire
 
 export type SxHeroVariant =
   | "editorial" // gros titre en capitales + bloc image coloré + chiffres verticaux
@@ -133,6 +134,8 @@ export interface SxBlock {
   image2?: string;
   /** sections Produits : catégorie affichée (vide = tous les produits) */
   category?: string;
+  /** section Carte : adresse affichée sur Google Maps */
+  address?: string;
 }
 
 export interface SxCopy {

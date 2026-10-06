@@ -47,7 +47,7 @@ export const SUR_MESURE: StoreTemplate[] = [
       product: "split",
       page: "simple",
     },
-    sections: ["hero", "features", "photostats", "products", "testimonials", "faq", "newsletter"],
+    sections: ["hero", "features", "photostats", "products", "testimonials", "map", "faq", "newsletter"],
     hiddenByDefault: ["testimonials"],
     showAnnouncement: false,
     ctaPhoto: true,
@@ -202,7 +202,7 @@ export const SUR_MESURE: StoreTemplate[] = [
       product: "panel",
       page: "banner",
     },
-    sections: ["hero", "statement", "products", "categories", "services", "testimonials", "faq", "newsletter"],
+    sections: ["hero", "statement", "products", "categories", "services", "testimonials", "map", "faq", "newsletter"],
     hiddenByDefault: ["testimonials"],
     showAnnouncement: false,
     copy: {
@@ -359,7 +359,7 @@ export const SUR_MESURE: StoreTemplate[] = [
       product: "centered",
       page: "split",
     },
-    sections: ["hero", "statement", "expert", "highlights", "testimonials", "products", "faq", "newsletter"],
+    sections: ["hero", "statement", "expert", "highlights", "testimonials", "products", "map", "faq", "newsletter"],
     hiddenByDefault: ["testimonials"],
     showAnnouncement: false,
     copy: {

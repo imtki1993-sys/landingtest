@@ -51,6 +51,7 @@ import {
   heroClinic,
   heroEstate,
 } from "./SeriesCustom";
+import { MapSection } from "./SeriesMap";
 import { CtaPhotoSection, FeaturesSection, PhotoStatsSection, heroSchool, hl, plain } from "./SeriesSchool";
 import { storeBuilderDefaults } from "../../lib/store-builder-config";
 import "./series-store.css";
@@ -1143,6 +1144,8 @@ export default function SeriesStore(props: SeriesStoreProps) {
             </div>
           </section>
         );
+      case "map":
+        return <MapSection b={b} editing={!!editing} lang={lang} />;
       case "statement":
         return (
           <StatementSection

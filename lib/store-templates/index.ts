@@ -62,6 +62,7 @@ export const SECTION_LABELS: Record<SxSectionType, string> = {
   services: "Services",
   expert: "Expert + chiffres",
   highlights: "Cartes points forts",
+  map: "Carte & adresse",
 };
 
 /** Toutes les sections connues du template (ordre par défaut + celles masquées par défaut). */
@@ -92,6 +93,7 @@ export const ADDABLE_SECTIONS: SxSectionType[] = [
   "services",
   "expert",
   "highlights",
+  "map",
 ];
 const ALL_TYPES = new Set<string>(Object.keys(SECTION_LABELS));
 

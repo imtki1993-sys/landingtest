@@ -154,6 +154,14 @@ describe("registre des templates de boutique", () => {
           ).toBeTruthy();
   });
 
+  it("section Carte & adresse : disponible partout, textes FR + AR, adresse modifiable", () => {
+    const t = getStoreTemplate("s1-01")!;
+    for (const lang of ["fr", "ar"] as const) expect(sectionContent(t, lang, "map", undefined).title).toBeTruthy();
+    const own = sectionContent(t, "fr", "map", { content: { map: { address: "Casablanca" } } });
+    expect(own.address).toBe("Casablanca");
+    expect(getStoreTemplate("s90-02")!.sections).toContain("map");
+  });
+
   it("getStoreTemplate refuse les valeurs inconnues", () => {
     expect(getStoreTemplate("s1-01")?.name).toBe("Vision Rouge");
     expect(getStoreTemplate("benchmark-ai")).toBeNull();
