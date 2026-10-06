@@ -62,6 +62,19 @@ describe("registre des templates de boutique", () => {
     }
   });
 
+  it("chaque template a sa propre combinaison de carte produit, FAQ, pied de page et pages internes", () => {
+    const combos = STORE_TEMPLATES.map((t) =>
+      [t.layout.card, t.layout.faq, t.layout.footer, t.layout.shop, t.layout.product, t.layout.page].join("|"),
+    );
+    expect(new Set(combos).size).toBe(STORE_TEMPLATES.length);
+    // chaque variante est utilisée par au moins un template de la série
+    const s1 = STORE_SERIES[0].templates;
+    expect(new Set(s1.map((t) => t.layout.card)).size).toBe(7);
+    expect(new Set(s1.map((t) => t.layout.faq)).size).toBe(5);
+    expect(new Set(s1.map((t) => t.layout.footer)).size).toBe(6);
+    expect(new Set(s1.map((t) => t.layout.product)).size).toBe(4);
+  });
+
   it("getStoreTemplate refuse les valeurs inconnues", () => {
     expect(getStoreTemplate("s1-01")?.name).toBe("Vision Rouge");
     expect(getStoreTemplate("benchmark-ai")).toBeNull();

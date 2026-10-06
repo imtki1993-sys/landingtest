@@ -43,6 +43,22 @@ export type SxCategories = "circles" | "tiles" | "pills";
 export type SxPromos = "split" | "cards" | "banner";
 export type SxTrust = "bar" | "icons" | "numbered";
 
+/** Mise en page des blocs communs et des pages internes, propre à chaque template. */
+export type SxCardLayout = "classic" | "overlay" | "minimal" | "editorial" | "centered" | "tag" | "framed";
+export type SxFaqLayout = "split" | "center" | "cards" | "numbered" | "band";
+export type SxFooterLayout = "columns" | "wordmark" | "centered" | "cta" | "minimal" | "split";
+export type SxShopLayout = "sidebar" | "topbar" | "banner";
+export type SxProductLayout = "split" | "stack" | "centered" | "panel";
+export type SxPageLayout = "simple" | "banner" | "split";
+export interface SxLayout {
+  card: SxCardLayout;
+  faq: SxFaqLayout;
+  footer: SxFooterLayout;
+  shop: SxShopLayout;
+  product: SxProductLayout;
+  page: SxPageLayout;
+}
+
 export interface SxItem {
   title: string;
   text?: string;
@@ -111,6 +127,8 @@ export interface StoreTemplate {
   categories: SxCategories;
   promos: SxPromos;
   trust: SxTrust;
+  /** cartes produit, FAQ, pied de page et pages internes (boutique, produit, livraison, contact…) */
+  layout: SxLayout;
   /** ordre par défaut des sections de l'accueil */
   sections: SxSectionType[];
   /** sections présentes mais masquées par défaut (à compléter par le marchand) */

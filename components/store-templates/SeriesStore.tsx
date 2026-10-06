@@ -1,7 +1,9 @@
 "use client";
 // Rendu d'une boutique avec un template de série (Série 1, 2…).
-// Storefront garde la logique (panier, variantes, commande, pages) ; ce composant
-// ne fait que la mise en page : header, accueil par sections, pied de page.
+// Storefront garde la logique (panier, variantes, commande) ; ce composant fait la
+// mise en page de toutes les pages : accueil par sections, boutique, produit,
+// livraison, contact, FAQ, pages légales, header et pied de page — chacune avec
+// la mise en page propre au template (t.layout).
 import React, { useEffect, useMemo, useState } from "react";
 import {
   copyLang,
@@ -13,6 +15,28 @@ import {
   type SxBlock,
   type SxSectionType,
 } from "../../lib/store-templates";
+import {
+  FaqBlock,
+  Icon,
+  ProductCard,
+  SeriesFooter,
+  TRUST_ICONS,
+  img,
+  price,
+  productUrl,
+  readableOn,
+  type SxCtx,
+} from "./SeriesParts";
+import {
+  ContactPage,
+  DeliveryPage,
+  FaqPage,
+  LegalPage,
+  NotFoundPage,
+  ProductPage,
+  ShopPage,
+  type VariantApi,
+} from "./SeriesPages";
 import "./series-store.css";
 
 type Txt = Record<string, string>;
@@ -25,8 +49,12 @@ export interface SeriesStoreProps {
   rtl: boolean;
   base: string;
   txt: Txt;
-  /** contenu des pages autres que l'accueil (produit, boutique, livraison…) */
-  body?: React.ReactNode;
+  /** produit de la page produit (null si introuvable) */
+  product?: any;
+  /** sélection des variantes (gérée par Storefront) */
+  variants: VariantApi;
+  /** blocs personnalisés ajoutés dans l'éditeur pour la page courante */
+  extra?: React.ReactNode;
   /** tiroir du panier (rendu par Storefront) */
   drawer?: React.ReactNode;
   cartCount: number;
@@ -34,27 +62,6 @@ export interface SeriesStoreProps {
   add: (p: any) => void;
 }
 
-/* ───────── utilitaires ───────── */
-const img = (p: any): string => (Array.isArray(p?.image_urls) ? p.image_urls.find(Boolean) || "" : "");
-const productUrl = (base: string, p: any) => base + "/product/" + encodeURIComponent(p.slug || p.id);
-const hasOptions = (p: any) =>
-  Array.isArray(p?.specifications?.options) &&
-  p.specifications.options.length > 0 &&
-  Array.isArray(p?.specifications?.variants) &&
-  p.specifications.variants.length > 0;
-const price = (v: any) => {
-  const n = Number(v);
-  return Number.isFinite(n) ? n.toLocaleString("fr-MA", { maximumFractionDigits: 2 }) + " DH" : "";
-};
-function readableOn(hex: string): string | undefined {
-  const m = /^#?([0-9a-f]{6})$/i.exec(String(hex || "").trim());
-  if (!m) return undefined;
-  const [r, g, b] = [0, 2, 4].map((i) => {
-    const v = parseInt(m[1].slice(i, i + 2), 16) / 255;
-    return v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4;
-  });
-  return 0.2126 * r + 0.7152 * g + 0.0722 * b > 0.45 ? "#111111" : "#ffffff";
-}
 const FONT_WEIGHTS = "wght@400;500;600;700;800";
 function fontsHref(families: string[]) {
   const list = Array.from(new Set(families.filter(Boolean)));
@@ -65,56 +72,9 @@ function fontsHref(families: string[]) {
   );
 }
 
-function Icon({ name }: { name: string }) {
-  const p: Record<string, React.ReactNode> = {
-    truck: (
-      <>
-        <path d="M3 6h11v9H3z" />
-        <path d="M14 9h4l3 3v3h-7" />
-        <circle cx="7" cy="17" r="2" />
-        <circle cx="17" cy="17" r="2" />
-      </>
-    ),
-    cash: (
-      <>
-        <rect x="3" y="6" width="18" height="12" rx="2" />
-        <circle cx="12" cy="12" r="2.5" />
-      </>
-    ),
-    swap: (
-      <>
-        <path d="M4 8h13l-3-3" />
-        <path d="M20 16H7l3 3" />
-      </>
-    ),
-    chat: <path d="M4 5h16v11H8l-4 4z" />,
-    cart: (
-      <>
-        <path d="M3 4h2l2.4 11h10.2L20 8H6.2" />
-        <circle cx="9" cy="19" r="1.5" />
-        <circle cx="17" cy="19" r="1.5" />
-      </>
-    ),
-    search: (
-      <>
-        <circle cx="11" cy="11" r="6" />
-        <path d="m20 20-4.5-4.5" />
-      </>
-    ),
-    arrow: <path d="M5 12h14m-5-5 5 5-5 5" />,
-    check: <path d="m5 12 4 4 10-10" />,
-    star: <path d="m12 3 2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1-4.4-4.3 6.1-.9z" />,
-  };
-  return (
-    <svg className="sx-icon" viewBox="0 0 24 24" aria-hidden="true">
-      {p[name] || p.check}
-    </svg>
-  );
-}
-const TRUST_ICONS = ["truck", "cash", "swap", "chat"];
-
 export default function SeriesStore(props: SeriesStoreProps) {
-  const { t, store, cfg, products, page, rtl, base, txt, body, drawer, cartCount, openCart, add } = props;
+  const { t, store, cfg, products, page, rtl, base, txt, product, variants, extra, drawer, cartCount, openCart, add } =
+    props;
   const [menu, setMenu] = useState(false);
   const [cat, setCat] = useState("");
   const [sort, setSort] = useState("featured");
@@ -174,9 +134,25 @@ export default function SeriesStore(props: SeriesStoreProps) {
         if (typeof x === "string" && x.trim()) map.set(x, { name: x, image: "", count: 0 });
     return Array.from(map.values());
   }, [products, cfg.categories]);
-  const ctx = { products: products.length, categories: categories.length };
+  const counts = { products: products.length, categories: categories.length };
   const shopUrl = base + "/shop";
   const catUrl = (name: string) => shopUrl + "?category=" + encodeURIComponent(name);
+  const ctx: SxCtx = {
+    t,
+    store,
+    cfg,
+    lang,
+    rtl,
+    base,
+    txt,
+    shopUrl,
+    catUrl,
+    categories,
+    products,
+    add,
+    about: hero.text,
+    trust: (block("trust").items || []).map((x) => ({ title: x.title, text: x.text })),
+  };
 
   /* ───────── éléments communs ───────── */
   const art = (i = 0, label?: string) =>
@@ -258,7 +234,7 @@ export default function SeriesStore(props: SeriesStoreProps) {
                 <div className="sx-hero-stats">
                   {statItems.slice(0, 2).map((s, i) => (
                     <span key={i}>
-                      <b>{fillTokens(s.value, ctx)}</b>
+                      <b>{fillTokens(s.value, counts)}</b>
                       <small>{s.title}</small>
                     </span>
                   ))}
@@ -412,7 +388,7 @@ export default function SeriesStore(props: SeriesStoreProps) {
               <div className="sx-hero-stats">
                 {statItems.slice(0, 3).map((s, i) => (
                   <span key={i}>
-                    <b>{fillTokens(s.value, ctx)}</b>
+                    <b>{fillTokens(s.value, counts)}</b>
                     <small>{s.title}</small>
                   </span>
                 ))}
@@ -607,39 +583,6 @@ export default function SeriesStore(props: SeriesStoreProps) {
     return null;
   }
 
-  /* ───────── cartes produit ───────── */
-  const card = (p: any) => {
-    const pr = Number(p.price),
-      cmp = Number(p.compare_at_price);
-    const off = cmp > pr && pr > 0 ? Math.round((1 - pr / cmp) * 100) : 0;
-    return (
-      <article className="sx-card" key={p.id}>
-        <a className="sx-card-media" href={productUrl(base, p)}>
-          {img(p) ? <img src={img(p)} alt={p.name} loading="lazy" /> : <span className="sx-art" aria-hidden="true" />}
-          {off > 0 && <em className="sx-off">-{off}%</em>}
-        </a>
-        <div className="sx-card-body">
-          {p.specifications?.category && <small className="sx-card-cat">{p.specifications.category}</small>}
-          <a className="sx-card-name" href={productUrl(base, p)}>
-            {p.name}
-          </a>
-          <div className="sx-price">
-            <b>{price(p.price)}</b>
-            {off > 0 && <s>{price(p.compare_at_price)}</s>}
-          </div>
-          {hasOptions(p) ? (
-            <a className="sx-add" href={productUrl(base, p)}>
-              {lang === "ar" ? "اختار" : "Choisir"}
-            </a>
-          ) : (
-            <button type="button" className="sx-add" onClick={() => add(p)}>
-              <Icon name="cart" /> {txt.add}
-            </button>
-          )}
-        </div>
-      </article>
-    );
-  };
   const head = (b: SxBlock, link = true, fallback = "") => (
     <div className="sx-head">
       <div>
@@ -724,7 +667,11 @@ export default function SeriesStore(props: SeriesStoreProps) {
                 title: pick(cfg.collectionTitle, c.collectionTitle),
                 text: own ? cfg.collectionSubtitle || "" : c.collectionSubtitle || "",
               })}
-              <div className={"sx-grid sx-card-" + t.card}>{products.slice(0, 8).map((p) => card(p))}</div>
+              <div className={"sx-grid sx-card-" + t.card}>
+                {products.slice(0, 8).map((p, i) => (
+                  <ProductCard key={p.id} ctx={ctx} p={p} index={i} />
+                ))}
+              </div>
             </div>
           </section>
         );
@@ -830,7 +777,7 @@ export default function SeriesStore(props: SeriesStoreProps) {
               <div className="sx-stats-list">
                 {items.map((x, i) => (
                   <div key={i}>
-                    <b>{fillTokens(x.value, ctx)}</b>
+                    <b>{fillTokens(x.value, counts)}</b>
                     <span>{x.title}</span>
                   </div>
                 ))}
@@ -892,19 +839,13 @@ export default function SeriesStore(props: SeriesStoreProps) {
       case "faq": {
         if (cfg.showFaq === false || !Array.isArray(cfg.faq) || !cfg.faq.length) return null;
         return (
-          <section className="sx-section sx-faq">
-            <div className="sx-wrap sx-faq-grid">
-              {head(b, false)}
-              <div>
-                {cfg.faq.slice(0, 6).map((x: any, i: number) => (
-                  <details key={i}>
-                    <summary>{x.q}</summary>
-                    <p>{x.a}</p>
-                  </details>
-                ))}
-              </div>
-            </div>
-          </section>
+          <FaqBlock
+            ctx={ctx}
+            eyebrow={b.eyebrow}
+            title={b.title || txt.faq}
+            text={b.text}
+            items={cfg.faq.slice(0, 6)}
+          />
         );
       }
     }
@@ -955,15 +896,33 @@ export default function SeriesStore(props: SeriesStoreProps) {
                 <option value="price-desc">{lang === "ar" ? "الثمن: من الأعلى" : "Prix décroissant"}</option>
               </select>
             </div>
-            <div className={"sx-grid sx-grid-3 sx-card-" + t.card}>{list.slice(0, 12).map((p) => card(p))}</div>
+            <div className={"sx-grid sx-grid-3 sx-card-" + t.card}>
+              {list.slice(0, 12).map((p, i) => (
+                <ProductCard key={p.id} ctx={ctx} p={p} index={i} />
+              ))}
+            </div>
           </div>
         </div>
       </section>
     );
   }
 
+  /* ───────── pages internes ───────── */
+  function innerPage() {
+    if (page.startsWith("product/"))
+      return product ? <ProductPage ctx={ctx} product={product} api={variants} /> : <NotFoundPage ctx={ctx} />;
+    if (page === "shop") return <ShopPage ctx={ctx} />;
+    if (page === "delivery") return <DeliveryPage ctx={ctx} />;
+    if (page === "contact") return <ContactPage ctx={ctx} />;
+    if (page === "faq")
+      return <FaqPage ctx={ctx} eyebrow={block("faq").eyebrow} title={block("faq").title || txt.faq} />;
+    if (page === "privacy" || page === "terms" || page === "returns") return <LegalPage ctx={ctx} page={page} />;
+    return <NotFoundPage ctx={ctx} />;
+  }
+
   /* ───────── page ───────── */
   const th = t.theme;
+  const lightHero = /^#[0-9a-f]{6}$/i.test(th.heroBg) && readableOn(th.heroBg) === "#111111";
   const style: Record<string, string> = {
     "--sx-bg": th.bg,
     "--sx-surface": th.surface,
@@ -978,6 +937,9 @@ export default function SeriesStore(props: SeriesStoreProps) {
     "--sx-on-dark": th.onDark,
     "--sx-hero-bg": th.heroBg,
     "--sx-hero-text": th.heroText,
+    // bandeaux des pages internes : fond du hero, ou couleur principale si le hero est clair
+    "--sx-banner-bg": lightHero ? primary : th.heroBg,
+    "--sx-banner-text": lightHero ? readableOn(primary) || "#fff" : th.heroText,
     "--sx-radius": th.radius + "px",
     "--sx-hfont": `"${headingFont}", "Cairo", system-ui, sans-serif`,
     "--sx-bfont": `"${bodyFont}", "Cairo", system-ui, sans-serif`,
@@ -1058,43 +1020,13 @@ export default function SeriesStore(props: SeriesStoreProps) {
       {isHome ? (
         order.filter((k) => !hidden.has(k)).map((k) => <React.Fragment key={k}>{section(k)}</React.Fragment>)
       ) : (
-        <div className="sx-page">{body}</div>
+        <div className="sx-page">
+          {innerPage()}
+          {extra}
+        </div>
       )}
 
-      {cfg.showFooter !== false && (
-        <footer className="sx-footer">
-          <div className="sx-wrap sx-footer-grid">
-            <div>
-              <b className="sx-footer-brand">{store.name}</b>
-              <p>{cfg.footerContent?.about || hero.text}</p>
-              <small>
-                © {new Date().getFullYear()} {store.name} · {txt.cod}
-              </small>
-            </div>
-            <nav>
-              <b>{txt.shop}</b>
-              <a href={shopUrl}>{lang === "ar" ? "جميع المنتجات" : "Tous les produits"}</a>
-              {categories.slice(0, 4).map((x) => (
-                <a key={x.name} href={catUrl(x.name)}>
-                  {x.name}
-                </a>
-              ))}
-            </nav>
-            <nav>
-              <b>{lang === "ar" ? "مساعدة" : "Aide"}</b>
-              <a href={base + "/delivery"}>{txt.delivery}</a>
-              <a href={base + "/faq"}>{txt.faq}</a>
-              <a href={base + "/contact"}>{txt.contact}</a>
-            </nav>
-            <nav>
-              <b>{lang === "ar" ? "قانوني" : "Informations"}</b>
-              <a href={base + "/privacy"}>{rtl ? "الخصوصية" : "Confidentialité"}</a>
-              <a href={base + "/terms"}>{rtl ? "الشروط" : "Conditions"}</a>
-              <a href={base + "/returns"}>{rtl ? "الإرجاع" : "Retours"}</a>
-            </nav>
-          </div>
-        </footer>
-      )}
+      {cfg.showFooter !== false && <SeriesFooter ctx={ctx} />}
       {drawer}
     </main>
   );
