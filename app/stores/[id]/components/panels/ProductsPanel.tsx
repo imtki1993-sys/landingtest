@@ -21,10 +21,13 @@ export default function ProductsPanel({
           <p>Sélectionne ce qui doit apparaître dans cette boutique.</p>
         </div>
       </div>
-      <label>
-        Titre de la collection
-        <input value={settings.collectionTitle || ""} onChange={(e) => patch({ collectionTitle: e.target.value })} />
-      </label>
+      {/* templates de série : le titre se modifie dans Accueil › Produits */}
+      {!series && (
+        <label>
+          Titre de la collection
+          <input value={settings.collectionTitle || ""} onChange={(e) => patch({ collectionTitle: e.target.value })} />
+        </label>
+      )}
       <input
         className="store-product-search"
         value={productSearch}

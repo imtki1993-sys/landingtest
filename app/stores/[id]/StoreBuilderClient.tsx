@@ -11,9 +11,8 @@ import DesignPanel from "./components/panels/DesignPanel";
 import ProductsPanel from "./components/panels/ProductsPanel";
 import HomePanel from "./components/panels/HomePanel";
 import PagesSectionsPanel from "./components/panels/PagesSectionsPanel";
-import AdvancedPanel from "./components/panels/AdvancedPanel";
 import { normalizeStoreSettings } from "../../../lib/store-settings";
-import { isSeriesTemplate } from "../../../lib/store-templates";
+import { getStoreTemplate, isSeriesTemplate, withTemplateTexts } from "../../../lib/store-templates";
 import "../../../components/store-templates/editor/editor.css";
 import StylePanel, { switchTemplateSettings } from "../../../components/store-templates/editor/StylePanel";
 import HomeSectionsPanel from "../../../components/store-templates/editor/HomeSectionsPanel";
@@ -49,7 +48,6 @@ export default function StoreBuilderClient({ storeId }: { storeId: string }) {
     [saving, setSaving] = useState(false),
     [copied, setCopied] = useState(false),
     [previewMode, setPreviewMode] = useState("desktop"),
-    [advanced, setAdvanced] = useState(false),
     [productSearch, setProductSearch] = useState(""),
     [tab, setTab] = useState("general"),
     [editPage, setEditPage] = useState("home"),
@@ -75,7 +73,9 @@ export default function StoreBuilderClient({ storeId }: { storeId: string }) {
       fetch("/api/products?limit=100", { cache: "no-store" }).then((r) => r.json()),
     ]).then(([a, b]) => {
       if (a.store) {
-        const st = normalizeStoreSettings(a.store.settings);
+        const tpl = getStoreTemplate(a.store.template_id);
+        const normalized = normalizeStoreSettings(a.store.settings);
+        const st = tpl ? withTemplateTexts(normalized, tpl, a.store.locale) : normalized;
         setStore(a.store);
         setSettings(st);
         savedSnap.current = snapshot(a.store, st);
@@ -396,7 +396,7 @@ export default function StoreBuilderClient({ storeId }: { storeId: string }) {
       x = await r.json();
     setSaving(false);
     if (!r.ok) return alert(x.error || "Erreur");
-    setStore(x.store);
+    setStore((v: any) => ({ ...x.store, workspace_whatsapp: v?.workspace_whatsapp }));
     savedSnap.current = snapshot(x.store, settings);
     setPreviewKey((k) => k + 1);
     if (status === "PUBLISHED") alert("Boutique publiée. URL : " + window.location.origin + "/store/" + x.store.slug);
@@ -411,11 +411,11 @@ export default function StoreBuilderClient({ storeId }: { storeId: string }) {
           setTab(t);
           setStyleFocus("");
           // l'aperçu suit l'onglet : accueil pour « Accueil », page ouverte pour « Pages »
-          if (series && t === "home") setEditPage("home");
+          if (t === "home") setEditPage("home");
+          // réglages du catalogue : l'aperçu montre la page Boutique
+          if (t === "catalog") setEditPage("shop");
           if (series && t === "pages" && !SERIES_PAGES.some(([k]) => k === editPage)) setEditPage("delivery");
         }}
-        advanced={advanced}
-        setAdvanced={setAdvanced}
         tabs={series ? SERIES_TABS : undefined}
         dirty={dirty}
       />
@@ -521,7 +521,6 @@ export default function StoreBuilderClient({ storeId }: { storeId: string }) {
             onShare={shareStore}
           />
         )}
-        {tab === "advanced" && <AdvancedPanel settings={settings} setSettings={setSettings} />}
       </section>
       <StorePreviewCanvas
         store={store}

@@ -497,3 +497,69 @@ textarea.sxe-legal {
   font-style: normal;
   color: #15803d;
 }
+
+/* ───────── Mode sombre de l'éditeur de boutique ───────── */
+html[data-theme="dark"] .sxe-panel h3,
+html[data-theme="dark"] .sxe-field > span,
+html[data-theme="dark"] .sxe-label {
+  color: #cbd5e1;
+}
+html[data-theme="dark"] :is(.sxe-panel-head p, .sxe-hint) {
+  color: #94a3b8;
+}
+html[data-theme="dark"] .sxe-help {
+  background: #172033;
+  color: #a5b4c8;
+}
+html[data-theme="dark"] .sxe-warn,
+html[data-theme="dark"] .sxe-section-name em {
+  background: rgba(245, 158, 11, 0.12);
+  border-color: rgba(245, 158, 11, 0.35);
+  color: #fbbf24;
+}
+html[data-theme="dark"] :is(.sxe-section, .sxe-item, .sxe-color, .sxe-library-grid button) {
+  background: #111827 !important;
+  border-color: #253147 !important;
+  color: #e5e7eb;
+}
+html[data-theme="dark"] .sxe-section.open {
+  border-color: #6366f1 !important;
+  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.3);
+}
+html[data-theme="dark"] .sxe-section-body {
+  border-top-color: #253147;
+}
+html[data-theme="dark"] .sxe-section-name {
+  color: #e5e7eb;
+}
+html[data-theme="dark"] :is(.sxe-library, .sxe-layout-row.is-focus) {
+  background: #172033;
+}
+html[data-theme="dark"] .sxe-trial {
+  background: rgba(99, 102, 241, 0.14);
+  border-color: rgba(129, 140, 248, 0.4);
+}
+html[data-theme="dark"] :is(.sxe-item-head button, .sxe-section-actions button, .sxe-choice button, .sxe-tabs button, .sxe-btn) {
+  background: #172033 !important;
+  border: 1px solid #2b3950 !important;
+  color: #e5e7eb !important;
+}
+html[data-theme="dark"] :is(.sxe-choice button.active, .sxe-tabs button.active, .sxe-btn-primary) {
+  background: #6366f1 !important;
+  border-color: #6366f1 !important;
+  color: #fff !important;
+}
+html[data-theme="dark"] .sxe-add {
+  background: rgba(99, 102, 241, 0.16) !important;
+  color: #c7d2fe !important;
+}
+html[data-theme="dark"] .sxe-danger {
+  background: rgba(239, 68, 68, 0.14) !important;
+  color: #fca5a5 !important;
+}
+html[data-theme="dark"] .sxe-thumb {
+  background: repeating-linear-gradient(45deg, #172033, #172033 6px, #111827 6px, #111827 12px);
+}
+html[data-theme="dark"] .sxe-panel code {
+  color: #7c8aa3;
+}

@@ -172,10 +172,10 @@ export default function HomePanel({ settings, setSettings, uploadHeroImage, move
               <label>
                 <input
                   type="checkbox"
-                  checked={!!settings[meta[1]]}
+                  checked={settings[meta[1]] !== false}
                   onChange={(e) => patch({ [meta[1]]: e.target.checked })}
                 />
-                {settings[meta[1]] ? "Visible" : "Masqué"}
+                {settings[meta[1]] !== false ? "Visible" : "Masqué"}
               </label>
               <button onClick={() => moveSection(id, -1)} disabled={idx === 0}>
                 ↑
@@ -191,7 +191,7 @@ export default function HomePanel({ settings, setSettings, uploadHeroImage, move
         <span>Barre d’annonce</span>
         <input
           type="checkbox"
-          checked={!!settings.showAnnouncement}
+          checked={settings.showAnnouncement !== false}
           onChange={(e) => patch({ showAnnouncement: e.target.checked })}
         />
       </label>

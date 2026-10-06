@@ -8,15 +8,7 @@ const tabs = [
   ["visual", "✦", "Pages & Sections"],
   ["publish", "5", "Publier"],
 ];
-export default function StoreBuilderSidebar({
-  store,
-  tab,
-  setTab,
-  advanced,
-  setAdvanced,
-  tabs: customTabs,
-  dirty,
-}: any) {
+export default function StoreBuilderSidebar({ store, tab, setTab, tabs: customTabs, dirty }: any) {
   const list = customTabs || tabs;
   return (
     <aside className="store-builder-side">
@@ -45,15 +37,6 @@ export default function StoreBuilderSidebar({
             {x[2]}
           </button>
         ))}
-        <button
-          className={advanced ? "active store-advanced-tab" : "store-advanced-tab"}
-          onClick={() => {
-            setAdvanced(!advanced);
-            setTab("advanced");
-          }}
-        >
-          <span>⚙</span>Avancé
-        </button>
       </div>
     </aside>
   );
