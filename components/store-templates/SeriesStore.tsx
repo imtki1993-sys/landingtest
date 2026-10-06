@@ -52,6 +52,15 @@ import {
   heroEstate,
 } from "./SeriesCustom";
 import { MapSection } from "./SeriesMap";
+import { SERIE3_HEROES, heroSerie3 } from "./SeriesHeroes3";
+import {
+  CATEGORIES_V3,
+  CategoriesV3,
+  DealsSection,
+  GallerySection,
+  MosaicSection,
+  SpecsSection,
+} from "./SeriesSections3";
 import { CtaPhotoSection, FeaturesSection, PhotoStatsSection, heroSchool, hl, plain } from "./SeriesSchool";
 import { storeBuilderDefaults } from "../../lib/store-builder-config";
 import "./series-store.css";
@@ -762,6 +771,7 @@ export default function SeriesStore(props: SeriesStoreProps) {
     // hero sur mesure (école) : cartes sous le texte, modifiables avec le hero
     const heroExtra = { ...kit, items: block("hero").items || [], fill: (v?: string) => fillTokens(v, counts) };
     if (t.hero === "school") return heroSchool(heroExtra);
+    if (SERIE3_HEROES.has(t.hero)) return heroSerie3(t.hero, { ...heroExtra, add });
     if (t.hero === "estate") return heroEstate(heroExtra);
     if (t.hero === "clinic") return heroClinic(heroExtra);
     // heros de la Série 2
@@ -822,6 +832,19 @@ export default function SeriesStore(props: SeriesStoreProps) {
       }
       case "categories": {
         if (!categories.length) return null;
+        if (CATEGORIES_V3.has(t.categories))
+          return (
+            <CategoriesV3
+              variant={t.categories}
+              b={b}
+              categories={categories}
+              catUrl={catUrl}
+              shopUrl={shopUrl}
+              art={art}
+              head={head(b)}
+              lang={lang}
+            />
+          );
         if (t.categories === "trio")
           return <TrioCategories b={b} categories={categories} catUrl={catUrl} art={art} head={head(b)} lang={lang} />;
         return (
@@ -1144,6 +1167,22 @@ export default function SeriesStore(props: SeriesStoreProps) {
             </div>
           </section>
         );
+      case "deals":
+        return <DealsSection b={b} ctx={ctx} head={head(b)} />;
+      case "mosaic":
+        return (
+          <MosaicSection
+            b={b}
+            art={art}
+            href={shopUrl}
+            head={head(b, false)}
+            more={lang === "ar" ? "اكتشف" : "Découvrir"}
+          />
+        );
+      case "specs":
+        return <SpecsSection b={b} />;
+      case "gallery":
+        return <GallerySection b={b} ctx={ctx} art={art} />;
       case "map":
         return <MapSection b={b} editing={!!editing} lang={lang} />;
       case "statement":

@@ -355,6 +355,158 @@ export function ProductCard({ ctx, p, index = 0 }: { ctx: SxCtx; p: any; index?:
         </article>
       );
     }
+    /* ───── Série 3 ───── */
+    case "cut":
+      return (
+        <article className="sx-card sx-cl-cut">
+          <a className="sx-card-media" href={url}>
+            {media}
+            {off > 0 && <em className="sx-off">-{off}%</em>}
+          </a>
+          <div className="sx-card-body">
+            {cat}
+            {name}
+            <div className="sx-card-line">
+              {priceRow}
+              {addBtn("icon")}
+            </div>
+          </div>
+        </article>
+      );
+    case "heart":
+    case "dark-icon":
+      return (
+        <article className={"sx-card sx-cl-" + layout}>
+          <a className="sx-card-media" href={url}>
+            {media}
+            {off > 0 && <em className="sx-off">-{off}%</em>}
+          </a>
+          <a className="sx-heart" href={url} aria-label={p.name}>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
+              <path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z" />
+            </svg>
+          </a>
+          <div className="sx-card-body">
+            {name}
+            {cat}
+            <div className="sx-card-line">
+              {priceRow}
+              {layout === "dark-icon" && addBtn("icon")}
+            </div>
+          </div>
+        </article>
+      );
+    case "market":
+    case "outline-cart":
+      return (
+        <article className={"sx-card sx-cl-" + layout}>
+          <a className="sx-card-media" href={url}>
+            {media}
+            {off > 0 ? (
+              <em className="sx-off">-{off}%</em>
+            ) : (
+              index < 2 && <em className="sx-off sx-new-tag">{tr(ctx, "Nouveau", "جديد")}</em>
+            )}
+          </a>
+          <div className="sx-card-body">
+            {name}
+            {priceRow}
+            {addBtn("full")}
+          </div>
+        </article>
+      );
+    case "glass":
+      return (
+        <article className="sx-card sx-cl-glass">
+          <a className="sx-card-media" href={url}>
+            {media}
+            {off > 0 && <em className="sx-off">-{off}%</em>}
+          </a>
+          <div className="sx-card-body">
+            <div>
+              {name}
+              {priceRow}
+            </div>
+            {addBtn("icon")}
+          </div>
+        </article>
+      );
+    case "tyre":
+      return (
+        <article className="sx-card sx-cl-tyre">
+          <a className="sx-card-media" href={url}>
+            {media}
+            {off > 0 && <em className="sx-off">-{off}%</em>}
+          </a>
+          <div className="sx-card-body">
+            {cat}
+            {name}
+            {priceRow}
+            <div className="sx-card-btns">
+              {addBtn("text")}
+              <a className="sx-card-details" href={url}>
+                {tr(ctx, "Détails", "التفاصيل")}
+              </a>
+            </div>
+          </div>
+        </article>
+      );
+    case "circle": {
+      const colors: string[] = Array.isArray(p.specifications?.colors) ? p.specifications.colors.slice(0, 3) : [];
+      return (
+        <article className={"sx-card sx-cl-circle sx-tint-" + (index % 3)}>
+          <a className="sx-card-media" href={url}>
+            <i className="sx-card-disc" aria-hidden="true" />
+            {media}
+            <b className="sx-card-price-top">{price(p.price)}</b>
+          </a>
+          <div className="sx-card-body">
+            {colors.length > 0 && (
+              <span className="sx-dots" aria-hidden="true">
+                {colors.map((c) => (
+                  <i key={c} style={{ background: colorOf(c) }} />
+                ))}
+              </span>
+            )}
+            {name}
+            {cat}
+            <div className="sx-card-btns">
+              <a className="sx-card-buy" href={url}>
+                {tr(ctx, "Acheter", "اشري")}
+              </a>
+              {addBtn("text")}
+            </div>
+          </div>
+        </article>
+      );
+    }
+    case "gray-round":
+      return (
+        <article className="sx-card sx-cl-gray-round">
+          <a className="sx-card-media" href={url}>
+            {media}
+            {off > 0 && <em className="sx-off">-{off}%</em>}
+          </a>
+          <div className="sx-card-body">
+            {cat}
+            {name}
+            {priceRow}
+          </div>
+          {addBtn("icon")}
+        </article>
+      );
+    case "price-badge":
+      return (
+        <article className="sx-card sx-cl-price-badge">
+          <a className="sx-card-media" href={url}>
+            {media}
+            <b className="sx-card-price-top">{price(p.price)}</b>
+            {off > 0 && <em className="sx-off">-{off}%</em>}
+          </a>
+          <span className="sx-card-buybar">{addBtn("text")}</span>
+          <div className="sx-card-body">{name}</div>
+        </article>
+      );
     case "listing": {
       // points forts : description courte découpée en 3 phrases
       const points = String(p.short_description || "")
@@ -683,6 +835,44 @@ export function SeriesFooter({ ctx }: { ctx: SxCtx }) {
         </div>
       </footer>
     );
+  if (layout === "mega") {
+    const wa = whatsappDigits(cfg.whatsapp || store.workspace_whatsapp);
+    return (
+      <footer className="sx-footer sx-footer-mega">
+        <div className="sx-wrap">
+          <div className="sx-footer-grid">
+            <div>
+              {brand}
+              <p>{about}</p>
+              {wa && (
+                <a className="sx-footer-wa" href={"https://wa.me/" + wa} target="_blank" rel="noreferrer">
+                  <Icon name="chat" /> WhatsApp
+                </a>
+              )}
+            </div>
+            {shopLinks}
+            {helpLinks}
+            {legalLinks}
+            <div className="sx-footer-badges">
+              {ctx.trust.slice(0, 2).map((x, i) => (
+                <span key={i}>
+                  <Icon name={TRUST_ICONS[i]} />
+                  <span>
+                    <b>{x.title}</b>
+                    {x.text && <small>{x.text}</small>}
+                  </span>
+                </span>
+              ))}
+            </div>
+          </div>
+          <div className="sx-footer-row sx-footer-bottom">
+            {copyright}
+            {payBadges}
+          </div>
+        </div>
+      </footer>
+    );
+  }
   if (layout === "photo") {
     const photo =
       (Array.isArray(cfg.heroImages) && cfg.heroImages[0]) ||

@@ -1,6 +1,7 @@
 // Templates de boutique par séries : registre, réglages initiaux, sections et contenus.
 import { describe, expect, it } from "vitest";
 import {
+  OVERLAY_HEROES,
   STORE_SERIES,
   STORE_TEMPLATES,
   STORE_TEMPLATE_IDS,
@@ -121,6 +122,38 @@ describe("registre des templates de boutique", () => {
         for (const lang of ["fr", "ar"] as const) {
           const c = sectionContent(t, lang, type, undefined);
           expect(c.title || c.items?.length, `${t.id} ${lang} ${type}`).toBeTruthy();
+        }
+    }
+  });
+
+  it("Série 3 : 20 templates, chacun avec son hero, sa carte produit et ses catégories", () => {
+    const s3 = STORE_SERIES.find((s) => s.id === 3)!.templates;
+    expect(s3).toHaveLength(20);
+    expect(s3.every((t, i) => t.series === 3 && t.id === "s3-" + String(i + 1).padStart(2, "0"))).toBe(true);
+    expect(new Set(s3.map((t) => t.folder)).size).toBe(20);
+    expect(new Set(s3.map((t) => t.hero)).size).toBe(20);
+    // aucun hero partagé avec les autres séries
+    const others = STORE_TEMPLATES.filter((t) => t.series !== 3);
+    for (const t of s3)
+      expect(
+        others.some((o) => o.hero === t.hero),
+        t.id,
+      ).toBe(false);
+    // les en-têtes superposés ne sont utilisés qu'avec un hero photo/sombre prévu pour
+    for (const t of s3) if (t.header === "overlay") expect(OVERLAY_HEROES.has(t.hero), t.id).toBe(true);
+  });
+
+  it("Série 3 : les nouvelles sections ont un contenu dans les deux langues", () => {
+    const s3 = STORE_SERIES.find((s) => s.id === 3)!.templates;
+    for (const type of ["deals", "mosaic", "specs", "gallery"] as const) {
+      const users = s3.filter((t) => t.sections.includes(type));
+      expect(users.length, type).toBeGreaterThan(0);
+      for (const t of users)
+        for (const lang of ["fr", "ar"] as const) {
+          const c = sectionContent(t, lang, type, undefined);
+          expect(c.title || c.items?.length, `${t.id} ${lang} ${type}`).toBeTruthy();
+          if (type === "mosaic" || type === "specs")
+            expect(c.items?.length, `${t.id} ${lang} ${type}`).toBeGreaterThan(0);
         }
     }
   });

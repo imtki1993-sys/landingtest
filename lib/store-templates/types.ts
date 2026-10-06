@@ -31,7 +31,12 @@ export type SxSectionType =
   | "services" // grille de services avec icônes + carte chiffre
   | "expert" // carte profil + grande photo avec chiffres
   | "highlights" // rangée de cartes : image, carte colorée, photo, chiffre + graphique
-  | "map"; // carte Google Maps + adresse, horaires et bouton itinéraire
+  | "map" // carte Google Maps + adresse, horaires et bouton itinéraire
+  // Série 3
+  | "deals" // offres du jour : produits en promo + compte à rebours jusqu'à minuit
+  | "mosaic" // mosaïque de bannières avec image, texte et bouton
+  | "specs" // bandeau de caractéristiques (étiquette + valeur)
+  | "gallery"; // bande de photos (produits ou images choisies)
 
 export type SxHeroVariant =
   | "editorial" // gros titre en capitales + bloc image coloré + chiffres verticaux
@@ -68,11 +73,49 @@ export type SxHeroVariant =
   // Sur mesure
   | "school" // titre souligné au feutre, collage photo sur blocs, deux cartes sous le texte
   | "estate" // photo plein cadre, titre en bas, chiffres sur une ligne, bouton pilule
-  | "clinic"; // photo arrondie encadrée, carte vidéo, pastilles de services, bandeau de garanties
+  | "clinic" // photo arrondie encadrée, carte vidéo, pastilles de services, bandeau de garanties
+  // Série 3
+  | "frost" // fond bleu acier, gros titres condensés, produit flottant au centre, prix + ajout
+  | "luxe-dark" // photo sombre, 2e ligne dorée, deux boutons, bandeau de garanties
+  | "slider-beige" // bannière beige avec flèches, pastille, titre gras
+  | "neon" // fond noir, halo rouge, cartes de chiffres en verre, carte flottante
+  | "portrait-dark" // portrait à droite, mot coloré, note manuscrite, garanties
+  | "diagonal" // photo sombre, découpe rouge en biais, numéro de slide
+  | "ghost-word" // panneau gris arrondi, mot géant transparent derrière le produit
+  | "smoke" // photo plein cadre fumée, titre discret
+  | "circle-product" // produit dans un grand disque, titre bicolore
+  | "center-product" // titre centré, liens, grand produit centré (épuré)
+  | "bold-photo" // photo de sport, titre très gras en capitales
+  | "brutal" // typographie géante, lettre de couleur, macaron rond
+  | "spec-tech" // produit high-tech, icônes de caractéristiques
+  | "badge-split" // bannière claire, accent manuscrit, pastille « jusqu'à -50% »
+  | "minimal-gray" // gris clair, produit à droite, deux boutons arrondis
+  | "giant-behind" // mot géant derrière la photo, dégradé orange, carte contact
+  | "night-photo" // photo nocturne plein cadre, petit titre en capitales
+  | "red-panel" // carte arrondie blanche avec panneau rouge en biais, pastille ronde
+  | "brand-giant" // nom de la boutique géant sur l'image, chiffre et mini carte produit
+  | "orange-orb"; // disque orange derrière la photo, chiffres sous le titre, carte vedette
 
 export type SxHeader = "split" | "center" | "overlay" | "dark";
 export type SxCard = "plain" | "boxed" | "soft" | "dark" | "outline";
-export type SxCategories = "circles" | "tiles" | "pills" | "trio";
+export type SxCategories =
+  | "circles"
+  | "tiles"
+  | "pills"
+  | "trio"
+  // Série 3
+  | "dark-tiles" // cartes sombres, nom en capitales, « Acheter »
+  | "icon-grid" // tuiles carrées avec icône, la 1re en couleur
+  | "color-blocks" // cartes de couleurs vives avec mot géant
+  | "gray-grid" // grille de tuiles grises, nom en haut, image en bas
+  | "circle-icons" // icônes rondes au trait
+  | "big-cards" // grandes cartes arrondies, image en bas à droite
+  | "side-cards" // titre à gauche, cartes image à droite
+  | "chip-cards" // petites cartes avec flèche ronde colorée
+  | "lavender" // cartes pastel, flèche ronde en haut à droite
+  | "collection" // cartes sombres, nombre de produits dans un cercle
+  | "square-tiles" // tuiles carrées claires avec image
+  | "split-tiles"; // tuiles 2×2 alternées, texte à gauche, image à droite
 export type SxPromos = "split" | "cards" | "banner";
 export type SxTrust = "bar" | "icons" | "numbered";
 
@@ -89,9 +132,21 @@ export type SxCardLayout =
   | "swatch" // fond gris, pastilles de couleurs, bouton +
   | "notch" // carte grise à encoche avec bouton flèche dans le coin
   | "listing" // carte horizontale : photo, lieu, prix, points forts
-  | "post"; // carte article : photo avec étiquette, titre, lien « En savoir plus »
+  | "post" // carte article : photo avec étiquette, titre, lien « En savoir plus »
+  // Série 3
+  | "cut" // coin coupé en biais, petits textes techniques
+  | "heart" // carte blanche, cœur en haut à droite
+  | "market" // centrée, badge, bouton « Ajouter » contour pleine largeur
+  | "glass" // verre sombre, flèche ronde
+  | "dark-icon" // carte sombre, cœur, bouton panier carré
+  | "tyre" // carte blanche bordée, nom en couleur, deux boutons
+  | "circle" // disque coloré derrière le produit, prix en haut, deux boutons
+  | "gray-round" // grande image grise arrondie, catégorie en petites capitales
+  | "outline-cart" // badge promo sombre, bouton panier contour
+  | "price-badge"; // fond pastel, prix en pastille, bouton « Acheter » sur l'image
 export type SxFaqLayout = "split" | "center" | "cards" | "numbered" | "band";
-export type SxFooterLayout = "columns" | "wordmark" | "centered" | "cta" | "minimal" | "split" | "bar" | "photo";
+export type SxFooterLayout =
+  "columns" | "wordmark" | "centered" | "cta" | "minimal" | "split" | "bar" | "photo" | "mega"; // colonnes + garanties et moyens de paiement
 export type SxShopLayout = "sidebar" | "topbar" | "banner";
 export type SxProductLayout = "split" | "stack" | "centered" | "panel";
 export type SxPageLayout = "simple" | "banner" | "split";

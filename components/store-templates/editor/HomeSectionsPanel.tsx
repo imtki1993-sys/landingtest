@@ -40,6 +40,12 @@ const SECTION_HELP: Partial<Record<SxSectionType, string>> = {
   services: "Un service par élément ; un élément avec un chiffre devient la carte colorée.",
   expert: "1er élément = la personne (nom, rôle, texte) ; les suivants = chiffres sur la photo.",
   highlights: "4 cartes : image + titre, carte colorée (étiquette + texte), grande photo, chiffre.",
+  deals:
+    "Produits en promotion (prix barré) avec un compte à rebours jusqu'à minuit ; sans promo, les 2 premiers produits.",
+  mosaic:
+    "Bannières en mosaïque (étiquette, titre, texte, image) qui mènent à la boutique. Un mot entre *étoiles* est mis en couleur.",
+  specs: "Bandeau de caractéristiques : une ligne par élément (nom + valeur).",
+  gallery: "Bande de photos ; sans images, les photos de vos produits sont utilisées.",
   map: "Carte Google Maps de votre adresse, reprise aussi sur la page Contact. Sans adresse, la section est masquée.",
 };
 const CUSTOM_TYPES: [string, string][] = [
@@ -479,6 +485,31 @@ function SectionFields({
             valueLabel="Chiffre ({products}, {categories} ou texte)"
             storeId={storeId}
             products={products}
+          />
+        </>
+      )}
+      {type === "deals" && (
+        <>
+          {f("eyebrow", "Petit titre")}
+          {f("title", "Titre")}
+          {f("text", "Texte", true)}
+          {f("button", "Bouton (vide = Ajouter au panier)")}
+        </>
+      )}
+      {["mosaic", "specs", "gallery"].includes(type) && (
+        <>
+          {type === "mosaic" && f("eyebrow", "Petit titre")}
+          {f("title", type === "specs" ? "Libellé du bandeau" : "Titre")}
+          {type !== "specs" && f("text", "Texte", true)}
+          <ItemsEditor
+            items={block.items || []}
+            onChange={(items) => onChange({ items })}
+            withValue={type !== "gallery"}
+            valueLabel={type === "specs" ? "Valeur (ex. Bluetooth, 30 h)" : "Étiquette (ex. Nouveau, -20 %)"}
+            withImage={type !== "specs"}
+            storeId={storeId}
+            products={products}
+            addLabel={type === "gallery" ? "+ Ajouter une photo" : "+ Ajouter un élément"}
           />
         </>
       )}
