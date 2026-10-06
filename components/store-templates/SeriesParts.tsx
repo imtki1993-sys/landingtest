@@ -123,6 +123,45 @@ export function Icon({ name }: { name: string }) {
 }
 export const TRUST_ICONS = ["truck", "cash", "swap", "chat"];
 
+/** Couleur d'affichage d'un nom de couleur de produit (pastille). */
+const COLOR_NAMES: Record<string, string> = {
+  noir: "#111111",
+  black: "#111111",
+  blanc: "#f5f5f5",
+  white: "#f5f5f5",
+  rouge: "#d93a3a",
+  red: "#d93a3a",
+  bleu: "#2f6fd6",
+  blue: "#2f6fd6",
+  vert: "#3d9a58",
+  green: "#3d9a58",
+  jaune: "#f2c230",
+  yellow: "#f2c230",
+  rose: "#f08fb0",
+  pink: "#f08fb0",
+  gris: "#9ca3af",
+  grey: "#9ca3af",
+  gray: "#9ca3af",
+  beige: "#d9c4a3",
+  camel: "#c19a6b",
+  marron: "#7a4b2a",
+  brown: "#7a4b2a",
+  orange: "#f08a24",
+  violet: "#7c5cd6",
+  purple: "#7c5cd6",
+  أسود: "#111111",
+  أبيض: "#f5f5f5",
+  أحمر: "#d93a3a",
+  أزرق: "#2f6fd6",
+};
+export function colorOf(name: string): string {
+  const k = String(name || "")
+    .trim()
+    .toLowerCase();
+  if (/^#[0-9a-f]{3,6}$/i.test(k)) return k;
+  return COLOR_NAMES[k] || "#cbd5e1";
+}
+
 /* ───────── carte produit ───────── */
 export function ProductCard({ ctx, p, index = 0 }: { ctx: SxCtx; p: any; index?: number }) {
   const layout = ctx.t.layout.card;
@@ -274,6 +313,47 @@ export function ProductCard({ ctx, p, index = 0 }: { ctx: SxCtx; p: any; index?:
           </div>
         </article>
       );
+    case "tinted":
+      return (
+        <article className={"sx-card sx-cl-tinted sx-tint-" + (index % 3)}>
+          <a className="sx-card-media" href={url}>
+            {media}
+            {off > 0 && <em className="sx-off">-{off}%</em>}
+          </a>
+          <div className="sx-card-body">
+            {name}
+            <div className="sx-card-line">
+              {priceRow}
+              {addBtn("text")}
+            </div>
+          </div>
+        </article>
+      );
+    case "swatch": {
+      const colors: string[] = Array.isArray(p.specifications?.colors) ? p.specifications.colors.slice(0, 4) : [];
+      return (
+        <article className="sx-card sx-cl-swatch">
+          <a className="sx-card-media" href={url}>
+            {media}
+            <em className="sx-new">{off > 0 ? "-" + off + "%" : tr(ctx, "Nouveau", "جديد")}</em>
+          </a>
+          <div className="sx-card-body">
+            <div className="sx-card-line">
+              {name}
+              <b className="sx-swatch-price">{price(p.price)}</b>
+            </div>
+            <div className="sx-card-line">
+              <span className="sx-dots" aria-label={colors.join(", ")}>
+                {colors.map((c) => (
+                  <i key={c} title={c} style={{ background: colorOf(c) }} />
+                ))}
+              </span>
+              {addBtn("icon")}
+            </div>
+          </div>
+        </article>
+      );
+    }
     default:
       return (
         <article className="sx-card sx-cl-classic">

@@ -41,6 +41,7 @@ import {
   type VariantApi,
 } from "./SeriesPages";
 import SeriesHeader from "./SeriesHeader";
+import { heroSerie2 } from "./SeriesHeroes2";
 import { storeBuilderDefaults } from "../../lib/store-builder-config";
 import "./series-store.css";
 
@@ -73,12 +74,21 @@ export interface SeriesStoreProps {
   add: (p: any) => void;
 }
 
-const FONT_WEIGHTS = "wght@400;500;600;700;800";
-function fontsHref(families: string[]) {
-  const list = Array.from(new Set(families.filter(Boolean)));
+// Graisses demandées à Google Fonts : une graisse absente fait échouer toute la feuille
+// de style, d'où une liste par police (400 à 700 par défaut, une seule pour certaines).
+const FONT_WEIGHTS: Record<string, string> = {
+  "DM Serif Display": "",
+  Anton: "",
+  "Bebas Neue": "",
+  Caveat: ":wght@400;700",
+};
+export function fontsHref(families: string[]) {
+  const list = Array.from(new Set(families.filter(Boolean).map((f) => f.trim())));
   return (
     "https://fonts.googleapis.com/css2?" +
-    list.map((f) => "family=" + f.trim().replace(/ /g, "+") + ":" + FONT_WEIGHTS).join("&") +
+    list
+      .map((f) => "family=" + f.replace(/ /g, "+") + (f in FONT_WEIGHTS ? FONT_WEIGHTS[f] : ":wght@400;500;600;700"))
+      .join("&") +
     "&display=swap"
   );
 }
@@ -714,7 +724,24 @@ export default function SeriesStore(props: SeriesStoreProps) {
           </section>
         );
     }
-    return null;
+    // heros de la Série 2
+    return heroSerie2(t.hero, {
+      hero,
+      store,
+      products,
+      categories,
+      lang,
+      base,
+      shopUrl,
+      catUrl,
+      stats: statItems.map((x) => ({ value: fillTokens(x.value, counts), title: x.title })),
+      trust: block("trust").items || [],
+      art,
+      title,
+      actions,
+      eyebrow,
+      searchBar,
+    });
   }
 
   const head = (b: SxBlock, link = true, fallback = "") => (
@@ -981,6 +1008,100 @@ export default function SeriesStore(props: SeriesStoreProps) {
               <a className="sx-btn sx-btn-light" href={base + "/contact"}>
                 {b.button || txt.contact} <Icon name="arrow" />
               </a>
+            </div>
+          </section>
+        );
+      case "marquee": {
+        const words = (b.items || []).map((x) => x.title).filter(Boolean);
+        const list = words.length ? words : categories.map((x) => x.name);
+        if (!list.length) return null;
+        const row = (
+          <span className="sx-marquee-row" aria-hidden="true">
+            {[...list, ...list].map((w, i) => (
+              <span key={i}>
+                {w}
+                <i>✦</i>
+              </span>
+            ))}
+          </span>
+        );
+        return (
+          <section className="sx-section sx-marquee" aria-label={list.join(", ")}>
+            <div className="sx-marquee-track">
+              {row}
+              {row}
+            </div>
+          </section>
+        );
+      }
+      case "bento": {
+        const items = b.items || [];
+        if (!items.length) return null;
+        return (
+          <section className="sx-section sx-bento">
+            <div className="sx-wrap">
+              {(b.title || b.text) && head(b, false)}
+              <div className="sx-bento-grid">
+                {items.slice(0, 4).map((x, i) => (
+                  <a key={i} href={shopUrl} className={"sx-bento-card sx-bento-" + i}>
+                    {(x.image || i === 1) && <span className="sx-bento-img">{art(i + 3, x.title, x.image)}</span>}
+                    <span className="sx-bento-copy">
+                      {x.title && <b>{x.title}</b>}
+                      {x.value && <strong>{fillTokens(x.value, counts)}</strong>}
+                      {x.text && <small>{x.text}</small>}
+                    </span>
+                  </a>
+                ))}
+              </div>
+            </div>
+          </section>
+        );
+      }
+      case "rows": {
+        const items = b.items || [];
+        if (!items.length) return null;
+        return (
+          <section className="sx-section sx-rows">
+            <div className="sx-wrap">
+              <div className="sx-rows-box">
+                {head(b, false)}
+                <div className="sx-rows-list">
+                  {items.map((x, i) => (
+                    <div key={i} className="sx-row">
+                      {x.value && <small className="sx-row-meta">{x.value}</small>}
+                      <div className="sx-row-copy">
+                        <b>{x.title}</b>
+                        {x.text && <p>{x.text}</p>}
+                        <a className="sx-btn sx-btn-light" href={shopUrl}>
+                          {b.button || (lang === "ar" ? "اكتشف" : "Découvrir")} <Icon name="arrow" />
+                        </a>
+                      </div>
+                      <span className="sx-row-img">{art(i + 2, x.title, x.image)}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </section>
+        );
+      }
+      case "spotlight":
+        return (
+          <section className="sx-section sx-spotlight">
+            <div className="sx-wrap">
+              <div className="sx-spot-frame">
+                <div className="sx-hero-bg">{art(2, b.title, b.image)}</div>
+                <div className="sx-spot-copy">
+                  {b.eyebrow && <small className="sx-eyebrow">{b.eyebrow}</small>}
+                  <h2>{b.title || hero.title}</h2>
+                  {b.text && <p>{b.text}</p>}
+                  {b.button && (
+                    <a className="sx-btn sx-btn-light" href={shopUrl}>
+                      {b.button} <Icon name="arrow" />
+                    </a>
+                  )}
+                </div>
+              </div>
             </div>
           </section>
         );

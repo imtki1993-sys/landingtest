@@ -31,6 +31,24 @@ const SERIE_1_FOLDERS = [
   "008_Dc3YlnbjodC",
 ];
 
+const SERIE_2_FOLDERS = [
+  "16_Home arch",
+  "17_Cousmi hand",
+  "18_Sport",
+  "19_Conference",
+  "20_architc",
+  "21_Fitness",
+  "22_Shoes",
+  "23_cloth",
+  "24_Cosmi Bio",
+  "25_Restaurant",
+  "26_Cousmi pro",
+  "27_Golf",
+  "28_cousmitique",
+  "29_Bio Tch",
+  "30_Golfio",
+];
+
 describe("registre des templates de boutique", () => {
   it("Série 1 : un template par dossier, 15 au total", () => {
     const s1 = STORE_SERIES.find((s) => s.id === 1)!;
@@ -82,6 +100,29 @@ describe("registre des templates de boutique", () => {
     expect(new Set(s1.map((t) => t.layout.faq)).size).toBe(5);
     expect(new Set(s1.map((t) => t.layout.footer)).size).toBe(6);
     expect(new Set(s1.map((t) => t.layout.product)).size).toBe(4);
+  });
+
+  it("Série 2 : un template par dossier, chacun avec son propre hero", () => {
+    const s2 = STORE_SERIES.find((s) => s.id === 2)!;
+    expect(s2.templates.map((t) => t.folder)).toEqual(SERIE_2_FOLDERS);
+    expect(s2.templates.every((t) => t.series === 2 && t.id.startsWith("s2-"))).toBe(true);
+    expect(new Set(s2.templates.map((t) => t.hero)).size).toBe(15);
+    // aucun hero ni nom partagé avec la Série 1
+    const s1 = STORE_SERIES.find((s) => s.id === 1)!.templates;
+    for (const t of s2.templates) expect(s1.some((o) => o.hero === t.hero)).toBe(false);
+  });
+
+  it("Série 2 : les nouvelles sections ont un contenu dans les deux langues", () => {
+    const s2 = STORE_SERIES.find((s) => s.id === 2)!.templates;
+    for (const type of ["marquee", "bento", "rows", "spotlight"] as const) {
+      const users = s2.filter((t) => t.sections.includes(type));
+      expect(users.length, type).toBeGreaterThan(0);
+      for (const t of users)
+        for (const lang of ["fr", "ar"] as const) {
+          const c = sectionContent(t, lang, type, undefined);
+          expect(c.title || c.items?.length, `${t.id} ${lang} ${type}`).toBeTruthy();
+        }
+    }
   });
 
   it("getStoreTemplate refuse les valeurs inconnues", () => {

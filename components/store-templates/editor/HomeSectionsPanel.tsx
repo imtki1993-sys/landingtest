@@ -30,6 +30,10 @@ const SECTION_HELP: Partial<Record<SxSectionType, string>> = {
   newsletter: "Bandeau avec un bouton vers la page Contact.",
   faq: "Les questions se modifient dans Pages > FAQ.",
   wordmark: "Le nom de la boutique en très grand.",
+  marquee: "Mots qui défilent en continu ; vide = noms des catégories.",
+  bento: "Jusqu'à 4 cartes avec chiffre, texte et image ; {products} et {categories} sont calculés.",
+  rows: "Liste en lignes (numéro, titre, texte, image) avec un lien vers la boutique.",
+  spotlight: "Grande image plein écran avec un titre et un bouton.",
 };
 const CUSTOM_TYPES: [string, string][] = [
   ["text", "Texte"],
@@ -384,6 +388,27 @@ function SectionFields({
         </>
       )}
       {type === "wordmark" && f("eyebrow", "Petit texte manuscrit")}
+      {["bento", "rows", "spotlight"].includes(type) && (
+        <>
+          {f("eyebrow", "Petit titre")}
+          {f("title", "Titre")}
+          {f("text", "Texte", true)}
+          {type !== "bento" && f("button", "Bouton")}
+        </>
+      )}
+      {type === "spotlight" && img("image", "Grande image")}
+      {["marquee", "bento", "rows"].includes(type) && (
+        <ItemsEditor
+          items={block.items || []}
+          onChange={(items) => onChange({ items })}
+          withValue={type !== "marquee"}
+          valueLabel={type === "bento" ? "Chiffre ({products}, {categories} ou texte)" : "Numéro ou étiquette"}
+          withImage={type !== "marquee"}
+          storeId={storeId}
+          products={products}
+          addLabel={type === "marquee" ? "+ Ajouter un mot" : "+ Ajouter un élément"}
+        />
+      )}
       {type === "showcase" && (
         <>
           {img("image", "Image principale")}
