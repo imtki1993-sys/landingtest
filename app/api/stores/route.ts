@@ -6,6 +6,7 @@ import { authContext } from "../../../lib/server-auth";
 import OpenAI from "openai";
 import { decryptIntegrationSecret } from "../../../lib/integration-secrets";
 import { createStoreProV2Config } from "../../../lib/store-pro-v2";
+import { getStoreTemplate, seedStoreSettings, STORE_TEMPLATE_IDS } from "../../../lib/store-templates";
 function slugify(v: string) {
   return (
     v
@@ -17,7 +18,8 @@ function slugify(v: string) {
       .slice(0, 60) || "store"
   );
 }
-const allowedTemplates = new Set(["benchmark-ai"]);
+// "benchmark-ai" = boutique générée par l'IA ; s1-01… = templates de boutique par séries
+const allowedTemplates = new Set(["benchmark-ai", ...STORE_TEMPLATE_IDS]);
 export async function GET(req: Request) {
   try {
     const { s, workspaceId } = await authContext(req);
@@ -60,7 +62,11 @@ export async function POST(req: Request) {
       slug = base + "-" + Date.now().toString().slice(-6);
     let settings: any = {},
       resolvedTemplateId = templateId;
-    if (b.generateWithAI === true) {
+    const seriesTemplate = getStoreTemplate(templateId);
+    if (seriesTemplate) {
+      // Template de série : boutique prête tout de suite, textes du template dans la langue choisie
+      settings = seedStoreSettings(seriesTemplate, locale);
+    } else if (b.generateWithAI === true) {
       const { data: integration, error: integrationError } = await s
         .from("workspace_integrations")
         .select("openai_api_key_enc")
