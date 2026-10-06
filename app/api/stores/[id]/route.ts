@@ -21,7 +21,9 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
       .eq("id", id)
       .single();
     if (error) throw error;
-    return NextResponse.json({ store: data });
+    // numéro WhatsApp des Paramètres : l'aperçu de l'éditeur affiche le bouton comme la boutique publique
+    const { data: ws } = await s.from("workspaces").select("settings").eq("id", workspaceId).maybeSingle();
+    return NextResponse.json({ store: { ...data, workspace_whatsapp: (ws as any)?.settings?.whatsapp_phone || "" } });
   } catch (e: any) {
     reportError(e, "api/stores/[id]");
     return NextResponse.json({ error: publicMessage(e) }, { status: 404 });

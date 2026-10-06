@@ -306,3 +306,23 @@ export function seedStoreSettings(
 export function isGenericDefault(key: keyof typeof storeBuilderDefaults, value: unknown): boolean {
   return !value || value === (storeBuilderDefaults as any)[key];
 }
+
+/**
+ * Réglages chargés dans l'éditeur pour une boutique en template de série : les textes encore
+ * égaux aux valeurs génériques de l'ancien éditeur (texte arabe par défaut…) sont remplacés par
+ * ceux du template, pour que l'éditeur montre ce que la boutique affiche vraiment.
+ */
+export function withTemplateTexts(settings: Record<string, any>, t: StoreTemplate, locale: unknown) {
+  if (settings.storeTemplateId && settings.storeTemplateId !== t.id) return settings;
+  const c = templateCopy(t, locale);
+  const fill: [keyof typeof storeBuilderDefaults, string][] = [
+    ["heroTitle", c.title],
+    ["heroText", c.text],
+    ["heroButton", c.button],
+    ["announcement", c.announcement],
+    ["collectionTitle", c.collectionTitle],
+  ];
+  const out = { ...settings };
+  for (const [k, v] of fill) if (isGenericDefault(k, out[k])) out[k] = v;
+  return out;
+}

@@ -21,7 +21,11 @@ export default function GeneralPanel({ store, setStore, settings, setSettings }:
           inputMode="tel"
           value={settings.whatsapp || ""}
           onChange={(e) => setSettings({ ...settings, whatsapp: e.target.value.replace(/[^0-9+ ]/g, "") })}
-          placeholder="Ex. 212600000000 — vide = numéro des Paramètres"
+          placeholder={
+            store.workspace_whatsapp
+              ? "Vide = numéro des Paramètres (" + store.workspace_whatsapp + ")"
+              : "Ex. 212600000000 — aucun numéro dans les Paramètres"
+          }
         />
       </label>
       <label className="store-check">
@@ -33,11 +37,20 @@ export default function GeneralPanel({ store, setStore, settings, setSettings }:
         Afficher le bouton WhatsApp sur toutes les pages
       </label>
       <label>
-        Annonce
+        Bandeau d'annonce (en haut de toutes les pages)
         <input
-          value={settings.announcement}
+          value={settings.announcement || ""}
           onChange={(e) => setSettings({ ...settings, announcement: e.target.value })}
+          placeholder="Ex. Livraison gratuite partout au Maroc"
         />
+      </label>
+      <label className="store-check">
+        <input
+          type="checkbox"
+          checked={settings.showAnnouncement !== false}
+          onChange={(e) => setSettings({ ...settings, showAnnouncement: e.target.checked })}
+        />{" "}
+        Afficher le bandeau d'annonce
       </label>
     </div>
   );

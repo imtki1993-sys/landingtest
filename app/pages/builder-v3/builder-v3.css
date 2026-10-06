@@ -36,3 +36,102 @@
 @media(max-width:1500px){
   .bv3-device-scroll{justify-content:flex-start}
 }
+
+/* ───────── Mode sombre de l'éditeur de landing (l'aperçu de la page reste dans ses couleurs) ───────── */
+html[data-theme="dark"] .bv3 {
+  --bd-bg: #0b1120;
+  --bd-card: #111827;
+  --bd-card-2: #172033;
+  --bd-border: #253147;
+  --bd-text: #e5e7eb;
+  --bd-muted: #94a3b8;
+  background: var(--bd-bg);
+  color: var(--bd-text);
+  color-scheme: dark;
+}
+html[data-theme="dark"] :is(.bv3-top, .bv3-left, .bv3-right) {
+  background: var(--bd-card);
+  border-color: var(--bd-border);
+  box-shadow: none;
+}
+html[data-theme="dark"] .bv3-top small,
+html[data-theme="dark"] .bv3-right small,
+html[data-theme="dark"] .bv3-gallery-head span,
+html[data-theme="dark"] .bv3-structure-row > span {
+  color: var(--bd-muted);
+}
+html[data-theme="dark"] .bv3 :is(h1, h2, h3, h4, b, strong):not(:where(.bv3-runtime-preview *)) {
+  color: var(--bd-text) !important;
+}
+html[data-theme="dark"] .bv3-right label {
+  color: #cbd5e1;
+}
+html[data-theme="dark"] .bv3 button:not(:where(.bv3-runtime-preview *)) {
+  background: var(--bd-card-2);
+  border-color: var(--bd-border);
+  color: var(--bd-text);
+}
+html[data-theme="dark"] .bv3 button:not(:where(.bv3-runtime-preview *)):hover {
+  background: #1e293b;
+  border-color: #3b4a63;
+}
+html[data-theme="dark"] .bv3 :is(button.primary, button.active):not(:where(.bv3-runtime-preview *)),
+html[data-theme="dark"] .bv3-left button.active {
+  background: #2563eb;
+  border-color: #2563eb;
+  color: #fff;
+}
+html[data-theme="dark"] .bv3-view {
+  background: var(--bd-bg);
+}
+html[data-theme="dark"] .bv3-view button:not(.active) {
+  background: transparent;
+}
+html[data-theme="dark"] .bv3-stage {
+  background: var(--bd-bg);
+}
+html[data-theme="dark"] .bv3-device-label {
+  background: var(--bd-card);
+  border-color: var(--bd-border);
+  color: var(--bd-muted);
+}
+html[data-theme="dark"] .bv3-device-frame {
+  box-shadow: 0 0 0 1px var(--bd-border), 0 8px 32px rgba(0, 0, 0, 0.45);
+}
+html[data-theme="dark"] .bv3 :is(input, textarea, select):not(:where(.bv3-runtime-preview *)) {
+  background: #0f172a !important;
+  border-color: #334155 !important;
+  color: var(--bd-text) !important;
+}
+html[data-theme="dark"] .bv3-right :is(input, textarea):focus {
+  border-color: #60a5fa !important;
+  box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.25);
+}
+html[data-theme="dark"] .bv3-right hr {
+  border-top-color: var(--bd-border);
+}
+html[data-theme="dark"]
+  :is(.bv3-library, .bv3-faq-item, .bv3-media-grid > div, .bv3-media-empty, .bv3-device, .bv3-hero-advanced) {
+  background: var(--bd-card-2);
+  border-color: var(--bd-border);
+}
+html[data-theme="dark"] :is(.bv3-upload span, .bv3-add-faq, .bv3-gallery-head) {
+  background: rgba(37, 99, 235, 0.12);
+  border-color: rgba(96, 165, 250, 0.45);
+  color: #93c5fd;
+}
+html[data-theme="dark"] .bv3-add {
+  color: #93c5fd !important;
+}
+html[data-theme="dark"] .bv3-gallery-count {
+  background: var(--bd-card);
+  color: #93c5fd !important;
+}
+html[data-theme="dark"] .bv3-save-notice {
+  background: rgba(22, 163, 74, 0.14);
+  border-color: rgba(74, 222, 128, 0.35);
+  color: #86efac;
+}
+html[data-theme="dark"] .bv3-media-preview {
+  border-color: var(--bd-border);
+}

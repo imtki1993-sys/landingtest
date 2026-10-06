@@ -1593,10 +1593,6 @@ input,textarea,select{border-color:#dfe3ea}input:focus,textarea:focus,select:foc
 /* LandPro dashboard light / dark theme */
 html[data-theme="dark"]{color-scheme:dark;--lp-bg:#0b1120;--lp-card:#111827;--lp-border:#253147;--lp-text:#e5e7eb;--lp-muted:#94a3b8}
 html[data-theme="dark"] body{background:#0b1120!important;color:#e5e7eb!important}
-html[data-theme="dark"] h1,html[data-theme="dark"] h2,html[data-theme="dark"] h3{color:#f8fafc!important}
-html[data-theme="dark"] small{color:#94a3b8}
-html[data-theme="dark"] input,html[data-theme="dark"] select,html[data-theme="dark"] textarea{background:#0f172a!important;border-color:#334155!important;color:#e5e7eb!important}
-html[data-theme="dark"] a{color:inherit}
 
 /* LandPro Dark Mode V2 — page-level surface harmonization */
 html[data-theme="dark"]{
@@ -1832,3 +1828,5 @@ html[data-theme="dark"]{
 
 /* Hero Engine V2.5 — layout, overlay and gallery mode parity */
 /* Création de boutique : IA sur les templates de séries */
+/* ───────── Mode sombre : éditeur de boutique (l'aperçu garde les couleurs de la boutique) ───────── */
+/* ───────── Mode sombre : assistants de création (boutique et landing page) ───────── */
