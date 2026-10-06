@@ -74,6 +74,8 @@ export interface SxItem {
   title: string;
   text?: string;
   value?: string;
+  /** image propre à l'élément (bannière promo) */
+  image?: string;
 }
 
 export interface SxBlock {
@@ -82,6 +84,11 @@ export interface SxBlock {
   text?: string;
   button?: string;
   items?: SxItem[];
+  /** images choisies par le marchand (sinon : photos des produits) */
+  image?: string;
+  image2?: string;
+  /** sections Produits : catégorie affichée (vide = tous les produits) */
+  category?: string;
 }
 
 export interface SxCopy {
@@ -147,9 +154,30 @@ export interface StoreTemplate {
   copy: { fr: SxCopy; ar: SxCopy };
 }
 
-/** Réglages enregistrés dans stores.settings.sx */
+/** Couleurs et formes réglables par le marchand (en plus des couleurs principale / CTA). */
+export interface SxThemeOverride {
+  bg?: string;
+  surface?: string;
+  text?: string;
+  dark?: string;
+  radius?: number;
+}
+
+/**
+ * Réglages enregistrés dans stores.settings.sx.
+ * Les sections de l'accueil sont désignées par une clé : le type ("promos"),
+ * une copie ("promos~2"), ou un bloc personnalisé ("custom:<id>").
+ */
 export interface SxSettings {
   order?: string[];
   hidden?: string[];
-  content?: Partial<Record<SxSectionType, SxBlock>>;
+  /** sections du template supprimées (elles ne sont pas rajoutées automatiquement) */
+  removed?: string[];
+  content?: Record<string, SxBlock>;
+  /** mise en page choisie pièce par pièce (sinon celle du template) */
+  layout?: Partial<SxLayout>;
+  hero?: SxHeroVariant;
+  theme?: SxThemeOverride;
+  /** image de chaque catégorie (nom → URL) */
+  categoryImages?: Record<string, string>;
 }

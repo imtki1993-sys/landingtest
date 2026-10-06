@@ -1,10 +1,29 @@
 "use client";
-export default function StoreBuilderTopbar({ store, saving, copied, onSave, onPublish, onCopy }: any) {
+export default function StoreBuilderTopbar({
+  store,
+  saving,
+  copied,
+  onSave,
+  onPublish,
+  onCopy,
+  dirty,
+  canUndo,
+  canRedo,
+  onUndo,
+  onRedo,
+}: any) {
   return (
     <>
       <header>
         <div>
-          <small>ÉDITEUR</small>
+          <small>
+            ÉDITEUR
+            {dirty ? (
+              <em className="store-dirty"> · modifications non enregistrées</em>
+            ) : (
+              <em className="store-saved"> · enregistré</em>
+            )}
+          </small>
           <h1>{store.name}</h1>
         </div>
         <div>
@@ -12,6 +31,22 @@ export default function StoreBuilderTopbar({ store, saving, copied, onSave, onPu
             <a className="ghost-btn store-open-btn" href={"/store/" + store.slug} target="_blank" rel="noreferrer">
               Voir Store ↗
             </a>
+          )}
+          {onUndo && (
+            <span className="store-history">
+              <button type="button" className="ghost-btn" onClick={onUndo} disabled={!canUndo} title="Annuler (Ctrl+Z)">
+                ↶
+              </button>
+              <button
+                type="button"
+                className="ghost-btn"
+                onClick={onRedo}
+                disabled={!canRedo}
+                title="Rétablir (Ctrl+Maj+Z)"
+              >
+                ↷
+              </button>
+            </span>
           )}
           <button className="ghost-btn" onClick={onSave} disabled={saving}>
             {saving ? "Enregistrement…" : "Enregistrer"}

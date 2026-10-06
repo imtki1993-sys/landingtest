@@ -115,7 +115,7 @@ describe("réglages et sections", () => {
 
   it("resolveSections : ordre enregistré, sections inconnues ignorées, nouvelles sections ajoutées", () => {
     const { order, hidden } = resolveSections(t, { order: ["faq", "nope", "hero"], hidden: ["faq"] });
-    expect(order.slice(0, 2)).toEqual(["faq", "hero"]);
+    expect(order.slice(0, 2)).toEqual(["hero", "faq"]); // le hero reste en tête
     expect(order).not.toContain("nope");
     expect(new Set(order)).toEqual(new Set(templateSectionKeys(t)));
     expect(hidden.has("faq")).toBe(true);

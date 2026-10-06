@@ -60,6 +60,11 @@ export default function Storefront({ store, products, page = "home" }: { store: 
     return () => window.removeEventListener("message", onMessage);
   }, []);
   store = previewStore;
+  // aperçu dans l'éditeur de boutique : sections cliquables (templates de série)
+  const [editingPreview, setEditingPreview] = useState(false);
+  useEffect(() => {
+    setEditingPreview(window.parent !== window && new URLSearchParams(window.location.search).get("preview") === "1");
+  }, []);
   const cfg = normalizeStoreSettings(store.settings),
     proV2 = isStoreProV2(cfg),
     pro = cfg.proV2 || {},
@@ -1197,6 +1202,10 @@ export default function Storefront({ store, products, page = "home" }: { store: 
         }
         drawer={drawer}
         floating={whatsappButton}
+        editing={editingPreview}
+        customHome={
+          page === "home" ? customBlocks.map((b: any, i: number) => ({ id: b.id, node: customSections[i] })) : []
+        }
         cartCount={cart.reduce((n, x) => n + x.qty, 0)}
         openCart={() => setOpen(true)}
         add={add}

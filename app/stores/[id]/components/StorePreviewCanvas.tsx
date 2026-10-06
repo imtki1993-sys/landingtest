@@ -10,16 +10,31 @@ export default function StorePreviewCanvas({
   previewKey,
   setPreviewKey,
   previewRef,
+  products = [],
+  trial = "",
 }: any) {
   const pageLabel = editPage === "home" ? "Accueil" : pageList.find((x: any) => x[0] === editPage)?.[1] || "Accueil",
-    path = "/store/" + store.slug + (editPage === "home" ? "" : "/" + editPage);
+    // page Produit : premier produit de la boutique
+    productSlug = products[0]?.slug || products[0]?.id || "",
+    path =
+      "/store/" +
+      store.slug +
+      (editPage === "home"
+        ? ""
+        : editPage === "product"
+          ? productSlug
+            ? "/product/" + encodeURIComponent(productSlug)
+            : "/shop"
+          : "/" + editPage);
   return (
     <section className="store-builder-preview">
       <div className="store-preview-stage">
         <div className="store-preview-label">
           <div>
             <b>Aperçu réel du Store</b>
-            <small>{pageLabel} · aperçu en temps réel</small>
+            <small>
+              {pageLabel} · aperçu en temps réel{trial ? " · essai d'un template" : ""}
+            </small>
           </div>
           <div className="store-preview-actions">
             <button className={previewMode === "desktop" ? "active" : ""} onClick={() => setPreviewMode("desktop")}>
@@ -41,10 +56,12 @@ export default function StorePreviewCanvas({
             title="Aperçu réel boutique"
             src={path + "?preview=1&v=" + previewKey}
             onLoad={() => {
-              previewRef.current?.contentWindow?.postMessage(
-                { type: "LANDPRO_STORE_PREVIEW", store: { ...store, settings } },
-                "*",
-              );
+              // l'aperçu signale qu'il est prêt (LANDPRO_PREVIEW_READY) : l'éditeur lui envoie alors la boutique
+              if (!trial)
+                previewRef.current?.contentWindow?.postMessage(
+                  { type: "LANDPRO_STORE_PREVIEW", store: { ...store, settings } },
+                  "*",
+                );
             }}
           />
         </div>
