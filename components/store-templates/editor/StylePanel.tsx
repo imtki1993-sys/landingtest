@@ -12,7 +12,7 @@ import {
   type SxLayout,
 } from "../../../lib/store-templates";
 import { resetStyle } from "../../../lib/store-templates/editing";
-import { ChoiceField, ImagePicker } from "./fields";
+import { ChoiceField, ImagePicker, TextField } from "./fields";
 
 const FONTS = [
   "Inter",
@@ -34,6 +34,7 @@ const FONTS = [
 const TEXT_FIELDS = [
   "heroEyebrow",
   "heroTitle",
+  "heroHighlight",
   "heroText",
   "heroButton",
   "heroSecondaryButton",
@@ -91,6 +92,39 @@ export default function StylePanel({
 }) {
   const base = getStoreTemplate(store.template_id)!;
   const [choosing, setChoosing] = useState(false);
+  const [brief, setBrief] = useState<string>(settings.aiBrief || "");
+  const [writing, setWriting] = useState(false);
+  // Meta AI réécrit tous les textes pour ce template ; le design et les images ne changent pas
+  async function writeWithAi() {
+    if (
+      !window.confirm(
+        "Meta AI va réécrire tous les textes de la boutique (accueil, sections, FAQ, livraison, contact).\n\nLe design, les images et l'ordre des sections ne changent pas. Tu pourras annuler avec ↶.",
+      )
+    )
+      return;
+    setWriting(true);
+    try {
+      const r = await fetch("/api/stores/ai-texts", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          templateId: base.id,
+          locale: store.locale,
+          name: store.name,
+          brief,
+          products: products.map((p: any) => ({ name: p.name, category: p.specifications?.category || p.category })),
+          settings: own,
+        }),
+      });
+      const x = await r.json().catch(() => ({}));
+      if (!r.ok || !x.settings) throw new Error(x.error || "Génération impossible");
+      setSettings(x.settings);
+    } catch (e: any) {
+      alert(e?.message || "Génération impossible");
+    } finally {
+      setWriting(false);
+    }
+  }
   const own = { ...settings, storeTemplateId: base.id };
   const sx = own.sx || {};
   const eff = effectiveTemplate(base, sx);
@@ -164,6 +198,22 @@ export default function StylePanel({
           />
         </>
       )}
+
+      <h3>Textes avec l'IA</h3>
+      <small className="sxe-hint">
+        Meta AI rédige tous les textes de ce template pour ta boutique, dans sa langue. Résultat visible dans l'aperçu
+        avant d'enregistrer.
+      </small>
+      <TextField
+        label="Décris ta boutique (produits, clientèle, ton…)"
+        value={brief}
+        onChange={setBrief}
+        multiline
+        placeholder="Ex. : cosmétiques naturels à l'argan, pour femmes 25-45 ans, ton doux et rassurant."
+      />
+      <button type="button" className="sxe-btn sxe-btn-primary sxe-btn-wide" disabled={writing} onClick={writeWithAi}>
+        {writing ? "✦ Meta AI rédige…" : "✦ Rédiger les textes avec l'IA"}
+      </button>
 
       <h3>Logo</h3>
       <ImagePicker

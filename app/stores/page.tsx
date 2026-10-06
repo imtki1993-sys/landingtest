@@ -109,6 +109,8 @@ export default function Stores() {
     [storeSort, setStoreSort] = useState("newest"),
     [generatorMode, setGeneratorMode] = useState<"templates" | "classic" | "pro-v2">("templates"),
     [storeTemplate, setStoreTemplate] = useState(""),
+    [useAi, setUseAi] = useState(true),
+    [brief, setBrief] = useState(""),
     [productList, setProductList] = useState<any[]>([]);
   useEffect(() => {
     Promise.all([
@@ -145,6 +147,9 @@ export default function Stores() {
     () => (filter === "Tous" ? TEMPLATES : TEMPLATES.filter((t) => t.category === filter)),
     [filter],
   );
+  // "ai-auto" : l'IA choisit le template, donc elle rédige forcément les textes
+  const autoTemplate = storeTemplate === "ai-auto";
+  const aiTexts = generatorMode === "templates" && (autoTemplate || useAi);
   async function createStore() {
     const n = name.trim();
     if (!n) return alert("Entre le nom de la boutique.");
@@ -155,7 +160,19 @@ export default function Stores() {
         headers: { "content-type": "application/json" },
         body: JSON.stringify(
           generatorMode === "templates"
-            ? { name: n, templateId: storeTemplate, locale: language }
+            ? {
+                name: n,
+                templateId: storeTemplate,
+                locale: language,
+                generateWithAI: aiTexts,
+                brief: aiTexts ? brief.trim() : undefined,
+                products: aiTexts
+                  ? productList.map((p: any) => ({
+                      name: p.name,
+                      category: p.specifications?.category || p.category || "",
+                    }))
+                  : undefined,
+              }
             : {
                 name: n,
                 templateId: "benchmark-ai",
@@ -498,7 +515,7 @@ export default function Stores() {
                     >
                       <b>▦ Templates de boutique</b>
                       <span>Séries de templates prêts à l’emploi</span>
-                      <small>Boutique prête tout de suite, avec tes produits · sans clé IA</small>
+                      <small>30 templates · textes rédigés par Meta AI pour ta boutique (ou textes du template)</small>
                     </button>
                     <button
                       type="button"
@@ -522,6 +539,20 @@ export default function Stores() {
                   {generatorMode === "templates" ? (
                     <>
                       <h3 className="store-niche-heading">Choisis ton template</h3>
+                      <button
+                        type="button"
+                        className={"store-ai-auto" + (autoTemplate ? " active" : "")}
+                        onClick={() => setStoreTemplate(autoTemplate ? "" : "ai-auto")}
+                      >
+                        <i>✦</i>
+                        <span>
+                          <b>Laisser l’IA choisir le template</b>
+                          <small>
+                            Meta AI choisit le template le plus adapté à ta boutique et rédige tous les textes.
+                          </small>
+                        </span>
+                        {autoTemplate && <em>✓</em>}
+                      </button>
                       <TemplateGallery
                         value={storeTemplate}
                         onChange={setStoreTemplate}
@@ -640,13 +671,48 @@ export default function Stores() {
               {createStep === 3 && generatorMode === "templates" && (
                 <section className="store-wizard-step store-ai-step">
                   <small>ÉTAPE 3 SUR 3</small>
-                  <div className="store-ai-icon">▦</div>
-                  <h2>Crée ma boutique</h2>
+                  <div className="store-ai-icon">{aiTexts ? "✦" : "▦"}</div>
+                  <h2>{aiTexts ? "Génère ma boutique avec l’IA" : "Crée ma boutique"}</h2>
                   <p>
-                    <b>{name || "Ta boutique"}</b> sera créée avec le template{" "}
-                    <b>{getStoreTemplate(storeTemplate)?.name}</b> et tes produits. Tous les textes, couleurs et
-                    sections restent modifiables dans l’éditeur.
+                    <b>{name || "Ta boutique"}</b> sera créée avec{" "}
+                    {autoTemplate ? (
+                      <>le template choisi par l’IA</>
+                    ) : (
+                      <>
+                        le template <b>{getStoreTemplate(storeTemplate)?.name}</b>
+                      </>
+                    )}{" "}
+                    et tes produits.{" "}
+                    {aiTexts
+                      ? "Meta AI rédige tous les textes (accueil, sections, FAQ, livraison, contact) dans la langue choisie."
+                      : "Les textes du template sont utilisés."}{" "}
+                    Tout reste modifiable dans l’éditeur.
                   </p>
+                  {!autoTemplate && (
+                    <label className="store-ai-toggle">
+                      <input type="checkbox" checked={useAi} onChange={(e) => setUseAi(e.target.checked)} />
+                      <span>
+                        <b>Rédiger les textes avec Meta AI</b>
+                        <small>Utilise la clé Meta Model API de Paramètres › Intégrations.</small>
+                      </span>
+                    </label>
+                  )}
+                  {aiTexts && (
+                    <label className="store-ai-brief">
+                      Décris ta boutique (conseillé)
+                      <textarea
+                        value={brief}
+                        onChange={(e) => setBrief(e.target.value)}
+                        rows={4}
+                        maxLength={1500}
+                        placeholder="Ex. : vêtements de sport pour femmes, leggings et brassières, clientèle 20-35 ans à Casablanca, ton motivant."
+                      />
+                      <small>
+                        Produits, clientèle, ville, ton… L’IA utilise aussi les noms de tes {productList.length}{" "}
+                        produits.
+                      </small>
+                    </label>
+                  )}
                   <div className="store-ai-summary">
                     <span>
                       <i>✓</i>
@@ -655,9 +721,11 @@ export default function Stores() {
                     </span>
                     <span>
                       <i>✓</i>
-                      <b>{getStoreTemplate(storeTemplate)?.name}</b>
+                      <b>{autoTemplate ? "Choisi par l’IA" : getStoreTemplate(storeTemplate)?.name}</b>
                       <small>
-                        {getStoreTemplate(storeTemplate)?.niche} · {getStoreTemplate(storeTemplate)?.folder}
+                        {autoTemplate
+                          ? "Parmi les 30 templates"
+                          : getStoreTemplate(storeTemplate)?.niche + " · " + getStoreTemplate(storeTemplate)?.folder}
                       </small>
                     </span>
                     <span>
@@ -669,7 +737,13 @@ export default function Stores() {
                   <div className="store-wizard-nav">
                     <button onClick={() => setCreateStep(2)}>← Retour</button>
                     <button className="store-wizard-generate" disabled={creating} onClick={createStore}>
-                      {creating ? "Création en cours…" : "Créer ma boutique"}
+                      {creating
+                        ? aiTexts
+                          ? "✦ Meta AI rédige ta boutique…"
+                          : "Création en cours…"
+                        : aiTexts
+                          ? "✦ Générer ma boutique avec l’IA"
+                          : "Créer ma boutique"}
                     </button>
                   </div>
                 </section>

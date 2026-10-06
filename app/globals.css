@@ -4675,3 +4675,19 @@ html:not([data-theme="dark"]) .orders-dashboard .orders-pagination button{backgr
 .landing-benchmark[data-preview-viewport="tablet"] .lp-hero-real.hero-media-right :is(.hero-split,.hero-cod,.hero-minimal,.hero-editorial,.hero-luxury,.hero-ugc,.hero-commerce,.hero-form,.hero-video-ugc),
 .landing-benchmark[data-preview-viewport="mobile"] .lp-hero-real.hero-media-left :is(.hero-split,.hero-cod,.hero-minimal,.hero-editorial,.hero-luxury,.hero-ugc,.hero-commerce,.hero-form,.hero-video-ugc),
 .landing-benchmark[data-preview-viewport="mobile"] .lp-hero-real.hero-media-right :is(.hero-split,.hero-cod,.hero-minimal,.hero-editorial,.hero-luxury,.hero-ugc,.hero-commerce,.hero-form,.hero-video-ugc){direction:ltr!important}
+/* Création de boutique : IA sur les templates de séries */
+.store-ai-auto{position:relative;display:flex;align-items:center;gap:14px;width:100%;margin:0 0 14px;padding:14px 16px;border:1px dashed #a78bfa;border-radius:14px;background:linear-gradient(135deg,#faf5ff,#fff);text-align:left;cursor:pointer}
+.store-ai-auto.active{border:2px solid #7c3aed;box-shadow:0 0 0 3px #ede9fe}
+.store-ai-auto>i{flex:none;width:40px;height:40px;display:grid;place-items:center;border-radius:12px;background:linear-gradient(135deg,#7c3aed,#a855f7);color:#fff;font-style:normal;font-size:18px}
+.store-ai-auto>span{display:flex;flex-direction:column;gap:3px}
+.store-ai-auto b{font-size:14px;color:#111827}
+.store-ai-auto small{font-size:12px;color:#64748b}
+.store-ai-auto>em{position:absolute;right:12px;top:12px;width:22px;height:22px;display:grid;place-items:center;border-radius:50%;background:#7c3aed;color:#fff;font-style:normal;font-size:11px}
+.store-wizard-step>label.store-ai-toggle{display:flex;align-items:flex-start;gap:10px;text-align:left;padding:12px 14px;border:1px solid #e2e8f0;border-radius:12px;background:#fafafa;cursor:pointer}
+.store-wizard-step>label.store-ai-toggle input{flex:none;display:block;width:18px;height:18px;margin:2px 0 0;padding:0;accent-color:#7c3aed}
+.store-ai-toggle span{display:flex;flex-direction:column;gap:2px}
+.store-ai-toggle b{font-size:13px}
+.store-ai-toggle small{font-size:11px;color:#64748b;font-weight:500}
+.store-ai-brief{text-align:left}
+.store-ai-brief textarea{display:block;width:100%;box-sizing:border-box;margin-top:6px;padding:12px;border:1px solid #cbd5e1;border-radius:9px;font:inherit;font-size:13px;font-weight:400;resize:vertical}
+.store-ai-brief small{display:block;margin-top:5px;font-size:11px;color:#64748b;font-weight:500}
