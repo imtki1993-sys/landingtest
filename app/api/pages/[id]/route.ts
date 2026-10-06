@@ -90,7 +90,7 @@ async function PATCHHandler(req: Request, { params }: { params: Promise<{ id: st
         .eq("id", id)
         .eq("workspace_id", workspaceId);
       if (syncError) throw syncError;
-      revalidateTag("landing:" + current.slug);
+      revalidateTag("landing:" + current.slug, { expire: 0 });
       return NextResponse.json(data);
     }
 
@@ -144,7 +144,7 @@ async function PATCHHandler(req: Request, { params }: { params: Promise<{ id: st
         b.metaPixelId !== undefined ||
         b.images !== undefined)
     )
-      revalidateTag("landing:" + data.slug);
+      revalidateTag("landing:" + data.slug, { expire: 0 });
     return NextResponse.json(data);
   } catch (e: any) {
     reportError(e, "api/pages/[id]");
@@ -165,7 +165,7 @@ async function DELETEHandler(req: Request, { params }: { params: Promise<{ id: s
       .maybeSingle();
     if (error) throw error;
     if (!data) return NextResponse.json({ error: "Page introuvable" }, { status: 404 });
-    revalidateTag("landing:" + data.slug);
+    revalidateTag("landing:" + data.slug, { expire: 0 });
     return NextResponse.json({ ok: true, archived: true });
   } catch (e: any) {
     reportError(e, "api/pages/[id]");

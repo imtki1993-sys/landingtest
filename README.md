@@ -8,7 +8,7 @@ Plateforme SaaS de landing pages et de boutiques e-commerce **COD (paiement à l
 - **Marketing** : Pixel Meta + API Conversions, statistiques de visites et de conversion.
 - **Comptes** : espaces de travail (workspaces), validation des comptes par un administrateur, abonnements avec quotas.
 
-Stack : Next.js 15 (App Router) · React 19 · TypeScript · Supabase (Postgres + Auth + Storage) · Vercel.
+Stack : Next.js 16 (App Router) · React 19 · TypeScript · Supabase (Postgres + Auth + Storage) · Vercel.
 
 ## Démarrer en local
 

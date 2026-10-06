@@ -9,7 +9,7 @@ describe("vidage du cache des landing pages", () => {
     revalidateTag.mockClear();
     const h = withLandingInvalidation(async () => new Response("{}", { status: 200 }));
     await h();
-    expect(revalidateTag).toHaveBeenCalledWith(PUBLIC_LANDINGS_TAG);
+    expect(revalidateTag).toHaveBeenCalledWith(PUBLIC_LANDINGS_TAG, { expire: 0 });
   });
 
   it("ne vide pas le cache quand la modification échoue", async () => {
