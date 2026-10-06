@@ -16,6 +16,23 @@ export default function GeneralPanel({ store, setStore, settings, setSettings }:
         </select>
       </label>
       <label>
+        Numéro WhatsApp de la boutique
+        <input
+          inputMode="tel"
+          value={settings.whatsapp || ""}
+          onChange={(e) => setSettings({ ...settings, whatsapp: e.target.value.replace(/[^0-9+ ]/g, "") })}
+          placeholder="Ex. 212600000000 — vide = numéro des Paramètres"
+        />
+      </label>
+      <label className="store-check">
+        <input
+          type="checkbox"
+          checked={settings.showWhatsapp !== false}
+          onChange={(e) => setSettings({ ...settings, showWhatsapp: e.target.checked })}
+        />{" "}
+        Afficher le bouton WhatsApp sur toutes les pages
+      </label>
+      <label>
         Annonce
         <input
           value={settings.announcement}

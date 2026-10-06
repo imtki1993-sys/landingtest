@@ -58,6 +58,8 @@ export interface SeriesStoreProps {
   extra?: React.ReactNode;
   /** tiroir du panier (rendu par Storefront) */
   drawer?: React.ReactNode;
+  /** éléments flottants (bouton WhatsApp) */
+  floating?: React.ReactNode;
   cartCount: number;
   openCart: () => void;
   add: (p: any) => void;
@@ -74,8 +76,24 @@ function fontsHref(families: string[]) {
 }
 
 export default function SeriesStore(props: SeriesStoreProps) {
-  const { t, store, cfg, products, page, rtl, base, txt, product, variants, extra, drawer, cartCount, openCart, add } =
-    props;
+  const {
+    t,
+    store,
+    cfg,
+    products,
+    page,
+    rtl,
+    base,
+    txt,
+    product,
+    variants,
+    extra,
+    drawer,
+    floating,
+    cartCount,
+    openCart,
+    add,
+  } = props;
   const [cat, setCat] = useState("");
   const [sort, setSort] = useState("featured");
   const lang = copyLang(store.locale);
@@ -988,6 +1006,7 @@ export default function SeriesStore(props: SeriesStoreProps) {
 
       {cfg.showFooter !== false && <SeriesFooter ctx={ctx} />}
       {drawer}
+      {floating}
     </main>
   );
 }
