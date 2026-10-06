@@ -235,8 +235,15 @@ export default function SeriesStore(props: SeriesStoreProps) {
     text: pick(cfg.heroText, c.text),
     button: pick(cfg.heroButton, c.button),
     secondary: own ? cfg.heroSecondaryButton || "" : c.secondary || "",
-    highlight: c.highlight || "",
+    highlight: "",
   };
+  // mot mis en valeur : celui réglé (IA ou éditeur), sinon celui du template tant que son titre est gardé
+  hero.highlight =
+    own && typeof cfg.heroHighlight === "string"
+      ? cfg.heroHighlight
+      : hero.title === c.title || hero.title.toLowerCase().includes((c.highlight || "").toLowerCase())
+        ? c.highlight || ""
+        : "";
   const primary = pick(cfg.primary, t.theme.primary);
   const accent = pick(cfg.accent, t.theme.accent);
   const headingFont = rtl ? "Cairo" : pick(cfg.headingFont, t.theme.headingFont);

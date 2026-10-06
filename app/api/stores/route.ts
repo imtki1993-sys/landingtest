@@ -7,6 +7,9 @@ import OpenAI from "openai";
 import { decryptIntegrationSecret } from "../../../lib/integration-secrets";
 import { createStoreProV2Config } from "../../../lib/store-pro-v2";
 import { getStoreTemplate, seedStoreSettings, STORE_TEMPLATE_IDS } from "../../../lib/store-templates";
+import { generateTemplateStore } from "../../../lib/store-templates/ai";
+import { metaAsk, MetaModelError } from "../../../lib/meta-model";
+import { aiProductList } from "../../../lib/store-templates/ai-input";
 function slugify(v: string) {
   return (
     v
@@ -18,8 +21,11 @@ function slugify(v: string) {
       .slice(0, 60) || "store"
   );
 }
-// "benchmark-ai" = boutique générée par l'IA ; s1-01… = templates de boutique par séries
-const allowedTemplates = new Set(["benchmark-ai", ...STORE_TEMPLATE_IDS]);
+// "benchmark-ai" = ancien générateur IA ; s1-01… = templates de boutique par séries ;
+// "ai-auto" = template de série choisi par l'IA
+const allowedTemplates = new Set(["benchmark-ai", "ai-auto", ...STORE_TEMPLATE_IDS]);
+// la génération IA peut prendre plus de 10 s
+export const maxDuration = 60;
 export async function GET(req: Request) {
   try {
     const { s, workspaceId } = await authContext(req);
@@ -63,7 +69,32 @@ export async function POST(req: Request) {
     let settings: any = {},
       resolvedTemplateId = templateId;
     const seriesTemplate = getStoreTemplate(templateId);
-    if (seriesTemplate) {
+    if ((seriesTemplate || templateId === "ai-auto") && b.generateWithAI === true) {
+      // Template de série + textes rédigés par Meta AI (template choisi par l'IA si "ai-auto")
+      try {
+        const ask = await metaAsk(s, workspaceId);
+        const generated = await generateTemplateStore(ask, {
+          name,
+          locale,
+          brief: String(b.brief || "").slice(0, 1500),
+          products: aiProductList(b.products),
+          templateId: seriesTemplate?.id,
+        });
+        settings = generated.settings;
+        resolvedTemplateId = generated.templateId;
+      } catch (aiError: any) {
+        if (aiError instanceof MetaModelError)
+          return NextResponse.json({ error: aiError.message, code: aiError.code }, { status: aiError.status });
+        console.error("Store template AI generation failed", { message: aiError?.message });
+        return NextResponse.json(
+          {
+            error: "La réponse de Meta AI est incomplète. Relance la génération (aucune boutique n'a été créée).",
+            code: "META_AI_UNAVAILABLE",
+          },
+          { status: 502 },
+        );
+      }
+    } else if (seriesTemplate) {
       // Template de série : boutique prête tout de suite, textes du template dans la langue choisie
       settings = seedStoreSettings(seriesTemplate, locale);
     } else if (b.generateWithAI === true) {

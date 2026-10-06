@@ -246,6 +246,11 @@ function HeroEditor({ settings, setSettings, uploadHeroImage }: any) {
     <>
       <TextField label="Petit titre" value={settings.heroEyebrow} onChange={set("heroEyebrow")} />
       <TextField label="Titre" value={settings.heroTitle} onChange={set("heroTitle")} />
+      <TextField
+        label="Mots mis en valeur (repris du titre, vide = aucun)"
+        value={settings.heroHighlight}
+        onChange={set("heroHighlight")}
+      />
       <TextField label="Texte" value={settings.heroText} onChange={set("heroText")} multiline />
       <TextField label="Bouton principal" value={settings.heroButton} onChange={set("heroButton")} />
       <TextField

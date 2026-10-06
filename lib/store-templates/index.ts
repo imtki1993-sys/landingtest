@@ -289,6 +289,7 @@ export function seedStoreSettings(
     bodyFont: t.theme.bodyFont,
     heroEyebrow: c.eyebrow,
     heroTitle: c.title,
+    heroHighlight: c.highlight || "",
     heroText: c.text,
     heroButton: c.button,
     heroSecondaryButton: c.secondary || "",
