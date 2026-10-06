@@ -59,6 +59,7 @@ export const SERIE_1: StoreTemplate[] = [
     categories: "pills",
     promos: "split",
     trust: "numbered",
+    layout: { card: "editorial", faq: "numbered", footer: "wordmark", shop: "topbar", product: "stack", page: "split" },
     sections: ["hero", "products", "showcase", "promos", "categories", "trust", "newsletter", "faq"],
     hiddenByDefault: ["stats", "testimonials"],
     copy: copy(
@@ -141,6 +142,7 @@ export const SERIE_1: StoreTemplate[] = [
     categories: "tiles",
     promos: "cards",
     trust: "icons",
+    layout: { card: "centered", faq: "cards", footer: "cta", shop: "banner", product: "panel", page: "banner" },
     sections: ["hero", "trust", "products", "showcase", "categories", "promos", "newsletter", "faq"],
     hiddenByDefault: ["testimonials"],
     copy: copy(
@@ -223,6 +225,7 @@ export const SERIE_1: StoreTemplate[] = [
     categories: "tiles",
     promos: "split",
     trust: "icons",
+    layout: { card: "framed", faq: "center", footer: "split", shop: "sidebar", product: "panel", page: "banner" },
     sections: ["hero", "showcase", "products", "promos", "trust", "categories", "newsletter", "faq"],
     hiddenByDefault: ["testimonials"],
     copy: copy(
@@ -297,6 +300,7 @@ export const SERIE_1: StoreTemplate[] = [
     categories: "tiles",
     promos: "cards",
     trust: "numbered",
+    layout: { card: "minimal", faq: "split", footer: "cta", shop: "topbar", product: "split", page: "split" },
     sections: ["hero", "products", "trust", "showcase", "stats", "categories", "newsletter", "faq"],
     hiddenByDefault: ["testimonials"],
     copy: copy(
@@ -375,6 +379,7 @@ export const SERIE_1: StoreTemplate[] = [
     categories: "pills",
     promos: "cards",
     trust: "icons",
+    layout: { card: "framed", faq: "center", footer: "minimal", shop: "topbar", product: "centered", page: "simple" },
     sections: ["hero", "trust", "products", "showcase", "categories", "stats", "newsletter", "faq"],
     hiddenByDefault: ["testimonials"],
     copy: copy(
@@ -449,6 +454,7 @@ export const SERIE_1: StoreTemplate[] = [
     categories: "tiles",
     promos: "split",
     trust: "bar",
+    layout: { card: "overlay", faq: "numbered", footer: "wordmark", shop: "banner", product: "stack", page: "banner" },
     sections: ["hero", "showcase", "promos", "products", "categories", "trust", "newsletter", "faq"],
     hiddenByDefault: ["testimonials"],
     copy: copy(
@@ -524,6 +530,7 @@ export const SERIE_1: StoreTemplate[] = [
     categories: "tiles",
     promos: "banner",
     trust: "bar",
+    layout: { card: "tag", faq: "band", footer: "split", shop: "banner", product: "split", page: "banner" },
     sections: ["hero", "promos", "products", "categories", "showcase", "trust", "newsletter", "faq"],
     hiddenByDefault: ["testimonials"],
     copy: copy(
@@ -594,6 +601,7 @@ export const SERIE_1: StoreTemplate[] = [
     categories: "pills",
     promos: "banner",
     trust: "numbered",
+    layout: { card: "classic", faq: "split", footer: "columns", shop: "sidebar", product: "split", page: "simple" },
     sections: ["hero", "catalog", "promos", "trust", "newsletter", "faq"],
     hiddenByDefault: ["testimonials"],
     copy: copy(
@@ -670,6 +678,7 @@ export const SERIE_1: StoreTemplate[] = [
     categories: "tiles",
     promos: "cards",
     trust: "icons",
+    layout: { card: "overlay", faq: "cards", footer: "cta", shop: "banner", product: "panel", page: "banner" },
     sections: ["hero", "trust", "categories", "products", "testimonials", "newsletter", "faq"],
     hiddenByDefault: ["testimonials"],
     copy: copy(
@@ -728,6 +737,7 @@ export const SERIE_1: StoreTemplate[] = [
     categories: "pills",
     promos: "cards",
     trust: "icons",
+    layout: { card: "minimal", faq: "band", footer: "columns", shop: "sidebar", product: "panel", page: "banner" },
     sections: ["hero", "categories", "products", "promos", "stats", "trust", "newsletter", "faq"],
     hiddenByDefault: ["testimonials"],
     copy: copy(
@@ -796,6 +806,7 @@ export const SERIE_1: StoreTemplate[] = [
     categories: "circles",
     promos: "split",
     trust: "bar",
+    layout: { card: "centered", faq: "center", footer: "centered", shop: "topbar", product: "split", page: "simple" },
     sections: ["hero", "trust", "categories", "promos", "products", "newsletter", "faq"],
     hiddenByDefault: ["testimonials"],
     copy: copy(
@@ -862,6 +873,7 @@ export const SERIE_1: StoreTemplate[] = [
     categories: "circles",
     promos: "cards",
     trust: "bar",
+    layout: { card: "tag", faq: "cards", footer: "split", shop: "banner", product: "panel", page: "banner" },
     sections: ["hero", "trust", "categories", "promos", "products", "showcase", "newsletter", "faq"],
     hiddenByDefault: ["testimonials"],
     copy: copy(
@@ -941,6 +953,7 @@ export const SERIE_1: StoreTemplate[] = [
     categories: "tiles",
     promos: "cards",
     trust: "icons",
+    layout: { card: "centered", faq: "band", footer: "wordmark", shop: "topbar", product: "centered", page: "banner" },
     sections: ["hero", "wordmark", "showcase", "products", "categories", "stats", "newsletter", "faq"],
     hiddenByDefault: ["testimonials"],
     copy: copy(
@@ -1013,6 +1026,7 @@ export const SERIE_1: StoreTemplate[] = [
     categories: "tiles",
     promos: "split",
     trust: "numbered",
+    layout: { card: "framed", faq: "numbered", footer: "cta", shop: "sidebar", product: "stack", page: "split" },
     sections: ["hero", "showcase", "products", "categories", "trust", "promos", "newsletter", "faq"],
     hiddenByDefault: ["testimonials"],
     copy: copy(
@@ -1109,6 +1123,7 @@ export const SERIE_1: StoreTemplate[] = [
     categories: "tiles",
     promos: "cards",
     trust: "icons",
+    layout: { card: "minimal", faq: "center", footer: "centered", shop: "topbar", product: "centered", page: "split" },
     sections: ["hero", "showcase", "products", "categories", "stats", "newsletter", "faq"],
     hiddenByDefault: ["testimonials"],
     copy: copy(

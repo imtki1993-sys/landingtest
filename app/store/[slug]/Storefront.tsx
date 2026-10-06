@@ -1178,15 +1178,14 @@ export default function Storefront({ store, products, page = "home" }: { store: 
         rtl={rtl}
         base={base}
         txt={txt}
-        body={
-          page === "home" ? undefined : (
-            <>
-              {body}
-              {page === "contact"
-                ? customSections.filter((b: any) => b.props?.className?.indexOf("contactForm") < 0)
-                : customSections}
-            </>
-          )
+        product={product}
+        variants={{ productSelections, selectOption, selectedVariant }}
+        extra={
+          page === "home"
+            ? undefined
+            : page === "contact"
+              ? customSections.filter((b: any) => b.props?.className?.indexOf("contactForm") < 0)
+              : customSections
         }
         drawer={drawer}
         cartCount={cart.reduce((n, x) => n + x.qty, 0)}

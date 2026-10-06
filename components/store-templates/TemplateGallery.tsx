@@ -31,6 +31,8 @@ function demoProducts(products: any[] | undefined) {
   }));
 }
 
+const NO_VARIANTS = { productSelections: {}, selectOption: () => {}, selectedVariant: () => null };
+
 const TXT = {
   fr: {
     home: "Accueil",
@@ -115,6 +117,7 @@ export function TemplatePreview({
           rtl={rtl}
           base="#"
           txt={rtl ? TXT.ar : TXT.fr}
+          variants={NO_VARIANTS}
           cartCount={0}
           openCart={() => {}}
           add={() => {}}
