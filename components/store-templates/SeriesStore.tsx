@@ -42,6 +42,15 @@ import {
 } from "./SeriesPages";
 import SeriesHeader from "./SeriesHeader";
 import { heroSerie2 } from "./SeriesHeroes2";
+import {
+  ExpertSection,
+  HighlightsSection,
+  ServicesSection,
+  StatementSection,
+  TrioCategories,
+  heroClinic,
+  heroEstate,
+} from "./SeriesCustom";
 import { CtaPhotoSection, FeaturesSection, PhotoStatsSection, heroSchool, hl, plain } from "./SeriesSchool";
 import { storeBuilderDefaults } from "../../lib/store-builder-config";
 import "./series-store.css";
@@ -750,8 +759,10 @@ export default function SeriesStore(props: SeriesStoreProps) {
       searchBar,
     };
     // hero sur mesure (école) : cartes sous le texte, modifiables avec le hero
-    if (t.hero === "school")
-      return heroSchool({ ...kit, items: block("hero").items || [], fill: (v) => fillTokens(v, counts) });
+    const heroExtra = { ...kit, items: block("hero").items || [], fill: (v?: string) => fillTokens(v, counts) };
+    if (t.hero === "school") return heroSchool(heroExtra);
+    if (t.hero === "estate") return heroEstate(heroExtra);
+    if (t.hero === "clinic") return heroClinic(heroExtra);
     // heros de la Série 2
     return heroSerie2(t.hero, kit);
   }
@@ -810,6 +821,8 @@ export default function SeriesStore(props: SeriesStoreProps) {
       }
       case "categories": {
         if (!categories.length) return null;
+        if (t.categories === "trio")
+          return <TrioCategories b={b} categories={categories} catUrl={catUrl} art={art} head={head(b)} lang={lang} />;
         return (
           <section className={"sx-section sx-cats sx-cats-" + t.categories}>
             <div className="sx-wrap">
@@ -1130,6 +1143,22 @@ export default function SeriesStore(props: SeriesStoreProps) {
             </div>
           </section>
         );
+      case "statement":
+        return (
+          <StatementSection
+            b={b}
+            layout={t.statement || "rows"}
+            art={art}
+            fill={(v) => fillTokens(v, counts)}
+            href={base + "/contact"}
+          />
+        );
+      case "services":
+        return <ServicesSection b={b} fill={(v) => fillTokens(v, counts)} />;
+      case "expert":
+        return <ExpertSection b={b} art={art} fill={(v) => fillTokens(v, counts)} href={base + "/contact"} />;
+      case "highlights":
+        return <HighlightsSection b={b} art={art} fill={(v) => fillTokens(v, counts)} href={shopUrl} />;
       case "features":
         return <FeaturesSection b={b} shopUrl={shopUrl} lang={lang} />;
       case "photostats":

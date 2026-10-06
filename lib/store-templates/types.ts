@@ -26,7 +26,11 @@ export type SxSectionType =
   | "spotlight" // grande image avec titre centré
   // Sur mesure
   | "features" // cartes à encoche avec icône dessinée et flèche
-  | "photostats"; // grande photo + chiffres en tuiles colorées
+  | "photostats" // grande photo + chiffres en tuiles colorées
+  | "statement" // phrase de présentation + photo + chiffres
+  | "services" // grille de services avec icônes + carte chiffre
+  | "expert" // carte profil + grande photo avec chiffres
+  | "highlights"; // rangée de cartes : image, carte colorée, photo, chiffre + graphique
 
 export type SxHeroVariant =
   | "editorial" // gros titre en capitales + bloc image coloré + chiffres verticaux
@@ -61,11 +65,13 @@ export type SxHeroVariant =
   | "center-photo" // photo plein cadre, titre centré en haut
   | "dark-split" // fond vert nuit, titre et accent jaune, image à droite
   // Sur mesure
-  | "school"; // titre souligné au feutre, collage photo sur blocs, deux cartes sous le texte
+  | "school" // titre souligné au feutre, collage photo sur blocs, deux cartes sous le texte
+  | "estate" // photo plein cadre, titre en bas, chiffres sur une ligne, bouton pilule
+  | "clinic"; // photo arrondie encadrée, carte vidéo, pastilles de services, bandeau de garanties
 
 export type SxHeader = "split" | "center" | "overlay" | "dark";
 export type SxCard = "plain" | "boxed" | "soft" | "dark" | "outline";
-export type SxCategories = "circles" | "tiles" | "pills";
+export type SxCategories = "circles" | "tiles" | "pills" | "trio";
 export type SxPromos = "split" | "cards" | "banner";
 export type SxTrust = "bar" | "icons" | "numbered";
 
@@ -80,9 +86,11 @@ export type SxCardLayout =
   | "framed"
   | "tinted" // fonds colorés en alternance
   | "swatch" // fond gris, pastilles de couleurs, bouton +
-  | "notch"; // carte grise à encoche avec bouton flèche dans le coin
+  | "notch" // carte grise à encoche avec bouton flèche dans le coin
+  | "listing" // carte horizontale : photo, lieu, prix, points forts
+  | "post"; // carte article : photo avec étiquette, titre, lien « En savoir plus »
 export type SxFaqLayout = "split" | "center" | "cards" | "numbered" | "band";
-export type SxFooterLayout = "columns" | "wordmark" | "centered" | "cta" | "minimal" | "split" | "bar";
+export type SxFooterLayout = "columns" | "wordmark" | "centered" | "cta" | "minimal" | "split" | "bar" | "photo";
 export type SxShopLayout = "sidebar" | "topbar" | "banner";
 export type SxProductLayout = "split" | "stack" | "centered" | "panel";
 export type SxPageLayout = "simple" | "banner" | "split";
@@ -191,6 +199,8 @@ export interface StoreTemplate {
   showAnnouncement?: boolean;
   /** appel à l'action avec photo détourée en biais (section « Appel à l'action ») */
   ctaPhoto?: boolean;
+  /** section « Présentation + chiffres » : chiffres en lignes sous la photo, ou en ligne à côté */
+  statement?: "rows" | "inline";
   copy: { fr: SxCopy; ar: SxCopy };
 }
 
