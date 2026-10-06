@@ -5,6 +5,7 @@ import { getBenchmarkTemplateRuntime } from "../../../lib/benchmark-template-reg
 import { isStoreProV2 } from "../../../lib/store-pro-v2";
 import { getStoreTemplate } from "../../../lib/store-templates";
 import SeriesStore from "../../../components/store-templates/SeriesStore";
+import WhatsAppButton, { whatsappDigits } from "../../../components/store-templates/WhatsAppButton";
 function UiIcon({ kind }: { kind: "truck" | "cash" | "check" | "play" }) {
   const common = {
     width: 20,
@@ -101,6 +102,9 @@ export default function Storefront({ store, products, page = "home" }: { store: 
     );
     return () => clearInterval(t);
   }, [heroImages.join("|"), cfg.heroSlideDuration]);
+  // WhatsApp : numéro de la boutique, sinon celui des Paramètres du compte
+  const whatsapp = whatsappDigits(cfg.whatsapp || store.workspace_whatsapp);
+  cfg.whatsapp = whatsapp;
   const base = "/store/" + store.slug,
     total = useMemo(() => cart.reduce((n, x) => n + Number(x.price) * x.qty, 0), [cart]),
     visible =
@@ -1166,6 +1170,10 @@ export default function Storefront({ store, products, page = "home" }: { store: 
   ) : null;
   // Templates de boutique par séries (Série 1…) : mise en page dédiée,
   // même panier, mêmes pages internes et même commande.
+  const whatsappButton =
+    whatsapp && cfg.showWhatsapp !== false ? (
+      <WhatsAppButton phone={whatsapp} storeName={store.name} productName={product?.name} rtl={rtl} />
+    ) : null;
   const seriesTemplate = getStoreTemplate(store.template_id);
   if (seriesTemplate)
     return (
@@ -1188,6 +1196,7 @@ export default function Storefront({ store, products, page = "home" }: { store: 
               : customSections
         }
         drawer={drawer}
+        floating={whatsappButton}
         cartCount={cart.reduce((n, x) => n + x.qty, 0)}
         openCart={() => setOpen(true)}
         add={add}
@@ -1430,6 +1439,7 @@ export default function Storefront({ store, products, page = "home" }: { store: 
         </footer>
       )}
       {drawer}
+      {whatsappButton}
     </main>
   );
 }

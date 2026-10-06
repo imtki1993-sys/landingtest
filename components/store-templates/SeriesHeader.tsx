@@ -19,6 +19,14 @@ export default function SeriesHeader({
   const { store, cfg, base, txt, shopUrl, categories } = ctx;
   const layout = ctx.t.layout.header;
   const [open, setOpen] = useState(false);
+  // Header collé en haut : il prend un fond et une ombre dès que la page défile
+  const [scrolled, setScrolled] = useState(false);
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 8);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
   // Échap ferme le menu ; le défilement de la page est bloqué pendant qu'il est ouvert
   useEffect(() => {
     if (!open) return;
@@ -261,7 +269,7 @@ export default function SeriesHeader({
   return (
     <>
       {before}
-      <header className={"sx-header sx-h-" + layout}>
+      <header className={"sx-header sx-h-" + layout + (scrolled ? " is-scrolled" : "")}>
         <div className="sx-wrap sx-header-row">{row}</div>
         {after}
       </header>

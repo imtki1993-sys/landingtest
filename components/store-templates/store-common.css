@@ -1,0 +1,103 @@
+/* Règles communes à toutes les boutiques (templates de série et boutiques IA). */
+
+/* Sur les pages boutique, html/body/main ne doivent pas être des conteneurs de
+   défilement : le CSS hérité du tableau de bord (« overflow-x: hidden ») transforme la page en conteneur de défilement et empêche
+   le header de rester collé en haut pendant le défilement ; « clip » coupe aussi
+   les débordements horizontaux sans casser position: sticky. */
+html:has(main.public-store),
+html:has(main.public-store) body {
+  overflow-x: clip !important;
+  overflow-y: visible !important;
+}
+main.public-store {
+  overflow-x: clip !important;
+  overflow-y: visible !important;
+}
+main.public-store > .ps-header,
+main.public-store > header.pro-header {
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 60 !important;
+}
+
+/* Bouton WhatsApp flottant */
+.store-wa-fab {
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  z-index: 90;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  height: 56px;
+  padding: 0 22px 0 16px;
+  border-radius: 99px;
+  background: #25d366;
+  color: #fff !important;
+  font: 700 15px/1 system-ui, sans-serif;
+  text-decoration: none !important;
+  box-shadow:
+    0 10px 30px rgba(18, 140, 70, 0.35),
+    0 2px 6px rgba(0, 0, 0, 0.12);
+  transition:
+    transform 0.2s,
+    box-shadow 0.2s;
+  animation: store-wa-in 0.4s ease 0.6s both;
+}
+.store-wa-fab:hover {
+  transform: translateY(-2px) scale(1.02);
+  box-shadow:
+    0 14px 36px rgba(18, 140, 70, 0.45),
+    0 2px 6px rgba(0, 0, 0, 0.12);
+}
+.store-wa-fab:focus-visible {
+  outline: 3px solid #0b5d2c;
+  outline-offset: 3px;
+}
+.store-wa-fab svg {
+  width: 28px;
+  height: 28px;
+  flex: none;
+}
+.store-wa-fab svg path:first-child {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.7;
+  stroke-linejoin: round;
+}
+.store-wa-fab svg path:last-child {
+  fill: currentColor;
+}
+[dir="rtl"] .store-wa-fab {
+  right: auto;
+  left: 20px;
+  padding: 0 16px 0 22px;
+}
+@keyframes store-wa-in {
+  from {
+    opacity: 0;
+    transform: translateY(16px) scale(0.9);
+  }
+}
+@media (max-width: 720px) {
+  .store-wa-fab {
+    right: 14px;
+    bottom: 14px;
+    width: 56px;
+    padding: 0;
+    justify-content: center;
+  }
+  [dir="rtl"] .store-wa-fab {
+    left: 14px;
+    padding: 0;
+  }
+  .store-wa-fab span {
+    display: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .store-wa-fab {
+    animation: none;
+    transition: none;
+  }
+}

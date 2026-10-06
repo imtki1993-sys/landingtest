@@ -4293,3 +4293,68 @@ a.sx-contact-card:hover {
   color: var(--sx-text);
   border-color: var(--sx-border);
 }
+
+/* ═════════════ header collé en haut pendant le défilement ═════════════ */
+.sx-store .sx-header {
+  position: sticky;
+  top: 0;
+  z-index: 60;
+  transition:
+    background-color 0.25s,
+    box-shadow 0.25s,
+    color 0.25s;
+}
+.sx-store .sx-header.is-scrolled {
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+}
+/* header transparent sur le hero : il devient opaque dès qu'on défile */
+.sx-header-overlay.sx-home .sx-header {
+  position: sticky;
+}
+.sx-header-overlay.sx-home .sx-header.is-scrolled {
+  background: color-mix(in srgb, var(--sx-bg) 94%, transparent);
+  backdrop-filter: blur(12px);
+  color: var(--sx-text);
+  border-color: var(--sx-border);
+}
+.sx-header-overlay.sx-home .sx-header.is-scrolled .sx-brand,
+.sx-header-overlay.sx-home .sx-header.is-scrolled .sx-nav {
+  text-shadow: none;
+}
+.sx-header-overlay.sx-home .sx-header.is-scrolled .sx-cart {
+  background: var(--sx-text);
+  color: var(--sx-bg);
+  border-color: var(--sx-text);
+}
+.sx-header-overlay.sx-home .sx-header.is-scrolled .sx-burger,
+.sx-header-overlay.sx-home .sx-header.is-scrolled .sx-icon-btn {
+  background: transparent;
+  backdrop-filter: none;
+  color: var(--sx-text);
+  border-color: var(--sx-border);
+}
+/* barre flottante : reste une pilule, sans fond derrière */
+.sx-store .sx-h-pill.is-scrolled,
+.sx-header-overlay.sx-home .sx-h-pill.is-scrolled {
+  background: transparent;
+  backdrop-filter: none;
+  box-shadow: none;
+  border-color: transparent;
+}
+.sx-h-pill.is-scrolled .sx-pill {
+  box-shadow: 0 14px 40px rgba(0, 0, 0, 0.14);
+}
+/* header empilé : la barre de catégories se replie au défilement */
+.sx-h-stacked .sx-header-sub {
+  transition: max-height 0.25s ease;
+  max-height: 60px;
+  overflow: hidden;
+}
+.sx-h-stacked.is-scrolled .sx-header-sub {
+  max-height: 0;
+  border-top-color: transparent;
+}
+/* ancres et titres : ne passent pas sous le header collé */
+.sx-store {
+  scroll-padding-top: 96px;
+}

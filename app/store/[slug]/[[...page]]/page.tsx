@@ -93,6 +93,8 @@ export default async function StorePage({
         .limit(100),
     ]);
     store.settings = { ...(store.settings || {}), contactEmail: workspace?.settings?.contact_email || "" };
+    // Numéro WhatsApp des Paramètres, utilisé si la boutique n'a pas le sien
+    (store as any).workspace_whatsapp = workspace?.settings?.whatsapp_phone || "";
     return (
       <>
         <DocumentLang locale={(store as any).published_locale || (store as any).locale} />
