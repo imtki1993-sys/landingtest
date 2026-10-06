@@ -54,6 +54,16 @@ import {
 import { MapSection } from "./SeriesMap";
 import { SERIE3_HEROES, heroSerie3 } from "./SeriesHeroes3";
 import {
+  CoverflowSection,
+  FilmstripSection,
+  KicksHero,
+  ShelfSection,
+  StuddsHero,
+  WelcomeSection,
+  ZigzagSection,
+  customFooter,
+} from "./SeriesKicks";
+import {
   CATEGORIES_V3,
   CategoriesV3,
   DealsSection,
@@ -99,6 +109,7 @@ export interface SeriesStoreProps {
 const FONT_WEIGHTS: Record<string, string> = {
   "DM Serif Display": "",
   Anton: "",
+  "Alfa Slab One": "",
   "Bebas Neue": "",
   Caveat: ":wght@400;700",
 };
@@ -771,6 +782,8 @@ export default function SeriesStore(props: SeriesStoreProps) {
     // hero sur mesure (école) : cartes sous le texte, modifiables avec le hero
     const heroExtra = { ...kit, items: block("hero").items || [], fill: (v?: string) => fillTokens(v, counts) };
     if (t.hero === "school") return heroSchool(heroExtra);
+    if (t.hero === "kicks") return <KicksHero h={{ ...heroExtra, add }} />;
+    if (t.hero === "studds") return <StuddsHero h={{ ...heroExtra, add }} />;
     if (SERIE3_HEROES.has(t.hero)) return heroSerie3(t.hero, { ...heroExtra, add });
     if (t.hero === "estate") return heroEstate(heroExtra);
     if (t.hero === "clinic") return heroClinic(heroExtra);
@@ -1183,6 +1196,16 @@ export default function SeriesStore(props: SeriesStoreProps) {
         return <SpecsSection b={b} />;
       case "gallery":
         return <GallerySection b={b} ctx={ctx} art={art} />;
+      case "zigzag":
+        return <ZigzagSection b={b} ctx={ctx} art={art} />;
+      case "welcome":
+        return <WelcomeSection b={b} ctx={ctx} art={art} />;
+      case "shelf":
+        return <ShelfSection b={b} ctx={ctx} art={art} />;
+      case "filmstrip":
+        return <FilmstripSection b={b} ctx={ctx} art={art} />;
+      case "coverflow":
+        return <CoverflowSection b={b} ctx={ctx} art={art} head={head(b, false)} />;
       case "map":
         return <MapSection b={b} editing={!!editing} lang={lang} />;
       case "statement":
@@ -1416,7 +1439,7 @@ export default function SeriesStore(props: SeriesStoreProps) {
         </div>
       )}
 
-      {cfg.showFooter !== false && <SeriesFooter ctx={ctx} />}
+      {cfg.showFooter !== false && (customFooter(ctx) || <SeriesFooter ctx={ctx} />)}
       {drawer}
       {floating}
     </main>

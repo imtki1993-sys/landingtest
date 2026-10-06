@@ -46,6 +46,11 @@ const SECTION_HELP: Partial<Record<SxSectionType, string>> = {
     "Bannières en mosaïque (étiquette, titre, texte, image) qui mènent à la boutique. Un mot entre *étoiles* est mis en couleur.",
   specs: "Bandeau de caractéristiques : une ligne par élément (nom + valeur).",
   gallery: "Bande de photos ; sans images, les photos de vos produits sont utilisées.",
+  zigzag: "Carte à 4 onglets : détails (titre, texte, image) en zigzag, livraison, photos des produits et contact.",
+  welcome: "Deux textes de part et d'autre d'une grande photo ; le titre vide affiche le nom de la boutique.",
+  shelf: "Une catégorie à la fois avec ses produits posés sur une étagère ; flèches pour passer à la suivante.",
+  filmstrip: "5 photos sombres numérotées ; celle du centre ouvre votre vidéo (lien YouTube, TikTok…).",
+  coverflow: "Carrousel de vos produits : celui du centre est agrandi avec son nom et un bouton.",
   map: "Carte Google Maps de votre adresse, reprise aussi sur la page Contact. Sans adresse, la section est masquée.",
 };
 const CUSTOM_TYPES: [string, string][] = [
@@ -511,6 +516,70 @@ function SectionFields({
             products={products}
             addLabel={type === "gallery" ? "+ Ajouter une photo" : "+ Ajouter un élément"}
           />
+        </>
+      )}
+      {type === "zigzag" && (
+        <>
+          {f("title", "Nom du 1er onglet")}
+          {f("button", "Bouton sous la carte")}
+          <ItemsEditor
+            items={block.items || []}
+            onChange={(items) => onChange({ items })}
+            withImage
+            storeId={storeId}
+            products={products}
+            addLabel="+ Ajouter un détail"
+          />
+        </>
+      )}
+      {type === "welcome" && (
+        <>
+          {f("eyebrow", "1re ligne (ex. Bienvenue chez)")}
+          {f("title", "2e ligne (vide = nom de la boutique)")}
+          {f("text", "Texte", true)}
+          {f("button", "Bouton")}
+          {img("image", "Grande photo au centre")}
+          <span className="sxe-label">Texte de droite (titre, 2e ligne dans « Valeur », texte)</span>
+          <ItemsEditor
+            items={(block.items || []).slice(0, 1)}
+            onChange={(items) => onChange({ items: items.slice(0, 1) })}
+            withValue
+            valueLabel="2e ligne"
+            storeId={storeId}
+            products={products}
+          />
+        </>
+      )}
+      {type === "shelf" && (
+        <>
+          {f("title", "Titre")}
+          {f("text", "Texte à côté du nom de la catégorie", true)}
+        </>
+      )}
+      {type === "filmstrip" && (
+        <>
+          {f("button", "Texte du cadre vidéo")}
+          <TextField
+            label="Lien de la vidéo (YouTube, TikTok…)"
+            value={block.url}
+            onChange={(v) => onChange({ url: v })}
+            placeholder="https://"
+          />
+          <span className="sxe-label">Photos (vides = photos de vos produits)</span>
+          <ItemsEditor
+            items={block.items || []}
+            onChange={(items) => onChange({ items: items.slice(0, 5) })}
+            withImage
+            storeId={storeId}
+            products={products}
+            addLabel="+ Ajouter une photo"
+          />
+        </>
+      )}
+      {type === "coverflow" && (
+        <>
+          {f("title", "Titre (facultatif)")}
+          {f("button", "Bouton")}
         </>
       )}
       {type === "newsletter" && ctaPhoto && img("image", "Photo")}

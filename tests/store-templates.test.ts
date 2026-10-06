@@ -187,6 +187,28 @@ describe("registre des templates de boutique", () => {
           ).toBeTruthy();
   });
 
+  it("templates sur mesure Détail Rouge et Bande Rouge : heros, sections, en-têtes et pieds de page propres", () => {
+    const kicks = getStoreTemplate("s90-04")!;
+    const studds = getStoreTemplate("s90-05")!;
+    expect(kicks.hero).toBe("kicks");
+    expect(studds.hero).toBe("studds");
+    expect(kicks.layout).toMatchObject({ header: "kicks", card: "kicks", footer: "kicks" });
+    expect(studds.layout).toMatchObject({ header: "studds", card: "studds", footer: "studds" });
+    expect(kicks.sections).toContain("zigzag");
+    expect(studds.sections).toEqual(expect.arrayContaining(["welcome", "shelf", "filmstrip", "coverflow"]));
+    for (const lang of ["fr", "ar"] as const) {
+      expect(sectionContent(kicks, lang, "zigzag", undefined).items).toHaveLength(3);
+      expect(sectionContent(kicks, lang, "zigzag", undefined).button).toBeTruthy();
+      expect(sectionContent(studds, lang, "hero", undefined).items?.[0]?.title).toBeTruthy();
+      expect(sectionContent(studds, lang, "welcome", undefined).items?.[0]?.text).toBeTruthy();
+      expect(sectionContent(studds, lang, "shelf", undefined).title).toBeTruthy();
+      expect(sectionContent(studds, lang, "filmstrip", undefined).button).toBeTruthy();
+    }
+    // lien vidéo modifiable par le marchand
+    const sx = { content: { filmstrip: { url: "https://youtu.be/x" } } };
+    expect(sectionContent(studds, "fr", "filmstrip", sx).url).toBe("https://youtu.be/x");
+  });
+
   it("section Carte & adresse : disponible partout, textes FR + AR, adresse modifiable", () => {
     const t = getStoreTemplate("s1-01")!;
     for (const lang of ["fr", "ar"] as const) expect(sectionContent(t, lang, "map", undefined).title).toBeTruthy();

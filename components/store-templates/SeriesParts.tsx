@@ -480,6 +480,37 @@ export function ProductCard({ ctx, p, index = 0 }: { ctx: SxCtx; p: any; index?:
         </article>
       );
     }
+    case "kicks":
+      return (
+        <article className="sx-card sx-cl-kicks">
+          <a className="sx-card-media" href={url}>
+            {media}
+            {off > 0 && <em className="sx-off">-{off}%</em>}
+          </a>
+          <div className="sx-card-body">
+            {cat}
+            {name}
+            {priceRow}
+            {addBtn("text")}
+          </div>
+        </article>
+      );
+    case "studds":
+      return (
+        <article className="sx-card sx-cl-studds">
+          <a className="sx-card-media" href={url}>
+            {media}
+            {off > 0 && <em className="sx-off">-{off}%</em>}
+          </a>
+          <i className="sx-card-tick" aria-hidden="true" />
+          <div className="sx-card-body">
+            {name}
+            {cat}
+            {priceRow}
+            {addBtn("text")}
+          </div>
+        </article>
+      );
     case "gray-round":
       return (
         <article className="sx-card sx-cl-gray-round">

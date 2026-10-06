@@ -62,6 +62,42 @@ export const SHARED_FR: Blocks = {
     ],
   },
   gallery: { title: "Nos produits en images", text: "Un aperçu de la boutique." },
+  zigzag: {
+    title: "Caractéristiques",
+    button: "Acheter ce modèle",
+    items: [
+      {
+        title: "Des finitions soignées",
+        text: "Chaque produit est vérifié avant l'envoi : coutures, matières et détails.",
+        image: "",
+      },
+      {
+        title: "Confort au quotidien",
+        text: "Des matières choisies pour durer et rester agréables jour après jour.",
+        image: "",
+      },
+      { title: "Un style qui dure", text: "Des lignes simples et des couleurs faciles à porter avec tout.", image: "" },
+    ],
+  },
+  welcome: {
+    eyebrow: "Bienvenue chez",
+    title: "",
+    text: "Nous sélectionnons des produits de qualité et nous les livrons partout au Maroc. Vous payez à la réception.",
+    button: "En savoir plus",
+    items: [
+      {
+        title: "Commandez",
+        value: "sur WhatsApp",
+        text: "Envoyez-nous la référence du produit qui vous plaît : nous confirmons la taille, la couleur et la livraison.",
+      },
+    ],
+  },
+  shelf: {
+    title: "Catégories de produits",
+    text: "Des produits choisis avec soin, livrés partout au Maroc et payés à la livraison.",
+  },
+  filmstrip: { title: "", button: "Voir la vidéo", url: "" },
+  coverflow: { title: "", button: "Voir le produit" },
 };
 
 export const SHARED_AR: Blocks = {
@@ -123,6 +159,30 @@ export const SHARED_AR: Blocks = {
     ],
   },
   gallery: { title: "منتجاتنا بالصور", text: "نظرة على المتجر." },
+  zigzag: {
+    title: "المميزات",
+    button: "شري هاد الموديل",
+    items: [
+      { title: "تشطيب متقن", text: "كل منتج كيتشاف قبل الإرسال: الخياطة، المواد والتفاصيل.", image: "" },
+      { title: "راحة كل نهار", text: "مواد مختارة باش تدوم وتبقى مريحة.", image: "" },
+      { title: "ستيل كيدوم", text: "خطوط بسيطة وألوان ساهلة تلبسها مع كلشي.", image: "" },
+    ],
+  },
+  welcome: {
+    eyebrow: "مرحبا بيك ف",
+    title: "",
+    text: "كنختارو منتجات ديال الجودة وكنوصلوها لجميع المدن. وكتخلص ملي توصلك.",
+    button: "عرف كثر",
+    items: [
+      { title: "طلب", value: "فواتساب", text: "صيفط لينا المنتج اللي عجبك: كنأكدو معاك المقاس، اللون والتوصيل." },
+    ],
+  },
+  shelf: {
+    title: "تصنيفات المنتجات",
+    text: "منتجات مختارة بعناية، التوصيل لجميع المدن والدفع عند الاستلام.",
+  },
+  filmstrip: { title: "", button: "شوف الفيديو", url: "" },
+  coverflow: { title: "", button: "شوف المنتج" },
 };
 
 export const DEFAULT_FAQ = {
