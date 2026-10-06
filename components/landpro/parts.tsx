@@ -266,7 +266,7 @@ export function OrderForm({
 }) {
   const u = vm.u;
   const sel = vm.offers.find((o) => o.qty === qty) || vm.offers[0];
-  const total = sel?.price ?? vm.price * qty;
+  const total = (sel?.price ?? vm.price * qty) + vm.shipping;
   const variantName = vm.variants[variant]?.name;
   const extra = `– ${sel?.label || qty}${variantName ? ` – ${variantName}` : ""} – ${formatPrice(total, vm.currency)}`;
   const waOnly = vm.orderMode === "whatsapp";
@@ -361,6 +361,12 @@ export function OrderForm({
         </>
       )}
 
+      {vm.shipping > 0 && (
+        <div className={cx("muted")} style={{ display: "flex", justifyContent: "space-between", fontSize: 14 }}>
+          <span>{vm.lang === "ar" ? "التوصيل" : "Livraison"}</span>
+          <span>{formatPrice(vm.shipping, vm.currency)}</span>
+        </div>
+      )}
       <div className={cx("total")}>
         <span>{u.form.total}</span>
         <span className={cx("accent")}>{formatPrice(total, vm.currency)}</span>
