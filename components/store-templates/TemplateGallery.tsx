@@ -133,12 +133,15 @@ export default function TemplateGallery({
   products,
   locale = "fr",
   storeName,
+  selectLabel,
 }: {
   value?: string;
   onChange: (id: string) => void;
   products?: any[];
   locale?: string;
   storeName?: string;
+  /** libellé du bouton de choix (ex. « Essayer ») */
+  selectLabel?: string;
 }) {
   const [series, setSeries] = useState(STORE_SERIES[0]?.id || 1);
   const [preview, setPreview] = useState("");
@@ -185,7 +188,11 @@ export default function TemplateGallery({
               <b>{t.name}</b>
               <small>{t.niche}</small>
               <em>{t.folder}</em>
-              {value === t.id && <strong>✓ Sélectionné</strong>}
+              {value === t.id ? (
+                <strong>✓ Sélectionné</strong>
+              ) : (
+                selectLabel && <strong className="sx-gallery-try">{selectLabel} →</strong>
+              )}
             </button>
           </article>
         ))}
@@ -217,7 +224,7 @@ export default function TemplateGallery({
                   setPreview("");
                 }}
               >
-                Utiliser ce template
+                {selectLabel || "Utiliser ce template"}
               </button>
             </footer>
           </div>

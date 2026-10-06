@@ -456,7 +456,7 @@ export function DeliveryPage({ ctx }: { ctx: SxCtx }) {
           typeof x === "string" ? { title: x } : { title: String(x?.title || ""), text: x?.text },
         )
       : ctx.trust;
-  const steps = [
+  const defaultSteps = [
     {
       title: tr(ctx, "Vous commandez", "كتطلب"),
       text: tr(
@@ -482,6 +482,11 @@ export function DeliveryPage({ ctx }: { ctx: SxCtx }) {
       ),
     },
   ];
+  // étapes modifiables dans l'éditeur (Pages > Livraison & paiement)
+  const steps: { title: string; text?: string }[] =
+    Array.isArray(dc.steps) && dc.steps.some((x: any) => x?.title)
+      ? dc.steps.filter((x: any) => x?.title)
+      : defaultSteps;
   const trustLayout = ctx.t.trust;
   return (
     <>
@@ -514,8 +519,8 @@ export function DeliveryPage({ ctx }: { ctx: SxCtx }) {
         <div className="sx-wrap sx-showcase-grid">
           <div className="sx-showcase-copy">
             <small className="sx-eyebrow">{tr(ctx, "Comment ça marche", "كيفاش خدامة")}</small>
-            <h2>{tr(ctx, "Paiement à la livraison, en 3 étapes", "الدفع عند الاستلام، ف3 خطوات")}</h2>
-            <p>{tr(ctx, "Aucune carte bancaire n'est demandée.", "ما كنطلبو حتى بطاقة بنكية.")}</p>
+            <h2>{dc.stepsTitle || tr(ctx, "Paiement à la livraison, en 3 étapes", "الدفع عند الاستلام، ف3 خطوات")}</h2>
+            <p>{dc.stepsText || tr(ctx, "Aucune carte bancaire n'est demandée.", "ما كنطلبو حتى بطاقة بنكية.")}</p>
           </div>
           <ol className="sx-steps">
             {steps.map((x, i) => (

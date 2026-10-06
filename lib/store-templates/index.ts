@@ -1,6 +1,6 @@
 // Registre des templates de boutique par séries + réglages initiaux d'une boutique.
 // Fichier sans React : utilisable côté serveur (API) comme côté navigateur.
-import type { SxBlock, SxCopy, SxSectionType, SxSettings, StoreTemplate } from "./types";
+import type { SxBlock, SxCopy, SxHeroVariant, SxLayout, SxSectionType, SxSettings, StoreTemplate } from "./types";
 import { SERIE_1 } from "./serie1";
 import { DEFAULT_FAQ } from "./shared-copy";
 import { storeBuilderDefaults } from "../store-builder-config";
@@ -54,24 +54,70 @@ export function templateSectionKeys(t: StoreTemplate): SxSectionType[] {
   return Array.from(new Set([...t.sections, ...(t.hiddenByDefault || [])]));
 }
 
-/** Ordre et visibilité effectifs, en tenant compte des réglages enregistrés. */
-export function resolveSections(t: StoreTemplate, sx: SxSettings | undefined) {
-  const known = templateSectionKeys(t);
-  const saved = Array.isArray(sx?.order) ? sx!.order.filter((k) => (known as string[]).includes(k)) : [];
-  const order = [...saved, ...known.filter((k) => !saved.includes(k))] as SxSectionType[];
+/** Types de section qu'on peut ajouter depuis la bibliothèque (le hero est unique). */
+export const ADDABLE_SECTIONS: SxSectionType[] = [
+  "products",
+  "promos",
+  "showcase",
+  "categories",
+  "trust",
+  "stats",
+  "testimonials",
+  "newsletter",
+  "faq",
+  "wordmark",
+  "catalog",
+];
+const ALL_TYPES = new Set<string>(Object.keys(SECTION_LABELS));
+
+/** Type d'une clé de section : "promos~2" → "promos", "custom:b_1" → "custom". */
+export function sectionType(key: string): SxSectionType | "custom" | null {
+  if (key.startsWith("custom:")) return "custom";
+  const type = key.split("~")[0];
+  return ALL_TYPES.has(type) ? (type as SxSectionType) : null;
+}
+
+/** Nouvelle clé libre pour une copie d'un type de section. */
+export function newSectionKey(type: SxSectionType, existing: string[]): string {
+  if (!existing.includes(type)) return type;
+  let n = 2;
+  while (existing.includes(type + "~" + n)) n++;
+  return type + "~" + n;
+}
+
+/**
+ * Ordre et visibilité effectifs des sections de l'accueil.
+ * - sections enregistrées (types connus, copies, blocs personnalisés existants) ;
+ * - puis sections du template absentes, sauf celles supprimées par le marchand.
+ */
+export function resolveSections(t: StoreTemplate, sx: SxSettings | undefined, customIds: string[] = []) {
+  const known = templateSectionKeys(t) as string[];
+  const removed = new Set(Array.isArray(sx?.removed) ? sx!.removed : []);
+  const valid = (k: string) => {
+    const type = sectionType(k);
+    if (!type) return false;
+    if (type === "custom") return customIds.includes(k.slice(7));
+    return k === type ? known.includes(k) || ADDABLE_SECTIONS.includes(type) : true;
+  };
+  const saved = Array.isArray(sx?.order) ? Array.from(new Set(sx!.order.filter(valid))) : [];
+  const order = [
+    ...saved,
+    ...known.filter((k) => !saved.includes(k) && !removed.has(k)),
+    // blocs personnalisés pas encore placés : à la fin
+    ...customIds.map((id) => "custom:" + id).filter((k) => !saved.includes(k)),
+  ];
+  // le hero reste toujours en tête
+  const hero = order.indexOf("hero");
+  if (hero > 0) order.unshift(...order.splice(hero, 1));
   const hidden = new Set<string>(Array.isArray(sx?.hidden) ? sx!.hidden : t.hiddenByDefault || []);
   return { order, hidden };
 }
 
 /** Contenu d'une section : texte enregistré par le marchand, sinon texte du template. */
-export function sectionContent(
-  t: StoreTemplate,
-  locale: unknown,
-  key: SxSectionType,
-  sx: SxSettings | undefined,
-): SxBlock {
-  const own = sx?.content?.[key] || {};
-  const def = templateCopy(t, locale).sections[key] || {};
+export function sectionContent(t: StoreTemplate, locale: unknown, key: string, sx: SxSettings | undefined): SxBlock {
+  const type = sectionType(key);
+  const own: Record<string, unknown> = (sx?.content?.[key] as any) || {};
+  const def = (type && type !== "custom" && templateCopy(t, locale).sections[type]) || {};
   const out: SxBlock = { ...def };
   for (const [k, v] of Object.entries(own)) {
     if (k === "items") {
@@ -80,6 +126,103 @@ export function sectionContent(
   }
   return out;
 }
+
+/** Variantes de hero adaptées à un header transparent (posé sur une photo ou un aplat sombre). */
+const OVERLAY_HEROES = new Set(["giant", "photo-dark", "color-block", "search", "wordmark"]);
+
+/**
+ * Template tel qu'il s'affiche pour une boutique : mise en page, hero et couleurs
+ * choisis par le marchand appliqués par-dessus ceux du template.
+ */
+export function effectiveTemplate(t: StoreTemplate, sx: SxSettings | undefined): StoreTemplate {
+  if (!sx || (!sx.layout && !sx.hero && !sx.theme)) return t;
+  const hero = sx.hero || t.hero;
+  const theme = { ...t.theme };
+  const o = sx.theme || {};
+  for (const k of ["bg", "surface", "text", "dark"] as const)
+    if (typeof o[k] === "string" && /^#[0-9a-f]{6}$/i.test(o[k]!)) theme[k] = o[k]!;
+  if (typeof o.radius === "number" && o.radius >= 0 && o.radius <= 40) theme.radius = o.radius;
+  // fond du hero : celui du template, ou le fond de page si le hero choisi vient d'un autre template
+  if (sx.hero && sx.hero !== t.hero && !OVERLAY_HEROES.has(hero)) {
+    theme.heroBg = theme.bg;
+    theme.heroText = theme.text;
+  }
+  const header = t.header === "overlay" && !OVERLAY_HEROES.has(hero) ? "split" : t.header;
+  return { ...t, hero, header, theme, layout: { ...t.layout, ...(sx.layout || {}) } };
+}
+
+/** Mises en page proposées dans l'éditeur, pièce par pièce. */
+export const LAYOUT_CHOICES: Record<keyof SxLayout, [string, string][]> = {
+  header: [
+    ["classic", "Classique"],
+    ["centered", "Logo centré"],
+    ["editorial", "Éditorial"],
+    ["pill", "Barre flottante"],
+    ["stacked", "Recherche + catégories"],
+    ["menu", "Bouton Menu"],
+    ["split", "Menu de part et d'autre"],
+    ["search", "Avec recherche"],
+    ["utility", "Bandeau d'infos"],
+  ],
+  card: [
+    ["classic", "Classique"],
+    ["overlay", "Texte sur l'image"],
+    ["minimal", "Minimale"],
+    ["editorial", "Éditoriale numérotée"],
+    ["centered", "Centrée en arche"],
+    ["tag", "Prix en étiquette"],
+    ["framed", "Encadrée"],
+  ],
+  faq: [
+    ["split", "Deux colonnes"],
+    ["center", "Centrée"],
+    ["cards", "Cartes"],
+    ["numbered", "Numérotée"],
+    ["band", "Bandeau sombre"],
+  ],
+  footer: [
+    ["columns", "Colonnes"],
+    ["wordmark", "Nom géant"],
+    ["centered", "Centré"],
+    ["cta", "Appel à commander"],
+    ["minimal", "Minimal"],
+    ["split", "Deux panneaux"],
+  ],
+  shop: [
+    ["sidebar", "Filtres sur le côté"],
+    ["topbar", "Filtres en haut"],
+    ["banner", "Grand bandeau"],
+  ],
+  product: [
+    ["split", "Photo + miniatures"],
+    ["stack", "Photos empilées"],
+    ["centered", "Centrée"],
+    ["panel", "Panneau coloré"],
+  ],
+  page: [
+    ["simple", "Simple"],
+    ["banner", "Bandeau coloré"],
+    ["split", "Grand titre"],
+  ],
+};
+
+export const HERO_CHOICES: [SxHeroVariant, string][] = [
+  ["editorial", "Éditorial (grand titre + bloc coloré)"],
+  ["pop", "Pop (image ronde)"],
+  ["giant", "Mot géant"],
+  ["split-card", "Image + carte produit"],
+  ["mockup", "Maquette mobile"],
+  ["photo-dark", "Photo plein écran sombre"],
+  ["color-block", "Aplat de couleur"],
+  ["market", "Marketplace"],
+  ["search", "Photo + recherche"],
+  ["rounded-dark", "Carte sombre arrondie"],
+  ["serif-photo", "Photo élégante"],
+  ["gradient-promo", "Dégradé promo"],
+  ["wordmark", "Photo + logotype"],
+  ["architect", "Arche + carte flottante"],
+  ["food", "Image ronde + cartes produits"],
+];
 
 /** Remplace {products} / {categories} par les vrais nombres de la boutique. */
 export function fillTokens(v: string | undefined, ctx: { products: number; categories: number }): string {

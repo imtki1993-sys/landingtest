@@ -8,11 +8,28 @@ const tabs = [
   ["visual", "✦", "Pages & Sections"],
   ["publish", "5", "Publier"],
 ];
-export default function StoreBuilderSidebar({ store, tab, setTab, advanced, setAdvanced }: any) {
+export default function StoreBuilderSidebar({
+  store,
+  tab,
+  setTab,
+  advanced,
+  setAdvanced,
+  tabs: customTabs,
+  dirty,
+}: any) {
+  const list = customTabs || tabs;
   return (
     <aside className="store-builder-side">
       <div className="store-builder-brand">
-        <Link href="/stores">← Stores</Link>
+        <Link
+          href="/stores"
+          onClick={(e) => {
+            if (dirty && !window.confirm("Des modifications ne sont pas enregistrées. Quitter quand même ?"))
+              e.preventDefault();
+          }}
+        >
+          ← Stores
+        </Link>
         <b>LandPro Store Builder</b>
         <small>{store.status === "PUBLISHED" ? "PUBLIÉ" : "BROUILLON"}</small>
         {store.status === "PUBLISHED" && (
@@ -22,7 +39,7 @@ export default function StoreBuilderSidebar({ store, tab, setTab, advanced, setA
         )}
       </div>
       <div className="store-builder-tabs">
-        {tabs.map((x) => (
+        {list.map((x: string[]) => (
           <button key={x[0]} className={tab === x[0] ? "active" : ""} onClick={() => setTab(x[0])}>
             <span>{x[1]}</span>
             {x[2]}

@@ -4358,3 +4358,103 @@ a.sx-contact-card:hover {
 .sx-store {
   scroll-padding-top: 96px;
 }
+
+/* ═════════════ aperçu de l'éditeur ═════════════ */
+.sx-eb {
+  position: relative;
+  width: 100%;
+  cursor: pointer;
+}
+.sx-eb::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border: 2px dashed transparent;
+  z-index: 5;
+  transition: border-color 0.15s;
+}
+.sx-eb:hover::after {
+  border-color: rgba(99, 102, 241, 0.7);
+}
+.sx-eb.is-selected::after {
+  border: 3px solid #6366f1;
+}
+.sx-eb.is-hidden > :not(.sx-eb-bar) {
+  opacity: 0.35;
+  filter: grayscale(0.6);
+}
+.sx-eb-bar {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  z-index: 30;
+  display: none;
+  align-items: center;
+  gap: 2px;
+  padding: 4px;
+  border-radius: 10px;
+  background: #111827;
+  color: #fff;
+  font: 600 12px/1 system-ui, sans-serif;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+  direction: ltr;
+}
+.sx-eb:hover > .sx-eb-bar,
+.sx-eb.is-selected > .sx-eb-bar {
+  display: flex;
+}
+.sx-eb-bar b {
+  padding: 0 8px;
+  white-space: nowrap;
+}
+.sx-store .sx-eb-bar button {
+  width: 28px;
+  height: 28px;
+  min-height: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 7px;
+  background: transparent;
+  color: #fff;
+  font-size: 14px;
+  line-height: 1;
+}
+.sx-store .sx-eb-bar button:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.16);
+}
+.sx-store .sx-eb-bar button:disabled {
+  opacity: 0.3;
+}
+.sx-eb-empty {
+  padding: 40px 24px;
+  text-align: center;
+  color: #6b7280;
+  font: 500 14px system-ui, sans-serif;
+  background: repeating-linear-gradient(45deg, #f8fafc, #f8fafc 10px, #f1f5f9 10px, #f1f5f9 20px);
+}
+.sx-editing .sx-header,
+.sx-editing .sx-footer {
+  cursor: pointer;
+}
+.sx-editing .sx-header:hover,
+.sx-editing .sx-footer:hover {
+  outline: 2px dashed rgba(99, 102, 241, 0.7);
+  outline-offset: -2px;
+}
+/* blocs personnalisés (texte, image, vidéo…) dans un template de série */
+.sx-custom {
+  width: 100%;
+  font-family: var(--sx-bfont);
+}
+.sx-custom h2,
+.sx-custom h3 {
+  font-family: var(--sx-hfont);
+  font-weight: var(--sx-hw);
+}
+.sx-gallery-select strong.sx-gallery-try {
+  color: #4f46e5;
+}
+.sx-eb {
+  scroll-margin-top: 110px;
+}

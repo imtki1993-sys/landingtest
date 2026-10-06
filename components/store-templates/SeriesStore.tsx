@@ -6,8 +6,11 @@
 // la mise en page propre au template (t.layout).
 import React, { useEffect, useMemo, useState } from "react";
 import {
+  SECTION_LABELS,
   copyLang,
+  effectiveTemplate,
   fillTokens,
+  sectionType,
   resolveSections,
   sectionContent,
   templateCopy,
@@ -38,6 +41,7 @@ import {
   type VariantApi,
 } from "./SeriesPages";
 import SeriesHeader from "./SeriesHeader";
+import { storeBuilderDefaults } from "../../lib/store-builder-config";
 import "./series-store.css";
 
 type Txt = Record<string, string>;
@@ -60,6 +64,10 @@ export interface SeriesStoreProps {
   drawer?: React.ReactNode;
   /** éléments flottants (bouton WhatsApp) */
   floating?: React.ReactNode;
+  /** blocs personnalisés de l'accueil (éditeur « Ajouter une section ») */
+  customHome?: { id: string; node: React.ReactNode }[];
+  /** aperçu de l'éditeur : sections cliquables avec barre d'actions */
+  editing?: boolean;
   cartCount: number;
   openCart: () => void;
   add: (p: any) => void;
@@ -75,9 +83,86 @@ function fontsHref(families: string[]) {
   );
 }
 
+/** Textes par défaut de l'ancien éditeur : jamais affichés dans un template de série. */
+const GENERIC_DEFAULTS = new Set<string>(
+  (["heroTitle", "heroText", "heroButton", "announcement", "collectionTitle"] as const).map(
+    (k) => storeBuilderDefaults[k],
+  ),
+);
+
+/* ───────── aperçu de l'éditeur ───────── */
+type EditAction = "select" | "up" | "down" | "hide" | "show" | "duplicate" | "delete";
+function postEdit(key: string, action: EditAction) {
+  window.parent?.postMessage({ type: "LANDPRO_SX_ACTION", key, action }, "*");
+}
+function EditBlock({
+  k,
+  label,
+  hidden,
+  selected,
+  first,
+  last,
+  fixed,
+  children,
+}: {
+  k: string;
+  label: string;
+  hidden: boolean;
+  selected: boolean;
+  first: boolean;
+  last: boolean;
+  /** section non déplaçable / non supprimable (bannière principale) */
+  fixed?: boolean;
+  children: React.ReactNode;
+}) {
+  const btn = (action: EditAction, text: string, title: string, disabled = false) => (
+    <button
+      type="button"
+      title={title}
+      aria-label={title}
+      disabled={disabled}
+      onClick={(e) => {
+        e.stopPropagation();
+        postEdit(k, action);
+      }}
+    >
+      {text}
+    </button>
+  );
+  return (
+    <div
+      className={"sx-eb" + (hidden ? " is-hidden" : "") + (selected ? " is-selected" : "")}
+      data-sx-key={k}
+      onClickCapture={(e) => {
+        // dans l'éditeur, un clic sélectionne la section au lieu de suivre les liens
+        if ((e.target as HTMLElement).closest(".sx-eb-bar")) return;
+        e.preventDefault();
+        e.stopPropagation();
+        postEdit(k, "select");
+      }}
+    >
+      <div className="sx-eb-bar">
+        <b>
+          {label}
+          {hidden ? " · masquée" : ""}
+        </b>
+        {btn("select", "✎", "Modifier")}
+        {!fixed && btn("up", "↑", "Monter", first)}
+        {!fixed && btn("down", "↓", "Descendre", last)}
+        {!k.startsWith("@") && btn(hidden ? "show" : "hide", hidden ? "◉" : "◌", hidden ? "Afficher" : "Masquer")}
+        {!fixed && btn("duplicate", "⧉", "Dupliquer")}
+        {!fixed && btn("delete", "🗑", "Supprimer")}
+      </div>
+      {children || (
+        <div className="sx-eb-empty">{label} : rien à afficher pour le moment (contenu ou produits manquants).</div>
+      )}
+    </div>
+  );
+}
+
 export default function SeriesStore(props: SeriesStoreProps) {
   const {
-    t,
+    t: templateDef,
     store,
     cfg,
     products,
@@ -90,20 +175,49 @@ export default function SeriesStore(props: SeriesStoreProps) {
     extra,
     drawer,
     floating,
+    customHome = [],
+    editing = false,
     cartCount,
     openCart,
     add,
   } = props;
   const [cat, setCat] = useState("");
+  // éditeur : section sélectionnée dans le panneau, mise en évidence et affichée
+  const [selectedKey, setSelectedKey] = useState("");
+  useEffect(() => {
+    if (!editing) return;
+    const onMsg = (e: MessageEvent) => {
+      if (e.data?.type !== "LANDPRO_SX_SELECTED") return;
+      const key = String(e.data.key || "");
+      setSelectedKey(key);
+      if (e.data.scroll)
+        requestAnimationFrame(() =>
+          document
+            .querySelector(`[data-sx-key="${CSS.escape(key)}"]`)
+            ?.scrollIntoView({ behavior: "smooth", block: "start" }),
+        );
+    };
+    window.addEventListener("message", onMsg);
+    return () => window.removeEventListener("message", onMsg);
+  }, [editing]);
   const [sort, setSort] = useState("featured");
   const lang = copyLang(store.locale);
-  const c = templateCopy(t, store.locale);
   // Réglages propres à ce template (sinon : textes et couleurs du template)
-  const own = cfg.storeTemplateId === t.id;
-  const pick = (v: unknown, fallback: string) => (own && typeof v === "string" && v.trim() ? v : fallback);
+  const own = cfg.storeTemplateId === templateDef.id;
   const sx = own ? cfg.sx : undefined;
-  const { order, hidden } = resolveSections(t, sx);
-  const block = (k: SxSectionType): SxBlock => sectionContent(t, store.locale, k, sx);
+  // mise en page, hero et couleurs choisis dans l'éditeur, par-dessus ceux du template
+  const t = effectiveTemplate(templateDef, sx);
+  const c = templateCopy(t, store.locale);
+  // valeur réglée par le marchand ; les valeurs génériques de l'éditeur (texte arabe par défaut…) sont ignorées
+  const pick = (v: unknown, fallback: string) =>
+    own && typeof v === "string" && v.trim() && !GENERIC_DEFAULTS.has(v) ? v : fallback;
+  const customById = new Map(customHome.map((x) => [x.id, x.node]));
+  const { order, hidden } = resolveSections(
+    t,
+    sx,
+    customHome.map((x) => x.id),
+  );
+  const block = (k: string): SxBlock => sectionContent(t, store.locale, k, sx);
 
   const hero = {
     eyebrow: pick(cfg.heroEyebrow, c.eyebrow),
@@ -150,8 +264,9 @@ export default function SeriesStore(props: SeriesStoreProps) {
     if (!map.size && Array.isArray(cfg.categories))
       for (const x of cfg.categories)
         if (typeof x === "string" && x.trim()) map.set(x, { name: x, image: "", count: 0 });
-    return Array.from(map.values());
-  }, [products, cfg.categories]);
+    const chosen = (sx?.categoryImages || {}) as Record<string, string>;
+    return Array.from(map.values()).map((x) => (chosen[x.name] ? { ...x, image: chosen[x.name] } : x));
+  }, [products, cfg.categories, sx?.categoryImages]);
   const counts = { products: products.length, categories: categories.length };
   const shopUrl = base + "/shop";
   const catUrl = (name: string) => shopUrl + "?category=" + encodeURIComponent(name);
@@ -173,9 +288,10 @@ export default function SeriesStore(props: SeriesStoreProps) {
   };
 
   /* ───────── éléments communs ───────── */
-  const art = (i = 0, label?: string) =>
-    pic(i) ? (
-      <img className="sx-img" src={pic(i)} alt={label || store.name} loading={i ? "lazy" : "eager"} />
+  /** image choisie (src) ou, à défaut, photo de produit n° i */
+  const art = (i = 0, label?: string, src?: string) =>
+    src || pic(i) ? (
+      <img className="sx-img" src={src || pic(i)} alt={label || store.name} loading={i ? "lazy" : "eager"} />
     ) : (
       <div className="sx-art" aria-hidden="true">
         <span>
@@ -617,9 +733,14 @@ export default function SeriesStore(props: SeriesStoreProps) {
   );
 
   /* ───────── sections ───────── */
-  function section(k: SxSectionType) {
+  function section(k: string) {
+    const type = sectionType(k);
+    if (type === "custom") {
+      const node = customById.get(k.slice(7));
+      return node ? <div className="sx-custom">{node}</div> : null;
+    }
     const b = block(k);
-    switch (k) {
+    switch (type) {
       case "hero":
         return heroNode();
       case "trust": {
@@ -676,17 +797,26 @@ export default function SeriesStore(props: SeriesStoreProps) {
         );
       }
       case "products": {
-        if (cfg.showProducts === false || !products.length) return null;
+        if (cfg.showProducts === false) return null;
+        // section principale : titre de la sélection ; copies : titre et catégorie propres
+        const main = k === "products";
+        const list = b.category ? products.filter((p) => p?.specifications?.category === b.category) : products;
+        if (!list.length) return null;
         return (
           <section className="sx-section sx-products">
             <div className="sx-wrap">
-              {head({
-                ...b,
-                title: pick(cfg.collectionTitle, c.collectionTitle),
-                text: own ? cfg.collectionSubtitle || "" : c.collectionSubtitle || "",
-              })}
+              {head(
+                main
+                  ? {
+                      ...b,
+                      title: pick(cfg.collectionTitle, c.collectionTitle),
+                      text: own ? cfg.collectionSubtitle || "" : c.collectionSubtitle || "",
+                    }
+                  : { ...b, title: b.title || b.category || c.collectionTitle },
+                true,
+              )}
               <div className={"sx-grid sx-card-" + t.card}>
-                {products.slice(0, 8).map((p, i) => (
+                {list.slice(0, 8).map((p, i) => (
                   <ProductCard key={p.id} ctx={ctx} p={p} index={i} />
                 ))}
               </div>
@@ -712,7 +842,7 @@ export default function SeriesStore(props: SeriesStoreProps) {
                   </div>
                   <div className="sx-banner-media">
                     {[1, 2, 3].map((i) => (
-                      <span key={i}>{art(i)}</span>
+                      <span key={i}>{art(i, undefined, i === 1 ? b.image : i === 2 ? b.image2 : undefined)}</span>
                     ))}
                   </div>
                 </div>
@@ -741,7 +871,7 @@ export default function SeriesStore(props: SeriesStoreProps) {
                         {lang === "ar" ? "اكتشف" : "Découvrir"} <Icon name="arrow" />
                       </span>
                     </span>
-                    <span className="sx-promo-media">{art(i + 2)}</span>
+                    <span className="sx-promo-media">{art(i + 2, x.title, x.image)}</span>
                   </a>
                 );
               })}
@@ -755,8 +885,8 @@ export default function SeriesStore(props: SeriesStoreProps) {
           <section className="sx-section sx-showcase">
             <div className="sx-wrap sx-showcase-grid">
               <div className="sx-showcase-media">
-                {art(1)}
-                {pics.length > 2 && <span className="sx-showcase-small">{art(2)}</span>}
+                {art(1, b.title, b.image)}
+                {(b.image2 || pics.length > 2) && <span className="sx-showcase-small">{art(2, "", b.image2)}</span>}
               </div>
               <div className="sx-showcase-copy">
                 {b.eyebrow && <small className="sx-eyebrow">{b.eyebrow}</small>}
@@ -983,12 +1113,35 @@ export default function SeriesStore(props: SeriesStoreProps) {
   return (
     <main
       className={
-        "public-store sx-store sx-tpl-" + t.id + " sx-header-" + t.header + (isHome ? " sx-home" : " sx-inner")
+        "public-store sx-store sx-tpl-" +
+        t.id +
+        " sx-header-" +
+        t.header +
+        (isHome ? " sx-home" : " sx-inner") +
+        (editing ? " sx-editing" : "")
       }
       dir={rtl ? "rtl" : "ltr"}
       lang={rtl ? "ar" : "fr"}
       style={style as React.CSSProperties}
       data-store-template={t.id}
+      onClickCapture={
+        editing
+          ? (e) => {
+              // éditeur : clic sur le header ou le pied de page = réglages de mise en page
+              const el = e.target as HTMLElement;
+              if (el.closest(".sx-eb, .sx-menu-wrap, .ps-drawer-wrap")) return;
+              const zone = el.closest(".sx-header, .sx-utility")
+                ? "@header"
+                : el.closest(".sx-footer")
+                  ? "@footer"
+                  : "";
+              if (!zone) return;
+              e.preventDefault();
+              e.stopPropagation();
+              postEdit(zone, "select");
+            }
+          : undefined
+      }
     >
       {cfg.showAnnouncement !== false && (
         <div className="sx-announcement">{pick(cfg.announcement, c.announcement)}</div>
@@ -996,10 +1149,48 @@ export default function SeriesStore(props: SeriesStoreProps) {
       <SeriesHeader ctx={ctx} page={page} cartCount={cartCount} openCart={openCart} />
 
       {isHome ? (
-        order.filter((k) => !hidden.has(k)).map((k) => <React.Fragment key={k}>{section(k)}</React.Fragment>)
+        editing ? (
+          order.map((k, i) => {
+            const type = sectionType(k);
+            const label =
+              type === "custom"
+                ? "Bloc personnalisé"
+                : (type && SECTION_LABELS[type]) + (k.includes("~") ? " (copie)" : "");
+            return (
+              <EditBlock
+                key={k}
+                k={k}
+                label={label}
+                hidden={hidden.has(k)}
+                selected={selectedKey === k}
+                first={i <= 1}
+                last={i === order.length - 1}
+                fixed={k === "hero"}
+              >
+                {section(k)}
+              </EditBlock>
+            );
+          })
+        ) : (
+          order.filter((k) => !hidden.has(k)).map((k) => <React.Fragment key={k}>{section(k)}</React.Fragment>)
+        )
       ) : (
         <div className="sx-page">
-          {innerPage()}
+          {editing ? (
+            <EditBlock
+              k={"@page:" + (page.startsWith("product/") ? "product" : page)}
+              label="Contenu de la page"
+              hidden={false}
+              selected={false}
+              first
+              last
+              fixed
+            >
+              {innerPage()}
+            </EditBlock>
+          ) : (
+            innerPage()
+          )}
           {extra}
         </div>
       )}
