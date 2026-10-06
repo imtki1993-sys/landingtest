@@ -251,6 +251,49 @@ export default function SeriesHeader({
         </>
       );
       break;
+    case "kicks":
+      row = (
+        <>
+          {brand}
+          {nav()}
+          <div className="sx-header-actions">
+            <a className="sx-hk-pill-link" href={base + "/faq"}>
+              {tr(ctx, "Aide", "مساعدة")}
+            </a>
+            <button type="button" className="sx-text-link sx-hk-cart" onClick={openCart}>
+              {txt.cart} <i>{cartCount}</i>
+            </button>
+            <a className="sx-text-link" href={shopUrl}>
+              {tr(ctx, "Rechercher", "قلب")}
+            </a>
+            {burger()}
+          </div>
+        </>
+      );
+      break;
+    case "studds": {
+      const left = [
+        links[0],
+        links[1],
+        ...categories.slice(0, 2).map((c) => ({ key: "cat:" + c.name, href: ctx.catUrl(c.name), label: c.name })),
+      ];
+      const right = [links[2], links[3], { key: "faq", href: base + "/faq", label: txt.faq }];
+      row = (
+        <>
+          {nav(left)}
+          <div className="sx-hst-logo">{brand}</div>
+          <div className="sx-header-end">
+            {nav(right)}
+            <div className="sx-header-actions">
+              {searchIcon}
+              {cart()}
+              {burger()}
+            </div>
+          </div>
+        </>
+      );
+      break;
+    }
     default:
       row = (
         <>

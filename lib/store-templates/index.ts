@@ -69,6 +69,11 @@ export const SECTION_LABELS: Record<SxSectionType, string> = {
   mosaic: "Mosaïque de bannières",
   specs: "Caractéristiques",
   gallery: "Bande de photos",
+  zigzag: "Détails produit à onglets",
+  welcome: "Présentation autour d'une photo",
+  shelf: "Catégories sur étagère",
+  filmstrip: "Bande vidéo numérotée",
+  coverflow: "Carrousel de produits",
 };
 
 /** Toutes les sections connues du template (ordre par défaut + celles masquées par défaut). */
@@ -104,6 +109,11 @@ export const ADDABLE_SECTIONS: SxSectionType[] = [
   "mosaic",
   "specs",
   "gallery",
+  "zigzag",
+  "welcome",
+  "shelf",
+  "filmstrip",
+  "coverflow",
 ];
 const ALL_TYPES = new Set<string>(Object.keys(SECTION_LABELS));
 
@@ -221,6 +231,8 @@ export const LAYOUT_CHOICES: Record<keyof SxLayout, [string, string][]> = {
     ["split", "Menu de part et d'autre"],
     ["search", "Avec recherche"],
     ["utility", "Bandeau d'infos"],
+    ["kicks", "Menu à traits + filet"],
+    ["studds", "Logo dans une bande"],
   ],
   card: [
     ["classic", "Classique"],
@@ -245,6 +257,8 @@ export const LAYOUT_CHOICES: Record<keyof SxLayout, [string, string][]> = {
     ["gray-round", "Grise arrondie"],
     ["outline-cart", "Badge + panier contour"],
     ["price-badge", "Pastel + prix en pastille"],
+    ["kicks", "Condensée + bouton pilule"],
+    ["studds", "Détourée + trait rouge"],
   ],
   faq: [
     ["split", "Deux colonnes"],
@@ -263,6 +277,8 @@ export const LAYOUT_CHOICES: Record<keyof SxLayout, [string, string][]> = {
     ["bar", "Barre + réseaux"],
     ["photo", "Sombre + photo"],
     ["mega", "Colonnes + garanties"],
+    ["kicks", "Sombre + tuiles produits"],
+    ["studds", "Sombre + visuel lumineux"],
   ],
   shop: [
     ["sidebar", "Filtres sur le côté"],
@@ -336,6 +352,8 @@ export const HERO_CHOICES: [SxHeroVariant, string][] = [
   ["red-panel", "Carte + panneau en biais"],
   ["brand-giant", "Nom géant sur l'image"],
   ["orange-orb", "Disque orange + chiffres"],
+  ["kicks", "Produit vedette + titre condensé"],
+  ["studds", "Bande rouge + produit au centre"],
 ];
 
 /** Remplace {products} / {categories} par les vrais nombres de la boutique. */

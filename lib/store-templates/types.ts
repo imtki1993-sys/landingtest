@@ -36,7 +36,13 @@ export type SxSectionType =
   | "deals" // offres du jour : produits en promo + compte à rebours jusqu'à minuit
   | "mosaic" // mosaïque de bannières avec image, texte et bouton
   | "specs" // bandeau de caractéristiques (étiquette + valeur)
-  | "gallery"; // bande de photos (produits ou images choisies)
+  | "gallery" // bande de photos (produits ou images choisies)
+  // Sur mesure (Kicks / Studds)
+  | "zigzag" // carte à onglets : détails produit en zigzag (image / texte alternés)
+  | "welcome" // présentation en deux colonnes autour d'une grande photo centrale
+  | "shelf" // catégories une à une, produits posés sur une étagère
+  | "filmstrip" // bande de 5 photos sombres numérotées, vidéo au centre
+  | "coverflow"; // carrousel de produits, celui du centre agrandi
 
 export type SxHeroVariant =
   | "editorial" // gros titre en capitales + bloc image coloré + chiffres verticaux
@@ -94,7 +100,10 @@ export type SxHeroVariant =
   | "night-photo" // photo nocturne plein cadre, petit titre en capitales
   | "red-panel" // carte arrondie blanche avec panneau rouge en biais, pastille ronde
   | "brand-giant" // nom de la boutique géant sur l'image, chiffre et mini carte produit
-  | "orange-orb"; // disque orange derrière la photo, chiffres sous le titre, carte vedette
+  | "orange-orb" // disque orange derrière la photo, chiffres sous le titre, carte vedette
+  // Sur mesure
+  | "kicks" // fond gris clair à lignes, titre condensé rouge dégradé, grand produit à droite
+  | "studds"; // bande rouge verticale au centre, titre slab, produit sur la bande, aperçu du suivant
 
 export type SxHeader = "split" | "center" | "overlay" | "dark";
 export type SxCard = "plain" | "boxed" | "soft" | "dark" | "outline";
@@ -143,10 +152,23 @@ export type SxCardLayout =
   | "circle" // disque coloré derrière le produit, prix en haut, deux boutons
   | "gray-round" // grande image grise arrondie, catégorie en petites capitales
   | "outline-cart" // badge promo sombre, bouton panier contour
-  | "price-badge"; // fond pastel, prix en pastille, bouton « Acheter » sur l'image
+  | "price-badge" // fond pastel, prix en pastille, bouton « Acheter » sur l'image
+  // Sur mesure
+  | "kicks" // carte blanche, nom condensé en capitales, prix rouge, bouton pilule
+  | "studds"; // produit détouré centré, trait rouge, nom en gras, bouton contour rouge
 export type SxFaqLayout = "split" | "center" | "cards" | "numbered" | "band";
 export type SxFooterLayout =
-  "columns" | "wordmark" | "centered" | "cta" | "minimal" | "split" | "bar" | "photo" | "mega"; // colonnes + garanties et moyens de paiement
+  | "columns"
+  | "wordmark"
+  | "centered"
+  | "cta"
+  | "minimal"
+  | "split"
+  | "bar"
+  | "photo"
+  | "mega" // colonnes + garanties et moyens de paiement
+  | "kicks" // fond sombre texturé, 4 tuiles produits, liens et réseaux
+  | "studds"; // sombre, logo rouge, 4 colonnes, visuel produit lumineux
 export type SxShopLayout = "sidebar" | "topbar" | "banner";
 export type SxProductLayout = "split" | "stack" | "centered" | "panel";
 export type SxPageLayout = "simple" | "banner" | "split";
@@ -159,7 +181,9 @@ export type SxHeaderLayout =
   | "menu" // bouton « Menu » et menu plein écran
   | "split" // menu de part et d'autre du logo centré
   | "search" // champ de recherche dans le header
-  | "utility"; // bandeau d'infos au-dessus du header
+  | "utility" // bandeau d'infos au-dessus du header
+  | "kicks" // logo, menu séparé par des traits, pastille + panier + recherche, filet orange
+  | "studds"; // logo dans une bande rouge centrale, menu de part et d'autre
 export interface SxLayout {
   header: SxHeaderLayout;
   card: SxCardLayout;
@@ -191,6 +215,8 @@ export interface SxBlock {
   category?: string;
   /** section Carte : adresse affichée sur Google Maps */
   address?: string;
+  /** section Bande vidéo : lien de la vidéo (YouTube, TikTok…) */
+  url?: string;
 }
 
 export interface SxCopy {
