@@ -2,6 +2,7 @@
 // Fichier sans React : utilisable côté serveur (API) comme côté navigateur.
 import type { SxBlock, SxCopy, SxHeroVariant, SxLayout, SxSectionType, SxSettings, StoreTemplate } from "./types";
 import { SERIE_1 } from "./serie1";
+import { SERIE_2 } from "./serie2";
 import { DEFAULT_FAQ } from "./shared-copy";
 import { storeBuilderDefaults } from "../store-builder-config";
 
@@ -10,6 +11,7 @@ export * from "./types";
 /** Séries publiées. Ajouter SERIE_2… ici quand elles arrivent. */
 export const STORE_SERIES: { id: number; label: string; templates: StoreTemplate[] }[] = [
   { id: 1, label: "Série 1", templates: SERIE_1 },
+  { id: 2, label: "Série 2", templates: SERIE_2 },
 ];
 
 export const STORE_TEMPLATES: StoreTemplate[] = STORE_SERIES.flatMap((s) => s.templates);
@@ -47,6 +49,10 @@ export const SECTION_LABELS: Record<SxSectionType, string> = {
   testimonials: "Avis clients",
   newsletter: "Appel à l'action",
   faq: "FAQ",
+  marquee: "Bandeau défilant",
+  bento: "Cartes chiffres",
+  rows: "Liste en lignes",
+  spotlight: "Grande image",
 };
 
 /** Toutes les sections connues du template (ordre par défaut + celles masquées par défaut). */
@@ -67,6 +73,10 @@ export const ADDABLE_SECTIONS: SxSectionType[] = [
   "faq",
   "wordmark",
   "catalog",
+  "marquee",
+  "bento",
+  "rows",
+  "spotlight",
 ];
 const ALL_TYPES = new Set<string>(Object.keys(SECTION_LABELS));
 
@@ -128,7 +138,18 @@ export function sectionContent(t: StoreTemplate, locale: unknown, key: string, s
 }
 
 /** Variantes de hero adaptées à un header transparent (posé sur une photo ou un aplat sombre). */
-const OVERLAY_HEROES = new Set(["giant", "photo-dark", "color-block", "search", "wordmark"]);
+const OVERLAY_HEROES = new Set([
+  "giant",
+  "photo-dark",
+  "color-block",
+  "search",
+  "wordmark",
+  "photo-cards",
+  "giant-under",
+  "dark-forest",
+  "center-photo",
+  "dark-split",
+]);
 
 /**
  * Template tel qu'il s'affiche pour une boutique : mise en page, hero et couleurs
@@ -172,6 +193,8 @@ export const LAYOUT_CHOICES: Record<keyof SxLayout, [string, string][]> = {
     ["centered", "Centrée en arche"],
     ["tag", "Prix en étiquette"],
     ["framed", "Encadrée"],
+    ["tinted", "Fonds colorés"],
+    ["swatch", "Pastilles de couleurs"],
   ],
   faq: [
     ["split", "Deux colonnes"],
@@ -222,6 +245,21 @@ export const HERO_CHOICES: [SxHeroVariant, string][] = [
   ["wordmark", "Photo + logotype"],
   ["architect", "Arche + carte flottante"],
   ["food", "Image ronde + cartes produits"],
+  ["gallery", "Galerie + recherche"],
+  ["warm-photo", "Photo chaude + produit flottant"],
+  ["sky-left", "Ciel + jauge"],
+  ["freeflow", "Vagues + titre géant"],
+  ["soft-card", "Carte pastel"],
+  ["photo-cards", "Photo + cartes flottantes"],
+  ["giant-under", "Photo + mot géant"],
+  ["editorial-serif", "Serif élégant"],
+  ["dark-forest", "Photo sombre végétale"],
+  ["plates", "Assiettes en cercle"],
+  ["sky-wellness", "Photo ciel + chiffres"],
+  ["framed-photo", "Photo encadrée"],
+  ["dark-collage", "Collage sur fond sombre"],
+  ["center-photo", "Photo + titre centré"],
+  ["dark-split", "Fond nuit + accent"],
 ];
 
 /** Remplace {products} / {categories} par les vrais nombres de la boutique. */

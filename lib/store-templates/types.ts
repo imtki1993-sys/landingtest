@@ -18,7 +18,12 @@ export type SxSectionType =
   | "wordmark"
   | "testimonials"
   | "newsletter"
-  | "faq";
+  | "faq"
+  // Série 2
+  | "marquee" // bandeau défilant (catégories ou mots-clés)
+  | "bento" // cartes chiffres / avantages avec images
+  | "rows" // liste en lignes avec image (événements, collections)
+  | "spotlight"; // grande image avec titre centré
 
 export type SxHeroVariant =
   | "editorial" // gros titre en capitales + bloc image coloré + chiffres verticaux
@@ -35,7 +40,23 @@ export type SxHeroVariant =
   | "gradient-promo" // dégradé, titre blanc, accent manuscrit
   | "wordmark" // photo ciel, accent manuscrit, grand logotype en minuscules
   | "architect" // titre souligné, image courbe et carte flottante
-  | "food"; // titre serif, image détourée, cartes colorées
+  | "food" // titre serif, image détourée, cartes colorées
+  // Série 2
+  | "gallery" // titre + image principale, miniatures, barre de recherche
+  | "warm-photo" // photo chaude arrondie, titre serif, carte produit flottante
+  | "sky-left" // dégradé ciel, image à droite, jauge de performance
+  | "freeflow" // vagues abstraites, titre géant bicolore
+  | "soft-card" // carte pastel arrondie, champ de recherche, grande image
+  | "photo-cards" // photo sombre, grand titre, cartes flottantes
+  | "giant-under" // photo ciel, mot géant en bas
+  | "editorial-serif" // serif capitales + italique, image avec points produits
+  | "dark-forest" // photo sombre verte, titre serif italique
+  | "plates" // assiettes en cercle, titre souligné au pinceau
+  | "sky-wellness" // photo ciel, chiffres sous le hero
+  | "framed-photo" // photo encadrée arrondie, étiquette, carte d'infos
+  | "dark-collage" // fond sombre, titre centré condensé, collage d'images
+  | "center-photo" // photo plein cadre, titre centré en haut
+  | "dark-split"; // fond vert nuit, titre et accent jaune, image à droite
 
 export type SxHeader = "split" | "center" | "overlay" | "dark";
 export type SxCard = "plain" | "boxed" | "soft" | "dark" | "outline";
@@ -44,7 +65,16 @@ export type SxPromos = "split" | "cards" | "banner";
 export type SxTrust = "bar" | "icons" | "numbered";
 
 /** Mise en page des blocs communs et des pages internes, propre à chaque template. */
-export type SxCardLayout = "classic" | "overlay" | "minimal" | "editorial" | "centered" | "tag" | "framed";
+export type SxCardLayout =
+  | "classic"
+  | "overlay"
+  | "minimal"
+  | "editorial"
+  | "centered"
+  | "tag"
+  | "framed"
+  | "tinted" // fonds colorés en alternance
+  | "swatch"; // fond gris, pastilles de couleurs, bouton +
 export type SxFaqLayout = "split" | "center" | "cards" | "numbered" | "band";
 export type SxFooterLayout = "columns" | "wordmark" | "centered" | "cta" | "minimal" | "split";
 export type SxShopLayout = "sidebar" | "topbar" | "banner";
