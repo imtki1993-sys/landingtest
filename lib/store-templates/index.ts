@@ -3,6 +3,7 @@
 import type { SxBlock, SxCopy, SxHeroVariant, SxLayout, SxSectionType, SxSettings, StoreTemplate } from "./types";
 import { SERIE_1 } from "./serie1";
 import { SERIE_2 } from "./serie2";
+import { SUR_MESURE } from "./sur-mesure";
 import { DEFAULT_FAQ } from "./shared-copy";
 import { storeBuilderDefaults } from "../store-builder-config";
 
@@ -12,6 +13,8 @@ export * from "./types";
 export const STORE_SERIES: { id: number; label: string; templates: StoreTemplate[] }[] = [
   { id: 1, label: "Série 1", templates: SERIE_1 },
   { id: 2, label: "Série 2", templates: SERIE_2 },
+  // templates créés à partir d'une maquette envoyée à part (hors séries de 15)
+  { id: 90, label: "Sur mesure", templates: SUR_MESURE },
 ];
 
 export const STORE_TEMPLATES: StoreTemplate[] = STORE_SERIES.flatMap((s) => s.templates);
@@ -53,6 +56,8 @@ export const SECTION_LABELS: Record<SxSectionType, string> = {
   bento: "Cartes chiffres",
   rows: "Liste en lignes",
   spotlight: "Grande image",
+  features: "Cartes avec icônes",
+  photostats: "Photo + chiffres",
 };
 
 /** Toutes les sections connues du template (ordre par défaut + celles masquées par défaut). */
@@ -77,6 +82,8 @@ export const ADDABLE_SECTIONS: SxSectionType[] = [
   "bento",
   "rows",
   "spotlight",
+  "features",
+  "photostats",
 ];
 const ALL_TYPES = new Set<string>(Object.keys(SECTION_LABELS));
 
@@ -195,6 +202,7 @@ export const LAYOUT_CHOICES: Record<keyof SxLayout, [string, string][]> = {
     ["framed", "Encadrée"],
     ["tinted", "Fonds colorés"],
     ["swatch", "Pastilles de couleurs"],
+    ["notch", "Carte à encoche"],
   ],
   faq: [
     ["split", "Deux colonnes"],
@@ -210,6 +218,7 @@ export const LAYOUT_CHOICES: Record<keyof SxLayout, [string, string][]> = {
     ["cta", "Appel à commander"],
     ["minimal", "Minimal"],
     ["split", "Deux panneaux"],
+    ["bar", "Barre + réseaux"],
   ],
   shop: [
     ["sidebar", "Filtres sur le côté"],
@@ -260,6 +269,7 @@ export const HERO_CHOICES: [SxHeroVariant, string][] = [
   ["dark-collage", "Collage sur fond sombre"],
   ["center-photo", "Photo + titre centré"],
   ["dark-split", "Fond nuit + accent"],
+  ["school", "École (titre souligné + collage)"],
 ];
 
 /** Remplace {products} / {categories} par les vrais nombres de la boutique. */
@@ -294,7 +304,7 @@ export function seedStoreSettings(
     heroButton: c.button,
     heroSecondaryButton: c.secondary || "",
     announcement: c.announcement,
-    showAnnouncement: true,
+    showAnnouncement: t.showAnnouncement !== false,
     collectionTitle: c.collectionTitle,
     collectionSubtitle: c.collectionSubtitle || "",
     faq: Array.isArray(current.faq) && current.faq.length ? current.faq : DEFAULT_FAQ[copyLang(locale)],

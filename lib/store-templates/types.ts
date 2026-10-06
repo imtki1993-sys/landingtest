@@ -23,7 +23,10 @@ export type SxSectionType =
   | "marquee" // bandeau défilant (catégories ou mots-clés)
   | "bento" // cartes chiffres / avantages avec images
   | "rows" // liste en lignes avec image (événements, collections)
-  | "spotlight"; // grande image avec titre centré
+  | "spotlight" // grande image avec titre centré
+  // Sur mesure
+  | "features" // cartes à encoche avec icône dessinée et flèche
+  | "photostats"; // grande photo + chiffres en tuiles colorées
 
 export type SxHeroVariant =
   | "editorial" // gros titre en capitales + bloc image coloré + chiffres verticaux
@@ -56,7 +59,9 @@ export type SxHeroVariant =
   | "framed-photo" // photo encadrée arrondie, étiquette, carte d'infos
   | "dark-collage" // fond sombre, titre centré condensé, collage d'images
   | "center-photo" // photo plein cadre, titre centré en haut
-  | "dark-split"; // fond vert nuit, titre et accent jaune, image à droite
+  | "dark-split" // fond vert nuit, titre et accent jaune, image à droite
+  // Sur mesure
+  | "school"; // titre souligné au feutre, collage photo sur blocs, deux cartes sous le texte
 
 export type SxHeader = "split" | "center" | "overlay" | "dark";
 export type SxCard = "plain" | "boxed" | "soft" | "dark" | "outline";
@@ -74,9 +79,10 @@ export type SxCardLayout =
   | "tag"
   | "framed"
   | "tinted" // fonds colorés en alternance
-  | "swatch"; // fond gris, pastilles de couleurs, bouton +
+  | "swatch" // fond gris, pastilles de couleurs, bouton +
+  | "notch"; // carte grise à encoche avec bouton flèche dans le coin
 export type SxFaqLayout = "split" | "center" | "cards" | "numbered" | "band";
-export type SxFooterLayout = "columns" | "wordmark" | "centered" | "cta" | "minimal" | "split";
+export type SxFooterLayout = "columns" | "wordmark" | "centered" | "cta" | "minimal" | "split" | "bar";
 export type SxShopLayout = "sidebar" | "topbar" | "banner";
 export type SxProductLayout = "split" | "stack" | "centered" | "panel";
 export type SxPageLayout = "simple" | "banner" | "split";
@@ -181,6 +187,10 @@ export interface StoreTemplate {
   sections: SxSectionType[];
   /** sections présentes mais masquées par défaut (à compléter par le marchand) */
   hiddenByDefault?: SxSectionType[];
+  /** bandeau d'annonce affiché à la création (par défaut : oui) */
+  showAnnouncement?: boolean;
+  /** appel à l'action avec photo détourée en biais (section « Appel à l'action ») */
+  ctaPhoto?: boolean;
   copy: { fr: SxCopy; ar: SxCopy };
 }
 

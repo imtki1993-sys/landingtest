@@ -3,6 +3,7 @@
 // Chaque bloc a plusieurs mises en page ; le template choisit la sienne (t.layout).
 import React from "react";
 import type { StoreTemplate } from "../../lib/store-templates";
+import { whatsappDigits } from "./WhatsAppButton";
 
 /* ───────── contexte partagé ───────── */
 export interface SxCategory {
@@ -354,6 +355,21 @@ export function ProductCard({ ctx, p, index = 0 }: { ctx: SxCtx; p: any; index?:
         </article>
       );
     }
+    case "notch":
+      return (
+        <article className="sx-card sx-cl-notch">
+          <a className="sx-card-media" href={url}>
+            {media}
+            {off > 0 && <em className="sx-off">-{off}%</em>}
+          </a>
+          <div className="sx-card-body">
+            {cat}
+            {name}
+            {priceRow}
+          </div>
+          <span className="sx-card-notch">{addBtn("icon")}</span>
+        </article>
+      );
     default:
       return (
         <article className="sx-card sx-cl-classic">
@@ -383,7 +399,7 @@ export function FaqBlock({
 }: {
   ctx: SxCtx;
   eyebrow?: string;
-  title: string;
+  title: React.ReactNode;
   text?: string;
   items: { q: string; a: string }[];
   as?: "h1" | "h2";
@@ -608,6 +624,55 @@ export function SeriesFooter({ ctx }: { ctx: SxCtx }) {
         </div>
       </footer>
     );
+  if (layout === "bar") {
+    const wa = whatsappDigits(cfg.whatsapp || store.workspace_whatsapp);
+    const round = (href: string, label: string, icon: string, external = false) => (
+      <a
+        className="sx-round"
+        href={href}
+        aria-label={label}
+        {...(external ? { target: "_blank", rel: "noreferrer" } : {})}
+      >
+        <Icon name={icon} />
+      </a>
+    );
+    return (
+      <footer className="sx-footer sx-footer-bar">
+        <div className="sx-wrap">
+          <div className="sx-footer-row">
+            {brand}
+            <nav className="sx-footer-inline">
+              {inline.slice(0, 4).map(([h, l]) => (
+                <a key={h} href={h}>
+                  {l}
+                </a>
+              ))}
+            </nav>
+            <a className="sx-btn" href={base + "/contact"}>
+              {txt.contact}
+            </a>
+          </div>
+          <div className="sx-footer-row sx-footer-bottom">
+            <div>
+              {copyright}
+              <nav className="sx-footer-legal">
+                {inline.slice(4).map(([h, l]) => (
+                  <a key={h} href={h}>
+                    {l}
+                  </a>
+                ))}
+              </nav>
+            </div>
+            <div className="sx-footer-rounds">
+              {wa && round("https://wa.me/" + wa, "WhatsApp", "chat", true)}
+              {round(base + "/contact", txt.contact, "phone")}
+              {round(base + "/delivery", txt.delivery, "truck")}
+            </div>
+          </div>
+        </div>
+      </footer>
+    );
+  }
   if (layout === "split")
     return (
       <footer className="sx-footer sx-footer-split">

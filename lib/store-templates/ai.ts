@@ -84,9 +84,19 @@ export function writableSections(t: StoreTemplate, locale: string): Record<strin
   const sections = templateCopy(t, locale).sections;
   const out: Record<string, SxBlock> = {};
   for (const type of t.sections) {
-    if (SKIP.includes(type) || out[type]) continue;
     const b = sections[type];
-    if (!b) continue;
+    // le hero se rédige à part, sauf ses cartes éventuelles (templates sur mesure)
+    if (type === "hero" && b?.items?.length && !out.hero) {
+      out.hero = {
+        items: b.items.map((x) => ({
+          title: x.title,
+          ...(x.text ? { text: x.text } : {}),
+          ...(x.value ? { value: x.value } : {}),
+        })),
+      };
+      continue;
+    }
+    if (SKIP.includes(type) || out[type] || !b) continue;
     out[type] = {
       ...(b.eyebrow ? { eyebrow: b.eyebrow } : {}),
       ...(b.title ? { title: b.title } : {}),
@@ -143,6 +153,7 @@ Règles obligatoires :
 - textes courts et percutants, de la même longueur que l'exemple (titres de 2 à 8 mots) ;
 - "hero.highlight" : 1 à 3 mots repris tels quels du hero.title, à mettre en valeur ;
 - un champ "value" qui contient {products}, {categories} ou une couleur #rrggbb se recopie tel quel ;
+- un mot entouré d'*étoiles* dans un titre est souligné : garde 1 mot (ou 2) entre étoiles dans ces titres ;
 - n'invente aucun chiffre, avis client, certification, prix ni garantie ;
 - "faq" : 5 questions/réponses utiles (commande, livraison, paiement, échange, contact) adaptées à la boutique ;
 - "delivery.points" : 3 ou 4 points (délais, zones, paiement à la livraison, échange) ;
