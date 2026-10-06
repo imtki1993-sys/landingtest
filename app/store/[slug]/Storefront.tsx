@@ -3,6 +3,8 @@ import { useEffect, useMemo, useState } from "react";
 import { normalizeStoreSettings } from "../../../lib/store-settings";
 import { getBenchmarkTemplateRuntime } from "../../../lib/benchmark-template-registry";
 import { isStoreProV2 } from "../../../lib/store-pro-v2";
+import { getStoreTemplate } from "../../../lib/store-templates";
+import SeriesStore from "../../../components/store-templates/SeriesStore";
 function UiIcon({ kind }: { kind: "truck" | "cash" | "check" | "play" }) {
   const common = {
     width: 20,
@@ -76,6 +78,12 @@ export default function Storefront({ store, products, page = "home" }: { store: 
     [catalogCols, setCatalogCols] = useState(0),
     [productSelections, setProductSelections] = useState<Record<string, Record<string, string>>>({}),
     [heroSlide, setHeroSlide] = useState(0);
+  // Recherche et catégorie passées dans l'URL (?q=…&category=…) : barre de recherche, liens de catégories
+  useEffect(() => {
+    const u = new URLSearchParams(window.location.search);
+    if (u.get("q")) setQ(u.get("q") || "");
+    if (u.get("category")) setCatalogCategory(u.get("category") || "");
+  }, []);
   const heroImages = useMemo(() => {
     const list = Array.isArray(cfg.heroImages)
       ? cfg.heroImages.filter((x: any) => typeof x === "string" && x.trim())
@@ -1101,6 +1109,91 @@ export default function Storefront({ store, products, page = "home" }: { store: 
       </>
     );
   }
+  const drawer = open ? (
+    <div className="ps-drawer-wrap" onClick={() => setOpen(false)}>
+      <aside className="ps-drawer" onClick={(e) => e.stopPropagation()}>
+        <button className="ps-close" onClick={() => setOpen(false)}>
+          ×
+        </button>
+        <h2>{txt.cart}</h2>
+        {sent ? (
+          <div className="ps-success">
+            ✓ {txt.success}
+            <small>{sent.order_number}</small>
+          </div>
+        ) : (
+          <>
+            {cart.map((x) => (
+              <div className="ps-cart-row" key={x.cartKey || x.id}>
+                <span>
+                  <b>{x.name}</b>
+                  {x.variant_options && Object.keys(x.variant_options).length > 0 && (
+                    <small>
+                      {Object.entries(x.variant_options)
+                        .map(([k, v]) => k + ": " + v)
+                        .join(" · ")}
+                    </small>
+                  )}
+                  <small>
+                    {x.qty} × {x.price} DH
+                  </small>
+                </span>
+                <button onClick={() => setCart((c) => c.filter((v) => (v.cartKey || v.id) !== (x.cartKey || x.id)))}>
+                  ×
+                </button>
+              </div>
+            ))}
+            {cart.length > 0 && (
+              <>
+                <div className="ps-total">
+                  <span>Total</span>
+                  <b>{total} DH</b>
+                </div>
+                <form onSubmit={order}>
+                  <input name="name" required placeholder={txt.name} />
+                  <input name="phone" required inputMode="tel" placeholder={txt.phone} />
+                  <input name="city" placeholder={txt.city} />
+                  <textarea name="address" placeholder={txt.address} />
+                  <button disabled={busy}>{busy ? "..." : txt.order + " · " + total + " DH"}</button>
+                </form>
+                <small className="ps-cod">💵 {txt.cod}</small>
+              </>
+            )}
+          </>
+        )}
+      </aside>
+    </div>
+  ) : null;
+  // Templates de boutique par séries (Série 1…) : mise en page dédiée,
+  // même panier, mêmes pages internes et même commande.
+  const seriesTemplate = getStoreTemplate(store.template_id);
+  if (seriesTemplate)
+    return (
+      <SeriesStore
+        t={seriesTemplate}
+        store={store}
+        cfg={cfg}
+        products={visible}
+        page={page}
+        rtl={rtl}
+        base={base}
+        txt={txt}
+        body={
+          page === "home" ? undefined : (
+            <>
+              {body}
+              {page === "contact"
+                ? customSections.filter((b: any) => b.props?.className?.indexOf("contactForm") < 0)
+                : customSections}
+            </>
+          )
+        }
+        drawer={drawer}
+        cartCount={cart.reduce((n, x) => n + x.qty, 0)}
+        openCart={() => setOpen(true)}
+        add={add}
+      />
+    );
   const ds = cfg.designSystem || {},
     dsc = ds.colors || {},
     dsl = ds.layout || {},
@@ -1337,63 +1430,7 @@ export default function Storefront({ store, products, page = "home" }: { store: 
           </nav>
         </footer>
       )}
-      {open && (
-        <div className="ps-drawer-wrap" onClick={() => setOpen(false)}>
-          <aside className="ps-drawer" onClick={(e) => e.stopPropagation()}>
-            <button className="ps-close" onClick={() => setOpen(false)}>
-              ×
-            </button>
-            <h2>{txt.cart}</h2>
-            {sent ? (
-              <div className="ps-success">
-                ✓ {txt.success}
-                <small>{sent.order_number}</small>
-              </div>
-            ) : (
-              <>
-                {cart.map((x) => (
-                  <div className="ps-cart-row" key={x.cartKey || x.id}>
-                    <span>
-                      <b>{x.name}</b>
-                      {x.variant_options && Object.keys(x.variant_options).length > 0 && (
-                        <small>
-                          {Object.entries(x.variant_options)
-                            .map(([k, v]) => k + ": " + v)
-                            .join(" · ")}
-                        </small>
-                      )}
-                      <small>
-                        {x.qty} × {x.price} DH
-                      </small>
-                    </span>
-                    <button
-                      onClick={() => setCart((c) => c.filter((v) => (v.cartKey || v.id) !== (x.cartKey || x.id)))}
-                    >
-                      ×
-                    </button>
-                  </div>
-                ))}
-                {cart.length > 0 && (
-                  <>
-                    <div className="ps-total">
-                      <span>Total</span>
-                      <b>{total} DH</b>
-                    </div>
-                    <form onSubmit={order}>
-                      <input name="name" required placeholder={txt.name} />
-                      <input name="phone" required inputMode="tel" placeholder={txt.phone} />
-                      <input name="city" placeholder={txt.city} />
-                      <textarea name="address" placeholder={txt.address} />
-                      <button disabled={busy}>{busy ? "..." : txt.order + " · " + total + " DH"}</button>
-                    </form>
-                    <small className="ps-cod">💵 {txt.cod}</small>
-                  </>
-                )}
-              </>
-            )}
-          </aside>
-        </div>
-      )}
+      {drawer}
     </main>
   );
 }

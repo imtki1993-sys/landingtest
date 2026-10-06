@@ -4,6 +4,8 @@ import SaaSSidebar from "../components/SaaSSidebar";
 import SaaSTopbar from "../components/SaaSTopbar";
 import { useEffect, useMemo, useState } from "react";
 import { STORE_BENCHMARK_CATEGORIES, STORE_BENCHMARK_NICHES } from "../../lib/store-benchmark-niches";
+import TemplateGallery from "../../components/store-templates/TemplateGallery";
+import { getStoreTemplate } from "../../lib/store-templates";
 
 const DEMOS = [
   ["Running Pro", "Sneakers", "Performance"],
@@ -105,7 +107,9 @@ export default function Stores() {
     [storeTab, setStoreTab] = useState<"all" | "published" | "draft">("all"),
     [storeSearch, setStoreSearch] = useState(""),
     [storeSort, setStoreSort] = useState("newest"),
-    [generatorMode, setGeneratorMode] = useState<"classic" | "pro-v2">("pro-v2");
+    [generatorMode, setGeneratorMode] = useState<"templates" | "classic" | "pro-v2">("templates"),
+    [storeTemplate, setStoreTemplate] = useState(""),
+    [productList, setProductList] = useState<any[]>([]);
   useEffect(() => {
     Promise.all([
       fetch("/api/stores", { cache: "no-store" }).then(async (r) => {
@@ -119,6 +123,7 @@ export default function Stores() {
         const map: Record<string, string> = {};
         for (const v of p.products || []) map[v.id] = v.image || v.images?.[0] || "";
         setProductImages(map);
+        setProductList(p.products || []);
         setStores(
           (x.stores || []).map((v: any) => ({
             id: v.id,
@@ -143,21 +148,26 @@ export default function Stores() {
   async function createStore() {
     const n = name.trim();
     if (!n) return alert("Entre le nom de la boutique.");
+    if (generatorMode === "templates" && !storeTemplate) return alert("Choisis un template.");
     setCreating(true);
     const r = await fetch("/api/stores", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({
-          name: n,
-          templateId: "benchmark-ai",
-          locale: language,
-          generateWithAI: true,
-          niche: aiNiche,
-          benchmarkNiche: aiNiche,
-          seed: n,
-          generatorVersion: generatorMode,
-          proPreset: generatorMode === "pro-v2" ? "modern-glow" : undefined,
-        }),
+        body: JSON.stringify(
+          generatorMode === "templates"
+            ? { name: n, templateId: storeTemplate, locale: language }
+            : {
+                name: n,
+                templateId: "benchmark-ai",
+                locale: language,
+                generateWithAI: true,
+                niche: aiNiche,
+                benchmarkNiche: aiNiche,
+                seed: n,
+                generatorVersion: generatorMode,
+                proPreset: generatorMode === "pro-v2" ? "modern-glow" : undefined,
+              },
+        ),
       }),
       x = await r.json();
     setCreating(false);
@@ -341,6 +351,7 @@ export default function Stores() {
           <div className="store-card-grid">
             {visibleStores.map((s, i) => {
               const t = TEMPLATES.find((x) => x.id === s.templateId);
+              const st = getStoreTemplate(s.templateId);
               return (
                 <article className="store-library-card" key={s.id}>
                   <div className={"store-card-media store-card-media-" + (i % 6)}>
@@ -379,7 +390,7 @@ export default function Stores() {
                     </div>
                     <div className="store-card-meta">
                       <span>
-                        <b>{t?.name || "AI Store"}</b>
+                        <b>{st?.name || t?.name || "AI Store"}</b>
                         <small>Design</small>
                       </span>
                       <span>
@@ -429,7 +440,15 @@ export default function Stores() {
                 {[1, 2, 3].map((n) => (
                   <span key={n} className={createStep >= n ? "active" : ""}>
                     <i>{createStep > n ? "✓" : n}</i>
-                    <b>{n === 1 ? "Nom du Store" : n === 2 ? "Template" : "Génération IA"}</b>
+                    <b>
+                      {n === 1
+                        ? "Nom du Store"
+                        : n === 2
+                          ? "Template"
+                          : generatorMode === "templates"
+                            ? "Création"
+                            : "Génération IA"}
+                    </b>
                   </span>
                 ))}
               </div>
@@ -474,6 +493,15 @@ export default function Stores() {
                   <div className="store-generator-modes">
                     <button
                       type="button"
+                      className={generatorMode === "templates" ? "active" : ""}
+                      onClick={() => setGeneratorMode("templates")}
+                    >
+                      <b>▦ Templates de boutique</b>
+                      <span>Séries de templates prêts à l’emploi</span>
+                      <small>Boutique prête tout de suite, avec tes produits · sans clé IA</small>
+                    </button>
+                    <button
+                      type="button"
                       className={generatorMode === "pro-v2" ? "active" : ""}
                       onClick={() => setGeneratorMode("pro-v2")}
                     >
@@ -491,102 +519,162 @@ export default function Stores() {
                       <small>Conserve le moteur Store actuel.</small>
                     </button>
                   </div>
-                  <h3 className="store-niche-heading">Choisis ensuite la niche de référence</h3>
-                  <input
-                    className="store-niche-search"
-                    value={nicheSearch}
-                    onChange={(e) => setNicheSearch(e.target.value)}
-                    placeholder="Rechercher : automobile, luxe, beauté, restaurant..."
-                  />
-                  <div className="store-niche-cats">
-                    {STORE_BENCHMARK_CATEGORIES.map((x) => (
-                      <button
-                        type="button"
-                        key={x}
-                        className={nicheCategory === x ? "active" : ""}
-                        onClick={() => setNicheCategory(x)}
-                      >
-                        {x}
-                      </button>
-                    ))}
-                  </div>
-                  <div className="store-niche-grid">
-                    {benchmarkVisible.map((n) => (
-                      <article key={n.id} className={"store-niche-card " + (aiNiche === n.id ? "selected" : "")}>
-                        <div className="store-niche-thumb">
-                          <iframe
-                            title={"Aperçu " + n.label}
-                            loading="lazy"
-                            src={
-                              "https://hylarucoder.github.io/benchmark-skill-ui-ux-pro-max/pages/" +
-                              n.id +
-                              "/index.html"
-                            }
-                            tabIndex={-1}
-                          />
-                          <button type="button" onClick={() => setNichePreview(n.id)}>
-                            Aperçu réel
-                          </button>
-                        </div>
-                        <button type="button" className="store-niche-select" onClick={() => setAiNiche(n.id)}>
-                          <span>{n.label}</span>
-                          <small>{n.category}</small>
-                          <em>{n.referencePath}</em>
-                          {aiNiche === n.id && <b>✓ Sélectionné</b>}
-                        </button>
-                      </article>
-                    ))}
-                  </div>
-                  {nichePreview && (
-                    <div className="store-niche-preview-modal" onClick={() => setNichePreview("")}>
-                      <div onClick={(e) => e.stopPropagation()}>
-                        <header>
-                          <div>
-                            <b>{STORE_BENCHMARK_NICHES.find((n) => n.id === nichePreview)?.label}</b>
-                            <small>UI/UX Pro Max · aperçu de référence</small>
-                          </div>
-                          <button type="button" onClick={() => setNichePreview("")}>
-                            ×
-                          </button>
-                        </header>
-                        <iframe
-                          title="Aperçu réel du template"
-                          src={
-                            "https://hylarucoder.github.io/benchmark-skill-ui-ux-pro-max/pages/" +
-                            nichePreview +
-                            "/index.html"
-                          }
-                        />
-                        <footer>
-                          <button type="button" onClick={() => setNichePreview("")}>
-                            Fermer
-                          </button>
+                  {generatorMode === "templates" ? (
+                    <>
+                      <h3 className="store-niche-heading">Choisis ton template</h3>
+                      <TemplateGallery
+                        value={storeTemplate}
+                        onChange={setStoreTemplate}
+                        products={productList}
+                        locale={language}
+                        storeName={name.trim() || undefined}
+                      />
+                    </>
+                  ) : (
+                    <>
+                      <h3 className="store-niche-heading">Choisis ensuite la niche de référence</h3>
+                      <input
+                        className="store-niche-search"
+                        value={nicheSearch}
+                        onChange={(e) => setNicheSearch(e.target.value)}
+                        placeholder="Rechercher : automobile, luxe, beauté, restaurant..."
+                      />
+                      <div className="store-niche-cats">
+                        {STORE_BENCHMARK_CATEGORIES.map((x) => (
                           <button
                             type="button"
-                            className="store-wizard-next"
-                            onClick={() => {
-                              setAiNiche(nichePreview);
-                              setNichePreview("");
-                            }}
+                            key={x}
+                            className={nicheCategory === x ? "active" : ""}
+                            onClick={() => setNicheCategory(x)}
                           >
-                            Utiliser ce design
+                            {x}
                           </button>
-                        </footer>
+                        ))}
                       </div>
-                    </div>
+                      <div className="store-niche-grid">
+                        {benchmarkVisible.map((n) => (
+                          <article key={n.id} className={"store-niche-card " + (aiNiche === n.id ? "selected" : "")}>
+                            <div className="store-niche-thumb">
+                              <iframe
+                                title={"Aperçu " + n.label}
+                                loading="lazy"
+                                src={
+                                  "https://hylarucoder.github.io/benchmark-skill-ui-ux-pro-max/pages/" +
+                                  n.id +
+                                  "/index.html"
+                                }
+                                tabIndex={-1}
+                              />
+                              <button type="button" onClick={() => setNichePreview(n.id)}>
+                                Aperçu réel
+                              </button>
+                            </div>
+                            <button type="button" className="store-niche-select" onClick={() => setAiNiche(n.id)}>
+                              <span>{n.label}</span>
+                              <small>{n.category}</small>
+                              <em>{n.referencePath}</em>
+                              {aiNiche === n.id && <b>✓ Sélectionné</b>}
+                            </button>
+                          </article>
+                        ))}
+                      </div>
+                      {nichePreview && (
+                        <div className="store-niche-preview-modal" onClick={() => setNichePreview("")}>
+                          <div onClick={(e) => e.stopPropagation()}>
+                            <header>
+                              <div>
+                                <b>{STORE_BENCHMARK_NICHES.find((n) => n.id === nichePreview)?.label}</b>
+                                <small>UI/UX Pro Max · aperçu de référence</small>
+                              </div>
+                              <button type="button" onClick={() => setNichePreview("")}>
+                                ×
+                              </button>
+                            </header>
+                            <iframe
+                              title="Aperçu réel du template"
+                              src={
+                                "https://hylarucoder.github.io/benchmark-skill-ui-ux-pro-max/pages/" +
+                                nichePreview +
+                                "/index.html"
+                              }
+                            />
+                            <footer>
+                              <button type="button" onClick={() => setNichePreview("")}>
+                                Fermer
+                              </button>
+                              <button
+                                type="button"
+                                className="store-wizard-next"
+                                onClick={() => {
+                                  setAiNiche(nichePreview);
+                                  setNichePreview("");
+                                }}
+                              >
+                                Utiliser ce design
+                              </button>
+                            </footer>
+                          </div>
+                        </div>
+                      )}
+                    </>
                   )}
                   <div className="store-wizard-nav">
                     <button onClick={() => setCreateStep(1)}>← Retour</button>
                     <button
                       className="store-wizard-next"
-                      onClick={() => (aiNiche ? setCreateStep(3) : alert("Sélectionne une niche."))}
+                      onClick={() =>
+                        generatorMode === "templates"
+                          ? storeTemplate
+                            ? setCreateStep(3)
+                            : alert("Choisis un template.")
+                          : aiNiche
+                            ? setCreateStep(3)
+                            : alert("Sélectionne une niche.")
+                      }
                     >
                       Continuer →
                     </button>
                   </div>
                 </section>
               )}
-              {createStep === 3 && (
+              {createStep === 3 && generatorMode === "templates" && (
+                <section className="store-wizard-step store-ai-step">
+                  <small>ÉTAPE 3 SUR 3</small>
+                  <div className="store-ai-icon">▦</div>
+                  <h2>Crée ma boutique</h2>
+                  <p>
+                    <b>{name || "Ta boutique"}</b> sera créée avec le template{" "}
+                    <b>{getStoreTemplate(storeTemplate)?.name}</b> et tes produits. Tous les textes, couleurs et
+                    sections restent modifiables dans l’éditeur.
+                  </p>
+                  <div className="store-ai-summary">
+                    <span>
+                      <i>✓</i>
+                      <b>{name}</b>
+                      <small>Nom du Store</small>
+                    </span>
+                    <span>
+                      <i>✓</i>
+                      <b>{getStoreTemplate(storeTemplate)?.name}</b>
+                      <small>
+                        {getStoreTemplate(storeTemplate)?.niche} · {getStoreTemplate(storeTemplate)?.folder}
+                      </small>
+                    </span>
+                    <span>
+                      <i>✓</i>
+                      <b>{language === "darija" ? "Darija Maroc" : language === "ar" ? "العربية" : "Français"}</b>
+                      <small>Langue</small>
+                    </span>
+                  </div>
+                  <div className="store-wizard-nav">
+                    <button onClick={() => setCreateStep(2)}>← Retour</button>
+                    <button className="store-wizard-generate" disabled={creating} onClick={createStore}>
+                      {creating ? "Création en cours…" : "Créer ma boutique"}
+                    </button>
+                  </div>
+                </section>
+              )}
+              {createStep === 3 && generatorMode !== "templates" && (
                 <section className="store-wizard-step store-ai-step">
                   <small>ÉTAPE 3 SUR 3</small>
                   <div className="store-ai-icon">✦</div>

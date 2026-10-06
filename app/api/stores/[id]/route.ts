@@ -2,8 +2,10 @@ import { publicMessage } from "../../../../lib/public-error";
 import { reportError } from "../../../../lib/monitoring";
 import { NextResponse } from "next/server";
 import { authContext } from "../../../../lib/server-auth";
+import { STORE_TEMPLATE_IDS } from "../../../../lib/store-templates";
 const allowedTemplates = new Set([
   "benchmark-ai",
+  ...STORE_TEMPLATE_IDS,
   ...Array.from({ length: 30 }, (_, i) => "free-" + String(i + 1).padStart(2, "0")),
 ]);
 export async function GET(req: Request, { params }: { params: Promise<{ id: string }> }) {

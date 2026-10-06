@@ -275,7 +275,13 @@ export default function StoreBuilderClient({ storeId }: { storeId: string }) {
           <GeneralPanel store={store} setStore={setStore} settings={settings} setSettings={setSettings} />
         )}
         {tab === "design" && (
-          <DesignPanel store={store} setStore={setStore} settings={settings} setSettings={setSettings} />
+          <DesignPanel
+            store={store}
+            setStore={setStore}
+            settings={settings}
+            setSettings={setSettings}
+            products={products}
+          />
         )}
         {tab === "home" && (
           <HomePanel
