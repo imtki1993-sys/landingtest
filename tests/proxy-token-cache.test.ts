@@ -2,7 +2,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { NextRequest } from "next/server";
 
-describe("middleware — vérification du jeton", () => {
+describe("proxy (ex-middleware) — vérification du jeton", () => {
   let fetchMock: ReturnType<typeof vi.fn>;
   beforeEach(() => {
     vi.resetModules();
@@ -18,7 +18,7 @@ describe("middleware — vérification du jeton", () => {
   afterEach(() => vi.unstubAllGlobals());
 
   const call = async (token: string) => {
-    const { middleware } = await import("../middleware");
+    const { proxy: middleware } = await import("../proxy");
     const req = new NextRequest("https://landpro.online/orders", { headers: { cookie: "lm_access=" + token } });
     return middleware(req);
   };

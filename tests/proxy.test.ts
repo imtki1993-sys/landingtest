@@ -1,12 +1,12 @@
 // Le middleware ne doit laisser passer sans connexion que les fichiers statiques et les pages publiques.
 import { describe, expect, it } from "vitest";
 import { NextRequest } from "next/server";
-import { middleware } from "../middleware";
+import { proxy as middleware } from "../proxy";
 
 const call = (path: string) => middleware(new NextRequest("https://landpro.online" + path));
 const passes = (res: Response) => res.headers.get("x-middleware-next") === "1";
 
-describe("middleware — accès sans connexion", () => {
+describe("proxy (ex-middleware) — accès sans connexion", () => {
   it("bloque une route API même si le chemin contient un point", async () => {
     for (const p of ["/api/products/123.json", "/api/orders.x", "/api/admin-users"]) {
       const res = await call(p);

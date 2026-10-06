@@ -7,7 +7,9 @@ export const PUBLIC_LANDINGS_TAG = "public-landings";
 
 export function invalidatePublicLandings() {
   try {
-    revalidateTag(PUBLIC_LANDINGS_TAG);
+    // Next 16 : { expire: 0 } = expiration immédiate (la visite suivante relit la base),
+    // et non « servir l'ancienne version puis rafraîchir » ("max").
+    revalidateTag(PUBLIC_LANDINGS_TAG, { expire: 0 });
   } catch (e) {
     console.error("[landing-cache] invalidation impossible", e);
   }

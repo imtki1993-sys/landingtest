@@ -73,7 +73,7 @@ async function refresh(req: NextRequest) {
     return null;
   }
 }
-export async function middleware(req: NextRequest) {
+export async function proxy(req: NextRequest) {
   const host = (req.headers.get("host") || "").split(":")[0].toLowerCase(),
     path = req.nextUrl.pathname;
   // Fichiers statiques uniquement : un chemin /api/ contenant un point (ex. /api/products/123.json)
