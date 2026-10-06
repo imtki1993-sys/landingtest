@@ -1,0 +1,857 @@
+/* Blocs « sur mesure » (template École Vive) : hero école, cartes à encoche,
+   photo + chiffres, appel à l'action avec photo, carte produit à encoche, pied de page « barre ». */
+
+/* ───────── doodles ───────── */
+.sx-doodle {
+  display: block;
+  pointer-events: none;
+  overflow: visible;
+}
+.sx-chalk {
+  background-color: var(--sx-primary);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='220' fill='none' stroke='%23fff' stroke-opacity='.5' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M40 60c-10-14 6-30 18-20 10-12 30 0 20 16-6 16-12 26-20 26s-14-8-18-22zM58 40c0-8 4-14 10-16'/%3E%3Cpath d='M150 40l70 30-6 14-70-30zM144 54l-8 10 14-4'/%3E%3Cpath d='M30 140h50l8 50H22zM40 140c0-14 30-14 30 0M38 160h34'/%3E%3Cpath d='M150 150a26 26 0 1 1 52 0h-52zM176 124v-6'/%3E%3Cpath d='M110 110c8-8 16 8 24 0s16 8 24 0M100 30c6 4 6 12 0 16M226 140c6 0 8 8 2 10M120 196c4-6 12-6 14 0'/%3E%3C/svg%3E");
+  background-size: 260px 220px;
+}
+
+/* titres soulignés au feutre (mots entre *étoiles*, mot mis en valeur du hero) */
+.sx-tpl-s90-01 .sx-hl {
+  position: relative;
+  color: inherit;
+  white-space: nowrap;
+}
+.sx-tpl-s90-01 .sx-hl::after {
+  content: "";
+  position: absolute;
+  inset-inline: -6% -4%;
+  bottom: -0.16em;
+  height: 0.3em;
+  background: var(--sx-accent);
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 30' preserveAspectRatio='none'%3E%3Cpath d='M40 10C110 2 200 2 270 9M4 26C90 14 200 12 296 20' fill='none' stroke='%23000' stroke-width='5' stroke-linecap='round'/%3E%3C/svg%3E")
+    center / 100% 100% no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 30' preserveAspectRatio='none'%3E%3Cpath d='M40 10C110 2 200 2 270 9M4 26C90 14 200 12 296 20' fill='none' stroke='%23000' stroke-width='5' stroke-linecap='round'/%3E%3C/svg%3E")
+    center / 100% 100% no-repeat;
+}
+
+/* bouton flèche posé dans une encoche (anneau de la couleur du fond) */
+.sx-notch-arrow {
+  position: absolute;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
+  background: var(--sx-surface);
+  color: var(--sx-accent);
+  box-shadow: 0 0 0 16px var(--sx-bg);
+  transition: transform 0.2s;
+}
+.sx-notch-arrow svg {
+  width: 36px;
+  height: 36px;
+}
+.sx-notch-arrow:hover {
+  transform: rotate(45deg);
+}
+
+/* ───────── hero école ───────── */
+.sx-store .sx-hero-school {
+  padding: 64px 0 40px;
+  background: var(--sx-hero-bg);
+  overflow: hidden;
+}
+.sx-school-grid {
+  display: grid;
+  grid-template-columns: 1.12fr 0.88fr;
+  grid-template-areas: "copy visual" "cards visual";
+  gap: 32px 28px;
+  align-items: start;
+}
+.sx-school-copy {
+  grid-area: copy;
+  position: relative;
+}
+.sx-hero-school .sx-hero-title {
+  font-size: clamp(46px, 7.4vw, 112px);
+  line-height: 0.98;
+  letter-spacing: -0.045em;
+}
+.sx-hero-school .sx-hero-text {
+  color: var(--sx-muted);
+  opacity: 1;
+  max-width: 470px;
+}
+.sx-hero-school .sx-actions {
+  margin-top: 28px;
+}
+.sx-tpl-s90-01 .sx-btn {
+  border-radius: 22px 22px 0 22px;
+  min-height: 52px;
+  padding: 0 34px;
+  font-weight: 600;
+}
+.sx-school-squiggle {
+  position: absolute;
+  right: 4%;
+  bottom: -14px;
+  width: 170px;
+  color: var(--sx-primary);
+}
+.sx-school-visual {
+  grid-area: visual;
+  position: relative;
+  min-height: 640px;
+  height: 100%;
+}
+.sx-school-block {
+  position: absolute;
+  border-radius: 34px;
+}
+.sx-school-block-a {
+  top: 18%;
+  right: 0;
+  width: 46%;
+  height: 34%;
+}
+.sx-school-block-b {
+  top: 46%;
+  left: 0;
+  width: 70%;
+  height: 24%;
+}
+.sx-school-block-c {
+  top: 72%;
+  left: 0;
+  right: 0;
+  height: 28%;
+}
+.sx-school-photo {
+  position: absolute;
+  inset: 0 6% 0 22%;
+  overflow: hidden;
+  border-radius: 200px 200px 34px 34px;
+  box-shadow: 0 30px 60px -30px rgba(0, 0, 0, 0.45);
+}
+.sx-school-photo .sx-img,
+.sx-school-photo .sx-art {
+  height: 100%;
+}
+.sx-school-burst {
+  position: absolute;
+  top: 6%;
+  left: -2%;
+  width: 150px;
+  color: var(--sx-accent);
+  transform: rotate(-12deg);
+}
+.sx-school-cards {
+  grid-area: cards;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+.sx-school-card {
+  position: relative;
+  min-height: 300px;
+  border-radius: 30px;
+  background: var(--sx-surface);
+  overflow: hidden;
+}
+.sx-school-card b {
+  display: block;
+  font-family: var(--sx-hfont);
+  font-weight: 600;
+  font-size: clamp(20px, 2vw, 28px);
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+}
+.sx-school-card .sx-hl {
+  color: var(--sx-primary);
+}
+.sx-school-card .sx-hl::after {
+  display: none;
+}
+.sx-school-card-person {
+  display: grid;
+  grid-template-columns: 0.9fr 1.1fr;
+}
+.sx-school-card-photo {
+  position: relative;
+  overflow: hidden;
+}
+.sx-school-card-person > div {
+  display: flex;
+  flex-direction: column;
+  padding: 30px 22px 26px 18px;
+}
+.sx-school-card-person strong {
+  margin-top: auto;
+  font-family: var(--sx-hfont);
+  font-size: 44px;
+  line-height: 1;
+  color: var(--sx-primary);
+}
+.sx-school-card-person small {
+  margin-top: 6px;
+  color: var(--sx-muted);
+  font-size: 13px;
+}
+.sx-school-card-notch {
+  padding: 22px 26px 28px;
+  display: flex;
+  flex-direction: column;
+}
+.sx-school-card-img {
+  display: block;
+  width: 64%;
+  aspect-ratio: 16/10;
+  overflow: hidden;
+  border-radius: 20px;
+}
+.sx-school-card-notch .sx-notch-arrow {
+  top: -10px;
+  right: -10px;
+  width: 104px;
+  height: 104px;
+  border-radius: 28px;
+  background: var(--sx-surface);
+}
+.sx-school-card-notch b {
+  margin-top: auto;
+  padding-top: 22px;
+  padding-inline-end: 76px;
+}
+.sx-school-card-notch small {
+  margin-top: 6px;
+  color: var(--sx-muted);
+}
+.sx-school-ast {
+  position: absolute;
+  right: 20px;
+  bottom: 22px;
+  width: 64px;
+  color: var(--sx-primary);
+}
+
+/* ───────── en-tête de section : titre à gauche, texte à droite ───────── */
+.sx-split-head {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 32px 60px;
+  align-items: start;
+  margin-bottom: 56px;
+}
+.sx-split-head h2 {
+  position: relative;
+  display: inline;
+  font-size: clamp(36px, 5vw, 76px);
+  line-height: 1.05;
+  letter-spacing: -0.04em;
+}
+.sx-head-spark {
+  display: inline-block;
+  width: 0.6em;
+  height: 0.6em;
+  margin-inline-start: 0.25em;
+  vertical-align: 0.15em;
+  color: var(--sx-accent);
+}
+.sx-store .sx-split-head p {
+  color: var(--sx-muted);
+  font-size: 18px;
+  line-height: 1.65;
+  padding-top: 10px;
+}
+.sx-head-deco {
+  position: absolute;
+  right: 0;
+  bottom: -60px;
+  width: 150px;
+  color: var(--sx-primary);
+  transform: scaleX(-1) rotate(-20deg);
+}
+
+/* ───────── cartes à encoche ───────── */
+.sx-features-list {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 28px;
+}
+.sx-feature {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-height: 420px;
+  padding: 56px 40px 130px;
+  border-radius: 34px;
+  background: var(--sx-surface);
+  overflow: hidden;
+}
+.sx-feature h3 {
+  font-family: var(--sx-hfont);
+  font-weight: 500;
+  font-size: clamp(26px, 2.6vw, 40px);
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+}
+.sx-feature h3 .sx-hl {
+  color: var(--sx-accent);
+}
+.sx-feature h3 .sx-hl::after {
+  display: none;
+}
+.sx-store .sx-feature p {
+  margin-top: 18px;
+  color: var(--sx-muted);
+  font-size: 17px;
+  line-height: 1.6;
+}
+.sx-feature-icon {
+  position: absolute;
+  left: 34px;
+  bottom: 34px;
+  width: 110px;
+  height: 90px;
+  color: var(--sx-primary);
+}
+.sx-feature .sx-notch-arrow {
+  right: -8px;
+  bottom: -8px;
+  width: 128px;
+  height: 128px;
+}
+.sx-feature-alt {
+  padding: 150px 40px 56px;
+}
+.sx-feature-alt .sx-feature-icon {
+  top: 52px;
+  bottom: auto;
+  width: 84px;
+  height: 84px;
+}
+.sx-feature-alt .sx-notch-arrow {
+  top: -8px;
+  bottom: auto;
+}
+
+/* ───────── photo + chiffres ───────── */
+.sx-ps-grid {
+  display: grid;
+  grid-template-columns: 1.15fr 0.6fr 0.6fr 0.55fr;
+  grid-template-rows: repeat(3, minmax(170px, auto));
+  gap: 22px;
+}
+.sx-ps-photo {
+  grid-column: 1 / 3;
+  grid-row: 1 / 4;
+  position: relative;
+  min-height: 560px;
+}
+.sx-ps-band {
+  position: absolute;
+  left: 0;
+  border-radius: 34px;
+}
+.sx-ps-band-a {
+  top: 6%;
+  right: 22%;
+  height: 40%;
+}
+.sx-ps-band-b {
+  top: 52%;
+  right: 0;
+  bottom: 0;
+}
+.sx-ps-img {
+  position: absolute;
+  inset: 0 18% 0 18%;
+  overflow: hidden;
+  border-radius: 240px 240px 34px 34px;
+}
+.sx-ps-img .sx-img,
+.sx-ps-img .sx-art {
+  height: 100%;
+}
+.sx-ps-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 28px 18px;
+  border-radius: 30px;
+  background: var(--sx-accent);
+  color: var(--sx-on-accent);
+}
+.sx-ps-stat strong {
+  font-family: var(--sx-hfont);
+  font-size: clamp(42px, 4.4vw, 72px);
+  line-height: 1;
+  letter-spacing: -0.04em;
+  color: color-mix(in srgb, var(--sx-on-accent) 82%, var(--sx-accent));
+}
+.sx-ps-stat span {
+  margin-top: 14px;
+  font-size: 17px;
+  line-height: 1.4;
+  max-width: 180px;
+}
+.sx-ps-stat-0 {
+  grid-column: 3;
+  grid-row: 1;
+}
+.sx-ps-stat-1 {
+  grid-column: 3;
+  grid-row: 2;
+}
+.sx-ps-stat-2 {
+  grid-column: 3 / 5;
+  grid-row: 3;
+}
+.sx-ps-burst {
+  grid-column: 4;
+  grid-row: 1;
+  align-self: center;
+  color: var(--sx-accent);
+}
+.sx-ps-burst .sx-doodle {
+  width: 100%;
+  max-width: 200px;
+}
+.sx-ps-tile {
+  border-radius: 30px;
+}
+.sx-ps-tile-a {
+  grid-column: 4;
+  grid-row: 2;
+}
+.sx-ps-tile-b {
+  display: none;
+}
+
+/* ───────── appel à l'action avec photo ───────── */
+.sx-ctap-box {
+  position: relative;
+  display: grid;
+  grid-template-columns: 0.75fr 1.25fr;
+  min-height: 460px;
+  border-radius: 34px;
+  background: var(--sx-primary);
+  color: var(--sx-on-primary);
+  overflow: hidden;
+}
+.sx-ctap-media {
+  position: relative;
+  overflow: hidden;
+  clip-path: polygon(0 0, 100% 0, 72% 100%, 0 100%);
+  background: var(--sx-surface);
+}
+.sx-ctap-media .sx-img,
+.sx-ctap-media .sx-art {
+  height: 100%;
+}
+.sx-ctap-copy {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 56px 220px 56px 24px;
+}
+.sx-ctap-copy small {
+  font-family: var(--sx-hfont);
+  font-size: clamp(26px, 3vw, 42px);
+  font-weight: 600;
+  color: var(--sx-accent);
+  letter-spacing: -0.02em;
+}
+.sx-ctap-copy h2 {
+  margin-top: 14px;
+  font-size: clamp(34px, 4.6vw, 68px);
+  line-height: 1.08;
+  color: inherit;
+}
+.sx-store .sx-ctap-copy p {
+  margin-top: 22px;
+  max-width: 520px;
+  opacity: 0.85;
+  font-size: 17px;
+  line-height: 1.6;
+}
+.sx-ctap-copy .sx-btn {
+  margin-top: 28px;
+  align-self: flex-start;
+}
+.sx-ctap-arrow {
+  top: -14px;
+  right: -14px;
+  width: 170px;
+  height: 150px;
+  border-radius: 34px;
+  background: var(--sx-primary);
+  color: var(--sx-accent);
+  box-shadow: 0 0 0 22px var(--sx-bg);
+}
+.sx-ctap-arrow svg {
+  width: 56px;
+  height: 56px;
+}
+.sx-ctap-ast {
+  position: absolute;
+  right: 60px;
+  bottom: 40px;
+  width: 170px;
+  color: var(--sx-accent);
+}
+
+/* ───────── carte produit à encoche ───────── */
+.sx-cl-notch {
+  position: relative;
+  padding: 18px 18px 26px;
+  border-radius: 28px;
+  background: var(--sx-surface);
+  overflow: hidden;
+}
+.sx-cl-notch .sx-card-media {
+  aspect-ratio: 4/3;
+  border-radius: 6px;
+}
+.sx-cl-notch .sx-card-body {
+  padding: 22px 120px 0 2px;
+}
+.sx-cl-notch .sx-card-name {
+  font-family: var(--sx-hfont);
+  font-weight: 500;
+  font-size: 22px;
+  line-height: 1.25;
+  letter-spacing: -0.015em;
+}
+.sx-card-notch {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 112px;
+  height: 100px;
+  border-radius: 24px 0 0 0;
+  background: var(--sx-bg);
+}
+.sx-store .sx-card-notch .sx-add-icon {
+  top: 14px;
+  left: 14px;
+  right: 0;
+  bottom: 0;
+  width: auto;
+  height: auto;
+  border-radius: 22px;
+  background: var(--sx-surface);
+  color: var(--sx-accent);
+  border: 0;
+  box-shadow: none;
+}
+.sx-store .sx-card-notch .sx-add-icon svg {
+  width: 34px;
+  height: 34px;
+}
+
+/* ───────── pied de page « barre » ───────── */
+.sx-store .sx-footer.sx-footer-bar {
+  background: var(--sx-bg);
+  color: var(--sx-text);
+  border-top: 1px solid var(--sx-border);
+  padding: 44px 0 36px;
+}
+.sx-footer-bar .sx-footer-brand {
+  font-family: var(--sx-hfont);
+  font-size: 30px;
+  letter-spacing: -0.03em;
+}
+.sx-footer-bar .sx-footer-row {
+  gap: 28px;
+}
+.sx-store .sx-footer-bar .sx-footer-inline {
+  gap: 40px !important;
+  color: var(--sx-muted);
+  font-size: 18px;
+}
+.sx-footer-bar .sx-footer-bottom {
+  margin-top: 34px;
+}
+.sx-footer-bar .sx-copy {
+  color: var(--sx-muted);
+  font-size: 15px;
+}
+.sx-store .sx-footer .sx-footer-legal {
+  flex-direction: row;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-top: 8px;
+  font-size: 13px;
+  color: var(--sx-muted);
+}
+.sx-footer-rounds {
+  display: flex;
+  gap: 18px;
+}
+.sx-store .sx-footer .sx-round {
+  opacity: 1;
+  display: grid;
+  place-items: center;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: var(--sx-primary);
+  color: var(--sx-on-primary);
+}
+.sx-round .sx-icon {
+  width: 24px;
+  height: 24px;
+}
+
+/* ───────── réglages propres au template École Vive ───────── */
+.sx-tpl-s90-01 .sx-header {
+  border-bottom: 1px solid var(--sx-border);
+}
+.sx-tpl-s90-01 .sx-brand {
+  font-family: var(--sx-hfont);
+  font-size: 30px;
+  font-weight: 700;
+  letter-spacing: -0.04em;
+}
+.sx-tpl-s90-01 .sx-nav a {
+  color: var(--sx-muted);
+  font-size: 17px;
+}
+.sx-tpl-s90-01 .sx-nav a.active {
+  color: var(--sx-text);
+}
+.sx-store.sx-tpl-s90-01 .sx-header-cta {
+  background: transparent;
+  color: var(--sx-text) !important;
+  border: 1.5px solid var(--sx-text);
+  border-radius: 12px;
+  min-height: 46px;
+  padding: 0 26px;
+  font-size: 15px;
+  font-weight: 500;
+}
+.sx-tpl-s90-01 .sx-products .sx-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 26px;
+}
+.sx-tpl-s90-01 .sx-head h2 {
+  font-size: clamp(34px, 4.6vw, 68px);
+  letter-spacing: -0.04em;
+  line-height: 1.06;
+}
+.sx-tpl-s90-01 .sx-quotes {
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 26px;
+}
+.sx-tpl-s90-01 .sx-quotes figure {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  padding: 32px 36px 40px;
+  border: 0;
+  border-radius: 30px;
+}
+.sx-tpl-s90-01 .sx-quotes figure.has-avatar {
+  padding-top: 0;
+}
+.sx-quote-avatar {
+  width: 150px;
+  height: 140px;
+  margin: 0 0 22px -36px;
+  object-fit: cover;
+  border-radius: 0 0 26px 0;
+  box-shadow: 0 0 0 14px var(--sx-bg);
+}
+.sx-tpl-s90-01 .sx-quotes .sx-stars {
+  order: -1;
+  color: #f8c300;
+  font-size: 22px;
+  letter-spacing: 4px;
+}
+.sx-tpl-s90-01 .sx-quotes figcaption {
+  order: -2;
+  font-family: var(--sx-hfont);
+  font-size: 22px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+.sx-quotes figcaption small {
+  display: block;
+  margin-top: 4px;
+  font-family: var(--sx-bfont);
+  font-weight: 400;
+  font-size: 15px;
+  color: var(--sx-muted);
+}
+.sx-tpl-s90-01 .sx-quotes blockquote {
+  margin-top: 22px;
+  font-size: 17px;
+  line-height: 1.7;
+}
+
+/* ───────── responsive ───────── */
+@media (max-width: 1024px) {
+  .sx-features-list {
+    grid-template-columns: 1fr 1fr;
+  }
+  .sx-ps-grid {
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto;
+  }
+  .sx-ps-photo {
+    grid-column: 1 / 3;
+    grid-row: auto;
+    min-height: 460px;
+  }
+  .sx-ps-stat-0,
+  .sx-ps-stat-1,
+  .sx-ps-stat-2 {
+    grid-column: auto;
+    grid-row: auto;
+  }
+  .sx-ps-burst,
+  .sx-ps-tile {
+    display: none;
+  }
+  .sx-ctap-copy {
+    padding-right: 150px;
+  }
+}
+@media (max-width: 860px) {
+  .sx-store .sx-hero-school {
+    padding-top: 36px;
+  }
+  .sx-school-grid {
+    grid-template-columns: 1fr;
+    grid-template-areas: "copy" "visual" "cards";
+  }
+  .sx-school-visual {
+    min-height: 440px;
+  }
+  .sx-school-squiggle {
+    display: none;
+  }
+  .sx-split-head {
+    grid-template-columns: 1fr;
+    gap: 16px;
+    margin-bottom: 36px;
+  }
+  .sx-store .sx-split-head p {
+    padding-top: 0;
+    font-size: 16px;
+  }
+  .sx-head-deco {
+    display: none;
+  }
+  .sx-tpl-s90-01 .sx-products .sx-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+  .sx-ctap-box {
+    grid-template-columns: 1fr;
+  }
+  .sx-ctap-media {
+    height: 260px;
+    clip-path: polygon(0 0, 100% 0, 100% 78%, 0 100%);
+  }
+  .sx-ctap-copy {
+    padding: 28px 26px 120px;
+  }
+  .sx-ctap-arrow {
+    width: 110px;
+    height: 100px;
+    top: auto;
+    bottom: -14px;
+  }
+  .sx-ctap-ast {
+    right: auto;
+    left: 26px;
+    bottom: 26px;
+    width: 80px;
+  }
+}
+@media (max-width: 640px) {
+  .sx-school-cards,
+  .sx-features-list,
+  .sx-ps-grid,
+  .sx-tpl-s90-01 .sx-products .sx-grid {
+    grid-template-columns: 1fr;
+  }
+  .sx-ps-photo {
+    grid-column: auto;
+    min-height: 380px;
+  }
+  .sx-school-visual {
+    min-height: 380px;
+  }
+  .sx-feature,
+  .sx-feature-alt {
+    min-height: 0;
+    padding: 34px 28px 130px;
+  }
+  .sx-feature-alt .sx-feature-icon {
+    top: auto;
+    bottom: 34px;
+  }
+  .sx-feature-alt .sx-notch-arrow {
+    top: auto;
+    bottom: -8px;
+  }
+  .sx-feature .sx-notch-arrow {
+    width: 104px;
+    height: 104px;
+  }
+  .sx-store .sx-footer-bar .sx-footer-inline {
+    gap: 18px !important;
+    font-size: 15px;
+  }
+  .sx-round {
+    width: 52px;
+    height: 52px;
+  }
+}
+
+/* ───────── arabe (droite à gauche) : les doodles passent de l'autre côté ───────── */
+[dir="rtl"] .sx-school-squiggle {
+  right: auto;
+  left: 0;
+  transform: scaleX(-1);
+}
+[dir="rtl"] .sx-school-ast,
+[dir="rtl"] .sx-ctap-ast {
+  right: auto;
+  left: 22px;
+}
+[dir="rtl"] .sx-head-deco {
+  right: auto;
+  left: 0;
+  transform: rotate(-20deg);
+}
+[dir="rtl"] .sx-feature-icon {
+  left: auto;
+  right: 34px;
+}
+[dir="rtl"] .sx-school-card-notch .sx-notch-arrow,
+[dir="rtl"] .sx-feature .sx-notch-arrow,
+[dir="rtl"] .sx-ctap-arrow {
+  right: auto;
+  left: -10px;
+}
+[dir="rtl"] .sx-feature .sx-notch-arrow {
+  left: -8px;
+}
+[dir="rtl"] .sx-notch-arrow svg {
+  transform: scaleX(-1);
+}
+[dir="rtl"] .sx-ctap-media {
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 28% 100%);
+}
+[dir="rtl"] .sx-ctap-copy {
+  padding: 56px 24px 56px 220px;
+}
+[dir="rtl"] .sx-school-card-notch b {
+  margin-inline-start: auto;
+}

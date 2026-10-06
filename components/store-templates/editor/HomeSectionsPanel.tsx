@@ -34,6 +34,8 @@ const SECTION_HELP: Partial<Record<SxSectionType, string>> = {
   bento: "Jusqu'à 4 cartes avec chiffre, texte et image ; {products} et {categories} sont calculés.",
   rows: "Liste en lignes (numéro, titre, texte, image) avec un lien vers la boutique.",
   spotlight: "Grande image plein écran avec un titre et un bouton.",
+  features: "Cartes à encoche avec icône dessinée. Un mot entre *étoiles* est mis en couleur.",
+  photostats: "Grande photo et jusqu'à 3 chiffres ; {products} et {categories} sont calculés.",
 };
 const CUSTOM_TYPES: [string, string][] = [
   ["text", "Texte"],
@@ -183,7 +185,28 @@ export default function HomeSectionsPanel({
                       products={products}
                     />
                   ) : type === "hero" ? (
-                    <HeroEditor settings={own} setSettings={setSettings} uploadHeroImage={uploadHeroImage} />
+                    <>
+                      <HeroEditor settings={own} setSettings={setSettings} uploadHeroImage={uploadHeroImage} />
+                      {/* cartes sous le hero (templates qui en ont) */}
+                      {(t.copy.fr.sections.hero?.items?.length || 0) > 0 && (
+                        <div className="sxe-hero-cards">
+                          <span className="sxe-label">Cartes sous la bannière</span>
+                          <small className="sxe-hint">
+                            Un mot entre *étoiles* est mis en couleur. Le chiffre peut être {"{products}"} ou{" "}
+                            {"{categories}"}.
+                          </small>
+                          <ItemsEditor
+                            items={sectionContent(t, store.locale, "hero", sx).items || []}
+                            onChange={(items) => setBlock("hero", { items })}
+                            withValue
+                            valueLabel="Chiffre (carte 1)"
+                            withImage
+                            storeId={store.id}
+                            products={products}
+                          />
+                        </div>
+                      )}
+                    </>
                   ) : (
                     type && (
                       <SectionFields
@@ -197,6 +220,7 @@ export default function HomeSectionsPanel({
                         products={products}
                         categories={categories}
                         promosLayout={t.promos}
+                        ctaPhoto={!!t.ctaPhoto}
                         sx={sx}
                         setSx={setSx}
                       />
@@ -313,6 +337,7 @@ function SectionFields({
   products,
   categories,
   promosLayout,
+  ctaPhoto = false,
   sx,
   setSx,
 }: {
@@ -326,6 +351,7 @@ function SectionFields({
   products: any[];
   categories: string[];
   promosLayout: string;
+  ctaPhoto?: boolean;
   sx: any;
   setSx: (sx: any) => void;
 }) {
@@ -386,13 +412,30 @@ function SectionFields({
       {type === "catalog" && f("title", "Titre")}
       {["promos", "showcase", "categories", "trust", "stats", "testimonials", "newsletter", "faq"].includes(type) && (
         <>
-          {type !== "trust" && type !== "stats" && type !== "newsletter" && f("eyebrow", "Petit titre")}
+          {type !== "trust" && type !== "stats" && (type !== "newsletter" || ctaPhoto) && f("eyebrow", "Petit titre")}
           {f("title", "Titre")}
           {["promos", "showcase", "categories", "newsletter"].includes(type) && f("text", "Texte", true)}
           {["promos", "showcase", "newsletter"].includes(type) && f("button", "Bouton")}
         </>
       )}
       {type === "wordmark" && f("eyebrow", "Petit texte manuscrit")}
+      {["features", "photostats"].includes(type) && (
+        <>
+          {f("eyebrow", "Petit titre")}
+          {f("title", "Titre (mot entre *étoiles* = souligné)")}
+          {f("text", "Texte", true)}
+          {type === "photostats" && img("image", "Photo")}
+          <ItemsEditor
+            items={block.items || []}
+            onChange={(items) => onChange({ items })}
+            withValue={type === "photostats"}
+            valueLabel="Chiffre ({products}, {categories} ou texte)"
+            storeId={storeId}
+            products={products}
+          />
+        </>
+      )}
+      {type === "newsletter" && ctaPhoto && img("image", "Photo")}
       {["bento", "rows", "spotlight"].includes(type) && (
         <>
           {f("eyebrow", "Petit titre")}

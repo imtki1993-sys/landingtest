@@ -42,6 +42,7 @@ import {
 } from "./SeriesPages";
 import SeriesHeader from "./SeriesHeader";
 import { heroSerie2 } from "./SeriesHeroes2";
+import { CtaPhotoSection, FeaturesSection, PhotoStatsSection, heroSchool, hl, plain } from "./SeriesSchool";
 import { storeBuilderDefaults } from "../../lib/store-builder-config";
 import "./series-store.css";
 
@@ -731,8 +732,7 @@ export default function SeriesStore(props: SeriesStoreProps) {
           </section>
         );
     }
-    // heros de la Série 2
-    return heroSerie2(t.hero, {
+    const kit = {
       hero,
       store,
       products,
@@ -748,14 +748,19 @@ export default function SeriesStore(props: SeriesStoreProps) {
       actions,
       eyebrow,
       searchBar,
-    });
+    };
+    // hero sur mesure (école) : cartes sous le texte, modifiables avec le hero
+    if (t.hero === "school")
+      return heroSchool({ ...kit, items: block("hero").items || [], fill: (v) => fillTokens(v, counts) });
+    // heros de la Série 2
+    return heroSerie2(t.hero, kit);
   }
 
   const head = (b: SxBlock, link = true, fallback = "") => (
     <div className="sx-head">
       <div>
         {b.eyebrow && <small className="sx-eyebrow">{b.eyebrow}</small>}
-        <h2>{b.title || fallback}</h2>
+        <h2>{hl(b.title || fallback)}</h2>
         {b.text && <p>{b.text}</p>}
       </div>
       {link && (
@@ -991,12 +996,16 @@ export default function SeriesStore(props: SeriesStoreProps) {
               {head(b, false)}
               <div className="sx-quotes">
                 {items.map((x, i) => (
-                  <figure key={i}>
+                  <figure key={i} className={x.image ? "has-avatar" : undefined}>
+                    {x.image && <img className="sx-quote-avatar" src={x.image} alt={x.title} loading="lazy" />}
                     <span className="sx-stars" aria-hidden="true">
                       ★★★★★
                     </span>
                     <blockquote>{x.text}</blockquote>
-                    <figcaption>{x.title}</figcaption>
+                    <figcaption>
+                      {x.title}
+                      {x.value && <small>{x.value}</small>}
+                    </figcaption>
                   </figure>
                 ))}
               </div>
@@ -1005,6 +1014,15 @@ export default function SeriesStore(props: SeriesStoreProps) {
         );
       }
       case "newsletter":
+        if (t.ctaPhoto)
+          return (
+            <CtaPhotoSection
+              b={b}
+              photo={art(4, plain(b.title), b.image)}
+              href={base + "/contact"}
+              fallback={txt.contact}
+            />
+          );
         return (
           <section className="sx-section sx-cta">
             <div className="sx-wrap sx-cta-box">
@@ -1112,13 +1130,17 @@ export default function SeriesStore(props: SeriesStoreProps) {
             </div>
           </section>
         );
+      case "features":
+        return <FeaturesSection b={b} shopUrl={shopUrl} lang={lang} />;
+      case "photostats":
+        return <PhotoStatsSection b={b} photo={art(3, plain(b.title), b.image)} fill={(v) => fillTokens(v, counts)} />;
       case "faq": {
         if (cfg.showFaq === false || !Array.isArray(cfg.faq) || !cfg.faq.length) return null;
         return (
           <FaqBlock
             ctx={ctx}
             eyebrow={b.eyebrow}
-            title={b.title || txt.faq}
+            title={hl(b.title || txt.faq)}
             text={b.text}
             items={cfg.faq.slice(0, 6)}
           />
@@ -1191,7 +1213,7 @@ export default function SeriesStore(props: SeriesStoreProps) {
     if (page === "delivery") return <DeliveryPage ctx={ctx} />;
     if (page === "contact") return <ContactPage ctx={ctx} />;
     if (page === "faq")
-      return <FaqPage ctx={ctx} eyebrow={block("faq").eyebrow} title={block("faq").title || txt.faq} />;
+      return <FaqPage ctx={ctx} eyebrow={block("faq").eyebrow} title={plain(block("faq").title) || txt.faq} />;
     if (page === "privacy" || page === "terms" || page === "returns") return <LegalPage ctx={ctx} page={page} />;
     return <NotFoundPage ctx={ctx} />;
   }

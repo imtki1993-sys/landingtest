@@ -125,6 +125,18 @@ describe("registre des templates de boutique", () => {
     }
   });
 
+  it("template sur mesure École Vive : cartes du hero, sections propres, textes FR + AR", () => {
+    const t = getStoreTemplate("s90-01")!;
+    expect(t.hero).toBe("school");
+    expect(t.sections).toEqual(expect.arrayContaining(["features", "photostats"]));
+    expect(seedStoreSettings(t, "fr").showAnnouncement).toBe(false);
+    for (const lang of ["fr", "ar"] as const) {
+      expect(sectionContent(t, lang, "hero", undefined).items).toHaveLength(2);
+      expect(sectionContent(t, lang, "features", undefined).items).toHaveLength(3);
+      expect(sectionContent(t, lang, "photostats", undefined).items?.length).toBeGreaterThan(0);
+    }
+  });
+
   it("getStoreTemplate refuse les valeurs inconnues", () => {
     expect(getStoreTemplate("s1-01")?.name).toBe("Vision Rouge");
     expect(getStoreTemplate("benchmark-ai")).toBeNull();
