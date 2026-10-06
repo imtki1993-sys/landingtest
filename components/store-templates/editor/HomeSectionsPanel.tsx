@@ -36,6 +36,10 @@ const SECTION_HELP: Partial<Record<SxSectionType, string>> = {
   spotlight: "Grande image plein écran avec un titre et un bouton.",
   features: "Cartes à encoche avec icône dessinée. Un mot entre *étoiles* est mis en couleur.",
   photostats: "Grande photo et jusqu'à 3 chiffres ; {products} et {categories} sont calculés.",
+  statement: "Phrase de présentation (titre foncé + suite en gris), photo et chiffres.",
+  services: "Un service par élément ; un élément avec un chiffre devient la carte colorée.",
+  expert: "1er élément = la personne (nom, rôle, texte) ; les suivants = chiffres sur la photo.",
+  highlights: "4 cartes : image + titre, carte colorée (étiquette + texte), grande photo, chiffre.",
 };
 const CUSTOM_TYPES: [string, string][] = [
   ["text", "Texte"],
@@ -419,6 +423,26 @@ function SectionFields({
         </>
       )}
       {type === "wordmark" && f("eyebrow", "Petit texte manuscrit")}
+      {["statement", "services", "expert", "highlights"].includes(type) && (
+        <>
+          {f("eyebrow", "Petit titre")}
+          {f("title", "Titre")}
+          {f("text", "Texte", true)}
+          {["statement", "expert"].includes(type) && f("button", "Bouton")}
+          {["statement", "expert"].includes(type) && img("image", type === "expert" ? "Photo de la personne" : "Photo")}
+          {["statement", "expert"].includes(type) &&
+            img("image2", type === "expert" ? "Grande photo" : "Petite photo (avatar)")}
+          <ItemsEditor
+            items={block.items || []}
+            onChange={(items) => onChange({ items })}
+            withValue
+            valueLabel="Chiffre / étiquette ({products}, {categories} ou texte)"
+            withImage={type === "highlights"}
+            storeId={storeId}
+            products={products}
+          />
+        </>
+      )}
       {["features", "photostats"].includes(type) && (
         <>
           {f("eyebrow", "Petit titre")}

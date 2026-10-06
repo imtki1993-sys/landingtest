@@ -137,6 +137,23 @@ describe("registre des templates de boutique", () => {
     }
   });
 
+  it("templates sur mesure Clé Lime et Sourire Clair : heros et sections propres", () => {
+    const lime = getStoreTemplate("s90-02")!;
+    const smile = getStoreTemplate("s90-03")!;
+    expect([lime.hero, smile.hero]).toEqual(["estate", "clinic"]);
+    expect(lime.sections).toEqual(expect.arrayContaining(["statement", "services"]));
+    expect(smile.sections).toEqual(expect.arrayContaining(["statement", "expert", "highlights"]));
+    for (const t of [lime, smile])
+      for (const lang of ["fr", "ar"] as const)
+        for (const k of t.sections.filter(
+          (x) => !["hero", "products", "faq", "testimonials", "categories"].includes(x),
+        ))
+          expect(
+            sectionContent(t, lang, k, undefined).items?.length || sectionContent(t, lang, k, undefined).title,
+            `${t.id} ${lang} ${k}`,
+          ).toBeTruthy();
+  });
+
   it("getStoreTemplate refuse les valeurs inconnues", () => {
     expect(getStoreTemplate("s1-01")?.name).toBe("Vision Rouge");
     expect(getStoreTemplate("benchmark-ai")).toBeNull();

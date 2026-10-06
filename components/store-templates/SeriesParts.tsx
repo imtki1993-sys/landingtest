@@ -355,6 +355,65 @@ export function ProductCard({ ctx, p, index = 0 }: { ctx: SxCtx; p: any; index?:
         </article>
       );
     }
+    case "listing": {
+      // points forts : description courte découpée en 3 phrases
+      const points = String(p.short_description || "")
+        .split(/[.;\n·•]+/)
+        .map((x: string) => x.trim())
+        .filter(Boolean)
+        .slice(0, 3);
+      return (
+        <article className="sx-card sx-cl-listing">
+          <a className="sx-card-media" href={url}>
+            {media}
+            {off > 0 && <em className="sx-off">-{off}%</em>}
+          </a>
+          <div className="sx-card-body">
+            <div>
+              {name}
+              {p.specifications?.category && (
+                <small className="sx-card-place">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+                    <path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z" />
+                    <circle cx="12" cy="9.5" r="2.5" />
+                  </svg>
+                  {p.specifications.category}
+                </small>
+              )}
+              {priceRow}
+            </div>
+            {points.length > 0 && (
+              <ul className="sx-card-points">
+                {points.map((x: string) => (
+                  <li key={x}>{x}</li>
+                ))}
+              </ul>
+            )}
+            {addBtn("text")}
+          </div>
+        </article>
+      );
+    }
+    case "post":
+      return (
+        <article className="sx-card sx-cl-post">
+          <a className="sx-card-media" href={url}>
+            {media}
+            {p.specifications?.category && <em className="sx-post-tag">{p.specifications.category}</em>}
+            {off > 0 && <em className="sx-off">-{off}%</em>}
+          </a>
+          <div className="sx-card-body">
+            {priceRow}
+            {name}
+            <div className="sx-card-line">
+              <a className="sx-post-more" href={url}>
+                <Icon name="arrow" /> {tr(ctx, "En savoir plus", "اعرف أكثر")}
+              </a>
+              {addBtn("icon")}
+            </div>
+          </div>
+        </article>
+      );
     case "notch":
       return (
         <article className="sx-card sx-cl-notch">
@@ -624,6 +683,56 @@ export function SeriesFooter({ ctx }: { ctx: SxCtx }) {
         </div>
       </footer>
     );
+  if (layout === "photo") {
+    const photo =
+      (Array.isArray(cfg.heroImages) && cfg.heroImages[0]) ||
+      cfg.heroImage ||
+      ctx.products.map((x: any) => (Array.isArray(x?.image_urls) ? x.image_urls[0] : "")).find(Boolean) ||
+      "";
+    const wa = whatsappDigits(cfg.whatsapp || store.workspace_whatsapp);
+    return (
+      <footer className="sx-footer sx-footer-photo">
+        <div className="sx-wrap sx-footer-photo-grid">
+          <div className="sx-footer-photo-copy">
+            <p>{about}</p>
+            <div className="sx-footer-photo-links">
+              <nav>
+                <b>{tr(ctx, "Liens rapides", "روابط")}</b>
+                {inline.slice(0, 4).map(([h, l]) => (
+                  <a key={h} href={h}>
+                    {l}
+                  </a>
+                ))}
+              </nav>
+              <nav>
+                <b>{txt.contact}</b>
+                {wa && (
+                  <a href={"https://wa.me/" + wa} target="_blank" rel="noreferrer">
+                    WhatsApp · +{wa}
+                  </a>
+                )}
+                {cfg.contactEmail && <a href={"mailto:" + cfg.contactEmail}>{cfg.contactEmail}</a>}
+                <a href={base + "/contact"}>{tr(ctx, "Formulaire de contact", "استمارة التواصل")}</a>
+              </nav>
+              <nav>
+                <b>{tr(ctx, "Informations", "معلومات")}</b>
+                {inline.slice(4).map(([h, l]) => (
+                  <a key={h} href={h}>
+                    {l}
+                  </a>
+                ))}
+              </nav>
+            </div>
+            {copyright}
+          </div>
+          <div className="sx-footer-photo-media">
+            {photo ? <img src={photo} alt="" loading="lazy" /> : <span className="sx-art" />}
+            <b className="sx-footer-photo-brand">{cfg.logo ? <img src={cfg.logo} alt={store.name} /> : store.name}</b>
+          </div>
+        </div>
+      </footer>
+    );
+  }
   if (layout === "bar") {
     const wa = whatsappDigits(cfg.whatsapp || store.workspace_whatsapp);
     const round = (href: string, label: string, icon: string, external = false) => (

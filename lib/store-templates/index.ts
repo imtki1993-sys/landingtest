@@ -58,6 +58,10 @@ export const SECTION_LABELS: Record<SxSectionType, string> = {
   spotlight: "Grande image",
   features: "Cartes avec icônes",
   photostats: "Photo + chiffres",
+  statement: "Présentation + chiffres",
+  services: "Services",
+  expert: "Expert + chiffres",
+  highlights: "Cartes points forts",
 };
 
 /** Toutes les sections connues du template (ordre par défaut + celles masquées par défaut). */
@@ -84,6 +88,10 @@ export const ADDABLE_SECTIONS: SxSectionType[] = [
   "spotlight",
   "features",
   "photostats",
+  "statement",
+  "services",
+  "expert",
+  "highlights",
 ];
 const ALL_TYPES = new Set<string>(Object.keys(SECTION_LABELS));
 
@@ -156,6 +164,8 @@ const OVERLAY_HEROES = new Set([
   "dark-forest",
   "center-photo",
   "dark-split",
+  "estate",
+  "clinic",
 ]);
 
 /**
@@ -203,6 +213,8 @@ export const LAYOUT_CHOICES: Record<keyof SxLayout, [string, string][]> = {
     ["tinted", "Fonds colorés"],
     ["swatch", "Pastilles de couleurs"],
     ["notch", "Carte à encoche"],
+    ["listing", "Annonce horizontale"],
+    ["post", "Article avec étiquette"],
   ],
   faq: [
     ["split", "Deux colonnes"],
@@ -219,6 +231,7 @@ export const LAYOUT_CHOICES: Record<keyof SxLayout, [string, string][]> = {
     ["minimal", "Minimal"],
     ["split", "Deux panneaux"],
     ["bar", "Barre + réseaux"],
+    ["photo", "Sombre + photo"],
   ],
   shop: [
     ["sidebar", "Filtres sur le côté"],
@@ -270,6 +283,8 @@ export const HERO_CHOICES: [SxHeroVariant, string][] = [
   ["center-photo", "Photo + titre centré"],
   ["dark-split", "Fond nuit + accent"],
   ["school", "École (titre souligné + collage)"],
+  ["estate", "Photo plein cadre + chiffres"],
+  ["clinic", "Photo arrondie + pastilles"],
 ];
 
 /** Remplace {products} / {categories} par les vrais nombres de la boutique. */
