@@ -367,3 +367,8 @@
 .lpx-success { background: #e7f8ee; color: #136c38; padding: 16px; border-radius: 12px; font-weight: 700; text-align: center; }
 .lpx-hero-fullbleed .lpx-bg img { max-height: 80%; object-fit: contain; }
 .lpx-stage.lpx-photo img { width: 100%; height: 100%; object-fit: cover; filter: none; }
+
+/* Styles de section de l'éditeur : le fond choisi remplace celui de la section */
+.lpx-styled[style*="background-color"] > section, .lpx-styled[style*="background-color"] > div:not(.lpx-block-tag) { background: transparent; }
+.lpx-styled > section { color: inherit; text-align: inherit; }
+.lpx-styled[style*="--lpx-sec-pad"] > section { padding-top: var(--lpx-sec-pad); padding-bottom: var(--lpx-sec-pad); }

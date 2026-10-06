@@ -25,6 +25,17 @@ export interface LandproTemplateProps {
   onSubmit?: (e: React.FormEvent<HTMLFormElement>, qty: number) => void;
 }
 
+/** Couleur de texte lisible sur un fond #rrggbb (sombre sur fond clair, claire sur fond sombre). */
+function readableOn(bg: string): string | undefined {
+  const m = /^#?([0-9a-f]{6})$/i.exec(bg.trim());
+  if (!m) return undefined;
+  const [r, g, b] = [0, 2, 4].map((i) => {
+    const v = parseInt(m[1].slice(i, i + 2), 16) / 255;
+    return v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4;
+  });
+  return 0.2126 * r + 0.7152 * g + 0.0722 * b > 0.45 ? "#111318" : "#f3f4f6";
+}
+
 export default function LandproTemplate({
   data,
   preview = false,
@@ -59,9 +70,35 @@ export default function LandproTemplate({
   const keys = vm.order;
   const announcementOn = keys.includes("announcement") && (!vm.hidden.has("announcement") || builderMode);
 
+  // Styles de section enregistrés par l'éditeur (fond, couleur du texte, alignement, marges)
+  const styleOf = (key: string): React.CSSProperties | undefined => {
+    const st = vm.sectionStyles[key];
+    if (!st || typeof st !== "object") return undefined;
+    const pad = st.padding === "" || st.padding == null ? NaN : Number(st.padding);
+    const out: Record<string, string | undefined> = {
+      backgroundColor: st.background || undefined,
+      // Fond choisi sans couleur de texte : texte sombre ou clair selon le fond, pour rester lisible
+      color: st.color || (st.background ? readableOn(String(st.background)) : undefined),
+      textAlign: st.align || undefined,
+      // marge appliquée à la section intérieure (voir landpro.css)
+      ["--lpx-sec-pad" as string]: Number.isFinite(pad) ? `${pad}px` : undefined,
+    };
+    return Object.values(out).some((v) => v !== undefined) ? (out as React.CSSProperties) : undefined;
+  };
+
   const block = (key: string, node: React.ReactNode) => {
     const hidden = vm.hidden.has(key);
-    if (!builderMode) return hidden ? null : <React.Fragment key={key}>{node}</React.Fragment>;
+    const style = styleOf(key);
+    if (!builderMode) {
+      if (hidden) return null;
+      return style ? (
+        <div key={key} className={cx("styled")} style={style}>
+          {node}
+        </div>
+      ) : (
+        <React.Fragment key={key}>{node}</React.Fragment>
+      );
+    }
     const label = key.startsWith("custom-")
       ? "Bloc personnalisé"
       : SECTION_LABELS[key as keyof typeof SECTION_LABELS] || key;
@@ -69,7 +106,8 @@ export default function LandproTemplate({
       <div
         key={key}
         data-lpx-section={key}
-        className={cx("block", hidden && "is-hidden")}
+        className={cx("block", hidden && "is-hidden", style && "styled")}
+        style={style}
         onClick={() => onSectionSelect?.(key)}
       >
         <span className={cx("block-tag")}>
@@ -142,7 +180,7 @@ export default function LandproTemplate({
         {vm.price > 0 && (
           <div className={cx("sticky-cta")}>
             <span className={cx("p")}>
-              {formatPrice(vm.offers.find((o) => o.qty === qty)?.price ?? vm.price, vm.currency)}
+              {formatPrice((vm.offers.find((o) => o.qty === qty)?.price ?? vm.price) + vm.shipping, vm.currency)}
             </span>
             <button type="button" className={cx("btn pulse")} onClick={scrollToOrder}>
               {vm.cta}

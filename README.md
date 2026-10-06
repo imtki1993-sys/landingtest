@@ -25,7 +25,7 @@ Les variables d'environnement sont toutes décrites dans [`.env.example`](.env.e
 | Commande | Rôle |
 |---|---|
 | `npm run dev` | Serveur de développement |
-| `npm run build` | Build de production (génère d'abord `app/landing-public.css`) |
+| `npm run build` | Build de production (génère d'abord `app/store-public.css`) |
 | `npm test` | Tests automatiques (Vitest) |
 | `npm run lint` | Lint ciblé (hooks React, code inaccessible…) |
 | `npm run typecheck` | Vérification TypeScript |
@@ -43,7 +43,7 @@ app/
 ├─ pages/               Tableau de bord des landing pages + éditeur (builder-v3/)
 ├─ orders/, products/, stores/, analytics/, settings/…   Tableau de bord
 ├─ globals.css          CSS du tableau de bord
-└─ landing-public.css   CSS des pages publiques — GÉNÉRÉ, ne pas modifier
+└─ store-public.css     CSS des boutiques publiques — GÉNÉRÉ, ne pas modifier
 components/
 ├─ landpro/             Moteur des 60 templates (registre, sections, hero, modèle de rendu)
 ├─ LandingTemplateV4.tsx Point d'entrée des templates (délègue à landpro/)
@@ -55,7 +55,7 @@ lib/
 ├─ monitoring.ts        Suivi des erreurs (logs + alerte webhook)
 ├─ public-error.ts      Message d'erreur montré à l'utilisateur
 └─ landing-template-presets.ts  Interface historique des templates
-scripts/build-landing-css.js    Génère app/landing-public.css à chaque build
+scripts/build-store-css.js      Génère app/store-public.css à chaque build
 tests/                  Tests Vitest
 ```
 
@@ -72,11 +72,13 @@ Un oubli expose les données d'un autre client (voir `tests/products-security.te
 
 **Cache des landing pages.** Une route qui modifie ce qu'affiche une landing (page, produit, réglages) doit être enveloppée par `withLandingInvalidation(...)`, sinon la page publiée peut rester en cache jusqu'à 5 minutes.
 
-**CSS.** Modifier `app/globals.css`, jamais `app/landing-public.css` (régénéré automatiquement).
+**CSS.** Modifier `app/globals.css`, jamais `app/store-public.css` (régénéré automatiquement). Les landing pages publiques ne chargent que `components/landpro/landpro.css` et `app/landing/landing.css`.
 
 ## Templates de landing pages
 
 Les 60 templates sont définis dans `components/landpro/registry.ts` : un thème (couleurs, typographie), une variante de hero et une liste de sections par défaut. Les identifiants `01 → 35` sont enregistrés dans les pages existantes : ne pas les renommer (ou ajouter un alias dans `TEMPLATE_ALIASES`).
+
+**Anciennes pages** (sans `landing_template_id`) : elles sont affichées automatiquement avec le template le plus proche de leur ancien thème (`components/landpro/legacy.ts`), contenu conservé. Rien n'est réécrit en base ; choisir un template dans l'éditeur l'enregistre définitivement.
 
 L'ordre réel des sections d'une page vient de `content.section_order` (modifié dans l'éditeur) ; `content.hidden_sections` masque une section sans la supprimer. Les sections sans contenu (avis, comparatif…) sont signalées dans l'éditeur et masquées en ligne.
 

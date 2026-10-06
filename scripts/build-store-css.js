@@ -1,26 +1,19 @@
-// Génère app/landing-public.css : sous-ensemble exact de app/globals.css (même ordre)
-// limité aux règles dont toutes les classes peuvent apparaître sur une page publique
-// (landing pages et boutiques). Les pages publiques ne chargent plus le CSS du
+// Génère app/store-public.css : sous-ensemble exact de app/globals.css (même ordre)
+// limité aux règles dont toutes les classes peuvent apparaître sur une boutique publique.
+// (Les landing pages n'en ont plus besoin : elles utilisent les templates LandPro.) Les pages publiques ne chargent plus le CSS du
 // tableau de bord. Lancé automatiquement avant chaque build (npm run prebuild).
 const fs = require("fs");
 const path = require("path");
 
 const ROOT = path.join(__dirname, "..");
-const PUBLIC_FILES = [
-  "app/landing/[slug]/LandingClient.tsx",
-  "app/landing/[slug]/HeroRenderer.tsx",
-  "app/landing/[slug]/page.tsx",
-  "app/store/[slug]/Storefront.tsx",
-  "app/store/[slug]/[[...page]]/page.tsx",
-  "components/LandingTemplateV4.tsx",
-];
-const OUT = path.join(ROOT, "app/landing-public.css");
+const PUBLIC_FILES = ["app/store/[slug]/Storefront.tsx", "app/store/[slug]/[[...page]]/page.tsx"];
+const OUT = path.join(ROOT, "app/store-public.css");
 
 let postcss;
 try {
   postcss = require("postcss");
 } catch {
-  console.warn("[landing-css] postcss introuvable : app/landing-public.css conservé tel quel.");
+  console.warn("[store-css] postcss introuvable : app/store-public.css conservé tel quel.");
   process.exit(0);
 }
 
@@ -57,6 +50,6 @@ root.walkAtRules((a) => {
 });
 
 const header =
-  "/* FICHIER GÉNÉRÉ par scripts/build-landing-css.js depuis globals.css — ne pas modifier à la main.\n   Contient uniquement les règles utilisables par les pages publiques (landing pages, boutiques). */\n";
+  "/* FICHIER GÉNÉRÉ par scripts/build-store-css.js depuis globals.css — ne pas modifier à la main.\n   Contient uniquement les règles utilisables par les boutiques publiques. */\n";
 fs.writeFileSync(OUT, header + root.toString());
-console.log(`[landing-css] ${kept} règles gardées, ${dropped} retirées → app/landing-public.css`);
+console.log(`[store-css] ${kept} règles gardées, ${dropped} retirées → app/store-public.css`);

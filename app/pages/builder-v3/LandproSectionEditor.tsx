@@ -3,7 +3,8 @@
 // et le choix du template / des couleurs. Branché dans BuilderV3.
 import React, { useState } from "react";
 import { uploadImages } from "../../../lib/builder-images";
-import { TEMPLATES, defaultSectionOrder, getTemplate, resolveTemplateId } from "../../../components/landpro/registry";
+import { TEMPLATES, defaultSectionOrder, getTemplate } from "../../../components/landpro/registry";
+import { adaptLegacyContent, resolvePageTemplate } from "../../../components/landpro/legacy";
 
 type Patch = (k: string, v: any) => void;
 type Field = {
@@ -414,14 +415,18 @@ export function LandproTemplatePanel({
   commit: (next: any) => void;
   patch: Patch;
 }) {
-  const current = getTemplate(resolveTemplateId(draft.landing_template_id || "cod-direct"));
+  // Template réellement affiché (les anciennes pages sont converties automatiquement)
+  const resolved = resolvePageTemplate(draft);
+  const current = getTemplate(resolved.templateId);
   const apply = (id: string, resetSections: boolean) => {
     const t = getTemplate(id);
-    const customs = (Array.isArray(draft.section_order) ? draft.section_order : []).filter((k: string) =>
+    // Ancienne page : la conversion faite à l'affichage est enregistrée avec le choix du template
+    const base = resolved.legacy ? adaptLegacyContent(draft, { hasWhatsapp: true }) : draft;
+    const customs = (Array.isArray(base.section_order) ? base.section_order : []).filter((k: string) =>
       k.startsWith("custom-"),
     );
     commit({
-      ...draft,
+      ...base,
       landing_template_id: t.id,
       landing_template_accent: t.theme.primary,
       landing_template_dark: t.theme.dark,
@@ -444,6 +449,12 @@ export function LandproTemplatePanel({
         {current.description} Changer de template applique ses sections par défaut (vos blocs personnalisés sont
         conservés).
       </small>
+      {resolved.legacy && (
+        <small>
+          Page créée avec l'ancien éditeur : elle s'affiche automatiquement avec ce template, contenu conservé.
+          Choisissez un template pour l'enregistrer définitivement.
+        </small>
+      )}
       <button type="button" onClick={() => apply(current.id, true)}>
         ↺ Remettre les sections par défaut du template
       </button>

@@ -38,6 +38,8 @@ export interface VM {
   price: number;
   oldPrice?: number;
   currency: string;
+  /** Frais de livraison ajoutés au total (0 = livraison gratuite) */
+  shipping: number;
   images: string[];
   cta: string;
   delivery: string;
@@ -233,6 +235,15 @@ export function buildVM(data: LandingV4Data, opts: { demo?: boolean } = {}): VM 
         ? "✕"
         : str(v);
 
+  const whatsapp = String(data.whatsappPhone || c.whatsapp_phone || "").replace(/\D/g, "");
+  const orderModeWanted: "form" | "whatsapp" | "both" =
+    (["form", "whatsapp", "both"].includes(c.order_mode) ? c.order_mode : t.options?.orderMode) || "form";
+
+  // « Livraison gratuite » seulement si la page ne facture pas la livraison
+  const shipping = Math.max(0, num(c.delivery_price, 0));
+  const deliveryWord =
+    shipping > 0 ? (lang === "ar" ? "توصيل لجميع المدن" : "Livraison partout au Maroc") : u.freeDelivery;
+
   return {
     t,
     rtl,
@@ -252,9 +263,10 @@ export function buildVM(data: LandingV4Data, opts: { demo?: boolean } = {}): VM 
     price,
     oldPrice: old > price ? old : undefined,
     currency: str(c.currency) || "DH",
+    shipping,
     images,
     cta: str(c.cta) || u.orderNow,
-    delivery: str(c.delivery) || `${u.cod} · ${u.freeDelivery}`,
+    delivery: str(c.delivery) || `${u.cod} · ${deliveryWord}`,
     show: {
       badge: c.hero_show_badge !== false,
       cta: c.hero_show_cta !== false,
@@ -265,7 +277,7 @@ export function buildVM(data: LandingV4Data, opts: { demo?: boolean } = {}): VM 
     benefits,
     features,
     steps,
-    trust: trustRaw.length ? trustRaw : DEFAULT_TRUST[lang],
+    trust: trustRaw.length ? trustRaw : [deliveryWord, ...DEFAULT_TRUST[lang].slice(1)],
     faq,
     problem: { pains, solution: str(c.solution) || (demo ? p.problem?.solution || dc.description : "") },
     reviews,
@@ -307,7 +319,7 @@ export function buildVM(data: LandingV4Data, opts: { demo?: boolean } = {}): VM 
     defaultQty: num(c.quantity_default_qty, offers[0]?.qty || 1),
     countdownMinutes: num(c.countdown_minutes, t.options?.countdownMinutes || 360),
     videoUrl: str(c.video_url),
-    whatsapp: String(data.whatsappPhone || c.whatsapp_phone || "").replace(/\D/g, ""),
+    whatsapp,
     story: {
       title: str(c.story_title) || (demo ? dc.tagline : str(c.subheadline) || str(data.name)),
       text: str(c.story_text) || str(c.description) || (demo ? dc.description : ""),
@@ -316,15 +328,17 @@ export function buildVM(data: LandingV4Data, opts: { demo?: boolean } = {}): VM 
     afterImage: str(c.after_image) || images[1] || images[0],
     guarantee: {
       title: str(c.guarantee_title) || u.guarantee,
-      text: str(c.guarantee_text) || `${u.freeDelivery} · ${u.cod} · ${u.support}`,
+      text: str(c.guarantee_text) || `${deliveryWord} · ${u.cod} · ${u.support}`,
     },
     finalCta: {
       title: str(c.final_cta_title) || u.finalCta,
       text: str(c.final_cta_text) || str(c.subheadline) || (demo ? dc.tagline : ""),
     },
-    announcement: str(c.announcement_text) || t.options?.announcement || `🚚 ${u.freeDelivery} · 💵 ${u.cod}`,
+    announcement:
+      str(c.announcement_text) || (shipping > 0 ? "" : t.options?.announcement) || `🚚 ${deliveryWord} · 💵 ${u.cod}`,
     orderTitle: str(c.order_title) || u.order,
-    orderMode: (["form", "whatsapp", "both"].includes(c.order_mode) ? c.order_mode : t.options?.orderMode) || "form",
+    // Sans numéro WhatsApp, le formulaire reste toujours disponible (jamais de page sans moyen de commander)
+    orderMode: whatsapp || demo ? orderModeWanted : "form",
     titles,
     order,
     hidden: new Set(arr(c.hidden_sections).map(String)),
