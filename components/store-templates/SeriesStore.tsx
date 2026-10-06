@@ -37,6 +37,7 @@ import {
   ShopPage,
   type VariantApi,
 } from "./SeriesPages";
+import SeriesHeader from "./SeriesHeader";
 import "./series-store.css";
 
 type Txt = Record<string, string>;
@@ -75,7 +76,6 @@ function fontsHref(families: string[]) {
 export default function SeriesStore(props: SeriesStoreProps) {
   const { t, store, cfg, products, page, rtl, base, txt, product, variants, extra, drawer, cartCount, openCart, add } =
     props;
-  const [menu, setMenu] = useState(false);
   const [cat, setCat] = useState("");
   const [sort, setSort] = useState("featured");
   const lang = copyLang(store.locale);
@@ -414,7 +414,7 @@ export default function SeriesStore(props: SeriesStoreProps) {
         return (
           <section className="sx-hero sx-hero-market">
             <div className="sx-wrap">
-              {categories.length > 0 && (
+              {categories.length > 0 && t.layout.header !== "stacked" && (
                 <nav className="sx-catbar" aria-label={lang === "ar" ? "التصنيفات" : "Catégories"}>
                   {categories.slice(0, 8).map((x) => (
                     <a key={x.name} href={catUrl(x.name)}>
@@ -961,12 +961,6 @@ export default function SeriesStore(props: SeriesStoreProps) {
     "--ps-body-font": `"${bodyFont}", "Cairo", sans-serif`,
   };
   const isHome = page === "home";
-  const nav = [
-    [base, txt.home],
-    [shopUrl, txt.shop],
-    [base + "/delivery", txt.delivery],
-    [base + "/contact", txt.contact],
-  ];
 
   return (
     <main
@@ -981,41 +975,7 @@ export default function SeriesStore(props: SeriesStoreProps) {
       {cfg.showAnnouncement !== false && (
         <div className="sx-announcement">{pick(cfg.announcement, c.announcement)}</div>
       )}
-      <header className="sx-header">
-        <div className="sx-wrap sx-header-row">
-          <a className="sx-brand" href={base}>
-            {cfg.logo ? <img src={cfg.logo} alt={store.name} /> : store.name}
-          </a>
-          <nav id="sx-nav" className={"sx-nav" + (menu ? " open" : "")}>
-            {nav.map(([h, l]) => (
-              <a key={h} href={h} onClick={() => setMenu(false)}>
-                {l}
-              </a>
-            ))}
-          </nav>
-          <div className="sx-header-actions">
-            <a className="sx-icon-btn" href={shopUrl} aria-label={txt.search}>
-              <Icon name="search" />
-            </a>
-            <button type="button" className="sx-cart" onClick={openCart} aria-label={txt.cart}>
-              <Icon name="cart" />
-              <i>{cartCount}</i>
-            </button>
-            <button
-              type="button"
-              className="sx-burger"
-              aria-label={rtl ? "القائمة" : "Menu"}
-              aria-expanded={menu}
-              aria-controls="sx-nav"
-              onClick={() => setMenu((v) => !v)}
-            >
-              <span />
-              <span />
-              <span />
-            </button>
-          </div>
-        </div>
-      </header>
+      <SeriesHeader ctx={ctx} page={page} cartCount={cartCount} openCart={openCart} />
 
       {isHome ? (
         order.filter((k) => !hidden.has(k)).map((k) => <React.Fragment key={k}>{section(k)}</React.Fragment>)
