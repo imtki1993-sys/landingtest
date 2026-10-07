@@ -3,6 +3,7 @@
 // de templates et l'aperçu avant création. Les vraies pages
 // utilisent toujours le contenu enregistré (content / ai_content).
 // ─────────────────────────────────────────────────────────────
+import { DESIGN_DEMOS } from "./designs/defs";
 import type { DemoProduct as Product, DemoReview as Review, DemoCopy as ProductCopy } from "./demo-types";
 
 const DEFAULT_WHATSAPP = "212600000000"; // ← votre numéro WhatsApp
@@ -1129,5 +1130,5 @@ export const products: Record<string, Product> = {
 };
 
 export function getDemoProduct(id: string): Product {
-  return products[id] ?? products.holder;
+  return products[id] ?? DESIGN_DEMOS[id] ?? products.holder;
 }

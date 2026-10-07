@@ -41,6 +41,8 @@ export interface VM {
   /** Frais de livraison ajoutés au total (0 = livraison gratuite) */
   shipping: number;
   images: string[];
+  /** légendes des photos (content.showcase_labels) */
+  imageLabels: string[];
   cta: string;
   delivery: string;
   show: { badge: boolean; cta: boolean; price: boolean; subtitle: boolean; address: boolean };
@@ -132,7 +134,8 @@ export function buildVM(data: LandingV4Data, opts: { demo?: boolean } = {}): VM 
   /** en démo, complète un champ vide avec la valeur de démonstration */
   const fill = <T>(real: T[], demoVal: () => T[]): T[] => (real.length || !demo ? real : demoVal());
 
-  const price = num(data.price, demo ? p.price : 0);
+  // démo sans prix : prix du produit de démonstration
+  const price = num(data.price, 0) || (demo ? p.price : 0);
   const old = num(data.oldPrice, 0) || (demo && !num(data.price) ? p.oldPrice || 0 : 0);
   const images = arr(data.images).length ? arr(data.images).map(String) : demo ? p.images : [p.images[0]];
 
@@ -191,7 +194,9 @@ export function buildVM(data: LandingV4Data, opts: { demo?: boolean } = {}): VM 
   for (const k of [...CORE_SECTIONS, ...LANDPRO_SECTIONS]) {
     const saved = str(c[`${k}_title`]);
     const fallback = key2ui[k] ? String(u[key2ui[k]]) : SECTION_LABELS[k as SectionKey];
-    titles[k] = saved || fallback;
+    // titre propre au template (designs sur mesure), seulement pour la langue du template
+    const own = t.lang === lang ? str(t.titles?.[k as SectionKey]) : "";
+    titles[k] = saved || own || fallback;
   }
 
   const benefits = fill(arr(c.benefits), () => dc.benefits).map(toItem);
@@ -244,6 +249,10 @@ export function buildVM(data: LandingV4Data, opts: { demo?: boolean } = {}): VM 
   const deliveryWord =
     shipping > 0 ? (lang === "ar" ? "توصيل لجميع المدن" : "Livraison partout au Maroc") : u.freeDelivery;
 
+  const labels = (Array.isArray(c.showcase_labels) ? c.showcase_labels : str(c.showcase_labels).split(/\n|,/))
+    .map((x: any) => str(x))
+    .filter(Boolean);
+
   return {
     t,
     rtl,
@@ -265,6 +274,7 @@ export function buildVM(data: LandingV4Data, opts: { demo?: boolean } = {}): VM 
     currency: str(c.currency) || "DH",
     shipping,
     images,
+    imageLabels: labels.length ? labels : demo ? p.imageLabels || [] : [],
     cta: str(c.cta) || u.orderNow,
     delivery: str(c.delivery) || `${u.cod} · ${deliveryWord}`,
     show: {

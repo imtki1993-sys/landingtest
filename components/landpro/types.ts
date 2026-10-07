@@ -43,7 +43,9 @@ export type HeroVariant =
   | "sport"
   | "marketplace"
   | "minimal"
-  | "oneScreen";
+  | "oneScreen"
+  // Designs sur mesure (components/landpro/designs) : hero propre au template
+  | "design";
 
 /** Sections natives de l'éditeur (déjà connues de BuilderV3). */
 export const CORE_SECTIONS = ["hero", "order", "benefits", "problem", "features", "how", "trust", "faq"] as const;
@@ -90,6 +92,8 @@ export interface TemplateDef {
     badge?: string;
   };
   sections: SectionKey[]; // sans "hero" : il est toujours ajouté en tête
+  /** titres par défaut des sections propres au template (sinon : titres génériques) */
+  titles?: Partial<Record<SectionKey, string>>;
   options?: { countdownMinutes?: number; orderMode?: "form" | "whatsapp" | "both"; announcement?: string };
 }
 

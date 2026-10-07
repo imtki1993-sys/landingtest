@@ -1,0 +1,1264 @@
+/* Design « Vortex Rouge » (classes vr-*). Points de rupture : container queries (aperçu mobile de l'éditeur). */
+.lpx-tpl-vortex-rouge {
+  --vr-red: var(--primary);
+  --vr-red-d: color-mix(in srgb, var(--primary) 70%, #000);
+  --vr-black: #060606;
+  --vr-card: #121212;
+  --vr-white: #f5f5f5;
+  --vr-ink: #0b0b0b;
+  font-size: 15px;
+  background: var(--vr-black);
+}
+.lpx-tpl-vortex-rouge h1,
+.lpx-tpl-vortex-rouge h2,
+.lpx-tpl-vortex-rouge h3 {
+  letter-spacing: 0;
+}
+.vr-wrap {
+  width: 100%;
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 0 40px;
+}
+.vr-eyebrow {
+  display: block;
+  margin-bottom: 12px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--vr-red);
+}
+.vr-dot {
+  font-style: normal;
+  color: var(--vr-red);
+}
+.lpx .vr-h2 {
+  margin: 0 0 18px;
+  font-size: clamp(30px, 3.4cqi, 44px);
+  font-weight: 700;
+  line-height: 1.05;
+  text-transform: uppercase;
+}
+
+/* boutons */
+.lpx .vr-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: 46px;
+  padding: 0 26px;
+  border: 0;
+  border-radius: 2px;
+  background: var(--vr-red);
+  color: var(--primary-text);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition:
+    transform 0.2s,
+    filter 0.2s;
+}
+.lpx .vr-btn:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.08);
+}
+.lpx .vr-btn > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+.lpx .vr-btn .lpx-ico {
+  font-size: 15px;
+  transform: rotate(-45deg);
+}
+.lpx .vr-btn-dl .lpx-ico {
+  transform: none;
+}
+.lpx[dir="rtl"] .vr-btn .lpx-ico {
+  transform: rotate(-135deg);
+}
+.lpx[dir="rtl"] .vr-btn.vr-btn-dl .lpx-ico {
+  transform: none;
+}
+.lpx .vr-btn-sm {
+  min-height: 38px;
+  padding: 0 18px;
+  font-size: 11px;
+}
+.lpx .vr-btn-dark,
+.lpx .vr-btn-black {
+  background: #0b0b0b;
+  color: #fff;
+}
+
+/* en-tête */
+.vr-header {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  background: #000;
+  border-bottom: 1px solid #161616;
+}
+.vr-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  height: 76px;
+}
+.vr-logo-link {
+  text-decoration: none;
+}
+.vr-logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--vr-red);
+}
+.vr-logo svg {
+  width: 30px;
+  height: 30px;
+  flex: none;
+}
+.vr-logo b {
+  font-family: var(--heading);
+  font-size: 24px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: #fff;
+  white-space: nowrap;
+}
+.vr-logo b i {
+  font-style: normal;
+  color: var(--vr-red);
+}
+.vr-nav {
+  display: flex;
+  align-items: center;
+  gap: 34px;
+  margin-inline-start: auto;
+  margin-inline-end: 24px;
+}
+.vr-nav a {
+  position: relative;
+  padding: 8px 0;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #fff;
+  text-decoration: none;
+}
+.vr-nav a:hover {
+  color: var(--vr-red);
+}
+.vr-nav a.vr-on::after {
+  content: "";
+  position: absolute;
+  inset-inline: 0;
+  bottom: -4px;
+  height: 2px;
+  margin: 0 auto;
+  width: 18px;
+  background: var(--vr-red);
+}
+
+/* hero */
+.vr-hero {
+  position: relative;
+  overflow: hidden;
+  background: #050505;
+  color: #fff;
+  min-height: 620px;
+}
+.vr-hero-img {
+  position: absolute;
+  inset-block: 0;
+  inset-inline-end: 0;
+  width: 78%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 80% 30%;
+}
+.lpx[dir="rtl"] .vr-hero-img {
+  transform: scaleX(-1);
+  object-position: 20% 30%;
+}
+.vr-hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: linear-gradient(90deg, #050505 30%, rgba(5, 5, 5, 0.6) 48%, transparent 64%);
+  pointer-events: none;
+}
+.lpx[dir="rtl"] .vr-hero::before {
+  background: linear-gradient(-90deg, #050505 30%, rgba(5, 5, 5, 0.6) 48%, transparent 64%);
+}
+.vr-hero-in {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 40px;
+  min-height: 620px;
+  padding-top: 70px;
+  padding-bottom: 64px;
+}
+.vr-hero-copy {
+  max-width: 560px;
+  align-self: center;
+}
+.lpx .vr-h1 {
+  margin: 0 0 22px;
+  max-width: 620px;
+  font-size: clamp(54px, 5.4cqi, 80px);
+  font-weight: 700;
+  line-height: 0.98;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+.vr-h1 em {
+  font-style: normal;
+  color: var(--vr-red);
+}
+.vr-lead {
+  max-width: 440px;
+  font-size: 14px;
+  line-height: 1.7;
+  color: #d4d4d4;
+}
+.vr-hero-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 26px;
+  margin-top: 30px;
+}
+.lpx .vr-reel {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  line-height: 1.5;
+  text-align: start;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+.vr-reel-ring {
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  transition: background 0.2s;
+}
+.vr-reel-ring .lpx-ico {
+  fill: #fff;
+  font-size: 15px;
+  margin-inline-start: 2px;
+}
+.lpx[dir="rtl"] .vr-reel-ring .lpx-ico {
+  transform: scaleX(-1);
+}
+.lpx .vr-reel:hover .vr-reel-ring {
+  background: var(--vr-red);
+  border-color: var(--vr-red);
+}
+.vr-sign {
+  flex: none;
+  min-width: 200px;
+  padding-bottom: 4px;
+}
+.vr-sign-name {
+  display: block;
+  margin-bottom: 14px;
+  font-family: "Caveat", cursive;
+  font-size: 54px;
+  font-weight: 500;
+  line-height: 1;
+  color: #fff;
+  transform: rotate(-6deg);
+  transform-origin: left bottom;
+}
+.vr-sign small {
+  display: block;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  line-height: 1.8;
+  text-transform: uppercase;
+  color: #d4d4d4;
+}
+.vr-sign small b {
+  font-size: 15px;
+  color: #fff;
+  letter-spacing: 0.04em;
+}
+.vr-sign small s {
+  margin-inline-start: 10px;
+  color: #8a8a8a;
+}
+
+/* modale vidéo */
+.vr-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background: rgba(0, 0, 0, 0.85);
+}
+.vr-modal-in {
+  position: relative;
+  width: min(960px, 100%);
+}
+.vr-modal-in .lpx-video-frame {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  background: #000;
+  display: grid;
+  place-items: center;
+}
+.vr-modal-in .lpx-video-frame img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.lpx .vr-modal-x {
+  position: absolute;
+  top: -44px;
+  inset-inline-end: 0;
+  width: 36px;
+  height: 36px;
+  border: 0;
+  border-radius: 50%;
+  background: var(--vr-red);
+  color: #fff;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+}
+
+/* à propos */
+.vr-about {
+  background: var(--vr-white);
+  color: var(--vr-ink);
+  padding: 50px 0 54px;
+}
+.vr-about-in {
+  display: grid;
+  grid-template-columns: 1.05fr 1fr;
+  gap: 60px;
+  align-items: center;
+}
+.vr-about-art {
+  position: relative;
+  aspect-ratio: 900 / 760;
+}
+.vr-ghost {
+  position: absolute;
+  top: 0;
+  inset-inline-start: 4%;
+  font-family: var(--heading);
+  font-size: clamp(90px, 13cqi, 180px);
+  font-weight: 700;
+  line-height: 0.9;
+  text-transform: uppercase;
+  color: transparent;
+  -webkit-text-stroke: 1px #d9d9d9;
+  white-space: nowrap;
+  pointer-events: none;
+}
+.vr-about-img {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+.vr-badge {
+  position: absolute;
+  top: 46%;
+  inset-inline-end: 6%;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  width: 118px;
+  height: 118px;
+  padding: 10px;
+  border: 1.5px solid var(--vr-red);
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 0 0 6px rgba(255, 255, 255, 0.7);
+  text-align: center;
+}
+.vr-badge b {
+  font-family: var(--heading);
+  font-size: 30px;
+  line-height: 1;
+}
+.vr-badge small {
+  margin-top: 4px;
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  line-height: 1.3;
+  text-transform: uppercase;
+  color: #444;
+}
+.vr-about-copy .vr-h2 {
+  color: #0b0b0b;
+  max-width: 470px;
+}
+.vr-text {
+  max-width: 470px;
+  font-size: 14px;
+  line-height: 1.7;
+  color: #333;
+}
+.vr-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 28px;
+  margin: 26px 0 32px;
+  padding: 0;
+  list-style: none;
+}
+.vr-stats li {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+.vr-stats .lpx-ico {
+  flex: none;
+  font-size: 28px;
+  color: var(--vr-red);
+}
+.vr-stats b {
+  display: block;
+  font-family: var(--heading);
+  font-size: 24px;
+  line-height: 1;
+}
+.vr-stats small {
+  display: block;
+  margin-top: 4px;
+  max-width: 100px;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  line-height: 1.35;
+  text-transform: uppercase;
+  color: #444;
+}
+
+/* services */
+.vr-services {
+  position: relative;
+  padding: 56px 0 60px;
+  background:
+    linear-gradient(115deg, transparent 0 58%, rgba(255, 255, 255, 0.025) 58% 72%, transparent 72%),
+    radial-gradient(ellipse at 70% 0%, #1a1a1a, #060606 60%);
+  color: #fff;
+}
+.vr-head-c {
+  text-align: center;
+  margin-bottom: 34px;
+}
+.vr-head-c .vr-h2 {
+  margin: 0;
+}
+.vr-cards {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 14px;
+}
+.vr-card {
+  padding: 24px 18px 26px;
+  border: 1px solid #222;
+  border-radius: 3px;
+  background: linear-gradient(180deg, #161616, #0f0f0f);
+  transition:
+    border-color 0.2s,
+    transform 0.2s;
+}
+.vr-card:hover {
+  border-color: var(--vr-red);
+  transform: translateY(-3px);
+}
+.vr-card-ico {
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  margin-bottom: 26px;
+  border: 1.5px solid var(--vr-red);
+  border-radius: 10px;
+  color: var(--vr-red);
+  font-size: 24px;
+}
+.lpx .vr-card h3 {
+  margin: 0 0 10px;
+  font-family: var(--font);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  line-height: 1.3;
+  text-transform: uppercase;
+}
+.vr-card p {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.6;
+  color: #bdbdbd;
+}
+
+/* réalisations / vignettes vidéo */
+.vr-works {
+  padding: 40px 0 46px;
+  background: #fff;
+  color: var(--vr-ink);
+}
+.vr-head-row {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+.vr-head-row .vr-h2 {
+  margin: 0;
+  color: #0b0b0b;
+}
+.vr-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding-bottom: 6px;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.lpx[dir="rtl"] .vr-link .lpx-ico {
+  transform: scaleX(-1);
+}
+.vr-tiles {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+}
+.lpx .vr-tile {
+  position: relative;
+  display: block;
+  aspect-ratio: 4 / 2.9;
+  overflow: hidden;
+  padding: 0;
+  border: 0;
+  background: #0b0b0b;
+  color: #fff;
+  text-align: start;
+  cursor: pointer;
+}
+.vr-tile-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.4s;
+}
+.lpx .vr-tile:hover .vr-tile-img {
+  transform: scale(1.05);
+}
+.lpx .vr-tile::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, transparent 50%, rgba(0, 0, 0, 0.85));
+}
+.vr-play {
+  position: absolute;
+  top: 42%;
+  left: 50%;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  background: var(--vr-red);
+  transform: translate(-50%, -50%);
+  box-shadow: 0 8px 24px rgba(225, 6, 0, 0.45);
+}
+.vr-play .lpx-ico {
+  fill: #fff;
+  stroke: #fff;
+  font-size: 16px;
+  margin-inline-start: 2px;
+}
+.vr-tile-cap {
+  position: absolute;
+  inset-inline: 16px;
+  bottom: 14px;
+  z-index: 2;
+}
+.vr-tile-cap b {
+  display: block;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.vr-tile-cap small {
+  font-size: 11px;
+  color: #d4d4d4;
+}
+
+/* process */
+.vr-process {
+  padding: 18px 0 30px;
+  background:
+    linear-gradient(120deg, transparent 0 62%, rgba(255, 255, 255, 0.02) 62% 78%, transparent 78%),
+    #060606;
+  color: #fff;
+}
+.vr-process .vr-head-c {
+  margin-bottom: 28px;
+}
+.vr-steps {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(var(--n, 5), 1fr);
+  gap: 20px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: none;
+}
+.vr-steps::before {
+  content: "";
+  position: absolute;
+  top: 17px;
+  inset-inline: calc(50% / var(--n, 5));
+  border-top: 1.5px dotted #5a5a5a;
+}
+.vr-steps li {
+  position: relative;
+  text-align: center;
+}
+.vr-num {
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  margin-bottom: 16px;
+  border-radius: 50%;
+  background: var(--vr-red);
+  font-size: 13px;
+  font-weight: 800;
+  box-shadow: 0 0 0 6px #060606;
+}
+.lpx .vr-steps h3 {
+  margin: 0 0 8px;
+  font-family: var(--font);
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.vr-steps p {
+  max-width: 190px;
+  margin: 0 auto;
+  font-size: 11px;
+  line-height: 1.55;
+  color: #bdbdbd;
+}
+
+/* coloris + avis */
+.vr-clients {
+  padding: 26px 0 40px;
+  background: var(--vr-white);
+  color: var(--vr-ink);
+}
+.vr-clients-in {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 60px;
+  align-items: center;
+}
+.vr-clients .vr-h2 {
+  max-width: 440px;
+  color: #0b0b0b;
+}
+.vr-marks {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 22px 18px;
+  margin-top: 26px;
+  max-width: 520px;
+}
+.lpx .vr-mark {
+  padding: 4px 0;
+  border: 0;
+  background: none;
+  color: #111;
+  font-size: 15px;
+  text-align: start;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+.lpx .vr-mark:hover {
+  color: var(--vr-red);
+}
+.lpx .vr-mk-a {
+  font-family: var(--heading);
+  font-weight: 700;
+  font-size: 17px;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+.lpx .vr-mk-b {
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  text-transform: lowercase;
+}
+.lpx .vr-mk-c {
+  font-family: "Caveat", cursive;
+  font-size: 22px;
+  font-weight: 600;
+}
+.lpx .vr-mk-d {
+  font-family: Georgia, serif;
+  font-weight: 700;
+  font-style: italic;
+}
+.lpx .vr-mk-e {
+  font-weight: 800;
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.lpx .vr-mk-f {
+  font-weight: 500;
+  font-size: 17px;
+  letter-spacing: -0.02em;
+}
+.lpx .vr-mk-g {
+  font-weight: 800;
+  font-style: italic;
+}
+.lpx .vr-mk-h {
+  font-family: var(--heading);
+  font-weight: 500;
+  font-size: 16px;
+  letter-spacing: 0.1em;
+}
+.vr-quote-wrap {
+  display: grid;
+  justify-items: center;
+}
+.vr-quote {
+  width: 100%;
+  max-width: 470px;
+  margin: 0;
+  padding: 28px 34px 24px;
+  border-radius: 6px;
+  background: #fff;
+  box-shadow: 0 24px 50px -24px rgba(0, 0, 0, 0.25);
+}
+.vr-q {
+  display: block;
+  height: 30px;
+  font-family: Georgia, serif;
+  font-size: 54px;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--vr-red);
+}
+.vr-quote blockquote {
+  margin: 4px 0 20px;
+  font-size: 15px;
+  line-height: 1.6;
+  color: #222;
+}
+.vr-quote figcaption {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.vr-avatar {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #111;
+  color: #fff;
+  font-weight: 800;
+}
+.vr-quote figcaption b {
+  display: block;
+  font-size: 13px;
+}
+.vr-quote figcaption small {
+  font-size: 11px;
+  color: #666;
+}
+.vr-dots {
+  display: flex;
+  gap: 6px;
+  margin-top: 16px;
+}
+.vr-dots button {
+  width: 6px;
+  height: 6px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: #c9c9c9;
+  cursor: pointer;
+}
+.vr-dots button.vr-on {
+  background: var(--vr-red);
+}
+
+/* commande */
+.vr-order {
+  padding: 64px 0;
+  background:
+    linear-gradient(118deg, transparent 0 66%, rgba(225, 6, 0, 0.12) 66% 70%, transparent 70%),
+    #060606;
+  color: #fff;
+}
+.vr-order .lpx-d-order-in {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 56px;
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 0 40px;
+  align-items: center;
+}
+.vr-order-art {
+  position: relative;
+  aspect-ratio: 1;
+  overflow: hidden;
+  border: 1px solid #222;
+  background: #0b0b0b;
+}
+.vr-order-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.vr-order .lpx-d-order-aside ul {
+  display: grid;
+  gap: 12px;
+  margin: 20px 0 0;
+  padding: 0;
+  list-style: none;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.vr-order .lpx-d-order-aside li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.vr-order .lpx-d-order-aside .lpx-ico {
+  font-size: 20px;
+  color: var(--vr-red);
+}
+.lpx .vr-order .lpx-d-order-title {
+  margin: 0 0 20px;
+  font-size: clamp(30px, 3.4cqi, 44px);
+  font-weight: 700;
+  text-align: start;
+  text-transform: uppercase;
+}
+.vr-order .lpx-order {
+  border: 1px solid #262626;
+  border-radius: 3px;
+  background: #111;
+  box-shadow: none;
+}
+.vr-order .lpx-order-opt,
+.vr-order .lpx-field input,
+.vr-order .lpx-field select {
+  border-radius: 2px;
+  background: #0a0a0a;
+  border-color: #2a2a2a;
+}
+.vr-order .lpx-order-opt.lpx-on {
+  border-color: var(--vr-red);
+  background: color-mix(in srgb, var(--vr-red) 12%, #0a0a0a);
+}
+.vr-order .lpx-field span {
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.vr-order .lpx-btn {
+  border-radius: 2px;
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  box-shadow: none;
+}
+
+/* faq */
+.vr-faq {
+  padding: 60px 0;
+  background: #fff;
+  color: var(--vr-ink);
+}
+.vr-faq-in {
+  display: grid;
+  grid-template-columns: 0.8fr 1.2fr;
+  gap: 60px;
+  align-items: start;
+}
+.vr-faq .vr-h2 {
+  color: #0b0b0b;
+}
+.vr-faq-list details {
+  border-bottom: 1px solid #e5e5e5;
+}
+.vr-faq-list summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 18px 0;
+  cursor: pointer;
+  list-style: none;
+  font-size: 15px;
+  font-weight: 700;
+}
+.vr-faq-list summary::-webkit-details-marker {
+  display: none;
+}
+.vr-faq-list summary .lpx-ico {
+  flex: none;
+  color: var(--vr-red);
+  font-size: 20px;
+  transition: transform 0.2s;
+}
+.vr-faq-list details[open] summary .lpx-ico {
+  transform: rotate(45deg);
+}
+.vr-faq-list details p {
+  margin: -4px 0 18px;
+  font-size: 14px;
+  color: #555;
+}
+
+/* bandeau final */
+.vr-final {
+  position: relative;
+  overflow: hidden;
+  padding: 50px 0;
+  background:
+    linear-gradient(118deg, transparent 0 18%, rgba(0, 0, 0, 0.35) 18% 26%, transparent 26%),
+    linear-gradient(118deg, transparent 0 52%, rgba(255, 255, 255, 0.08) 52% 55%, transparent 55%),
+    linear-gradient(118deg, transparent 0 60%, rgba(0, 0, 0, 0.55) 60% 74%, transparent 74%),
+    linear-gradient(118deg, transparent 0 80%, rgba(0, 0, 0, 0.3) 80% 84%, transparent 84%),
+    linear-gradient(90deg, var(--vr-red-d), var(--vr-red) 45%, var(--vr-red-d));
+  color: #fff;
+}
+.vr-final-in {
+  display: grid;
+  grid-template-columns: 1.1fr 1fr 0.9fr;
+  gap: 40px;
+  align-items: center;
+}
+.vr-final .vr-eyebrow {
+  color: #ffd6d4;
+}
+.lpx .vr-final-title {
+  margin: 0;
+  font-size: clamp(36px, 4cqi, 54px);
+  font-weight: 700;
+  line-height: 1;
+  text-transform: uppercase;
+}
+.vr-final-title .vr-dot {
+  color: #0b0b0b;
+}
+.vr-final-mid p {
+  margin: 0 0 20px;
+  max-width: 320px;
+  font-size: 13px;
+  line-height: 1.65;
+  color: #ffe9e8;
+}
+.vr-final-end ul {
+  display: grid;
+  gap: 10px;
+  margin: 0 0 16px;
+  padding: 0;
+  list-style: none;
+  font-size: 13px;
+  font-weight: 600;
+}
+.vr-final-end li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.vr-final-end li a {
+  text-decoration: none;
+}
+.vr-final-end li > span {
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  flex: none;
+  border-radius: 4px;
+  background: rgba(0, 0, 0, 0.55);
+  font-size: 14px;
+}
+.vr-social {
+  display: inline-grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  border-radius: 50%;
+  font-size: 16px;
+  text-decoration: none;
+}
+
+/* pied de page */
+.vr-footer {
+  background: #000;
+  color: #cfcfcf;
+}
+.vr-footer-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  min-height: 66px;
+}
+.vr-footer .vr-logo b {
+  font-size: 20px;
+}
+.vr-footer .vr-logo svg {
+  width: 24px;
+  height: 24px;
+}
+.vr-footer small {
+  font-size: 11px;
+}
+.vr-footer nav {
+  display: flex;
+  gap: 36px;
+}
+.vr-footer nav a {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  text-decoration: none;
+}
+.vr-footer nav a:hover {
+  color: var(--vr-red);
+}
+
+/* ─── tablette ─── */
+@container lpx (max-width: 1100px) {
+  .vr-nav {
+    gap: 22px;
+  }
+  .vr-cards {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+@container lpx (max-width: 900px) {
+  .vr-wrap {
+    padding: 0 20px;
+  }
+  .vr-nav {
+    display: none;
+  }
+  .vr-header-row {
+    height: 64px;
+  }
+  .vr-hero {
+    min-height: 0;
+  }
+  .vr-hero-img {
+    position: relative;
+    width: 100%;
+    height: 400px;
+    object-position: 74% 20%;
+  }
+  .lpx[dir="rtl"] .vr-hero-img {
+    object-position: 26% 20%;
+  }
+  .vr-hero::before,
+  .lpx[dir="rtl"] .vr-hero::before {
+    top: 200px;
+    bottom: auto;
+    height: 200px;
+    background: linear-gradient(180deg, transparent, #050505);
+  }
+  .vr-hero-in {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 26px;
+    min-height: 0;
+    margin-top: -90px;
+    padding-top: 0;
+    padding-bottom: 44px;
+  }
+  .vr-hero-copy {
+    align-self: stretch;
+  }
+  .lpx .vr-h1 {
+    font-size: clamp(42px, 12cqi, 64px);
+  }
+  .vr-sign-name {
+    font-size: 42px;
+  }
+  .vr-about-in,
+  .vr-clients-in,
+  .vr-faq-in {
+    grid-template-columns: 1fr;
+    gap: 34px;
+  }
+  .vr-about-art {
+    max-width: 520px;
+  }
+  .vr-tiles {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .vr-steps {
+    grid-template-columns: 1fr;
+    gap: 22px;
+    max-width: 420px;
+    margin: 0 auto;
+  }
+  .vr-steps::before {
+    top: 18px;
+    bottom: 18px;
+    inset-inline: auto;
+    inset-inline-start: 17px;
+    border-top: 0;
+    border-inline-start: 1.5px dotted #5a5a5a;
+  }
+  .vr-steps li {
+    display: grid;
+    grid-template-columns: 36px 1fr;
+    column-gap: 18px;
+    text-align: start;
+  }
+  .vr-num {
+    grid-row: span 2;
+    margin: 0;
+  }
+  .vr-steps p {
+    max-width: none;
+    margin: 0;
+  }
+  .vr-process {
+    padding: 40px 0 46px;
+  }
+  .vr-order .lpx-d-order-in {
+    grid-template-columns: 1fr;
+    gap: 28px;
+    padding: 0 20px;
+  }
+  .vr-order-art {
+    aspect-ratio: 16 / 10;
+  }
+  .vr-final-in {
+    grid-template-columns: 1fr;
+    gap: 22px;
+  }
+  .vr-footer-row {
+    flex-direction: column;
+    justify-content: center;
+    gap: 10px;
+    padding: 20px 0;
+    text-align: center;
+  }
+}
+@container lpx (max-width: 560px) {
+  .lpx .vr-btn-sm {
+    padding: 0 14px;
+  }
+  .vr-logo b {
+    font-size: 20px;
+  }
+  .vr-hero-img {
+    height: 340px;
+  }
+  .vr-hero::before,
+  .lpx[dir="rtl"] .vr-hero::before {
+    top: 160px;
+    height: 180px;
+  }
+  .vr-cards {
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  .vr-card {
+    padding: 18px 14px;
+  }
+  .vr-card-ico {
+    margin-bottom: 16px;
+  }
+  .vr-head-row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .vr-tiles {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+  .vr-marks {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .vr-quote {
+    padding: 24px 22px 20px;
+  }
+  .vr-badge {
+    width: 92px;
+    height: 92px;
+  }
+  .vr-badge b {
+    font-size: 22px;
+  }
+  .vr-stats {
+    gap: 18px;
+  }
+  .vr-stats li {
+    flex: 1 1 40%;
+  }
+}
