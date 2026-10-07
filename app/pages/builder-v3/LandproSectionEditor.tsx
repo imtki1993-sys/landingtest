@@ -190,6 +190,14 @@ export default function LandproSectionEditor({
         <>
           {title}
           <small>Les photos affichées sont celles du produit (onglet Médias / Hero).</small>
+          <Text
+            draft={draft}
+            patch={patch}
+            k="showcase_labels"
+            label="Légendes des photos (une par ligne, facultatif)"
+            area
+            placeholder={"Face\nProfil\nArrière"}
+          />
         </>
       );
     case "story":

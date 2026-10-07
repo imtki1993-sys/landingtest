@@ -52,6 +52,8 @@ export interface DemoProduct {
   oldPrice?: number;
   currency: string; // "DH", "€", "$"…
   images: string[]; // 1re image = image principale
+  /** légendes des photos (galerie « vues ») */
+  imageLabels?: string[];
   rating: number;
   reviewsCount: number;
   stock?: number;

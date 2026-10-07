@@ -1,5 +1,5 @@
 // ─────────────────────────────────────────────────────────────
-// LES 60 TEMPLATES LANDPRO
+// LES TEMPLATES LANDPRO (60 historiques + designs sur mesure 61 → 79)
 // Pour modifier un template : couleurs dans `theme`, style d'en-tête
 // dans `hero.variant`, sections par défaut dans `sections`.
 // Les identifiants 01→35 sont ceux déjà enregistrés dans les pages
@@ -7,6 +7,7 @@
 // ─────────────────────────────────────────────────────────────
 import type { SectionKey, TemplateDef } from "./types";
 import { darkTheme as D, lightTheme as L } from "./theme";
+import { DESIGN_DEFS } from "./designs/defs";
 
 const raw: Omit<TemplateDef, "description">[] = [
   // ════════════════ 01 → 30 : COD & conversion ════════════════
@@ -1238,9 +1239,10 @@ const heroLabel: Record<string, string> = {
   marketplace: "Fiche marketplace",
   minimal: "Hero minimal",
   oneScreen: "Tout sur un écran",
+  design: "Design sur mesure",
 };
 
-export const TEMPLATES: TemplateDef[] = raw.map((t) => {
+export const TEMPLATES: TemplateDef[] = [...raw, ...DESIGN_DEFS].map((t) => {
   const sections = (t.sections.includes("order") ? t.sections : [...t.sections, "order"]) as SectionKey[];
   const highlights = sections
     .filter((s) => !["order", "faq", "trust", "announcement"].includes(s))

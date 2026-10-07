@@ -11,6 +11,7 @@ import { SECTION_LABELS } from "./registry";
 import { cx, scrollToOrder } from "./parts";
 import { Hero } from "./Hero";
 import { EMPTY_HINT, isEmpty, renderSection } from "./Sections";
+import { DESIGNS } from "./designs";
 import "./landpro.css";
 
 export interface LandproTemplateProps {
@@ -45,6 +46,8 @@ export default function LandproTemplate({
   onSubmit,
 }: LandproTemplateProps) {
   const vm = useMemo(() => buildVM(data, { demo }), [data, demo]);
+  // design sur mesure : en-tête, hero, sections et pied de page propres au template
+  const design = DESIGNS[vm.t.id];
   const [qty, setQty] = useState(vm.defaultQty);
   const [variant, setVariant] = useState(0);
   useEffect(() => setQty(vm.defaultQty), [vm.defaultQty]);
@@ -57,6 +60,17 @@ export default function LandproTemplate({
     l.href = googleFontsHref;
     document.head.appendChild(l);
   }, []);
+  const designFonts = design?.fonts;
+  useEffect(() => {
+    if (!designFonts) return;
+    const id = "lpx-fonts-" + vm.t.id;
+    if (document.getElementById(id)) return;
+    const l = document.createElement("link");
+    l.id = id;
+    l.rel = "stylesheet";
+    l.href = "https://fonts.googleapis.com/css2?" + designFonts + "&display=swap";
+    document.head.appendChild(l);
+  }, [designFonts, vm.t.id]);
 
   const theme = {
     ...vm.t.theme,
@@ -120,7 +134,7 @@ export default function LandproTemplate({
   };
 
   const sectionNode = (key: string) => {
-    if (key === "hero") return <Hero vm={vm} />;
+    if (key === "hero") return design ? design.hero(sp) : <Hero vm={vm} />;
     if (isEmpty(key, vm)) {
       return builderMode ? (
         <section className={cx("section")}>
@@ -134,31 +148,47 @@ export default function LandproTemplate({
         </section>
       ) : null;
     }
-    return renderSection(key, sp);
+    const own = design?.sections?.[key];
+    return own ? own(sp) : renderSection(key, sp);
   };
 
   return (
     <div className={cx("root")}>
       <div
-        className={["lpx", builderMode ? "lpx-builder" : "", theme.glow ? "lpx-glow" : "", `lpx-tpl-${vm.t.id}`]
+        className={[
+          "lpx",
+          builderMode ? "lpx-builder" : "",
+          theme.glow ? "lpx-glow" : "",
+          design ? "lpx-design" : "",
+          `lpx-tpl-${vm.t.id}`,
+        ]
           .filter(Boolean)
           .join(" ")}
-        style={{ ...style, ["--font" as string]: fonts[theme.font], ["--heading" as string]: fonts[theme.heading] }}
+        style={{
+          ...style,
+          ["--font" as string]: (!vm.rtl && design?.font) || fonts[theme.font],
+          ["--heading" as string]: (!vm.rtl && design?.heading) || fonts[theme.heading],
+        }}
         dir={vm.rtl ? "rtl" : "ltr"}
         lang={vm.lang}
         data-landing-template={vm.t.id}
       >
-        {announcementOn && block("announcement", renderSection("announcement", sp))}
-        <header className={cx("lp-header")}>
-          <div className={cx("container")}>
-            <span className={cx("header-name")}>{vm.name}</span>
-            <div className={cx("header-actions")}>
-              <button type="button" className={cx("btn")} onClick={scrollToOrder}>
-                {vm.cta}
-              </button>
+        {announcementOn &&
+          block("announcement", design?.sections?.announcement?.(sp) ?? renderSection("announcement", sp))}
+        {design?.header ? (
+          design.header(sp)
+        ) : (
+          <header className={cx("lp-header")}>
+            <div className={cx("container")}>
+              <span className={cx("header-name")}>{vm.name}</span>
+              <div className={cx("header-actions")}>
+                <button type="button" className={cx("btn")} onClick={scrollToOrder}>
+                  {vm.cta}
+                </button>
+              </div>
             </div>
-          </div>
-        </header>
+          </header>
+        )}
 
         {keys
           .filter((k) => k !== "announcement")
@@ -168,14 +198,18 @@ export default function LandproTemplate({
             return block(key, node);
           })}
 
-        <footer className={cx("lp-footer")}>
-          <div className={cx("container")}>
-            <p>
-              © {new Date().getFullYear()} {vm.name}
-            </p>
-            <p>{vm.delivery}</p>
-          </div>
-        </footer>
+        {design?.footer ? (
+          design.footer(sp)
+        ) : (
+          <footer className={cx("lp-footer")}>
+            <div className={cx("container")}>
+              <p>
+                © {new Date().getFullYear()} {vm.name}
+              </p>
+              <p>{vm.delivery}</p>
+            </div>
+          </footer>
+        )}
 
         {vm.price > 0 && (
           <div className={cx("sticky-cta")}>
