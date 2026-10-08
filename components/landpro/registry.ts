@@ -1,5 +1,5 @@
 // ─────────────────────────────────────────────────────────────
-// LES TEMPLATES LANDPRO (60 historiques + designs sur mesure 61 → 79)
+// LES TEMPLATES LANDPRO (60 historiques + designs sur mesure 61 → 89)
 // Pour modifier un template : couleurs dans `theme`, style d'en-tête
 // dans `hero.variant`, sections par défaut dans `sections`.
 // Les identifiants 01→35 sont ceux déjà enregistrés dans les pages
