@@ -51,7 +51,10 @@ export async function POST(req: Request) {
         },
         { status: 403 },
       );
-    const res = NextResponse.json({ ok: true });
+    // Rôle pour la redirection après connexion (agent → ses commandes)
+    const { data: ctxRole } = await admin.rpc("resolve_user_context", { p_user_id: data.user.id });
+    const role = (Array.isArray(ctxRole) ? ctxRole[0] : ctxRole)?.role || null;
+    const res = NextResponse.json({ ok: true, role });
     const secure = process.env.NODE_ENV === "production";
     res.cookies.set("lm_access", data.session.access_token, {
       httpOnly: true,

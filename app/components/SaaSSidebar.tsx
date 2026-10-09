@@ -22,19 +22,38 @@ export default function SaaSSidebar() {
   const pathname = usePathname(),
     [isAdmin, setIsAdmin] = useState(false),
     [isAgent, setIsAgent] = useState(false),
+    // Le menu attend de connaître le rôle : pas d'éclair du menu complet chez un agent
+    [ready, setReady] = useState(false),
     [plan, setPlan] = useState<{ active: boolean; days: number | null } | null>(null);
   useEffect(() => {
+    // Rôle déjà connu dans cet onglet : menu affiché tout de suite
+    try {
+      const cached = sessionStorage.getItem("lp_role");
+      if (cached) {
+        setIsAgent(cached === "agent");
+        setIsAdmin(cached === "admin");
+        setReady(true);
+      }
+    } catch {}
     fetch("/api/auth/context", { cache: "no-store" })
       .then((r) => (r.ok ? r.json() : null))
       .then((x) => {
         setIsAdmin(!!x?.is_platform_admin);
+        setReady(true);
+        try {
+          if (x)
+            sessionStorage.setItem("lp_role", x.role === "agent" ? "agent" : x.is_platform_admin ? "admin" : "owner");
+        } catch {}
         // Agent de confirmation : uniquement ses commandes
         if (x?.role === "agent") {
           setIsAgent(true);
           if (!location.pathname.startsWith("/orders")) location.replace("/orders");
         }
       })
-      .catch(() => setIsAdmin(false));
+      .catch(() => {
+        setIsAdmin(false);
+        setReady(true);
+      });
     fetch("/api/license", { cache: "no-store" })
       .then((r) => (r.ok ? r.json() : null))
       .then((x) => x && setPlan({ active: !!x.active, days: x.days_left ?? null }))
@@ -55,7 +74,7 @@ export default function SaaSSidebar() {
         <i>⌄</i>
       </div>
       <nav className="dash-nav">
-        {items
+        {(ready ? items : [])
           .filter(([href]) => (isAgent ? href === "/orders" : !href.startsWith("/admin/") || isAdmin))
           .map(([href, icon, label]) => {
             const active = href === "/" ? pathname === "/" : pathname === href || pathname.startsWith(href + "/");

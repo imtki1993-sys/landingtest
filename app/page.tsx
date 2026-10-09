@@ -32,6 +32,9 @@ export default function Home() {
   }, []);
   async function logout() {
     await fetch("/api/auth/logout", { method: "POST" });
+    try {
+      sessionStorage.removeItem("lp_role");
+    } catch {}
     window.location.href = "/login";
   }
   const t = data?.totals || {},
