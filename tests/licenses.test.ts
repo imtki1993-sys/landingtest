@@ -167,3 +167,26 @@ describe("activation d'une clé", () => {
     expect(restore.values).toMatchObject({ status: "available", used_by_workspace: null });
   });
 });
+
+describe("messages de mise en place", () => {
+  it("explique une table manquante, une variable manquante, une colonne manquante", async () => {
+    const { licenseSetupMessage } = await import("../lib/licenses");
+    expect(
+      licenseSetupMessage({
+        code: "PGRST205",
+        message: "Could not find the table 'public.license_keys' in the schema cache",
+      }),
+    ).toContain("supabase/migrations");
+    expect(licenseSetupMessage({ code: "42P01", message: 'relation "public.license_keys" does not exist' })).toContain(
+      "SQL Editor",
+    );
+    expect(licenseSetupMessage(new Error("license_secret_not_configured"))).toContain("LICENSE_KEY_SECRET");
+    expect(
+      licenseSetupMessage({
+        code: "PGRST204",
+        message: "Could not find the 'current_period_end' column in the schema cache",
+      }),
+    ).toContain("workspace_subscriptions");
+    expect(licenseSetupMessage(new Error("autre chose"))).toBeNull();
+  });
+});
