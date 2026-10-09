@@ -56,7 +56,16 @@ export default function Orders() {
     [team, setTeam] = useState<any[]>([]),
     [assignTo, setAssignTo] = useState(""),
     [page, setPage] = useState(1);
-  const isAgent = me?.role === "agent";
+  const [cachedRole, setCachedRole] = useState<string | null>(null);
+  useEffect(() => {
+    try {
+      setCachedRole(sessionStorage.getItem("lp_role"));
+    } catch {}
+  }, []);
+  const role = me?.role ?? (cachedRole === "agent" ? "agent" : cachedRole ? "owner" : null);
+  const isAgent = role === "agent",
+    // Boutons du propriétaire : seulement une fois le rôle connu (jamais d'éclair chez un agent)
+    ownerUI = role !== null && !isAgent;
   useEffect(() => {
     fetch("/api/team/me", { cache: "no-store" })
       .then((r) => (r.ok ? r.json() : null))
@@ -703,13 +712,11 @@ export default function Orders() {
             <h1>{isAgent ? "Mes commandes à confirmer" : "Commandes COD"}</h1>
             <p>Gère et suis toutes vos commandes en un seul endroit.</p>
           </div>
-          <button
-            className="primary orders-add-btn orders-add-btn-v2"
-            hidden={isAgent}
-            onClick={() => setManualOpen(true)}
-          >
-            + Ajouter une commande
-          </button>
+          {ownerUI && (
+            <button className="primary orders-add-btn orders-add-btn-v2" onClick={() => setManualOpen(true)}>
+              + Ajouter une commande
+            </button>
+          )}
         </header>
         <div className="orders-status-tabs">
           <button className={quickFilter === "ALL" ? "active" : ""} onClick={() => setQuickFilter("ALL")}>
@@ -854,42 +861,48 @@ export default function Orders() {
                 />
                 <strong>{selectedIds.length} sélectionnée(s)</strong>
               </div>
-              <div className="orders-bulk-actions" hidden={isAgent}>
-                {team.length > 0 && (
-                  <span className="orders-assign">
-                    <select value={assignTo} onChange={(e) => setAssignTo(e.target.value)}>
-                      <option value="">Attribuer à…</option>
-                      {team.map((a) => (
-                        <option key={a.id} value={a.id}>
-                          {a.full_name || a.email}
-                        </option>
-                      ))}
-                      <option value="none">Personne (retirer)</option>
-                    </select>
-                    <button onClick={bulkAssign} disabled={!selectedIds.length || !assignTo}>
-                      Attribuer ({selectedIds.length})
-                    </button>
-                  </span>
-                )}
-                <button className="primary confirm-bulk" onClick={bulkConfirm} disabled={!selectedIds.length}>
-                  ✓ Confirmer ({selectedIds.length})
-                </button>
-                <button className="primary ozon-bulk" onClick={bulkSendOzon} disabled={!selectedIds.length || ozonBusy}>
-                  ▣ Envoyer Ozon ({selectedIds.length})
-                </button>
-                <button
-                  onClick={() => {
-                    const oz = carriers.find((a) => a.code === "OZON_EXPRESS");
-                    if (oz) loadOzonCities(oz.id);
-                  }}
-                >
-                  ⌖ Villes Ozon
-                </button>
-                <button onClick={exportCsv}>↓ CSV</button>
-                <button className="danger-bulk" disabled={!selectedIds.length}>
-                  ♜ Supprimer ({selectedIds.length})
-                </button>
-              </div>
+              {ownerUI && (
+                <div className="orders-bulk-actions">
+                  {team.length > 0 && (
+                    <span className="orders-assign">
+                      <select value={assignTo} onChange={(e) => setAssignTo(e.target.value)}>
+                        <option value="">Attribuer à…</option>
+                        {team.map((a) => (
+                          <option key={a.id} value={a.id}>
+                            {a.full_name || a.email}
+                          </option>
+                        ))}
+                        <option value="none">Personne (retirer)</option>
+                      </select>
+                      <button onClick={bulkAssign} disabled={!selectedIds.length || !assignTo}>
+                        Attribuer ({selectedIds.length})
+                      </button>
+                    </span>
+                  )}
+                  <button className="primary confirm-bulk" onClick={bulkConfirm} disabled={!selectedIds.length}>
+                    ✓ Confirmer ({selectedIds.length})
+                  </button>
+                  <button
+                    className="primary ozon-bulk"
+                    onClick={bulkSendOzon}
+                    disabled={!selectedIds.length || ozonBusy}
+                  >
+                    ▣ Envoyer Ozon ({selectedIds.length})
+                  </button>
+                  <button
+                    onClick={() => {
+                      const oz = carriers.find((a) => a.code === "OZON_EXPRESS");
+                      if (oz) loadOzonCities(oz.id);
+                    }}
+                  >
+                    ⌖ Villes Ozon
+                  </button>
+                  <button onClick={exportCsv}>↓ CSV</button>
+                  <button className="danger-bulk" disabled={!selectedIds.length}>
+                    ♜ Supprimer ({selectedIds.length})
+                  </button>
+                </div>
+              )}
               <div className="orders-ref-view">
                 <label>
                   Afficher{" "}
@@ -1123,7 +1136,7 @@ export default function Orders() {
                               })}`}
                           </small>
                         )}
-                        {!isAgent && (
+                        {ownerUI && (
                           <small className="order-agent">
                             {o.agent ? "👤 " + o.agent.name : team.length ? "Non attribuée" : ""}
                           </small>
@@ -1181,7 +1194,7 @@ export default function Orders() {
                           <summary>Actions ▾</summary>
                           <div className="order-action-list">
                             <button onClick={() => openDetails(o)}>Détails</button>
-                            {o.lead?.status === "CONFIRMED" && !o.tracking_number && (
+                            {ownerUI && o.lead?.status === "CONFIRMED" && !o.tracking_number && (
                               <button className="primary" disabled={ozonBusy} onClick={() => sendToOzon(o)}>
                                 {ozonBusy ? "Envoi..." : "🚚 Envoyer Ozon"}
                               </button>
@@ -1191,12 +1204,12 @@ export default function Orders() {
                                 WhatsApp : confirmer
                               </a>
                             )}
-                            {o.lead?.phone_e164 && !isAgent && (
+                            {o.lead?.phone_e164 && ownerUI && (
                               <button onClick={() => toggleBlock(o)}>
                                 {o.risk?.level === "blocked" ? "Débloquer le numéro" : "Bloquer le numéro"}
                               </button>
                             )}
-                            {!isAgent && (
+                            {ownerUI && (
                               <button className="order-delete" onClick={() => remove(o)}>
                                 Supprimer
                               </button>
