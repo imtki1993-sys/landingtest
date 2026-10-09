@@ -1,0 +1,188 @@
+/* F15 — un vrai avis en grand + colonne marque/liens */
+.lpx .pc-f15 {
+  background: color-mix(in srgb, var(--primary) 9%, var(--bg));
+  color: var(--text);
+  font-family: var(--font);
+  border-top: 1px solid var(--border);
+}
+.lpx .pc-f15-in {
+  max-width: 1160px;
+  margin: 0 auto;
+  padding: 72px 40px 56px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 260px;
+  gap: 56px;
+}
+.lpx .pc-f15-main {
+  min-width: 0;
+}
+.lpx .pc-f15-quote {
+  margin: 0;
+}
+.lpx .pc-f15-mark {
+  display: block;
+  height: 52px;
+  font-family: var(--heading);
+  font-weight: 700;
+  font-size: 120px;
+  line-height: 0.85;
+  color: var(--primary);
+}
+.lpx[dir="rtl"] .pc-f15-mark {
+  transform: scaleX(-1);
+  width: max-content;
+}
+.lpx .pc-f15-quote blockquote {
+  margin: 18px 0 0;
+  max-width: 30em;
+  font-family: var(--heading);
+  font-weight: 400;
+  font-size: 34px;
+  line-height: 1.32;
+  letter-spacing: -0.01em;
+  text-wrap: pretty;
+  overflow-wrap: anywhere;
+}
+.lpx .pc-f15-quote figcaption {
+  margin-top: 28px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 14px;
+  font-size: 15px;
+  font-weight: 700;
+}
+.lpx .pc-f15-av {
+  flex: none;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-weight: 800;
+  font-size: 17px;
+  background: color-mix(in srgb, var(--primary) 26%, var(--bg));
+  color: color-mix(in srgb, var(--primary) 70%, var(--text));
+}
+.lpx .pc-f15-who {
+  color: color-mix(in srgb, var(--text) 82%, var(--bg));
+}
+.lpx .pc-f15-stars {
+  display: inline-flex;
+  gap: 2px;
+  font-size: 17px;
+  color: var(--primary);
+}
+
+/* sans avis : la garantie */
+.lpx .pc-f15-seal {
+  display: grid;
+  place-items: center;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  color: var(--primary);
+  background: color-mix(in srgb, var(--primary) 16%, var(--bg));
+  box-shadow: 0 0 0 6px color-mix(in srgb, var(--primary) 7%, transparent);
+}
+.lpx .pc-f15-gt {
+  margin: 26px 0 0;
+  font-family: var(--heading);
+  font-weight: var(--hw);
+  text-transform: var(--htt);
+  font-size: 34px;
+  line-height: 1.2;
+}
+.lpx .pc-f15-gx {
+  margin: 12px 0 0;
+  max-width: 40em;
+  font-size: 17px;
+  line-height: 1.6;
+  color: var(--muted);
+}
+
+/* colonne marque */
+.lpx .pc-f15-side {
+  display: flex;
+  flex-direction: column;
+  padding-inline-start: 40px;
+  border-inline-start: 1px solid color-mix(in srgb, var(--primary) 30%, var(--border));
+}
+.lpx .pc-f15-name {
+  font-family: var(--heading);
+  font-weight: var(--hw);
+  text-transform: var(--htt);
+  font-size: 26px;
+  line-height: 1.15;
+  overflow-wrap: anywhere;
+}
+.lpx .pc-f15-links {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 18px;
+}
+.lpx .pc-f15-links a {
+  width: max-content;
+  color: var(--muted);
+  text-decoration: none;
+  font-size: 15px;
+  transition: color 0.15s;
+}
+.lpx .pc-f15-links a:hover,
+.lpx .pc-f15-links a:focus-visible {
+  color: var(--primary);
+}
+.lpx .pc-f15-legal {
+  margin: auto 0 0;
+  padding-top: 32px;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+@container lpx (max-width: 900px) {
+  .lpx .pc-f15-in {
+    grid-template-columns: minmax(0, 1fr) 210px;
+    gap: 40px;
+    padding: 60px 28px 44px;
+  }
+  .lpx .pc-f15-side {
+    padding-inline-start: 28px;
+  }
+  .lpx .pc-f15-quote blockquote,
+  .lpx .pc-f15-gt {
+    font-size: 27px;
+  }
+}
+@container lpx (max-width: 560px) {
+  .lpx .pc-f15-in {
+    grid-template-columns: 1fr;
+    gap: 36px;
+    padding: 48px 20px 28px;
+  }
+  .lpx .pc-f15-mark {
+    font-size: 96px;
+    height: 40px;
+  }
+  .lpx .pc-f15-quote blockquote,
+  .lpx .pc-f15-gt {
+    font-size: 22px;
+  }
+  .lpx .pc-f15-gx {
+    font-size: 15.5px;
+  }
+  .lpx .pc-f15-side {
+    padding: 28px 0 0;
+    border-inline-start: 0;
+    border-top: 1px solid color-mix(in srgb, var(--primary) 30%, var(--border));
+  }
+  .lpx .pc-f15-links {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 8px 22px;
+    margin-top: 14px;
+  }
+  .lpx .pc-f15-legal {
+    padding-top: 22px;
+  }
+}

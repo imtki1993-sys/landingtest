@@ -95,6 +95,13 @@ export interface TemplateDef {
   /** titres par défaut des sections propres au template (sinon : titres génériques) */
   titles?: Partial<Record<SectionKey, string>>;
   options?: { countdownMinutes?: number; orderMode?: "form" | "whatsapp" | "both"; announcement?: string };
+  /** pièces combinables (components/landpro/pieces) : header, hero, footer, versions de sections */
+  pieces?: {
+    header?: string;
+    hero?: string;
+    footer?: string;
+    sections?: Partial<Record<SectionKey, string>>;
+  };
 }
 
 export type LandingV4Data = {

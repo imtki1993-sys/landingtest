@@ -1,0 +1,28 @@
+/* f13-vague */
+.lpx .pc-f13 { position: relative; background: var(--bg); color: var(--primary-text); font-family: var(--font); }
+.lpx .pc-f13-wave { display: block; width: 100%; height: 110px; fill: var(--primary); margin-bottom: -1px; }
+.lpx .pc-f13-wave2 { fill: color-mix(in srgb, var(--primary) 35%, var(--bg)); }
+.lpx[dir="rtl"] .pc-f13-wave { transform: scaleX(-1); }
+.lpx .pc-f13-body { background: var(--primary); }
+.lpx .pc-f13-in { max-width: 1120px; margin: 0 auto; padding: 18px 24px 48px; display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr) minmax(0, 1fr); gap: 40px; }
+.lpx .pc-f13-in.is-two { grid-template-columns: minmax(0, 2.3fr) minmax(0, 1fr); }
+.lpx .pc-f13-name { display: block; font-family: var(--heading); font-weight: var(--hw); text-transform: var(--htt); font-size: 36px; line-height: 1.1; letter-spacing: -.01em; }
+.lpx .pc-f13-deliv { margin: 12px 0 0; font-size: 15.5px; line-height: 1.65; max-width: 34ch; opacity: .82; }
+.lpx .pc-f13-col { display: flex; flex-direction: column; align-items: flex-start; gap: 12px; padding-top: 6px; }
+.lpx .pc-f13-col b { font-size: 15px; font-weight: 800; margin-bottom: 4px; }
+.lpx .pc-f13-col a { color: inherit; opacity: .8; text-decoration: none; font-size: 15px; background: linear-gradient(currentColor, currentColor) no-repeat 0 100% / 0 1.5px; padding-bottom: 2px; transition: opacity .15s, background-size .25s; }
+.lpx[dir="rtl"] .pc-f13-col a { background-position: 100% 100%; }
+.lpx .pc-f13-col a:hover { opacity: 1; background-size: 100% 1.5px; }
+.lpx .pc-f13-col a:focus-visible { outline: 2px solid currentColor; outline-offset: 3px; border-radius: 2px; }
+.lpx .pc-f13-legal { max-width: 1120px; margin: 0 auto; padding: 18px 24px 26px; border-top: 1px solid color-mix(in srgb, var(--primary-text) 22%, transparent); font-size: 13px; opacity: .75; }
+
+@container lpx (max-width: 760px) {
+  .lpx .pc-f13-in, .lpx .pc-f13-in.is-two { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 32px 24px; }
+  .lpx .pc-f13-brand { grid-column: 1 / -1; }
+}
+@container lpx (max-width: 560px) {
+  .lpx .pc-f13-wave { height: 64px; }
+  .lpx .pc-f13-in { padding: 10px 16px 36px; }
+  .lpx .pc-f13-name { font-size: 30px; }
+  .lpx .pc-f13-legal { padding: 16px 16px 22px; margin-inline: 16px; padding-inline: 0; }
+}

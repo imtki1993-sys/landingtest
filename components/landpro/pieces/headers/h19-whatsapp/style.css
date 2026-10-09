@@ -1,0 +1,73 @@
+/* h19-whatsapp — logo + liens discrets, grand bouton WhatsApp dominant */
+.lpx .pc-h19 {
+  position: sticky; top: 0; z-index: 30;
+  background: color-mix(in srgb, var(--bg) 94%, transparent);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid color-mix(in srgb, var(--border) 70%, transparent);
+}
+.lpx .pc-h19-in {
+  max-width: 1200px; margin: 0 auto; padding-inline: 40px; height: 84px;
+  display: flex; align-items: center; gap: 28px;
+}
+.lpx .pc-h19-brand {
+  flex: none; min-width: 0; max-width: 32%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  text-decoration: none; color: color-mix(in srgb, var(--primary) 70%, var(--text));
+  font-family: var(--heading); font-weight: var(--hw); text-transform: var(--htt);
+  font-size: 23px; letter-spacing: -.01em; line-height: 1.2;
+}
+.lpx .pc-h19-links { display: flex; align-items: center; gap: 26px; min-width: 0; }
+.lpx .pc-h19-link {
+  font-size: 14.5px; font-weight: 500; white-space: nowrap; text-decoration: none;
+  color: color-mix(in srgb, var(--text) 75%, var(--bg)); transition: color .15s;
+}
+.lpx .pc-h19-link:hover { color: var(--text); }
+
+.lpx .pc-h19-btn {
+  margin-inline-start: auto; flex: none; position: relative;
+  display: inline-flex; align-items: center; gap: 12px; height: 56px; padding-inline: 22px 28px;
+  border: 0; border-radius: 999px; cursor: pointer; text-decoration: none;
+  background: var(--primary); color: var(--primary-text);
+  font: inherit; font-weight: 800; font-size: 15.5px; white-space: nowrap;
+  box-shadow: 0 14px 30px -16px var(--primary); transition: transform .15s, filter .15s, box-shadow .2s;
+}
+.lpx .pc-h19-btn.wa {
+  background: color-mix(in srgb, #25d366 78%, #000);
+  color: #fff;
+  box-shadow: 0 14px 30px -14px color-mix(in srgb, #25d366 80%, transparent);
+}
+.lpx .pc-h19-btn.wa::after {
+  content: ""; position: absolute; inset: -4px; border-radius: inherit; pointer-events: none;
+  border: 2px solid color-mix(in srgb, #25d366 55%, transparent);
+  animation: pc-h19-ring 2.6s ease-out infinite;
+}
+@keyframes pc-h19-ring {
+  0% { opacity: .9; transform: scale(.98); }
+  70%, 100% { opacity: 0; transform: scale(1.08); }
+}
+.lpx .pc-h19-btn:hover { transform: translateY(-1px); filter: brightness(1.06); }
+.lpx .pc-h19-btn:focus-visible, .lpx .pc-h19-link:focus-visible, .lpx .pc-h19-brand:focus-visible {
+  outline: 2px solid var(--text); outline-offset: 3px;
+}
+.lpx .pc-h19-ic {
+  flex: none; display: grid; place-items: center; width: 34px; height: 34px; border-radius: 50%;
+  font-size: 22px; background: rgba(255, 255, 255, .16);
+}
+.lpx .pc-h19-short { display: none; }
+.lpx .pc-h19-num {
+  direction: ltr; unicode-bidi: isolate;
+  font-weight: 500; font-size: 12.5px; opacity: .88; letter-spacing: .03em;
+  padding-inline-start: 12px; border-inline-start: 1px solid rgba(255, 255, 255, .35);
+}
+
+@container lpx (max-width: 900px) {
+  .lpx .pc-h19-in { padding-inline: 24px; height: 76px; }
+  .lpx .pc-h19-links { display: none; }
+}
+@container lpx (max-width: 560px) {
+  .lpx .pc-h19-in { padding-inline: 16px; height: 64px; gap: 12px; }
+  .lpx .pc-h19-brand { font-size: 19px; max-width: 48%; }
+  .lpx .pc-h19-btn { height: 46px; padding-inline: 8px 18px; gap: 9px; font-size: 14.5px; }
+  .lpx .pc-h19-ic { width: 30px; height: 30px; font-size: 19px; }
+  .lpx .pc-h19-long, .lpx .pc-h19-num { display: none; }
+  .lpx .pc-h19-short { display: inline; }
+}

@@ -1,0 +1,153 @@
+/* order-etapes : formulaire COD en étapes */
+.lpx .pc-ore {
+  padding: 88px 20px; scroll-margin-top: 12px;
+  background:
+    radial-gradient(70% 50% at 50% 0%, color-mix(in srgb, var(--primary) 8%, transparent), transparent 70%),
+    var(--bg);
+}
+.lpx .pc-ore-in { max-width: 860px; margin: 0 auto; }
+.lpx .pc-ore-title { text-align: center; font-size: clamp(24px, 3cqi, 36px); margin: 0 auto 28px; max-width: 26ch; }
+.lpx .pc-ore-card {
+  background: var(--surface); border: 1px solid color-mix(in srgb, var(--border) 70%, transparent);
+  border-radius: calc(var(--radius) * 1.2); padding: 36px 40px 28px;
+  box-shadow: 0 40px 80px -50px rgba(0, 0, 0, 0.5), 0 2px 8px -4px rgba(0, 0, 0, 0.08);
+}
+/* fil des étapes */
+.lpx .pc-ore-rail { list-style: none; margin: 0 0 34px; padding: 0; display: flex; align-items: center; gap: 12px; }
+.lpx .pc-ore-st { display: flex; align-items: center; gap: 12px; flex: 1; min-width: 0; }
+.lpx .pc-ore-st:last-child { flex: none; }
+.lpx .pc-ore-stb {
+  display: inline-flex; align-items: center; gap: 10px; padding: 0; border: 0; background: none; color: var(--text);
+  font-weight: 700; font-size: 14.5px; cursor: pointer; min-width: 0;
+}
+.lpx .pc-ore-stb:disabled { cursor: default; }
+.lpx .pc-ore-stb:focus-visible { outline: 2px solid var(--primary); outline-offset: 4px; border-radius: 999px; }
+.lpx .pc-ore-num {
+  flex: none; width: 32px; height: 32px; border-radius: 50%; display: grid; place-items: center; font-size: 14px; font-weight: 800;
+  background: var(--text); color: var(--bg); transition: background 0.25s, color 0.25s;
+}
+.lpx .pc-ore-st.now .pc-ore-num { background: var(--primary); color: var(--primary-text); box-shadow: 0 0 0 5px color-mix(in srgb, var(--primary) 18%, transparent); }
+.lpx .pc-ore-st.todo .pc-ore-num { background: color-mix(in srgb, var(--text) 10%, var(--surface)); color: var(--muted); }
+.lpx .pc-ore-st.todo .pc-ore-stl { color: var(--muted); }
+.lpx .pc-ore-stl { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.lpx .pc-ore-line { flex: 1; min-width: 16px; height: 2px; border-radius: 2px; background: color-mix(in srgb, var(--text) 12%, transparent); }
+.lpx .pc-ore-st.done .pc-ore-line { background: var(--text); }
+.lpx .pc-ore-head { font-size: clamp(22px, 2.6cqi, 30px); margin: 0 0 22px; outline: none; }
+.lpx .pc-ore-panel { animation: pc-ore-in 0.35s ease both; }
+.lpx .pc-ore-panel[hidden] { display: none; }
+/* offres */
+.lpx .pc-ore-offers { display: grid; gap: 10px; }
+.lpx .pc-ore-offer {
+  position: relative; display: flex; align-items: center; gap: 14px; padding: 16px 18px; cursor: pointer;
+  border: 1.5px solid var(--border); border-radius: calc(var(--radius) / 1.4); background: var(--bg);
+  transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
+}
+.lpx .pc-ore-offer:hover { border-color: color-mix(in srgb, var(--primary) 50%, var(--border)); }
+.lpx .pc-ore-offer.on { border-color: var(--primary); background: color-mix(in srgb, var(--primary) 7%, var(--bg)); box-shadow: 0 14px 30px -24px var(--primary); }
+.lpx .pc-ore-offer input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+.lpx .pc-ore-offer:has(input:focus-visible) { outline: 2px solid var(--primary); outline-offset: 2px; }
+.lpx .pc-ore-dot { flex: none; width: 20px; height: 20px; border-radius: 50%; border: 2px solid color-mix(in srgb, var(--text) 28%, transparent); transition: border 0.2s; }
+.lpx .pc-ore-offer.on .pc-ore-dot { border: 6px solid var(--primary); }
+.lpx .pc-ore-ol { display: flex; flex-wrap: wrap; align-items: center; gap: 2px 10px; min-width: 0; flex: 1; line-height: 1.3; }
+.lpx .pc-ore-ol b { font-size: 16px; overflow-wrap: anywhere; }
+.lpx .pc-ore-ol small { flex-basis: 100%; color: var(--primary); font-weight: 700; font-size: 13px; }
+.lpx .pc-ore-badge { flex: none; font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 999px; background: var(--primary); color: var(--primary-text); white-space: nowrap; }
+.lpx .pc-ore-op { flex: none; font-weight: 800; font-size: 17px; }
+/* variantes */
+.lpx .pc-ore-vars { margin-top: 22px; }
+.lpx .pc-ore-offers + .pc-ore-vars { padding-top: 20px; border-top: 1px dashed var(--border); }
+.lpx .pc-ore-vlab { display: block; font-size: 13.5px; font-weight: 600; color: var(--muted); margin-bottom: 10px; }
+.lpx .pc-ore-vlab b { color: var(--text); }
+.lpx .pc-ore-vlist { display: flex; flex-wrap: wrap; gap: 8px; }
+.lpx .pc-ore-var {
+  display: inline-flex; align-items: center; gap: 8px; padding: 10px 16px; border-radius: 999px; cursor: pointer;
+  border: 1.5px solid var(--border); background: var(--bg); color: var(--text); font-weight: 600; font-size: 14px;
+}
+.lpx .pc-ore-var.on { border-color: var(--primary); box-shadow: inset 0 0 0 1px var(--primary); }
+.lpx .pc-ore-var:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+.lpx .pc-ore-sw { width: 16px; height: 16px; border-radius: 50%; box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.2); }
+/* champs */
+.lpx .pc-ore-fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px 18px; }
+.lpx .pc-ore-field { display: flex; flex-direction: column; gap: 7px; min-width: 0; }
+.lpx .pc-ore-field > span { font-size: 13.5px; font-weight: 600; color: var(--muted); }
+.lpx .pc-ore-field input {
+  width: 100%; height: 52px; padding: 0 16px; border-radius: calc(var(--radius) / 1.6); outline: none;
+  border: 1.5px solid var(--border); background: var(--bg); color: var(--text); font-size: 15.5px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.lpx .pc-ore-field input::placeholder { color: color-mix(in srgb, var(--muted) 70%, transparent); }
+.lpx .pc-ore-field input:focus { border-color: var(--primary); box-shadow: 0 0 0 4px color-mix(in srgb, var(--primary) 16%, transparent); }
+.lpx .pc-ore-field input:user-invalid { border-color: #e5484d; }
+.lpx[dir="rtl"] .pc-ore-field input[dir="ltr"] { text-align: right; }
+/* récapitulatif */
+.lpx .pc-ore-recap { display: grid; gap: 14px; }
+.lpx .pc-ore-prod { display: flex; align-items: center; gap: 14px; padding: 14px; border-radius: calc(var(--radius) / 1.4); background: var(--bg); border: 1px solid var(--border); }
+.lpx .pc-ore-thumb { flex: none; width: 64px; height: 64px; border-radius: calc(var(--radius) / 1.8); overflow: hidden; background: var(--surface2, var(--surface)); }
+.lpx .pc-ore-thumb img { width: 100%; height: 100%; object-fit: cover; }
+.lpx .pc-ore-pn { display: flex; flex-direction: column; min-width: 0; flex: 1; line-height: 1.35; }
+.lpx .pc-ore-pn b { overflow-wrap: anywhere; }
+.lpx .pc-ore-pn small { color: var(--muted); font-size: 13.5px; }
+.lpx .pc-ore-pp { flex: none; font-weight: 800; }
+.lpx .pc-ore-who { position: relative; margin: 0; display: grid; gap: 8px; padding: 16px 18px; border-radius: calc(var(--radius) / 1.4); border: 1px dashed var(--border); }
+.lpx .pc-ore-who > div { display: flex; gap: 12px; font-size: 14.5px; }
+.lpx .pc-ore-who dt { flex: none; width: 120px; color: var(--muted); }
+.lpx .pc-ore-who dd { margin: 0; font-weight: 600; min-width: 0; overflow-wrap: anywhere; }
+.lpx .pc-ore-edit {
+  position: absolute; inset-block-start: 12px; inset-inline-end: 12px; display: inline-flex; align-items: center; gap: 6px;
+  border: 0; background: none; color: var(--primary); font-weight: 700; font-size: 13.5px; cursor: pointer; padding: 4px;
+}
+.lpx .pc-ore-line2 { display: flex; justify-content: space-between; color: var(--muted); font-size: 14.5px; }
+.lpx .pc-ore-total { display: flex; justify-content: space-between; align-items: baseline; padding-top: 14px; border-top: 1px solid var(--border); font-weight: 700; }
+.lpx .pc-ore-total b { font-size: 24px; color: var(--primary); }
+/* navigation */
+.lpx .pc-ore-err { margin: 16px 0 0; color: #e5484d; font-weight: 600; font-size: 14px; }
+.lpx .pc-ore-nav { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 28px; }
+.lpx .pc-ore-sum { color: var(--muted); font-size: 15px; }
+.lpx .pc-ore-sum b { color: var(--text); font-size: 18px; margin-inline-start: 4px; }
+.lpx .pc-ore-back, .lpx .pc-ore-next {
+  display: inline-flex; align-items: center; justify-content: center; gap: 10px; min-height: 52px; padding: 0 22px; cursor: pointer;
+  border-radius: var(--btn-radius); font-weight: 700; font-size: 15.5px; transition: transform 0.2s, filter 0.2s;
+}
+.lpx .pc-ore-back { border: 1.5px solid var(--border); background: var(--surface); color: var(--text); }
+.lpx .pc-ore-back:hover { border-color: var(--text); }
+.lpx .pc-ore-next { border: 0; background: var(--text); color: var(--bg); padding-inline: 28px; box-shadow: 0 16px 30px -20px rgba(0, 0, 0, 0.6); }
+.lpx .pc-ore-next:hover { transform: translateY(-1px); }
+.lpx .pc-ore-go { background: var(--primary); color: var(--primary-text); box-shadow: 0 16px 30px -18px var(--primary); }
+.lpx .pc-ore-back:focus-visible, .lpx .pc-ore-next:focus-visible, .lpx .pc-ore-edit:focus-visible { outline: 3px solid var(--primary); outline-offset: 3px; }
+.lpx .pc-ore-ar { font-size: 18px; }
+.lpx[dir="rtl"] .pc-ore-ar { transform: scaleX(-1); }
+.lpx .pc-ore-wa {
+  margin-top: 12px; display: flex; align-items: center; justify-content: center; gap: 10px; min-height: 52px;
+  border-radius: var(--btn-radius); background: #25d366; color: #fff; font-weight: 700; text-decoration: none;
+}
+.lpx .pc-ore-wa svg { font-size: 20px; }
+.lpx .pc-ore-note { margin: 18px 0 0; display: flex; align-items: center; justify-content: center; gap: 8px; color: var(--muted); font-size: 13.5px; text-align: center; }
+.lpx .pc-ore-note svg { flex: none; }
+@keyframes pc-ore-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+@container lpx (max-width: 900px) {
+  .lpx .pc-ore { padding: 68px 20px; }
+}
+@container lpx (max-width: 560px) {
+  .lpx .pc-ore { padding: 48px 12px; }
+  .lpx .pc-ore-title { margin-bottom: 20px; }
+  .lpx .pc-ore-card { padding: 24px 16px 20px; }
+  .lpx .pc-ore-rail { gap: 8px; margin-bottom: 26px; }
+  .lpx .pc-ore-st { gap: 8px; }
+  .lpx .pc-ore-stl { display: none; }
+  .lpx .pc-ore-st.now .pc-ore-stl { display: inline; }
+  .lpx .pc-ore-st.now { flex: 0 0 auto; }
+  .lpx .pc-ore-st.now .pc-ore-line { width: 16px; flex: none; }
+  .lpx .pc-ore-go svg { display: none; }
+  .lpx .pc-ore-num { width: 28px; height: 28px; font-size: 13px; }
+  .lpx .pc-ore-stb { font-size: 13.5px; }
+  .lpx .pc-ore-head { margin-bottom: 18px; }
+  .lpx .pc-ore-fields { grid-template-columns: minmax(0, 1fr); gap: 14px; }
+  .lpx .pc-ore-offer { padding: 14px; gap: 10px; }
+  .lpx .pc-ore-badge { font-size: 10px; padding: 3px 8px; }
+  .lpx .pc-ore-op { font-size: 16px; }
+  .lpx .pc-ore-who dt { width: 92px; }
+  .lpx .pc-ore-edit { position: static; justify-self: start; padding: 0; }
+  .lpx .pc-ore-nav { margin-top: 22px; }
+  .lpx .pc-ore-back { padding: 0 16px; }
+  .lpx .pc-ore-next { flex: 1; padding-inline: 16px; }
+}

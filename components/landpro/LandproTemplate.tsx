@@ -12,6 +12,8 @@ import { cx, scrollToOrder } from "./parts";
 import { Hero } from "./Hero";
 import { EMPTY_HINT, isEmpty, renderSection } from "./Sections";
 import { DESIGNS } from "./designs";
+import { PIECES } from "./pieces";
+import type { PieceChoice } from "./pieces/types";
 import "./landpro.css";
 
 export interface LandproTemplateProps {
@@ -24,6 +26,8 @@ export interface LandproTemplateProps {
   builderMode?: boolean;
   onSectionSelect?: (id: string) => void;
   onSubmit?: (e: React.FormEvent<HTMLFormElement>, qty: number) => void;
+  /** pièces imposées (aperçu des pièces, choix du marchand) : remplacent celles du template */
+  pieces?: PieceChoice;
 }
 
 /** Couleur de texte lisible sur un fond #rrggbb (sombre sur fond clair, claire sur fond sombre). */
@@ -44,6 +48,7 @@ export default function LandproTemplate({
   builderMode = false,
   onSectionSelect,
   onSubmit,
+  pieces,
 }: LandproTemplateProps) {
   const vm = useMemo(() => buildVM(data, { demo }), [data, demo]);
   // design sur mesure : en-tête, hero, sections et pied de page propres au template
@@ -80,6 +85,11 @@ export default function LandproTemplate({
   };
   const style = themeVars(theme);
   const sp = { vm, qty, setQty, variant, setVariant, preview: preview || builderMode, onSubmit };
+  // pièces combinables : celles imposées, sinon celles du template (un design sur mesure reste prioritaire)
+  const pc: PieceChoice = { ...(vm.t.pieces || {}), ...(pieces || {}) };
+  const piece = (id?: string) => (id && PIECES[id] ? PIECES[id].render(sp) : undefined);
+  const pieceHeader = design?.header ? undefined : piece(pc.header);
+  const pieceFooter = design?.footer ? undefined : piece(pc.footer);
 
   const keys = vm.order;
   const announcementOn = keys.includes("announcement") && (!vm.hidden.has("announcement") || builderMode);
@@ -134,7 +144,7 @@ export default function LandproTemplate({
   };
 
   const sectionNode = (key: string) => {
-    if (key === "hero") return design ? design.hero(sp) : <Hero vm={vm} />;
+    if (key === "hero") return design ? design.hero(sp) : (piece(pc.hero) ?? <Hero vm={vm} />);
     if (isEmpty(key, vm)) {
       return builderMode ? (
         <section className={cx("section")}>
@@ -149,7 +159,9 @@ export default function LandproTemplate({
       ) : null;
     }
     const own = design?.sections?.[key];
-    return own ? own(sp) : renderSection(key, sp);
+    if (own) return own(sp);
+    const pieceSection = piece(pc.sections?.[key as keyof typeof pc.sections]);
+    return pieceSection ?? renderSection(key, sp);
   };
 
   return (
@@ -177,6 +189,8 @@ export default function LandproTemplate({
           block("announcement", design?.sections?.announcement?.(sp) ?? renderSection("announcement", sp))}
         {design?.header ? (
           design.header(sp)
+        ) : pieceHeader ? (
+          pieceHeader
         ) : (
           <header className={cx("lp-header")}>
             <div className={cx("container")}>
@@ -200,6 +214,8 @@ export default function LandproTemplate({
 
         {design?.footer ? (
           design.footer(sp)
+        ) : pieceFooter ? (
+          pieceFooter
         ) : (
           <footer className={cx("lp-footer")}>
             <div className={cx("container")}>

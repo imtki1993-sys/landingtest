@@ -1,0 +1,70 @@
+/* h18-asymetrique — bandeau inversé, logo-étiquette penché, liens décalés, bouton biseauté */
+.lpx .pc-h18 {
+  position: sticky; top: 0; z-index: 30;
+  background: var(--text); color: var(--bg);
+  box-shadow: 0 12px 30px -22px rgba(0, 0, 0, .6);
+}
+.lpx .pc-h18-in {
+  max-width: 1240px; margin: 0 auto; padding-inline: 40px; height: 88px;
+  display: flex; align-items: center; gap: 28px;
+}
+.lpx .pc-h18-logo {
+  flex: none; min-width: 0; max-width: 34%; display: inline-block;
+  transform: rotate(-7deg); padding: 9px 18px 8px;
+  background: var(--primary); color: var(--primary-text); text-decoration: none;
+  font-family: var(--heading); font-weight: 900; text-transform: uppercase;
+  font-size: 25px; line-height: 1; letter-spacing: .01em;
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--bg) 85%, transparent), 6px 6px 0 color-mix(in srgb, var(--bg) 22%, transparent);
+  transition: transform .25s cubic-bezier(.3, 1.6, .5, 1);
+}
+.lpx .pc-h18-logo span { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.lpx .pc-h18-logo:hover { transform: rotate(-3deg) scale(1.04); }
+.lpx[dir="rtl"] .pc-h18-logo { transform: rotate(7deg); }
+.lpx[dir="rtl"] .pc-h18-logo:hover { transform: rotate(3deg) scale(1.04); }
+
+.lpx .pc-h18-links { display: flex; align-items: center; gap: 30px; margin-inline-start: 7%; min-width: 0; }
+.lpx .pc-h18-link {
+  position: relative; white-space: nowrap; text-decoration: none;
+  color: color-mix(in srgb, var(--bg) 78%, var(--text)); font-size: 14px; font-weight: 600; letter-spacing: .02em;
+  padding: 6px 2px; transition: color .15s, transform .2s;
+}
+.lpx .pc-h18-link.s0 { transform: translateY(-12px); }
+.lpx .pc-h18-link.s1 { transform: translateY(10px); }
+.lpx .pc-h18-link.s2 { transform: translateY(-5px); }
+.lpx .pc-h18-link::before {
+  content: ""; position: absolute; inset-inline-start: -10px; top: 50%; width: 5px; height: 5px; margin-top: -2.5px;
+  background: var(--primary); transform: rotate(45deg) scale(0); transition: transform .2s;
+}
+.lpx .pc-h18-link:hover { color: var(--bg); }
+.lpx .pc-h18-link:hover::before { transform: rotate(45deg) scale(1); }
+
+.lpx .pc-h18-end { margin-inline-start: auto; display: flex; align-items: center; gap: 22px; flex: none; }
+.lpx .pc-h18-cta {
+  cursor: pointer; border: 0; height: 48px; padding-inline: 30px;
+  background: var(--primary); color: var(--primary-text);
+  font-family: var(--heading); font-weight: 900; font-size: 15px; text-transform: uppercase; letter-spacing: .03em; white-space: nowrap;
+  transform: skewX(-14deg); transition: transform .2s, filter .15s;
+  box-shadow: 5px 5px 0 color-mix(in srgb, var(--bg) 25%, transparent);
+}
+.lpx .pc-h18-cta > span { display: inline-block; }
+.lpx .pc-h18-cta .pc-h18-short { display: none; }
+.lpx .pc-h18-cta:hover { transform: skewX(-14deg) translate(-2px, -2px); box-shadow: 7px 7px 0 color-mix(in srgb, var(--bg) 30%, transparent); filter: brightness(1.06); }
+.lpx[dir="rtl"] .pc-h18-cta { transform: skewX(14deg); box-shadow: -5px 5px 0 color-mix(in srgb, var(--bg) 25%, transparent); }
+.lpx[dir="rtl"] .pc-h18-cta:hover { transform: skewX(14deg) translate(2px, -2px); }
+.lpx .pc-h18-cta:focus-visible, .lpx .pc-h18-link:focus-visible, .lpx .pc-h18-logo:focus-visible {
+  outline: 2px solid var(--primary); outline-offset: 4px;
+}
+
+@container lpx (max-width: 900px) {
+  .lpx .pc-h18-in { padding-inline: 24px; height: 76px; }
+  .lpx .pc-h18-links { display: none; }
+}
+@container lpx (max-width: 560px) {
+  .lpx .pc-h18-in { padding-inline: 18px; height: 64px; gap: 12px; }
+  .lpx .pc-h18-logo { font-size: 18px; padding: 7px 12px 6px; box-shadow: 0 0 0 2px color-mix(in srgb, var(--bg) 85%, transparent), 4px 4px 0 color-mix(in srgb, var(--bg) 22%, transparent); }
+  .lpx .pc-h18-end { gap: 14px; }
+  .lpx .pc-h18-cta .pc-h18-long { display: none; }
+  .lpx .pc-h18-cta .pc-h18-short { display: inline-block; }
+  .lpx .pc-h18-logo { max-width: 60%; }
+  .lpx .pc-h18-cta { height: 40px; padding-inline: 18px; font-size: 13px; box-shadow: 3px 3px 0 color-mix(in srgb, var(--bg) 25%, transparent); }
+}

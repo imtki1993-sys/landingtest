@@ -1,0 +1,110 @@
+/* benefits-numerote : liste numérotée éditoriale */
+.lpx .pc-bn {
+  padding: 96px 0;
+  background: var(--bg);
+}
+.lpx .pc-bn-in {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding-inline: 20px;
+}
+.lpx .pc-bn-title {
+  text-align: start;
+  font-size: clamp(28px, 4.2cqi, 46px);
+  max-width: 22ch;
+  margin: 0 0 44px;
+}
+.lpx .pc-bn-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border-bottom: 1px solid var(--border);
+}
+.lpx .pc-bn-item {
+  position: relative;
+  display: grid;
+  grid-template-columns: 120px minmax(0, 1fr);
+  column-gap: 32px;
+  align-items: center;
+  padding: 28px 0;
+  border-top: 1px solid var(--border);
+}
+.lpx .pc-bn-item::before {
+  content: "";
+  position: absolute;
+  inset-inline-start: 0;
+  top: -1px;
+  height: 1px;
+  width: 0;
+  background: var(--accent);
+  transition: width 0.5s ease;
+}
+.lpx .pc-bn-item:hover::before {
+  width: 100%;
+}
+.lpx .pc-bn-num {
+  font-family: var(--heading);
+  font-weight: 400;
+  font-size: clamp(40px, 4.6cqi, 60px);
+  line-height: 0.9;
+  letter-spacing: -0.02em;
+  color: var(--accent);
+  font-variant-numeric: tabular-nums lining-nums;
+  transition: transform 0.35s ease;
+}
+.lpx .pc-bn-item:hover .pc-bn-num {
+  transform: translateX(6px);
+}
+.lpx[dir="rtl"] .pc-bn-item:hover .pc-bn-num {
+  transform: translateX(-6px);
+}
+.lpx .pc-bn-h {
+  margin: 0;
+  font-family: var(--font);
+  font-weight: 700;
+  text-transform: none;
+  letter-spacing: 0;
+  font-size: clamp(18px, 1.9cqi, 22px);
+  line-height: 1.3;
+  color: var(--text);
+}
+.lpx .pc-bn-p {
+  margin: 6px 0 0;
+  color: var(--muted);
+  font-size: 16px;
+  line-height: 1.6;
+  max-width: 54ch;
+}
+@container lpx (max-width: 900px) {
+  .lpx .pc-bn {
+    padding: 72px 0;
+  }
+  .lpx .pc-bn-item {
+    grid-template-columns: 88px minmax(0, 1fr);
+    column-gap: 20px;
+    padding: 24px 0;
+  }
+}
+@container lpx (max-width: 560px) {
+  .lpx .pc-bn {
+    padding: 56px 0;
+  }
+  .lpx .pc-bn-title {
+    margin-bottom: 28px;
+  }
+  .lpx .pc-bn-item {
+    grid-template-columns: 50px minmax(0, 1fr);
+    column-gap: 14px;
+    align-items: start;
+    padding: 20px 0;
+  }
+  .lpx .pc-bn-num {
+    font-size: 34px;
+  }
+  .lpx .pc-bn-h {
+    font-size: 17px;
+  }
+  .lpx .pc-bn-p {
+    font-size: 15px;
+  }
+}

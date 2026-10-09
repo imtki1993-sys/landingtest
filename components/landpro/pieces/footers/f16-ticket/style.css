@@ -1,0 +1,178 @@
+/* F16 — ticket de caisse (récapitulatif réel de la commande) */
+.lpx .pc-f16 {
+  background: color-mix(in srgb, var(--text) 9%, var(--bg));
+  color: var(--text);
+  font-family: var(--font);
+  border-top: 1px solid var(--border);
+}
+.lpx .pc-f16-in {
+  max-width: 1160px;
+  margin: 0 auto;
+  padding: 64px 24px 32px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.lpx .pc-f16-paper {
+  width: min(400px, 100%);
+  filter: drop-shadow(0 0 0.7px color-mix(in srgb, var(--text) 45%, transparent))
+    drop-shadow(0 18px 22px rgba(0, 0, 0, 0.16)) drop-shadow(0 2px 3px rgba(0, 0, 0, 0.08));
+}
+.lpx .pc-f16-ticket {
+  --pc-f16-ink: color-mix(in srgb, var(--text) 88%, var(--surface));
+  background: var(--surface);
+  color: var(--pc-f16-ink);
+  padding: 30px 30px 44px;
+  font-family: ui-monospace, "SFMono-Regular", "IBM Plex Mono", Menlo, Consolas, monospace, var(--font);
+  font-size: 14.5px;
+  line-height: 1.7;
+  /* bord inférieur dentelé */
+  -webkit-mask: conic-gradient(from -45deg at bottom, #0000, #000 1deg 89deg, #0000 90deg) 50% / 22px 100%;
+  mask: conic-gradient(from -45deg at bottom, #0000, #000 1deg 89deg, #0000 90deg) 50% / 22px 100%;
+}
+.lpx .pc-f16-head {
+  margin: 0;
+  text-align: center;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  overflow-wrap: anywhere;
+}
+.lpx[dir="rtl"] .pc-f16-head {
+  letter-spacing: 0;
+}
+.lpx .pc-f16-ticket hr {
+  margin: 14px 0;
+  border: 0;
+  border-top: 1.5px dashed color-mix(in srgb, var(--text) 38%, var(--surface));
+}
+.lpx .pc-f16-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+}
+.lpx .pc-f16-row + .pc-f16-row {
+  margin-top: 4px;
+}
+.lpx .pc-f16-lab {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.lpx .pc-f16-lab b {
+  font-weight: 600;
+  white-space: nowrap;
+}
+.lpx .pc-f16-lab small {
+  display: block;
+  font-size: 12.5px;
+  color: var(--muted);
+}
+.lpx .pc-f16-val {
+  flex: none;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+.lpx .pc-f16-row.is-total {
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.lpx .pc-f16-row.is-total .pc-f16-val {
+  letter-spacing: 0;
+  color: var(--primary);
+}
+.lpx .pc-f16-cod {
+  margin: 14px 0 0;
+  text-align: center;
+}
+.lpx .pc-f16-bars {
+  height: 34px;
+  width: 70%;
+  margin: 18px auto 0;
+  opacity: 0.75;
+  background: repeating-linear-gradient(
+    90deg,
+    var(--pc-f16-ink) 0 2px,
+    transparent 2px 4px,
+    var(--pc-f16-ink) 4px 5px,
+    transparent 5px 8px,
+    var(--pc-f16-ink) 8px 11px,
+    transparent 11px 13px
+  );
+}
+
+.lpx .pc-f16-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: min(400px, 100%);
+  margin-top: 28px;
+  border: 0;
+  cursor: pointer;
+  background: var(--primary);
+  color: var(--primary-text);
+  border-radius: var(--btn-radius);
+  padding: 16px 24px;
+  font: 800 16px var(--font);
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+.lpx .pc-f16-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 12px 24px -12px color-mix(in srgb, var(--primary) 70%, transparent);
+}
+.lpx[dir="rtl"] .pc-f16-btn .lpx-ico {
+  transform: scaleX(-1);
+}
+
+.lpx .pc-f16-foot {
+  width: 100%;
+  margin-top: 48px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px 24px;
+  flex-wrap: wrap;
+  font-size: 13.5px;
+  color: var(--muted);
+}
+.lpx .pc-f16-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 22px;
+}
+.lpx .pc-f16-links a {
+  text-decoration: none;
+}
+.lpx .pc-f16-links a:hover,
+.lpx .pc-f16-links a:focus-visible {
+  color: var(--primary);
+}
+.lpx .pc-f16-legal {
+  margin: 0;
+}
+
+@container lpx (max-width: 560px) {
+  .lpx .pc-f16-in {
+    padding: 44px 16px 24px;
+  }
+  .lpx .pc-f16-ticket {
+    padding: 24px 20px 40px;
+    font-size: 13.5px;
+  }
+  .lpx .pc-f16-row.is-total {
+    font-size: 16.5px;
+  }
+  .lpx .pc-f16-foot {
+    margin-top: 36px;
+    flex-direction: column;
+    text-align: center;
+  }
+  .lpx .pc-f16-links {
+    justify-content: center;
+  }
+}

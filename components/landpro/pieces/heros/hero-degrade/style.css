@@ -1,0 +1,50 @@
+/* hero-degrade — dégradé du thème qui glisse lentement, composition centrée */
+.lpx .pc-hdg { position: relative; overflow: hidden; isolation: isolate; color: var(--text); text-align: center; padding: 72px 24px 76px; min-height: clamp(560px, 50cqi, 760px); display: flex; flex-direction: column; justify-content: center; background: var(--bg); }
+.lpx .pc-hdg-bg { position: absolute; inset: 0; z-index: -1; overflow: hidden;
+  background: linear-gradient(125deg,
+    color-mix(in srgb, var(--accent) 42%, var(--bg)) 0%,
+    color-mix(in srgb, var(--primary) 34%, var(--bg)) 28%,
+    color-mix(in srgb, var(--primary) 18%, color-mix(in srgb, var(--accent) 22%, var(--bg))) 55%,
+    color-mix(in srgb, var(--accent) 30%, var(--bg)) 78%,
+    color-mix(in srgb, var(--primary) 30%, var(--bg)) 100%);
+  background-size: 260% 260%; animation: pc-hdg-pan 26s ease-in-out infinite alternate; }
+.lpx .pc-hdg-blob { position: absolute; border-radius: 50%; filter: blur(80px); will-change: transform; }
+.lpx .pc-hdg-blob.b1 { width: 55%; aspect-ratio: 1; background: color-mix(in srgb, var(--primary) 70%, transparent); opacity: 0.45; top: -28%; inset-inline-start: -14%; animation: pc-hdg-a 22s ease-in-out infinite alternate; }
+.lpx .pc-hdg-blob.b2 { width: 52%; aspect-ratio: 1; background: color-mix(in srgb, var(--accent) 75%, transparent); opacity: 0.42; bottom: -32%; inset-inline-end: -12%; animation: pc-hdg-b 28s ease-in-out infinite alternate; }
+.lpx .pc-hdg-blob.b3 { width: 36%; aspect-ratio: 1; background: color-mix(in srgb, var(--primary) 45%, var(--accent)); opacity: 0.28; top: 30%; inset-inline-start: 34%; animation: pc-hdg-c 34s ease-in-out infinite alternate; }
+.lpx .pc-hdg-grain { position: absolute; inset: 0; opacity: 0.5; background-image: radial-gradient(color-mix(in srgb, var(--text) 9%, transparent) 1px, transparent 1.2px); background-size: 4px 4px; mask-image: radial-gradient(ellipse at center, transparent 30%, #000 100%); -webkit-mask-image: radial-gradient(ellipse at center, transparent 30%, #000 100%); }
+@keyframes pc-hdg-pan { 0% { background-position: 0% 30%; } 100% { background-position: 100% 70%; } }
+@keyframes pc-hdg-a { to { transform: translate(34%, 26%) scale(1.15); } }
+@keyframes pc-hdg-b { to { transform: translate(-32%, -22%) scale(1.2); } }
+@keyframes pc-hdg-c { to { transform: translate(-30%, 22%) scale(0.8); } }
+@media (prefers-reduced-motion: reduce) {
+  .lpx .pc-hdg-bg, .lpx .pc-hdg-blob { animation: none; }
+}
+
+.lpx .pc-hdg-in { position: relative; max-width: 880px; margin: 0 auto; display: flex; flex-direction: column; align-items: center; }
+.lpx .pc-hdg-prod { position: relative; width: clamp(180px, 19cqi, 260px); aspect-ratio: 1; display: grid; place-items: center; margin-bottom: 30px; }
+.lpx .pc-hdg-ring { position: absolute; inset: 0; border-radius: 50%; background: color-mix(in srgb, var(--bg) 42%, transparent); border: 1px solid color-mix(in srgb, var(--bg) 60%, transparent); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); box-shadow: 0 30px 60px -24px color-mix(in srgb, var(--primary) 55%, transparent), inset 0 1px 0 color-mix(in srgb, var(--bg) 70%, transparent); }
+.lpx .pc-hdg-img { position: relative; width: 72%; height: 72%; object-fit: contain; border-radius: 16px; filter: drop-shadow(0 18px 22px rgba(0, 0, 0, 0.25)); }
+.lpx .pc-hdg-eyebrow { display: inline-block; padding: 7px 16px; border-radius: 999px; font-size: 12px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; background: color-mix(in srgb, var(--bg) 55%, transparent); border: 1px solid color-mix(in srgb, var(--text) 12%, transparent); backdrop-filter: blur(8px); margin-bottom: 18px; }
+.lpx[dir="rtl"] .pc-hdg-eyebrow { letter-spacing: 0; }
+.lpx .pc-hdg-title { font-family: var(--heading); font-weight: var(--hw, 800); font-size: clamp(36px, 5.4cqi, 72px); line-height: 1.04; letter-spacing: -0.02em; margin: 0; max-width: 18ch; text-wrap: balance; color: var(--text); }
+.lpx .pc-hdg-title em { font-style: normal; background: linear-gradient(100deg, var(--primary), color-mix(in srgb, var(--accent) 80%, var(--primary))); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.lpx .pc-hdg-sub { font-size: 18px; line-height: 1.55; color: color-mix(in srgb, var(--text) 74%, transparent); margin: 16px 0 0; max-width: 580px; text-wrap: balance; }
+.lpx .pc-hdg-cta { margin-top: 32px; display: inline-flex; align-items: center; justify-content: center; background: var(--text); color: var(--bg); border: 0; border-radius: 999px; min-height: 58px; padding: 0 34px; font-weight: 800; font-size: 16px; cursor: pointer; box-shadow: 0 16px 34px -12px rgba(0, 0, 0, 0.45); transition: transform 0.2s, box-shadow 0.2s; }
+.lpx .pc-hdg-cta:hover { transform: translateY(-2px); box-shadow: 0 22px 40px -14px rgba(0, 0, 0, 0.5); }
+.lpx .pc-hdg-cta:focus-visible { outline: 2px solid var(--primary); outline-offset: 4px; }
+.lpx .pc-hdg-cta-p { white-space: pre; }
+.lpx .pc-hdg-price { margin-top: 28px; font-family: var(--heading); font-weight: var(--hw, 800); font-size: 34px; }
+.lpx .pc-hdg-was { display: flex; align-items: center; justify-content: center; gap: 10px; margin: 14px 0 0; font-size: 14px; color: color-mix(in srgb, var(--text) 62%, transparent); }
+.lpx .pc-hdg-was i { font-style: normal; font-weight: 800; font-size: 12px; padding: 3px 9px; border-radius: 999px; background: color-mix(in srgb, var(--bg) 60%, transparent); color: var(--text); }
+.lpx .pc-hdg-deliv { position: absolute; left: 0; right: 0; bottom: 22px; margin: 0; padding-inline: 20px; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 13px; color: color-mix(in srgb, var(--text) 66%, transparent); }
+.lpx .pc-hdg-deliv .lpx-ico { font-size: 16px; }
+
+@container lpx (max-width: 560px) {
+  .lpx .pc-hdg { padding: 52px 20px 72px; min-height: 0; }
+  .lpx .pc-hdg-prod { width: 168px; margin-bottom: 24px; }
+  .lpx .pc-hdg-title { font-size: clamp(32px, 10cqi, 42px); }
+  .lpx .pc-hdg-sub { font-size: 16px; }
+  .lpx .pc-hdg-cta { width: 100%; padding: 0 22px; }
+  .lpx .pc-hdg-blob { filter: blur(60px); }
+}

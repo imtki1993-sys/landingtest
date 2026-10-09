@@ -19,7 +19,7 @@
   font-family: var(--font);
   min-height: 100vh;
   line-height: 1.55;
-  overflow-x: hidden;
+  overflow-x: clip;
 }
 .lpx h1, .lpx h2, .lpx h3 {
   font-family: var(--heading);

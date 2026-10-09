@@ -1,0 +1,41 @@
+/* f10-faq */
+.lpx .pc-f10 { --f10-bg: color-mix(in srgb, var(--primary) 16%, black); --f10-ink: rgba(255,255,255,.94); --f10-soft: color-mix(in srgb, var(--primary) 18%, rgba(255,255,255,.66)); background: var(--f10-bg); color: var(--f10-ink); font-family: var(--font); }
+.lpx .pc-f10-in { max-width: 1120px; margin: 0 auto; padding: 64px 24px 56px; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 64px; align-items: start; }
+.lpx .pc-f10.is-solo .pc-f10-in { grid-template-columns: minmax(0, 1fr); }
+.lpx .pc-f10-brand { display: flex; flex-direction: column; align-items: flex-start; }
+.lpx .pc-f10-name { font-family: var(--heading); font-weight: var(--hw); text-transform: var(--htt); font-size: 34px; line-height: 1.1; letter-spacing: -.01em; color: #fff; }
+.lpx .pc-f10-deliv { margin: 14px 0 0; color: var(--f10-soft); font-size: 15.5px; line-height: 1.7; max-width: 38ch; }
+.lpx .pc-f10-links { display: flex; flex-wrap: wrap; align-items: center; margin-top: 22px; font-size: 15px; }
+.lpx .pc-f10-links a { color: var(--f10-soft); text-decoration: none; transition: color .15s; }
+.lpx .pc-f10-links a + a::before { content: "·"; display: inline-block; margin-inline: 10px; color: var(--f10-soft); opacity: .7; }
+.lpx .pc-f10-links a:hover { color: #fff; }
+.lpx .pc-f10-btn { display: inline-flex; align-items: center; gap: 8px; margin-top: 26px; border: 0; cursor: pointer; background: var(--primary); color: var(--primary-text); border-radius: var(--btn-radius); padding: 14px 26px; font-weight: 700; font-size: 15px; transition: transform .15s; }
+.lpx .pc-f10-btn:hover { transform: translateY(-1px); }
+.lpx[dir="rtl"] .pc-f10-btn .lpx-ico { transform: scaleX(-1); }
+.lpx .pc-f10-legal { margin: 40px 0 0; font-size: 13px; color: var(--f10-soft); opacity: .8; }
+
+.lpx .pc-f10-faq { display: flex; flex-direction: column; gap: 10px; }
+.lpx .pc-f10-title { margin: 0 0 8px; font-family: var(--font); font-size: 13px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; color: color-mix(in srgb, var(--primary) 62%, white); }
+.lpx[dir="rtl"] .pc-f10-title { letter-spacing: 0; }
+.lpx .pc-f10-item { background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.06); border-radius: calc(var(--radius) * .6 + 4px); transition: background .2s, border-color .2s; }
+.lpx .pc-f10-item:hover { background: rgba(255,255,255,.1); }
+.lpx .pc-f10-item.is-open { background: rgba(255,255,255,.1); border-color: color-mix(in srgb, var(--primary) 40%, transparent); }
+.lpx .pc-f10-q { margin: 0; font: inherit; }
+.lpx .pc-f10-q button { width: 100%; display: flex; align-items: center; gap: 12px; padding: 16px 18px; border: 0; background: none; color: #fff; font-family: var(--font); font-size: 15.5px; font-weight: 700; line-height: 1.4; text-align: start; cursor: pointer; border-radius: inherit; }
+.lpx .pc-f10-q button:focus-visible { outline: 2px solid color-mix(in srgb, var(--primary) 70%, white); outline-offset: 2px; }
+.lpx .pc-f10-tri { flex: none; width: 0; height: 0; border-block: 5px solid transparent; border-inline-start: 7px solid currentColor; transition: transform .25s; }
+.lpx .pc-f10-item.is-open .pc-f10-tri { transform: rotate(90deg); }
+.lpx[dir="rtl"] .pc-f10-item.is-open .pc-f10-tri { transform: rotate(-90deg); }
+.lpx .pc-f10-a { display: grid; grid-template-rows: 0fr; transition: grid-template-rows .3s ease; }
+.lpx .pc-f10-item.is-open .pc-f10-a { grid-template-rows: 1fr; }
+.lpx .pc-f10-a > div { overflow: hidden; }
+.lpx .pc-f10-a p { margin: 0; padding: 0 18px 16px 37px; color: var(--f10-soft); font-size: 14.5px; line-height: 1.65; }
+.lpx[dir="rtl"] .pc-f10-a p { padding: 0 37px 16px 18px; }
+
+@container lpx (max-width: 900px) { .lpx .pc-f10-in { grid-template-columns: minmax(0, 1fr); gap: 40px; } .lpx .pc-f10-legal { margin-top: 24px; } }
+@container lpx (max-width: 560px) {
+  .lpx .pc-f10-in { padding: 44px 16px 36px; display: flex; flex-direction: column; gap: 36px; }
+  .lpx .pc-f10-name { font-size: 28px; }
+  .lpx .pc-f10-faq { order: -1; }
+  .lpx .pc-f10.is-solo .pc-f10-btn { width: 100%; justify-content: center; }
+}

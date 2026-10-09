@@ -1,0 +1,158 @@
+/* h11-prix — barre minimale : logotype espacé | accroche · prix · bouton */
+/* .lpx a overflow-x: hidden, qui empêche tout header collant : clip garde la protection sans casser sticky. */
+.lpx:has(> .pc-h11) {
+  overflow-x: clip;
+}
+.lpx .pc-h11 {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  background: color-mix(in srgb, var(--bg) 88%, transparent);
+  backdrop-filter: saturate(1.4) blur(14px);
+  -webkit-backdrop-filter: saturate(1.4) blur(14px);
+  border-bottom: 1px solid var(--border);
+}
+.lpx .pc-h11-in {
+  max-width: 1240px;
+  margin: 0 auto;
+  padding-inline: 40px;
+  height: 76px;
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+.lpx .pc-h11-brand {
+  min-width: 0;
+  color: var(--text);
+  text-decoration: none;
+  font-family: var(--heading);
+  font-weight: 700;
+  font-size: 24px;
+  line-height: 1;
+  letter-spacing: 0.17em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding-block: 4px;
+}
+.lpx .pc-h11-brand.long {
+  font-size: 19px;
+  letter-spacing: 0.1em;
+}
+.lpx[dir="rtl"] .pc-h11-brand {
+  letter-spacing: 0;
+}
+.lpx .pc-h11-right {
+  margin-inline-start: auto;
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  flex: none;
+  min-width: 0;
+}
+.lpx .pc-h11-tag {
+  font-size: 14px;
+  color: var(--muted);
+  white-space: nowrap;
+  max-width: 300px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.lpx .pc-h11-price {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  line-height: 1;
+  white-space: nowrap;
+}
+.lpx .pc-h11-old {
+  color: var(--muted);
+  font-size: 14px;
+  text-decoration-thickness: 1px;
+}
+.lpx .pc-h11-now {
+  font-weight: 700;
+  font-size: 20px;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+.lpx .pc-h11-cta {
+  height: 44px;
+  padding: 0 26px;
+  display: inline-flex;
+  align-items: center;
+  cursor: pointer;
+  border: 0;
+  background: var(--text);
+  color: var(--bg);
+  border-radius: min(var(--btn-radius), 10px);
+  font-weight: 600;
+  font-size: 13px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  transition:
+    transform 0.15s,
+    background 0.2s,
+    color 0.2s;
+}
+.lpx[dir="rtl"] .pc-h11-cta {
+  letter-spacing: 0;
+  font-size: 14px;
+}
+.lpx .pc-h11-short {
+  display: none;
+}
+.lpx .pc-h11-cta:hover {
+  background: var(--primary);
+  color: var(--primary-text);
+  transform: translateY(-1px);
+}
+.lpx .pc-h11-cta:focus-visible,
+.lpx .pc-h11-brand:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 3px;
+}
+@container lpx (max-width: 900px) {
+  .lpx .pc-h11-in {
+    padding-inline: 24px;
+    gap: 18px;
+  }
+  .lpx .pc-h11-tag {
+    display: none;
+  }
+}
+@container lpx (max-width: 560px) {
+  .lpx .pc-h11-in {
+    height: 60px;
+    padding-inline: 16px;
+    gap: 12px;
+  }
+  .lpx .pc-h11-brand,
+  .lpx .pc-h11-brand.long {
+    font-size: 16px;
+    letter-spacing: 0.1em;
+  }
+  .lpx .pc-h11-right {
+    gap: 12px;
+  }
+  .lpx .pc-h11-old {
+    display: none;
+  }
+  .lpx .pc-h11-long {
+    display: none;
+  }
+  .lpx .pc-h11-short {
+    display: inline;
+  }
+  .lpx .pc-h11-now {
+    font-size: 16px;
+  }
+  .lpx .pc-h11-cta {
+    height: 38px;
+    padding: 0 14px;
+    font-size: 11px;
+    letter-spacing: 0.08em;
+  }
+}

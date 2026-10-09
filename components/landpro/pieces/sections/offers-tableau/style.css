@@ -1,0 +1,71 @@
+/* offers-tableau : tableau comparatif des offres */
+.lpx .pc-oft { padding: 88px 20px; background: color-mix(in srgb, var(--primary) 5%, var(--bg)); }
+.lpx .pc-oft-in { max-width: 980px; margin: 0 auto; }
+.lpx .pc-oft-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px 24px; flex-wrap: wrap; margin-bottom: 28px; }
+.lpx .pc-oft-title { font-size: clamp(26px, 3.4cqi, 40px); margin: 0; max-width: 24ch; }
+.lpx .pc-oft-sub { margin: 0; display: inline-flex; align-items: center; gap: 8px; color: var(--muted); font-weight: 600; font-size: 14.5px; }
+.lpx .pc-oft-sub svg { font-size: 19px; color: var(--primary); }
+.lpx .pc-oft-scroll { overflow-x: auto; border-radius: calc(var(--radius) * 1.1); scrollbar-width: thin; }
+.lpx .pc-oft-grid {
+  display: grid; grid-template-columns: minmax(130px, 1.3fr) repeat(var(--n), minmax(110px, 1fr));
+  background: var(--surface); border: 1px solid color-mix(in srgb, var(--border) 70%, transparent);
+  border-radius: calc(var(--radius) * 1.1); overflow: hidden;
+  box-shadow: 0 28px 56px -40px rgba(0, 0, 0, 0.45);
+}
+.lpx .pc-oft-corner { border-bottom: 1px solid var(--border); }
+.lpx .pc-oft-th {
+  position: relative; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 8px;
+  padding: 22px 12px 16px; border: 0; border-bottom: 1px solid var(--border); background: transparent; color: var(--text);
+  cursor: pointer; text-align: center; transition: background 0.2s, color 0.2s;
+}
+.lpx .pc-oft-th:hover { background: color-mix(in srgb, var(--primary) 6%, var(--surface)); }
+.lpx .pc-oft-th:focus-visible { outline: 2px solid var(--primary); outline-offset: -4px; }
+.lpx .pc-oft-th.on { background: var(--primary); color: var(--primary-text); border-bottom-color: transparent; }
+.lpx .pc-oft-lab { font-family: var(--heading); font-weight: var(--hw, 800); font-size: 17px; line-height: 1.2; overflow-wrap: anywhere; }
+.lpx .pc-oft-badge {
+  font-size: 11px; font-weight: 700; letter-spacing: 0.04em; padding: 4px 10px; border-radius: 999px; line-height: 1.2;
+  background: color-mix(in srgb, var(--primary) 14%, var(--surface)); color: var(--primary);
+}
+.lpx .pc-oft-th.on .pc-oft-badge { background: color-mix(in srgb, var(--primary-text) 20%, transparent); color: var(--primary-text); }
+.lpx .pc-oft-radio { width: 18px; height: 18px; border-radius: 50%; border: 2px solid color-mix(in srgb, var(--text) 30%, transparent); }
+.lpx .pc-oft-th.on .pc-oft-radio { border: 5px solid var(--primary-text); background: var(--primary); }
+.lpx .pc-oft-rh, .lpx .pc-oft-td { padding: 15px 16px; border-bottom: 1px solid color-mix(in srgb, var(--border) 70%, transparent); font-size: 15px; display: flex; align-items: center; }
+.lpx .pc-oft-rh { color: var(--muted); font-weight: 600; }
+.lpx .pc-oft-rh.strong { color: var(--text); font-weight: 800; border-bottom: 0; }
+.lpx .pc-oft-td { justify-content: center; text-align: center; cursor: pointer; flex-wrap: wrap; gap: 2px 8px; transition: background 0.2s; }
+.lpx .pc-oft-td.on { background: color-mix(in srgb, var(--primary) 9%, var(--surface)); }
+.lpx .pc-oft-price { border-bottom: 0; flex-direction: column; padding-block: 18px; }
+.lpx .pc-oft-price b { font-size: 18px; font-weight: 800; }
+.lpx .pc-oft-price.on b { color: var(--primary); }
+.lpx .pc-oft-price s { color: var(--muted); font-size: 13px; }
+.lpx .pc-oft-save { color: var(--primary); font-weight: 700; }
+.lpx .pc-oft-dash { color: var(--muted); }
+.lpx .pc-oft-foot { margin-top: 24px; display: flex; align-items: center; gap: 14px 24px; flex-wrap: wrap; }
+.lpx .pc-oft-cta {
+  display: inline-flex; align-items: center; gap: 12px; min-height: 54px; padding: 0 28px; border: 0; cursor: pointer;
+  border-radius: var(--btn-radius); background: var(--text); color: var(--bg); font-weight: 700; font-size: 16px;
+  box-shadow: 0 18px 34px -22px rgba(0, 0, 0, 0.6); transition: transform 0.2s, box-shadow 0.2s;
+}
+.lpx .pc-oft-cta:hover { transform: translateY(-2px); }
+.lpx .pc-oft-cta:focus-visible { outline: 3px solid var(--primary); outline-offset: 3px; }
+.lpx .pc-oft-arrow { font-size: 18px; }
+.lpx[dir="rtl"] .pc-oft-arrow { transform: scaleX(-1); }
+.lpx .pc-oft-total { color: var(--muted); font-size: 15px; }
+.lpx .pc-oft-total b { color: var(--text); font-size: 18px; margin-inline-start: 4px; }
+@container lpx (max-width: 900px) {
+  .lpx .pc-oft { padding: 68px 20px; }
+}
+@container lpx (max-width: 560px) {
+  .lpx .pc-oft { padding: 52px 16px; }
+  .lpx .pc-oft-head { margin-bottom: 20px; }
+  .lpx .pc-oft-grid { grid-template-columns: minmax(84px, 1fr) repeat(var(--n), minmax(86px, 1fr)); }
+  .lpx .pc-oft-th { padding: 16px 6px 12px; gap: 6px; }
+  .lpx .pc-oft-lab { font-size: 14.5px; }
+  .lpx .pc-oft-badge { font-size: 10px; padding: 3px 7px; }
+  .lpx .pc-oft-rh { padding: 12px 8px 12px 12px; font-size: 12.5px; overflow-wrap: anywhere; hyphens: auto; }
+  .lpx .pc-oft-td { padding: 12px 6px; font-size: 13.5px; }
+  .lpx .pc-oft-price b { font-size: 15px; }
+  .lpx .pc-oft-price s { font-size: 11.5px; }
+  .lpx .pc-oft-foot { flex-direction: column; align-items: stretch; text-align: center; }
+  .lpx .pc-oft-cta { justify-content: center; }
+}

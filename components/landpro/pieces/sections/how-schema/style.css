@@ -1,0 +1,224 @@
+/* how-schema : schéma annoté autour de la photo */
+.lpx .pc-hs {
+  padding: 96px 0;
+  background: color-mix(in srgb, var(--primary) 6%, var(--bg));
+  overflow: hidden;
+}
+.lpx .pc-hs-in {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding-inline: 20px;
+}
+.lpx .pc-hs-title {
+  text-align: start;
+  font-size: clamp(28px, 4.2cqi, 46px);
+  margin: 0 0 48px;
+  max-width: 24ch;
+}
+.lpx .pc-hs-fig {
+  --pc-hs-in: 64px; /* longueur du trait qui entre sur la photo */
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 380px) minmax(0, 1fr);
+  align-items: stretch;
+}
+.lpx .pc-hs-photo {
+  grid-column: 2;
+  grid-row: 1;
+  position: relative;
+  aspect-ratio: 4 / 5;
+  border-radius: calc(var(--radius) * 1.6 + 6px);
+  overflow: hidden;
+  background: var(--surface);
+  box-shadow:
+    0 0 0 10px color-mix(in srgb, var(--surface) 55%, transparent),
+    0 40px 70px -36px rgba(0, 0, 0, 0.55);
+}
+.lpx .pc-hs-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.lpx .pc-hs-col {
+  grid-row: 1;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  gap: 24px;
+  position: relative;
+  z-index: 1;
+  min-width: 0;
+}
+.lpx .pc-hs-col.end {
+  grid-column: 3;
+  padding-block: 4% 16%;
+}
+.lpx .pc-hs-col.start {
+  grid-column: 1;
+  padding-block: 22% 6%;
+}
+.lpx .pc-hs-fig.solo .pc-hs-col.end {
+  padding-block: 0;
+}
+.lpx .pc-hs-step {
+  display: flex;
+  align-items: flex-start;
+}
+.lpx .pc-hs-col.start .pc-hs-step {
+  flex-direction: row-reverse;
+}
+.lpx .pc-hs-line {
+  flex: 1 0 56px;
+  position: relative;
+  height: 2px;
+  margin-top: 11px;
+  background: var(--primary);
+}
+.lpx .pc-hs-col.end .pc-hs-line {
+  margin-inline-start: calc(-1 * var(--pc-hs-in));
+  margin-inline-end: 16px;
+}
+.lpx .pc-hs-col.start .pc-hs-line {
+  margin-inline-end: calc(-1 * var(--pc-hs-in));
+  margin-inline-start: 16px;
+}
+.lpx .pc-hs-line i {
+  position: absolute;
+  top: 50%;
+  width: 14px;
+  height: 14px;
+  margin-top: -7px;
+  border-radius: 50%;
+  background: var(--primary);
+  box-shadow:
+    0 0 0 4px var(--surface),
+    0 0 0 6px color-mix(in srgb, var(--primary) 35%, transparent);
+}
+.lpx .pc-hs-col.end .pc-hs-line i {
+  inset-inline-start: -4px;
+}
+.lpx .pc-hs-col.start .pc-hs-line i {
+  inset-inline-end: -4px;
+}
+.lpx .pc-hs-step:hover .pc-hs-line i {
+  animation: pc-hs-ping 1.4s ease-out infinite;
+}
+@keyframes pc-hs-ping {
+  50% {
+    box-shadow:
+      0 0 0 4px var(--surface),
+      0 0 0 12px color-mix(in srgb, var(--primary) 0%, transparent);
+  }
+}
+.lpx .pc-hs-num {
+  display: none;
+}
+.lpx .pc-hs-txt {
+  flex: 0 1 250px;
+  min-width: 0;
+}
+.lpx .pc-hs-txt b {
+  display: block;
+  font-size: 17px;
+  line-height: 1.35;
+  color: var(--text);
+}
+.lpx .pc-hs-k {
+  color: var(--primary);
+  font-variant-numeric: tabular-nums;
+}
+.lpx .pc-hs-txt p {
+  margin: 4px 0 0;
+  font-size: 15px;
+  line-height: 1.55;
+  color: var(--muted);
+}
+
+/* Écrans moyens et mobiles : photo en haut, puis étapes en frise verticale. */
+@container lpx (max-width: 900px) {
+  .lpx .pc-hs {
+    padding: 72px 0;
+  }
+  .lpx .pc-hs-fig {
+    grid-template-columns: minmax(0, 1fr);
+    max-width: 560px;
+    margin-inline: auto;
+  }
+  .lpx .pc-hs-photo {
+    grid-column: 1;
+    width: min(100%, 340px);
+    margin: 0 auto 36px;
+  }
+  .lpx .pc-hs-col,
+  .lpx .pc-hs-col.end,
+  .lpx .pc-hs-col.start {
+    grid-column: 1;
+    grid-row: auto;
+    padding: 0;
+    gap: 0;
+  }
+  .lpx .pc-hs-step,
+  .lpx .pc-hs-col.start .pc-hs-step {
+    flex-direction: row;
+    gap: 16px;
+    position: relative;
+    padding-bottom: 24px;
+  }
+  /* trait vertical qui relie les pastilles */
+  .lpx .pc-hs-step::before {
+    content: "";
+    position: absolute;
+    inset-inline-start: 17px;
+    top: 36px;
+    bottom: 0;
+    width: 2px;
+    background: color-mix(in srgb, var(--primary) 35%, transparent);
+  }
+  .lpx .pc-hs-col.start .pc-hs-step:last-child,
+  .lpx .pc-hs-fig.solo .pc-hs-step,
+  .lpx .pc-hs-col.end:last-child .pc-hs-step:last-child {
+    padding-bottom: 0;
+  }
+  .lpx .pc-hs-col.start .pc-hs-step:last-child::before,
+  .lpx .pc-hs-col.end:last-child .pc-hs-step:last-child::before {
+    display: none;
+  }
+  .lpx .pc-hs-line {
+    display: none;
+  }
+  .lpx .pc-hs-num {
+    flex: none;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    font-weight: 800;
+    font-size: 15px;
+    color: var(--primary-text);
+    background: var(--primary);
+    box-shadow: 0 0 0 5px color-mix(in srgb, var(--primary) 16%, transparent);
+  }
+  .lpx .pc-hs-k {
+    display: none;
+  }
+  .lpx .pc-hs-txt {
+    flex: 1 1 auto;
+    padding-top: 6px;
+  }
+}
+@container lpx (max-width: 560px) {
+  .lpx .pc-hs {
+    padding: 56px 0;
+  }
+  .lpx .pc-hs-title {
+    margin-bottom: 28px;
+  }
+  .lpx .pc-hs-photo {
+    width: min(78%, 300px);
+    margin-bottom: 30px;
+  }
+}

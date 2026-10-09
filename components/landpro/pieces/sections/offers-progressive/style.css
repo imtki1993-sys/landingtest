@@ -1,0 +1,87 @@
+/* offers-progressive : réglette à paliers */
+.lpx .pc-ofp { padding: 88px 20px; background: color-mix(in srgb, var(--accent) 7%, var(--bg)); }
+.lpx .pc-ofp-in { max-width: 1000px; margin: 0 auto; }
+.lpx .pc-ofp-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px 24px; flex-wrap: wrap; margin-bottom: 44px; }
+.lpx .pc-ofp-title { font-size: clamp(26px, 3.4cqi, 40px); margin: 0; max-width: 24ch; }
+.lpx .pc-ofp-up {
+  display: inline-flex; align-items: center; gap: 8px; padding: 8px 14px; border-radius: 999px; font-weight: 700; font-size: 14px;
+  background: color-mix(in srgb, var(--primary) 14%, var(--bg)); color: var(--primary);
+}
+.lpx .pc-ofp-scale { position: relative; }
+.lpx .pc-ofp-track {
+  position: relative; height: 12px; margin: 0 0 26px; border-radius: 999px;
+  background: color-mix(in srgb, var(--primary) 16%, var(--bg));
+}
+.lpx .pc-ofp-fill {
+  position: absolute; inset-block: 0; inset-inline-start: 0; border-radius: 999px; background: var(--primary);
+  transition: width 0.45s cubic-bezier(0.3, 0.7, 0.2, 1);
+}
+.lpx .pc-ofp-tick {
+  position: absolute; top: 50%; width: 10px; height: 10px; border-radius: 50%; translate: -50% -50%;
+  background: color-mix(in srgb, var(--primary) 35%, var(--bg));
+}
+.lpx[dir="rtl"] .pc-ofp-tick, .lpx[dir="rtl"] .pc-ofp-knob { translate: 50% -50%; }
+.lpx .pc-ofp-tick.done { background: var(--primary-text); opacity: 0.85; }
+.lpx .pc-ofp-knob {
+  position: absolute; top: 50%; width: 32px; height: 32px; border-radius: 50%; translate: -50% -50%;
+  background: var(--bg); border: 5px solid var(--primary);
+  box-shadow: 0 6px 16px -6px color-mix(in srgb, var(--primary) 80%, transparent), 0 0 0 6px color-mix(in srgb, var(--primary) 14%, transparent);
+  transition: inset-inline-start 0.45s cubic-bezier(0.3, 0.7, 0.2, 1);
+}
+.lpx .pc-ofp-steps { display: grid; grid-template-columns: repeat(var(--n), minmax(0, 1fr)); gap: 12px; align-items: start; }
+.lpx .pc-ofp-step {
+  position: relative; display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 16px 10px 18px;
+  border: 1.5px solid transparent; border-radius: var(--radius); background: transparent; color: var(--text);
+  cursor: pointer; text-align: center; transition: background 0.2s, border-color 0.2s, transform 0.2s;
+}
+.lpx .pc-ofp-step:hover { background: color-mix(in srgb, var(--surface) 70%, transparent); }
+.lpx .pc-ofp-step:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+.lpx .pc-ofp-step.on {
+  background: var(--surface); border-color: color-mix(in srgb, var(--primary) 45%, var(--border));
+  box-shadow: 0 22px 40px -30px rgba(0, 0, 0, 0.5);
+}
+.lpx .pc-ofp-badge {
+  font-size: 11px; font-weight: 700; letter-spacing: 0.04em; padding: 4px 10px; border-radius: 999px; line-height: 1.2;
+  background: var(--primary); color: var(--primary-text);
+}
+.lpx .pc-ofp-ghost { visibility: hidden; }
+.lpx .pc-ofp-lab { font-family: var(--heading); font-weight: var(--hw, 800); font-size: 20px; line-height: 1.2; overflow-wrap: anywhere; }
+.lpx .pc-ofp-lab em { font-style: normal; color: var(--primary); white-space: nowrap; }
+.lpx .pc-ofp-step.on .pc-ofp-lab { color: var(--primary); }
+.lpx .pc-ofp-price { display: flex; align-items: baseline; justify-content: center; flex-wrap: wrap; gap: 2px 8px; }
+.lpx .pc-ofp-price b { font-size: 16px; font-weight: 700; }
+.lpx .pc-ofp-price s { color: var(--muted); font-size: 13px; }
+.lpx .pc-ofp-save { font-size: 13px; font-weight: 700; color: var(--primary); }
+.lpx .pc-ofp-unit { font-size: 13px; color: var(--muted); }
+.lpx .pc-ofp-foot { margin-top: 40px; display: flex; align-items: center; gap: 14px 24px; flex-wrap: wrap; }
+.lpx .pc-ofp-cta {
+  display: inline-flex; align-items: center; gap: 12px; min-height: 54px; padding: 0 28px; border: 0; cursor: pointer;
+  border-radius: var(--btn-radius); background: var(--text); color: var(--bg); font-weight: 700; font-size: 16px;
+  box-shadow: 0 18px 34px -22px rgba(0, 0, 0, 0.6); transition: transform 0.2s;
+}
+.lpx .pc-ofp-cta:hover { transform: translateY(-2px); }
+.lpx .pc-ofp-cta:focus-visible { outline: 3px solid var(--primary); outline-offset: 3px; }
+.lpx .pc-ofp-arrow { font-size: 18px; }
+.lpx[dir="rtl"] .pc-ofp-arrow { transform: scaleX(-1); }
+.lpx .pc-ofp-note { display: inline-flex; align-items: center; gap: 8px; color: var(--muted); font-weight: 600; font-size: 14.5px; }
+.lpx .pc-ofp-note svg { font-size: 19px; color: var(--primary); }
+@container lpx (max-width: 900px) {
+  .lpx .pc-ofp { padding: 68px 20px; }
+}
+@container lpx (max-width: 560px) {
+  .lpx .pc-ofp { padding: 52px 16px; }
+  .lpx .pc-ofp-head { margin-bottom: 32px; }
+  .lpx .pc-ofp-steps { gap: 4px; }
+  .lpx .pc-ofp-step { padding: 12px 4px 14px; gap: 4px; }
+  .lpx .pc-ofp-lab { font-size: 15.5px; }
+  .lpx .pc-ofp-lab em { display: block; font-size: 14px; }
+  .lpx .pc-ofp-badge { font-size: 9.5px; padding: 3px 6px; }
+  .lpx .pc-ofp-price { flex-direction: column; align-items: center; }
+  .lpx .pc-ofp-price b { font-size: 14px; }
+  .lpx .pc-ofp-price s { font-size: 11.5px; }
+  .lpx .pc-ofp-save, .lpx .pc-ofp-unit { font-size: 11.5px; }
+  .lpx .pc-ofp-knob { width: 26px; height: 26px; border-width: 4px; }
+  .lpx .pc-ofp-foot { margin-top: 28px; flex-direction: column; align-items: stretch; text-align: center; }
+  .lpx .pc-ofp-cta { justify-content: center; }
+  .lpx .pc-ofp-note { justify-content: center; }
+}

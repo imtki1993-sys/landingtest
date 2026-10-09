@@ -1,0 +1,29 @@
+/* f11-whatsapp */
+.lpx .pc-f11 { background: color-mix(in srgb, var(--primary) 7%, var(--surface2, var(--bg))); color: var(--text); font-family: var(--font); border-top: 1px solid var(--border); }
+.lpx .pc-f11-in { max-width: 1120px; margin: 0 auto; padding: 64px 24px; display: flex; align-items: center; justify-content: space-between; gap: 48px; }
+.lpx .pc-f11-brand { min-width: 0; flex: 1; }
+.lpx .pc-f11-name { display: block; font-family: var(--heading); font-weight: var(--hw, 800); text-transform: var(--htt); font-size: 30px; line-height: 1.1; color: var(--text); }
+.lpx .pc-f11-links { display: flex; flex-wrap: wrap; align-items: center; margin-top: 14px; font-size: 15px; line-height: 1.9; }
+.lpx .pc-f11-links a { color: var(--muted); text-decoration: none; transition: color .15s; }
+.lpx .pc-f11-links a + a::before { content: "·"; display: inline-block; margin-inline: 10px; color: var(--muted); }
+.lpx .pc-f11-links a:hover { color: var(--primary); }
+.lpx .pc-f11-legal { margin: 36px 0 0; font-size: 13px; color: var(--muted); }
+
+.lpx .pc-f11-card { --f11-c: var(--primary); --f11-t: var(--primary-text); flex: none; width: 420px; max-width: 100%; padding: 26px; background: var(--surface); border: 1px solid var(--border); border-radius: calc(var(--radius) + 8px); box-shadow: 0 28px 50px -30px rgba(0,0,0,.45), 0 2px 6px -2px rgba(0,0,0,.08); }
+.lpx .pc-f11-card.is-wa { --f11-c: #25d366; --f11-t: #fff; }
+.lpx .pc-f11-head { display: flex; align-items: center; gap: 16px; }
+.lpx .pc-f11-ico { flex: none; width: 56px; height: 56px; border-radius: 50%; display: grid; place-items: center; background: var(--f11-c); color: var(--f11-t); box-shadow: 0 10px 20px -10px var(--f11-c); }
+.lpx .pc-f11-txt { min-width: 0; }
+.lpx .pc-f11-title { margin: 0; font-family: var(--font); text-transform: none; font-size: 19px; font-weight: 800; line-height: 1.25; color: var(--text); }
+.lpx .pc-f11-sub { margin: 4px 0 0; font-size: 14.5px; line-height: 1.4; color: var(--muted); }
+.lpx .pc-f11-btn { display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; min-height: 54px; margin-top: 20px; padding: 12px 20px; border: 0; cursor: pointer; text-decoration: none; border-radius: 999px; background: var(--f11-c); color: var(--f11-t); font-family: var(--font); font-weight: 800; font-size: 16px; box-shadow: 0 14px 26px -14px var(--f11-c); transition: transform .15s, filter .15s; }
+.lpx .pc-f11-btn:hover { transform: translateY(-2px); filter: brightness(1.05); }
+.lpx[dir="rtl"] .pc-f11-card:not(.is-wa) .pc-f11-btn .lpx-ico { transform: scaleX(-1); }
+
+@container lpx (max-width: 760px) {
+  .lpx .pc-f11-in { flex-direction: column; align-items: stretch; gap: 32px; padding: 44px 16px 32px; }
+  .lpx .pc-f11-card { order: -1; width: 100%; padding: 22px; }
+  .lpx .pc-f11-brand { text-align: center; }
+  .lpx .pc-f11-links { justify-content: center; }
+  .lpx .pc-f11-legal { margin-top: 18px; }
+}

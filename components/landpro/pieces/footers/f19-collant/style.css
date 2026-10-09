@@ -1,0 +1,204 @@
+/* F19 — barre de commande collante + petit pied de page */
+/* la barre remplace la barre collante générique du moteur */
+.lpx:has(.pc-f19) .lpx-sticky-cta {
+  display: none;
+}
+.lpx .pc-f19 {
+  background: var(--surface);
+  color: var(--text);
+  font-family: var(--font);
+  border-top: 1px solid var(--border);
+}
+.lpx .pc-f19-in {
+  max-width: 1160px;
+  margin: 0 auto;
+  /* place pour la barre fixe : le bas de page reste lisible */
+  padding: 48px 40px 124px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px 40px;
+}
+.lpx .pc-f19-brand {
+  min-width: 0;
+}
+.lpx .pc-f19-name {
+  font-family: var(--heading);
+  font-weight: var(--hw);
+  text-transform: var(--htt);
+  font-size: 24px;
+  line-height: 1.15;
+  overflow-wrap: anywhere;
+}
+.lpx .pc-f19-deliv {
+  margin: 6px 0 0;
+  color: var(--muted);
+  font-size: 14.5px;
+}
+.lpx .pc-f19-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 24px;
+  font-size: 14.5px;
+}
+.lpx .pc-f19-links a {
+  color: var(--muted);
+  text-decoration: none;
+}
+.lpx .pc-f19-links a:hover,
+.lpx .pc-f19-links a:focus-visible {
+  color: var(--primary);
+}
+.lpx .pc-f19-legal {
+  flex-basis: 100%;
+  margin: 8px 0 0;
+  padding-top: 18px;
+  border-top: 1px solid var(--border);
+  font-size: 13px;
+  color: var(--muted);
+}
+
+/* barre fixe */
+.lpx .pc-f19-bar {
+  position: fixed;
+  inset-inline: 0;
+  bottom: 0;
+  z-index: 60;
+  padding: 14px 24px calc(14px + env(safe-area-inset-bottom));
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  box-shadow: 0 -14px 32px -16px rgba(0, 0, 0, 0.35);
+  transform: translateY(110%);
+  visibility: hidden;
+  transition:
+    transform 0.32s cubic-bezier(0.2, 0.7, 0.2, 1),
+    visibility 0s linear 0.32s;
+}
+.lpx .pc-f19-bar.is-on {
+  transform: none;
+  visibility: visible;
+  transition:
+    transform 0.32s cubic-bezier(0.2, 0.7, 0.2, 1),
+    visibility 0s;
+}
+.lpx .pc-f19-bar-in {
+  max-width: 1160px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.lpx .pc-f19-thumb {
+  flex: none;
+  width: 56px;
+  height: 56px;
+  border-radius: calc(var(--radius) * 0.7);
+  overflow: hidden;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+}
+.lpx .pc-f19-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.lpx .pc-f19-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  line-height: 1.25;
+}
+.lpx .pc-f19-info b {
+  font-size: 16px;
+  font-weight: 800;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.lpx .pc-f19-info > span {
+  font-size: 14px;
+  color: var(--muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.lpx .pc-f19-info em {
+  font-style: normal;
+  font-weight: 800;
+  color: var(--text);
+}
+.lpx .pc-f19-info i {
+  font-style: normal;
+}
+.lpx .pc-f19-btn {
+  flex: none;
+  min-height: 52px;
+  border: 0;
+  cursor: pointer;
+  background: var(--primary);
+  color: var(--primary-text);
+  border-radius: 999px;
+  padding: 0 34px;
+  font-weight: 800;
+  font-size: 16px;
+  white-space: nowrap;
+  box-shadow: 0 10px 22px -12px color-mix(in srgb, var(--primary) 80%, transparent);
+  transition: transform 0.15s;
+}
+.lpx .pc-f19-btn:hover {
+  transform: translateY(-1px);
+}
+
+@container lpx (max-width: 560px) {
+  .lpx .pc-f19-in {
+    padding: 36px 20px 112px;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .lpx .pc-f19-legal {
+    flex-basis: auto;
+    width: 100%;
+  }
+  .lpx .pc-f19-bar {
+    padding: 10px 12px calc(10px + env(safe-area-inset-bottom));
+  }
+  .lpx .pc-f19-bar-in {
+    gap: 10px;
+  }
+  .lpx .pc-f19-thumb {
+    width: 46px;
+    height: 46px;
+  }
+  .lpx .pc-f19-info b {
+    font-size: 14.5px;
+  }
+  .lpx .pc-f19-info > span {
+    font-size: 12.5px;
+  }
+  .lpx .pc-f19-btn {
+    min-height: 46px;
+    padding: 0 20px;
+    font-size: 15px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lpx .pc-f19-bar,
+  .lpx .pc-f19-bar.is-on {
+    transition: none;
+  }
+}
+
+/* dans l'éditeur : la barre est montrée en place, sous le pied de page */
+.lpx.lpx-builder .pc-f19-in {
+  padding-bottom: 32px;
+}
+.lpx.lpx-builder .pc-f19-bar {
+  position: relative;
+  transform: none;
+  visibility: visible;
+  transition: none;
+}
