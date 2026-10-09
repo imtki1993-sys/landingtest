@@ -182,7 +182,7 @@ export async function POST(req: Request) {
       );
     const { data: lp } = await s
       .from("landing_pages")
-      .select("id,status,workspace_id")
+      .select("id,name,status,workspace_id")
       .eq("slug", slug)
       .is("archived_at", null)
       .maybeSingle();
@@ -198,21 +198,37 @@ export async function POST(req: Request) {
     });
     if (error) throw error;
     if (data?.order_id) {
-      const origin = req.headers.get("origin") || req.headers.get("referer") || undefined,
-        ip2 =
-          (req.headers.get("x-forwarded-for") || req.headers.get("x-real-ip") || "").split(",")[0].trim() || undefined;
+      // URL exacte de la page (envoyée par la landing), sinon le Referer ; jamais une autre origine
+      const referer = req.headers.get("referer") || "",
+        pageUrl = typeof b.page_url === "string" ? b.page_url.slice(0, 1000) : "";
+      const sameHost = (u: string) => {
+        try {
+          return new URL(u).host === new URL(referer || req.url).host;
+        } catch {
+          return false;
+        }
+      };
+      const eventSourceUrl = pageUrl && sameHost(pageUrl) ? pageUrl : referer || undefined;
+      const ip2 =
+        (req.headers.get("x-forwarded-for") || req.headers.get("x-real-ip") || "").split(",")[0].trim() || undefined;
       after(() =>
         sendMetaPurchase({
           workspaceId: lp.workspace_id,
           landingPageId: lp.id,
           orderId: data.order_id,
           value: Number(data.total || 0),
-          currency: "MAD",
+          currency: String(data.currency || "MAD"),
+          quantity: Math.min(10, Math.max(1, Number(b.quantity || 1))),
+          contentName: lp.name || undefined,
           phone: String(b.phone),
           name: String(b.name),
-          eventSourceUrl: origin,
+          city: b.city ? String(b.city) : undefined,
+          eventSourceUrl,
           clientIp: ip2,
           userAgent: req.headers.get("user-agent") || undefined,
+          fbp: typeof b.fbp === "string" ? b.fbp : undefined,
+          fbc: typeof b.fbc === "string" ? b.fbc : undefined,
+          externalId: typeof b.visitor_id === "string" ? b.visitor_id.slice(0, 80) : undefined,
         }).catch(() => {}),
       );
     }
