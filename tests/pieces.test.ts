@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { PIECE_LIST, PIECES } from "../components/landpro/pieces";
+import { PIECE_CATALOG } from "../components/landpro/pieces/catalog";
 
 describe("landpro pieces", () => {
   it("registers the 47 pieces with unique ids", () => {
@@ -22,5 +23,11 @@ describe("landpro pieces", () => {
       expect(p.name.length).toBeGreaterThan(0);
       if (p.kind === "section") expect(p.section).toBeTruthy();
     }
+  });
+
+  it("le catalogue serveur reprend exactement les pièces enregistrées", () => {
+    const meta = (p: { id: string; kind: string; section?: string; name: string }) =>
+      `${p.id}|${p.kind}|${p.section || ""}|${p.name}`;
+    expect(PIECE_CATALOG.map(meta).sort()).toEqual(PIECE_LIST.map(meta).sort());
   });
 });
