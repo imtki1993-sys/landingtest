@@ -7,6 +7,7 @@ const items = [
   ["/pages", "▣", "Landing Pages"],
   ["/stores", "▦", "Stores"],
   ["/orders", "◎", "Commandes"],
+  ["/team", "☺", "Équipe"],
   ["/delivery", "🚚", "Livraison"],
   ["/products", "◇", "Mes produits"],
   ["/domains", "⌁", "Domaines"],
@@ -20,11 +21,19 @@ const items = [
 export default function SaaSSidebar() {
   const pathname = usePathname(),
     [isAdmin, setIsAdmin] = useState(false),
+    [isAgent, setIsAgent] = useState(false),
     [plan, setPlan] = useState<{ active: boolean; days: number | null } | null>(null);
   useEffect(() => {
     fetch("/api/auth/context", { cache: "no-store" })
       .then((r) => (r.ok ? r.json() : null))
-      .then((x) => setIsAdmin(!!x?.is_platform_admin))
+      .then((x) => {
+        setIsAdmin(!!x?.is_platform_admin);
+        // Agent de confirmation : uniquement ses commandes
+        if (x?.role === "agent") {
+          setIsAgent(true);
+          if (!location.pathname.startsWith("/orders")) location.replace("/orders");
+        }
+      })
       .catch(() => setIsAdmin(false));
     fetch("/api/license", { cache: "no-store" })
       .then((r) => (r.ok ? r.json() : null))
@@ -47,7 +56,7 @@ export default function SaaSSidebar() {
       </div>
       <nav className="dash-nav">
         {items
-          .filter(([href]) => !href.startsWith("/admin/") || isAdmin)
+          .filter(([href]) => (isAgent ? href === "/orders" : !href.startsWith("/admin/") || isAdmin))
           .map(([href, icon, label]) => {
             const active = href === "/" ? pathname === "/" : pathname === href || pathname.startsWith(href + "/");
             return (
@@ -58,7 +67,7 @@ export default function SaaSSidebar() {
             );
           })}
       </nav>
-      <Link href="/account" className={"sidebar-plan" + (plan && !plan.active ? " is-off" : "")}>
+      <Link href="/account" hidden={isAgent} className={"sidebar-plan" + (plan && !plan.active ? " is-off" : "")}>
         <small>ABONNEMENT</small>
         <b>{!plan ? "LandPro" : plan.active ? "Actif" : "Expiré"}</b>
         <span>
