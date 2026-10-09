@@ -86,19 +86,21 @@ export default function SaaSSidebar() {
             );
           })}
       </nav>
-      <Link href="/account" hidden={isAgent} className={"sidebar-plan" + (plan && !plan.active ? " is-off" : "")}>
-        <small>ABONNEMENT</small>
-        <b>{!plan ? "LandPro" : plan.active ? "Actif" : "Expiré"}</b>
-        <span>
-          {!plan
-            ? "Mon abonnement"
-            : plan.active
-              ? plan.days !== null
-                ? `${plan.days} jour${plan.days === 1 ? "" : "s"} restant${plan.days === 1 ? "" : "s"}`
-                : "Sans date de fin"
-              : "Activer une clé"}
-        </span>
-      </Link>
+      {ready && !isAgent && (
+        <Link href="/account" className={"sidebar-plan" + (plan && !plan.active ? " is-off" : "")}>
+          <small>ABONNEMENT</small>
+          <b>{!plan ? "LandPro" : plan.active ? "Actif" : "Expiré"}</b>
+          <span>
+            {!plan
+              ? "Mon abonnement"
+              : plan.active
+                ? plan.days !== null
+                  ? `${plan.days} jour${plan.days === 1 ? "" : "s"} restant${plan.days === 1 ? "" : "s"}`
+                  : "Sans date de fin"
+                : "Activer une clé"}
+          </span>
+        </Link>
+      )}
     </aside>
   );
 }
