@@ -4,6 +4,8 @@ import { NextResponse, after } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { authContext, adminDb } from "../../../lib/server-auth";
 import { sendMetaPurchase } from "../../../lib/meta-capi";
+import { customerRisk } from "../../../lib/order-risk";
+import { blacklistedPhones, cancelIfBlacklisted } from "../../../lib/blacklist";
 function db() {
   const u = process.env.NEXT_PUBLIC_SUPABASE_URL,
     k = process.env.SUPABASE_SECRET_KEY;
@@ -109,8 +111,38 @@ export async function GET(req: Request) {
       landings = by(landingsQ.data || []),
       stores = by(storesQ.data || []),
       carriers = by(carriersQ.data || []);
+    // Fiabilité client : toutes les commandes du compte avec le même numéro + liste noire
+    const phones = [...new Set([...leads.values()].map((l: any) => l.phone_e164).filter(Boolean))] as string[];
+    const [historyQ, blocked] = await Promise.all([
+      phones.length
+        ? supabase
+            .from("leads")
+            .select("id,phone_e164,status,created_at")
+            .eq("workspace_id", workspaceId)
+            .in("phone_e164", phones)
+            .limit(5000)
+        : Promise.resolve({ data: [] }),
+      blacklistedPhones(supabase, workspaceId, phones),
+    ]);
+    const historyByPhone = new Map<string, any[]>();
+    for (const h of (historyQ as any).data || [])
+      historyByPhone.set(h.phone_e164, [...(historyByPhone.get(h.phone_e164) || []), h]);
+    const riskOf = (o: any) => {
+      const lead = leads.get(o.lead_id) as any;
+      if (!lead) return null;
+      return customerRisk({
+        leadId: lead.id,
+        createdAt: o.created_at,
+        phoneE164: lead.phone_e164,
+        history: historyByPhone.get(lead.phone_e164) || [
+          { id: lead.id, status: lead.status, created_at: o.created_at },
+        ],
+        blacklisted: blocked.get(lead.phone_e164) || null,
+      });
+    };
     const rows = base.map((o: any) => ({
       ...o,
+      risk: riskOf(o),
       lead: leads.get(o.lead_id) || null,
       product: products.get(o.product_id) || null,
       landing: landings.get(o.landing_page_id) || null,
@@ -198,6 +230,8 @@ export async function POST(req: Request) {
     });
     if (error) throw error;
     if (data?.order_id) {
+      const orderId = String(data.order_id);
+      after(() => cancelIfBlacklisted(s, orderId).catch(() => false));
       // URL exacte de la page (envoyée par la landing), sinon le Referer ; jamais une autre origine
       const referer = req.headers.get("referer") || "",
         pageUrl = typeof b.page_url === "string" ? b.page_url.slice(0, 1000) : "";
