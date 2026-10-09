@@ -3,16 +3,23 @@ import { publicMessage } from "../../../../lib/public-error";
 import { reportError } from "../../../../lib/monitoring";
 import { NextResponse } from "next/server";
 import { authContext } from "../../../../lib/server-auth";
-import { generateLicenseCode, hashLicenseCode, licenseHint, offerFor } from "../../../../lib/licenses";
+import {
+  generateLicenseCode,
+  hashLicenseCode,
+  licenseHint,
+  licenseSetupMessage,
+  offerFor,
+} from "../../../../lib/licenses";
 
 async function admin(req: Request) {
   const a = await authContext(req);
   if (!a.isPlatformAdmin) throw new Error("Accès administrateur requis");
   return a;
 }
+// L'admin voit la cause précise d'une erreur de mise en place (table, variable manquante)
 const fail = (e: any) =>
   NextResponse.json(
-    { error: publicMessage(e) },
+    { error: licenseSetupMessage(e) || publicMessage(e) },
     { status: String(e?.message || "").includes("administrateur") ? 403 : 500 },
   );
 

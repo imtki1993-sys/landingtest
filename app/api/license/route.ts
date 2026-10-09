@@ -3,7 +3,7 @@ import { publicMessage } from "../../../lib/public-error";
 import { reportError } from "../../../lib/monitoring";
 import { NextResponse } from "next/server";
 import { authContext } from "../../../lib/server-auth";
-import { activateLicense, daysLeft, LicenseError, LICENSE_OFFERS } from "../../../lib/licenses";
+import { activateLicense, daysLeft, LicenseError, LICENSE_OFFERS, licenseSetupMessage } from "../../../lib/licenses";
 
 const clientIp = (req: Request) =>
   (req.headers.get("x-forwarded-for") || req.headers.get("x-real-ip") || "unknown").split(",")[0].trim();
@@ -51,6 +51,13 @@ export async function POST(req: Request) {
   } catch (e: any) {
     if (e instanceof LicenseError) return NextResponse.json({ error: e.message, code: e.code }, { status: e.status });
     reportError(e, "api/license");
-    return NextResponse.json({ error: publicMessage(e) }, { status: 500 });
+    return NextResponse.json(
+      {
+        error: licenseSetupMessage(e)
+          ? "L’activation des clés n’est pas encore disponible. Contacte l’administrateur."
+          : publicMessage(e),
+      },
+      { status: 500 },
+    );
   }
 }

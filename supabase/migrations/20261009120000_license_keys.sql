@@ -24,7 +24,11 @@ create index if not exists license_keys_workspace_idx on public.license_keys (us
 -- Aucune lecture possible avec la clé publique (anon) ou un jeton utilisateur
 alter table public.license_keys enable row level security;
 revoke all on public.license_keys from anon, authenticated;
+grant all on public.license_keys to service_role;
 
 -- Dates de période sur les abonnements (déjà présentes normalement ; sans effet sinon)
 alter table public.workspace_subscriptions add column if not exists current_period_start timestamptz;
 alter table public.workspace_subscriptions add column if not exists current_period_end timestamptz;
+
+-- Rend la nouvelle table visible tout de suite pour l'API Supabase
+notify pgrst, 'reload schema';

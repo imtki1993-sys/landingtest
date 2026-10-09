@@ -163,3 +163,21 @@ export async function activateLicense(
     throw e;
   }
 }
+
+/**
+ * Erreurs de mise en place connues → message clair pour l'admin (jamais de secret ni de détail SQL).
+ * Renvoie null pour toute autre erreur.
+ */
+export function licenseSetupMessage(error: unknown): string | null {
+  const e = error as any;
+  const text = `${e?.code || ""} ${e?.message || ""} ${e?.details || ""} ${e?.hint || ""}`;
+  if (/license_secret_not_configured/.test(text))
+    return "Configuration manquante : ajoute la variable LICENSE_KEY_SECRET dans Vercel (Settings > Environment Variables), puis redéploie.";
+  if (/42P01|PGRST205|license_keys/.test(text) && /exist|schema cache|find the table|relation/i.test(text))
+    return "La table des clés n'existe pas encore : exécute le fichier supabase/migrations/20261009120000_license_keys.sql dans Supabase (SQL Editor), puis réessaie.";
+  if (/42703|PGRST204|current_period_(start|end)/.test(text) && /column|schema cache/i.test(text))
+    return "Colonne manquante dans workspace_subscriptions : exécute le fichier de migration des clés dans Supabase (SQL Editor), puis réessaie.";
+  if (/42501|permission denied/i.test(text))
+    return "Accès refusé à la table des clés : vérifie que SUPABASE_SECRET_KEY est bien la clé « service_role » dans Vercel.";
+  return null;
+}
