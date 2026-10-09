@@ -99,7 +99,8 @@ export default function Orders() {
       ["PENDING", "PICKED_UP", "IN_TRANSIT"].includes(o.shipment_status)) ||
     (quickFilter === "OUT" && o.shipment_status === "OUT_FOR_DELIVERY") ||
     (quickFilter === "DELIVERED" && o.shipment_status === "DELIVERED") ||
-    (quickFilter === "RETURN" && ["FAILED", "RETURNING", "RETURNED", "CANCELLED"].includes(o.shipment_status));
+    (quickFilter === "RETURN" && ["FAILED", "RETURNING", "RETURNED", "CANCELLED"].includes(o.shipment_status)) ||
+    (quickFilter === "CHECK" && ["blocked", "duplicate", "risky"].includes(o.risk?.level));
   const filtered = useMemo(
     () =>
       orders.filter(
@@ -388,6 +389,46 @@ export default function Orders() {
     setManualOpen(false);
     alert("Commande créée : " + x.order_number);
   }
+  const toCheck = orders.filter((o) => ["blocked", "duplicate", "risky"].includes(o.risk?.level)).length;
+  /** Message WhatsApp de confirmation pré-rempli (le marchand n'a plus qu'à l'envoyer). */
+  function confirmLink(o: any) {
+    const phone = String(o.lead?.phone_e164 || "").replace(/\D/g, "");
+    if (!phone) return "";
+    const msg =
+      `Salam ${o.lead?.full_name || ""} 👋\n` +
+      `Merci pour votre commande ${o.order_number || ""} : ${o.product?.name || "votre produit"} × ${o.quantity || 1}, ` +
+      `total ${Number(o.total || 0)} DH, paiement à la livraison.\n` +
+      `Vous confirmez la livraison à ${o.lead?.city_name || "votre ville"}${o.lead?.address ? ", " + o.lead.address : ""} ? ` +
+      `Répondez OUI pour confirmer.`;
+    return "https://wa.me/" + phone + "?text=" + encodeURIComponent(msg);
+  }
+  async function toggleBlock(o: any) {
+    const phone = o.lead?.phone_e164;
+    if (!phone) return;
+    const blocked = o.risk?.level === "blocked";
+    let reason = "";
+    if (!blocked) {
+      const r = prompt(
+        "Bloquer " +
+          (o.lead?.phone_raw || phone) +
+          " ?\nSes prochaines commandes seront annulées automatiquement.\nRaison (facultatif) :",
+        "Refuse les colis",
+      );
+      if (r === null) return;
+      reason = r;
+    }
+    const res = await fetch(
+      "/api/blacklist" + (blocked ? "?phone=" + encodeURIComponent(phone) : ""),
+      blocked
+        ? { method: "DELETE" }
+        : { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ phone, reason }) },
+    );
+    const x = await res.json().catch(() => ({}));
+    if (!res.ok) return alert(x.error || "Action impossible");
+    const rr = await fetch("/api/orders", { cache: "no-store" }),
+      xx = await rr.json();
+    setOrders(xx.orders || []);
+  }
   async function remove(o: any) {
     if (!confirm("Supprimer la commande " + o.order_number + " ?")) return;
     const r = await fetch("/api/orders/" + o.id, { method: "DELETE" });
@@ -621,6 +662,7 @@ export default function Orders() {
             ["OUT", "En livraison", kpi.OUT],
             ["DELIVERED", "Livrées", kpi.DELIVERED],
             ["RETURN", "Retours", kpi.RETURN],
+            ["CHECK", "À vérifier", toCheck],
           ].map(([id, label, value]: any) => (
             <button key={id} className={quickFilter === id ? "active" : ""} onClick={() => setQuickFilter(id)}>
               {label} <b>{value}</b>
@@ -916,7 +958,14 @@ export default function Orders() {
                           })}
                         </small>
                       </td>
-                      <td>{o.lead?.full_name || "—"}</td>
+                      <td>
+                        {o.lead?.full_name || "—"}
+                        {o.risk && (
+                          <small className={"order-risk " + o.risk.level} title={o.risk.detail}>
+                            {o.risk.label}
+                          </small>
+                        )}
+                      </td>
                       <td>{o.lead?.phone_raw || "—"}</td>
                       <td>{o.lead?.city_name || "—"}</td>
                       <td>
@@ -1042,13 +1091,14 @@ export default function Orders() {
                               </button>
                             )}
                             {o.lead?.phone_e164 && (
-                              <a
-                                href={"https://wa.me/" + String(o.lead.phone_e164).replace("+", "")}
-                                target="_blank"
-                                rel="noreferrer"
-                              >
-                                WhatsApp
+                              <a href={confirmLink(o)} target="_blank" rel="noreferrer">
+                                WhatsApp : confirmer
                               </a>
+                            )}
+                            {o.lead?.phone_e164 && (
+                              <button onClick={() => toggleBlock(o)}>
+                                {o.risk?.level === "blocked" ? "Débloquer le numéro" : "Bloquer le numéro"}
+                              </button>
                             )}
                             <button className="order-delete" onClick={() => remove(o)}>
                               Supprimer
@@ -1203,6 +1253,19 @@ export default function Orders() {
                 </p>
                 <button onClick={() => startClientEdit(selected)}>✎ Modifier client</button>
               </div>
+              {selected.risk && (
+                <div className={"order-risk-panel " + selected.risk.level}>
+                  <b>{selected.risk.label}</b>
+                  <span>
+                    {selected.risk.detail} · {selected.risk.orders} commande{selected.risk.orders > 1 ? "s" : ""} avec
+                    ce numéro, {selected.risk.delivered} livrée{selected.risk.delivered > 1 ? "s" : ""},{" "}
+                    {selected.risk.returned} retour{selected.risk.returned > 1 ? "s" : ""}
+                  </span>
+                  <button onClick={() => toggleBlock(selected)}>
+                    {selected.risk.level === "blocked" ? "Débloquer" : "Bloquer ce numéro"}
+                  </button>
+                </div>
+              )}
               {editingClient && (
                 <div className="client-edit-form">
                   <label>
