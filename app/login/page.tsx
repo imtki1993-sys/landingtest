@@ -4,7 +4,9 @@ export default function Login() {
   const [email, setEmail] = useState(""),
     [password, setPassword] = useState(""),
     [error, setError] = useState(""),
-    [loading, setLoading] = useState(false);
+    [loading, setLoading] = useState(false),
+    [licenseKey, setLicenseKey] = useState(""),
+    [needKey, setNeedKey] = useState(false);
   async function submit(e: FormEvent) {
     e.preventDefault();
     setLoading(true);
@@ -13,9 +15,10 @@ export default function Login() {
       const r = await fetch("/api/auth/login", {
           method: "POST",
           headers: { "content-type": "application/json" },
-          body: JSON.stringify({ email, password }),
+          body: JSON.stringify({ email, password, license_key: needKey ? licenseKey : undefined }),
         }),
         x = await r.json();
+      if (x.code === "PENDING") setNeedKey(true);
       if (!r.ok) throw new Error(x.error || "Connexion impossible");
       window.location.href = "/";
     } catch (e: any) {
@@ -101,6 +104,30 @@ export default function Login() {
             marginBottom: 18,
           }}
         />
+        {needKey && (
+          <>
+            <label style={{ display: "block", fontSize: 13, marginBottom: 7 }}>Clé d’activation</label>
+            <input
+              required
+              placeholder="LP-XXXX-XXXX-XXXX"
+              autoComplete="off"
+              value={licenseKey}
+              onChange={(e) => setLicenseKey(e.target.value.toUpperCase())}
+              style={{
+                width: "100%",
+                boxSizing: "border-box",
+                padding: "13px 14px",
+                borderRadius: 10,
+                border: "1px solid #ff8a3d",
+                background: "#0b1220",
+                color: "white",
+                marginBottom: 18,
+                letterSpacing: 1,
+                fontFamily: "monospace",
+              }}
+            />
+          </>
+        )}
         <div style={{ textAlign: "right", margin: "-8px 0 16px" }}>
           <a href="/forgot-password" style={{ color: "#ff8a3d", fontSize: 13 }}>
             Mot de passe oublié ?
@@ -133,7 +160,7 @@ export default function Login() {
             cursor: "pointer",
           }}
         >
-          {loading ? "Connexion..." : "Se connecter"}
+          {loading ? "Connexion..." : needKey ? "Activer et se connecter" : "Se connecter"}
         </button>
         <p style={{ textAlign: "center", color: "#94a3b8", fontSize: 14, margin: "20px 0 0" }}>
           Pas encore de compte ?{" "}
