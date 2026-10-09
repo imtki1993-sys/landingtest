@@ -20,7 +20,10 @@ export default function Login() {
         x = await r.json();
       if (x.code === "PENDING") setNeedKey(true);
       if (!r.ok) throw new Error(x.error || "Connexion impossible");
-      window.location.href = "/";
+      try {
+        sessionStorage.setItem("lp_role", x.role === "agent" ? "agent" : "owner");
+      } catch {}
+      window.location.href = x.role === "agent" ? "/orders" : "/";
     } catch (e: any) {
       setError(e.message);
     } finally {
