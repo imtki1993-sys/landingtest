@@ -8,6 +8,28 @@ import { useParams } from "next/navigation";
 import React, { useEffect, useRef, useState } from "react";
 import LandingTemplateV4 from "../../../components/LandingTemplateV4";
 import { toTemplateData } from "../../../components/landpro/legacy";
+import { fbcFromClickId, metaCurrency, metaValue, purchaseEventId } from "../../../lib/meta-events";
+
+const fbq = (...args: unknown[]) => (window as any).fbq?.(...args);
+const readCookie = (k: string) =>
+  document.cookie
+    .split("; ")
+    .find((c) => c.startsWith(k + "="))
+    ?.slice(k.length + 1);
+/** Identifiants navigateur Meta pour l'API Conversions (_fbp, _fbc ou fbclid de la visite). */
+function metaBrowserIds() {
+  let fbc = readCookie("_fbc");
+  if (!fbc) {
+    try {
+      const raw = sessionStorage.getItem("lm_fbclid");
+      if (raw) {
+        const { id, t } = JSON.parse(raw);
+        fbc = fbcFromClickId(id, t);
+      }
+    } catch {}
+  }
+  return { fbp: readCookie("_fbp"), fbc };
+}
 
 export default function LandingClient({
   initialData,
@@ -48,14 +70,16 @@ export default function LandingClient({
       .catch((e) => setError(e.message));
   }, [slug, initialData]);
 
-  // Suivi des visites (statistiques LandPro) et Pixel Meta
+  // Suivi des visites (statistiques LandPro) et Pixel Meta — jamais en aperçu (?preview=1) ni dans l'éditeur
   useEffect(() => {
     if (builderMode || !data?.id) return;
-    const q = new URLSearchParams(location.search),
-      sid = sessionStorage.getItem("lm_sid") || crypto.randomUUID(),
+    const q = new URLSearchParams(location.search);
+    if (q.get("preview") === "1") return;
+    const sid = sessionStorage.getItem("lm_sid") || crypto.randomUUID(),
       vid = localStorage.getItem("lm_vid") || crypto.randomUUID();
     sessionStorage.setItem("lm_sid", sid);
     localStorage.setItem("lm_vid", vid);
+    if (q.get("fbclid")) sessionStorage.setItem("lm_fbclid", JSON.stringify({ id: q.get("fbclid"), t: Date.now() }));
     const track = (event: string) =>
       fetch("/api/track", {
         method: "POST",
@@ -78,23 +102,38 @@ export default function LandingClient({
       }).catch(() => {});
     (window as any).lmTrack = track;
     track("PAGE_VIEW");
-    if (data.metaPixelId) {
+    const pixelId = String(data.metaPixelId || "").replace(/\D/g, "");
+    if (pixelId) {
       const w: any = window;
       if (!w.fbq) {
-        const f: any = function () {
-          f.callMethod ? f.callMethod.apply(f, arguments) : f.queue.push(arguments);
-        };
-        f.queue = [];
-        f.loaded = true;
-        f.version = "2.0";
-        w.fbq = f;
+        // Code d'installation officiel du Pixel Meta
+        const n: any = (w.fbq = function () {
+          n.callMethod ? n.callMethod.apply(n, arguments) : n.queue.push(arguments);
+        });
+        if (!w._fbq) w._fbq = n;
+        n.push = n;
+        n.loaded = true;
+        n.version = "2.0";
+        n.queue = [];
         const s = document.createElement("script");
         s.async = true;
         s.src = "https://connect.facebook.net/en_US/fbevents.js";
         document.head.appendChild(s);
       }
-      w.fbq("init", data.metaPixelId);
-      w.fbq("track", "PageView");
+      // Un seul init / PageView par pixel et par page, même si le composant se remonte
+      const done: Set<string> = (w.__lpPixels ||= new Set());
+      if (!done.has(pixelId)) {
+        done.add(pixelId);
+        w.fbq("init", pixelId, { external_id: vid });
+        w.fbq("track", "PageView");
+        w.fbq("track", "ViewContent", {
+          content_type: "product",
+          content_ids: [String(data.id)],
+          content_name: String(data.name || ""),
+          value: metaValue(data.price),
+          currency: metaCurrency(data.content?.currency),
+        });
+      }
     }
     const onScroll = () => {
       const max = document.documentElement.scrollHeight - innerHeight,
@@ -118,14 +157,24 @@ export default function LandingClient({
     if (!(e.target as HTMLElement).closest?.("form")) return;
     trackedForm.current = true;
     (window as any).lmTrack?.("FORM_START");
-    (window as any).fbq?.("track", "InitiateCheckout");
+    fbq("track", "InitiateCheckout", {
+      content_type: "product",
+      content_ids: [String(data?.id || "")],
+      content_name: String(data?.name || ""),
+      value: metaValue(data?.price),
+      currency: metaCurrency(data?.content?.currency),
+      num_items: 1,
+    });
   }
 
   // Clic sur un bouton WhatsApp
   function onClickCapture(e: React.MouseEvent) {
     if (builderMode) return;
     const a = (e.target as HTMLElement).closest?.("a");
-    if (a && /^https:\/\/wa\.me\//.test(a.getAttribute("href") || "")) (window as any).lmTrack?.("WHATSAPP_CLICK");
+    if (a && /^https:\/\/wa\.me\//.test(a.getAttribute("href") || "")) {
+      (window as any).lmTrack?.("WHATSAPP_CLICK");
+      fbq("track", "Contact", { content_name: String(data?.name || "") });
+    }
   }
 
   async function submit(e: React.FormEvent<HTMLFormElement>, qty: number) {
@@ -143,6 +192,10 @@ export default function LandingClient({
           city: f.get("city"),
           address: f.get("address"),
           quantity: qty,
+          // pour l'API Conversions Meta (même visiteur que le Pixel)
+          page_url: location.href,
+          visitor_id: localStorage.getItem("lm_vid") || undefined,
+          ...metaBrowserIds(),
         }),
       });
     if (!r.ok) {
@@ -152,14 +205,25 @@ export default function LandingClient({
     }
     const result = await r.json().catch(() => ({}));
     setSent(true);
-    (window as any).fbq?.("track", "Lead");
-    if (result?.order_id)
-      (window as any).fbq?.(
+    if (result?.order_id) {
+      const params = {
+        content_type: "product",
+        content_ids: [String(data?.id || "")],
+        content_name: String(data?.name || ""),
+        contents: [{ id: String(data?.id || ""), quantity: qty }],
+        num_items: qty,
+        value: metaValue(result?.total),
+        currency: metaCurrency(result?.currency),
+      };
+      fbq("track", "Lead", params, { eventID: "lead_" + result.order_id });
+      // même eventID que l'API Conversions (lib/meta-capi.ts) : Meta ne compte l'achat qu'une fois
+      fbq(
         "track",
         "Purchase",
-        { value: Number(result?.total || 0), currency: String(result?.currency || "MAD") },
-        { eventID: "order_" + result.order_id },
+        { ...params, order_id: String(result.order_id) },
+        { eventID: purchaseEventId(String(result.order_id)) },
       );
+    }
     if (data?.whatsappPhone) {
       const msg = encodeURIComponent(
         "سلام، بغيت نأكد الطلب ديالي:\nالمنتج: " +
