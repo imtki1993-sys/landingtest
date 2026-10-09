@@ -1,4 +1,4 @@
-// Les 89 templates (60 historiques + 29 designs sur mesure) et leur adaptateur historique (création de page, /api/pages, galerie).
+// Les 149 templates (60 historiques + 29 designs sur mesure + 60 assemblés) et leur adaptateur historique (création de page, /api/pages, galerie).
 import { describe, expect, it } from "vitest";
 import { TEMPLATES, getTemplate, resolveTemplateId, TEMPLATE_ALIASES } from "../components/landpro/registry";
 import { LANDING_TEMPLATE_PRESETS, landingTemplate } from "../lib/landing-template-presets";
@@ -6,14 +6,14 @@ import { DESIGNS } from "../components/landpro/designs";
 import { getDemoProduct } from "../components/landpro/demo-products";
 
 describe("registre des templates", () => {
-  it("contient 89 templates numérotés de 1 à 89, aux identifiants uniques", () => {
-    expect(TEMPLATES).toHaveLength(89);
-    expect(TEMPLATES.map((t) => t.number)).toEqual(Array.from({ length: 89 }, (_, i) => i + 1));
-    expect(new Set(TEMPLATES.map((t) => t.id)).size).toBe(89);
+  it("contient 149 templates numérotés de 1 à 149, aux identifiants uniques", () => {
+    expect(TEMPLATES).toHaveLength(149);
+    expect(TEMPLATES.map((t) => t.number)).toEqual(Array.from({ length: 149 }, (_, i) => i + 1));
+    expect(new Set(TEMPLATES.map((t) => t.id)).size).toBe(149);
   });
 
   it("designs sur mesure 61 → 89 : rendu propre, produit de démo avec images et textes", () => {
-    const designs = TEMPLATES.filter((t) => t.number > 60);
+    const designs = TEMPLATES.filter((t) => t.number > 60 && t.number <= 89);
     expect(designs).toHaveLength(29);
     for (const t of designs) {
       expect(t.hero.variant, t.id).toBe("design");
@@ -59,8 +59,8 @@ describe("registre des templates", () => {
 });
 
 describe("adaptateur landing-template-presets", () => {
-  it("expose les 89 templates avec un ordre de sections commençant par le hero", () => {
-    expect(LANDING_TEMPLATE_PRESETS).toHaveLength(89);
+  it("expose les 149 templates avec un ordre de sections commençant par le hero", () => {
+    expect(LANDING_TEMPLATE_PRESETS).toHaveLength(149);
     for (const p of LANDING_TEMPLATE_PRESETS) {
       expect(p.sectionOrder[0], p.id).toBe("hero");
       expect(p.sectionOrder, p.id).toContain("order");

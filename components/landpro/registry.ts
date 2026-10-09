@@ -1,5 +1,6 @@
 // ─────────────────────────────────────────────────────────────
-// LES TEMPLATES LANDPRO (60 historiques + designs sur mesure 61 → 89)
+// LES TEMPLATES LANDPRO (60 historiques + designs sur mesure 61 → 89
+// + 60 templates assemblés à partir des pièces 90 → 149)
 // Pour modifier un template : couleurs dans `theme`, style d'en-tête
 // dans `hero.variant`, sections par défaut dans `sections`.
 // Les identifiants 01→35 sont ceux déjà enregistrés dans les pages
@@ -8,6 +9,8 @@
 import type { SectionKey, TemplateDef } from "./types";
 import { darkTheme as D, lightTheme as L } from "./theme";
 import { DESIGN_DEFS } from "./designs/defs";
+import { COMBO_DEFS } from "./combos";
+import { PIECE_META } from "./pieces/catalog";
 
 const raw: Omit<TemplateDef, "description">[] = [
   // ════════════════ 01 → 30 : COD & conversion ════════════════
@@ -1242,13 +1245,18 @@ const heroLabel: Record<string, string> = {
   design: "Design sur mesure",
 };
 
-export const TEMPLATES: TemplateDef[] = [...raw, ...DESIGN_DEFS].map((t) => {
+export const TEMPLATES: TemplateDef[] = [...raw, ...DESIGN_DEFS, ...COMBO_DEFS].map((t) => {
   const sections = (t.sections.includes("order") ? t.sections : [...t.sections, "order"]) as SectionKey[];
   const highlights = sections
     .filter((s) => !["order", "faq", "trust", "announcement"].includes(s))
     .slice(0, 3)
     .map((s) => SECTION_LABELS[s].toLowerCase());
-  return { ...t, sections, description: `${heroLabel[t.hero.variant]} · ${highlights.join(", ")} · formulaire COD.` };
+  const pieceHero = t.pieces?.hero ? PIECE_META[t.pieces.hero]?.name : undefined;
+  const pieceHeader = t.pieces?.header ? PIECE_META[t.pieces.header]?.name : undefined;
+  const description = pieceHero
+    ? `${pieceHero} · header ${(pieceHeader || "classique").toLowerCase()} · ${highlights.join(", ")} · formulaire COD.`
+    : `${heroLabel[t.hero.variant]} · ${highlights.join(", ")} · formulaire COD.`;
+  return { ...t, sections, description };
 });
 
 export function resolveTemplateId(id: string): string {
