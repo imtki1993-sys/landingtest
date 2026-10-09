@@ -54,17 +54,17 @@ export async function POST(req: Request) {
     if (le) throw le;
     if (!lp || lp.seo?.source !== "external" || (lp.status !== "DRAFT" && lp.status !== "PUBLISHED"))
       return NextResponse.json({ error: "Landing externe introuvable ou inactive" }, { status: 404, headers: cors });
+    // Le script est appelé depuis le navigateur du visiteur, sur le domaine déclaré de la landing :
+    // l'en-tête Origin est obligatoire et doit correspondre à ce domaine.
     const allowed = String(lp.seo?.external_domain || "")
       .trim()
       .toLowerCase();
-    if (allowed && origin) {
-      let host = "";
-      try {
-        host = new URL(origin).hostname.toLowerCase();
-      } catch {}
-      if (host && host !== allowed && !host.endsWith("." + allowed))
-        return NextResponse.json({ error: "Domaine non autorisé" }, { status: 403, headers: cors });
-    }
+    let host = "";
+    try {
+      host = new URL(origin).hostname.toLowerCase();
+    } catch {}
+    if (!host || (allowed && host !== allowed && !host.endsWith("." + allowed)))
+      return NextResponse.json({ error: "Domaine non autorisé" }, { status: 403, headers: cors });
     const { data: rate, error: re } = await s.rpc("check_public_order_rate_limit", {
       p_key: "external:" + landingId + "|" + ip,
       p_limit: 12,
@@ -76,6 +76,32 @@ export async function POST(req: Request) {
         { error: "Trop de tentatives. Réessayez dans quelques minutes." },
         { status: 429, headers: { ...cors, "Retry-After": "600" } },
       );
+    // Même règles que les autres commandes : abonnement actif et quota mensuel de commandes
+    const { data: sub, error: se } = await s
+      .from("workspace_subscriptions")
+      .select("status,order_monthly_limit")
+      .eq("workspace_id", lp.workspace_id)
+      .maybeSingle();
+    if (se) throw se;
+    if (sub && !["active", "trialing"].includes(String(sub.status)))
+      return NextResponse.json({ error: "Boutique momentanément indisponible" }, { status: 403, headers: cors });
+    const limit = Number(sub?.order_monthly_limit || 0);
+    if (limit > 0) {
+      const monthStart = new Date();
+      monthStart.setUTCDate(1);
+      monthStart.setUTCHours(0, 0, 0, 0);
+      const { count, error: ce } = await s
+        .from("orders")
+        .select("id", { count: "exact", head: true })
+        .eq("workspace_id", lp.workspace_id)
+        .gte("created_at", monthStart.toISOString());
+      if (ce) throw ce;
+      if ((count || 0) >= limit)
+        return NextResponse.json(
+          { error: "Limite mensuelle de commandes atteinte pour ce plan." },
+          { status: 403, headers: cors },
+        );
+    }
     const { data: product, error: pe } = await s
       .from("products")
       .select("id,price,is_active")

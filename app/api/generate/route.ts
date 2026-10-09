@@ -3,6 +3,7 @@ import { reportError } from "../../../lib/monitoring";
 import { withLandingInvalidation } from "../../../lib/landing-cache";
 import { NextResponse } from "next/server";
 import { authContext } from "../../../lib/server-auth";
+import { MetaModelError, resolveMetaKey } from "../../../lib/meta-model";
 import OpenAI from "openai";
 
 function slugify(s: string) {
@@ -87,6 +88,8 @@ async function POSTHandler(req: Request) {
   try {
     const p = await req.json();
     if (!p.name || !p.price) return NextResponse.json({ error: "Nom et prix requis" }, { status: 400 });
+    // compte vérifié AVANT tout appel réseau (fournisseur, IA)
+    const { s: supabase, workspaceId } = await authContext(req);
 
     const language = p.language || "Darija Maroc";
     const supplier = await supplierData(p.sourceUrl);
@@ -95,16 +98,14 @@ async function POSTHandler(req: Request) {
       .join("\n\n")
       .slice(0, 5000);
     const requestedTheme = p.theme || "auto";
-    const { s: supabase, workspaceId } = await authContext(req);
-    const { data: integration } = await supabase.rpc("get_workspace_integration_secrets", {
-      p_workspace_id: workspaceId,
-    });
-    const metaKey = integration?.[0]?.openai_api_key || process.env.MODEL_API_KEY;
-    if (!metaKey)
-      return NextResponse.json(
-        { error: "Ajoute ta MODEL_API_KEY Meta dans Paramètres > Intégrations" },
-        { status: 503 },
-      );
+    let metaKey: string;
+    try {
+      metaKey = (await resolveMetaKey(supabase, workspaceId)).key;
+    } catch (keyError: any) {
+      if (keyError instanceof MetaModelError)
+        return NextResponse.json({ error: keyError.message, code: keyError.code }, { status: keyError.status });
+      throw keyError;
+    }
     const client = new OpenAI({ baseURL: "https://api.meta.ai/v1", apiKey: metaKey });
     const prompt = `Tu es directeur artistique et expert landing pages COD Maroc.
 Produit: ${p.name}

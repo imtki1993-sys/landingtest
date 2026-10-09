@@ -36,6 +36,27 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Domaine et landing page requis" }, { status: 400 });
     if (!/^(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,}$/i.test(hostname))
       return NextResponse.json({ error: "Nom de domaine invalide" }, { status: 400 });
+    // Domaines de la plateforme : réservés (sous-domaines *.landpro.online attribués automatiquement)
+    if (/(^|\.)(landpro\.online|vercel\.app)$/.test(hostname))
+      return NextResponse.json({ error: "Ce domaine est réservé par LandPro" }, { status: 400 });
+    // La landing doit appartenir à ce workspace
+    const { data: lp, error: lpError } = await s
+      .from("landing_pages")
+      .select("id")
+      .eq("id", b.landing_page_id)
+      .eq("workspace_id", workspaceId)
+      .maybeSingle();
+    if (lpError) throw lpError;
+    if (!lp) return NextResponse.json({ error: "Landing page introuvable" }, { status: 404 });
+    // Un domaine déjà enregistré par un autre workspace ne peut pas être repris
+    const { data: existing, error: exError } = await s
+      .from("domains")
+      .select("workspace_id")
+      .eq("hostname", hostname)
+      .maybeSingle();
+    if (exError) throw exError;
+    if (existing && existing.workspace_id !== workspaceId)
+      return NextResponse.json({ error: "Ce domaine est déjà utilisé par un autre compte" }, { status: 409 });
     const token = process.env.VERCEL_TOKEN,
       project = process.env.VERCEL_PROJECT_ID || "landingtest";
     if (!token)
@@ -60,7 +81,7 @@ export async function POST(req: Request) {
       .upsert(
         {
           workspace_id: workspaceId,
-          landing_page_id: b.landing_page_id,
+          landing_page_id: lp.id,
           hostname,
           type: hostname.split(".").length > 2 ? "SUBDOMAIN" : "CUSTOM",
           verification_status: verified ? "VERIFIED" : "PENDING",

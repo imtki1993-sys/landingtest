@@ -3,6 +3,7 @@ import { reportError } from "../../../../lib/monitoring";
 import { withLandingInvalidation } from "../../../../lib/landing-cache";
 import { NextResponse } from "next/server";
 import { authContext } from "../../../../lib/server-auth";
+import { safeFetch, UnsafeUrlError } from "../../../../lib/safe-fetch";
 function slugify(v: string) {
   return (
     v
@@ -79,12 +80,14 @@ async function PUTHandler(req: Request) {
       timer = setTimeout(() => controller.abort(), 8000);
     let r: Response;
     try {
-      r = await fetch(url, {
-        redirect: "follow",
+      r = await safeFetch(url, {
         signal: controller.signal,
         headers: { "user-agent": "LandPro-External-Landing-Scanner/1.0" },
         cache: "no-store",
       });
+    } catch (e) {
+      if (e instanceof UnsafeUrlError) return NextResponse.json({ error: e.message }, { status: 400 });
+      throw e;
     } finally {
       clearTimeout(timer);
     }

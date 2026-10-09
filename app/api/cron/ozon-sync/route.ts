@@ -1,4 +1,5 @@
 import { publicMessage } from "../../../../lib/public-error";
+import { openCarrierSettings } from "../../../../lib/carrier-secrets";
 import { reportError } from "../../../../lib/monitoring";
 import { NextResponse } from "next/server";
 import { serviceDb, syncOzonOrder } from "../../../../lib/ozon";
@@ -22,7 +23,7 @@ export async function GET(req: Request) {
       updated = 0,
       failed = 0;
     for (const carrier of carriers || []) {
-      const cfg: any = carrier.settings || {};
+      const cfg: any = openCarrierSettings(carrier.settings);
       if (!cfg.client_id || !cfg.api_key) continue;
       const { data: orders } = await s
         .from("orders")
@@ -61,7 +62,7 @@ export async function GET(req: Request) {
         ]);
         if (!o || !c) throw new Error("Order or carrier missing");
         const before = o.shipment_status,
-          x = await syncOzonOrder(s, o, c.settings || {});
+          x = await syncOzonOrder(s, o, openCarrierSettings(c.settings));
         if (x.shipment !== before) updated++;
         await s
           .from("delivery_sync_jobs")

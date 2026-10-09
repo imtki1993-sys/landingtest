@@ -2,6 +2,7 @@ import { publicMessage } from "../../../../../lib/public-error";
 import { reportError } from "../../../../../lib/monitoring";
 import { NextResponse } from "next/server";
 import { authContext } from "../../../../../lib/server-auth";
+import { openCarrierSettings, redactSecret } from "../../../../../lib/carrier-secrets";
 
 const pick = (v: any): any[] => {
   if (Array.isArray(v)) return v;
@@ -71,20 +72,22 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
       .maybeSingle();
     if (!c || c.code !== "OZON_EXPRESS")
       return NextResponse.json({ error: "Intégration Ozon introuvable" }, { status: 404 });
-    const cfg: any = c.settings || {};
+    const cfg: any = openCarrierSettings(c.settings);
     if (!cfg.client_id || !cfg.api_key)
       return NextResponse.json({ error: "Client ID et API Key Ozon requis" }, { status: 400 });
     const out = await fetchCities(cfg.client_id, cfg.api_key);
     if (!out.ok)
       return NextResponse.json(
-        { error: "Impossible de charger les villes Ozon avec la configuration actuelle.", details: out.last },
+        {
+          error: "Impossible de charger les villes Ozon avec la configuration actuelle.",
+          details: redactSecret(out.last, cfg.api_key),
+        },
         { status: 502 },
       );
     return NextResponse.json({
       ok: true,
       message: "Connexion Ozon réussie. API des villes accessible.",
       cities: out.cities,
-      source_url: out.url,
     });
   } catch (e: any) {
     reportError(e, "api/delivery-companies/[id]/ozon-test");
