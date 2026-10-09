@@ -17,7 +17,8 @@ function isPublic(req: NextRequest) {
   if (p === "/api/orders" && req.method === "POST") return true;
   if (p === "/api/store-order" && req.method === "POST") return true;
   // Tâches planifiées : protégées par CRON_SECRET dans la route elle-même
-  if (p === "/api/cron/ozon-sync" || p === "/api/cron/analytics-rollup") return true;
+  if (p === "/api/cron/ozon-sync" || p === "/api/cron/analytics-rollup" || p === "/api/cron/subscriptions-expire")
+    return true;
   // Formulaires publics : commandes des landings externes (+ pré-requête CORS) et contact des boutiques
   if (p === "/api/external-orders" && (req.method === "POST" || req.method === "OPTIONS")) return true;
   if (p === "/api/store-contact" && req.method === "POST") return true;

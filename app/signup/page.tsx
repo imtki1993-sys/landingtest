@@ -6,7 +6,8 @@ export default function Signup() {
     [confirm, setConfirm] = useState(""),
     [error, setError] = useState(""),
     [message, setMessage] = useState(""),
-    [loading, setLoading] = useState(false);
+    [loading, setLoading] = useState(false),
+    [licenseKey, setLicenseKey] = useState("");
   async function submit(e: FormEvent) {
     e.preventDefault();
     setError("");
@@ -20,14 +21,19 @@ export default function Signup() {
       const r = await fetch("/api/auth/signup", {
           method: "POST",
           headers: { "content-type": "application/json" },
-          body: JSON.stringify({ email, password }),
+          body: JSON.stringify({ email, password, license_key: licenseKey.trim() || undefined }),
         }),
         x = await r.json();
       if (!r.ok) throw new Error(x.error || "Inscription impossible");
+      if (x.licenseError) setError(x.licenseError);
       if (x.confirmationRequired) {
-        setMessage("Compte créé. Vérifie ton email pour confirmer ton inscription.");
+        setMessage(
+          "Compte créé. Vérifie ton email pour confirmer ton inscription" +
+            (licenseKey.trim() && !x.licenseError ? " : ton abonnement est déjà activé." : "."),
+        );
         return;
       }
+      if (x.licenseError) return;
       window.location.href = "/";
     } catch (e: any) {
       setError(e.message);
@@ -129,6 +135,30 @@ export default function Signup() {
             marginBottom: 18,
           }}
         />
+        <label style={{ display: "block", fontSize: 13, marginBottom: 7 }}>
+          Clé d’activation <span style={{ color: "#94a3b8" }}>(facultatif)</span>
+        </label>
+        <input
+          placeholder="LP-XXXX-XXXX-XXXX"
+          autoComplete="off"
+          value={licenseKey}
+          onChange={(e) => setLicenseKey(e.target.value.toUpperCase())}
+          style={{
+            width: "100%",
+            boxSizing: "border-box",
+            padding: 13,
+            borderRadius: 10,
+            border: "1px solid #334155",
+            background: "#0b1220",
+            color: "white",
+            marginBottom: 6,
+            letterSpacing: 1,
+            fontFamily: "monospace",
+          }}
+        />
+        <p style={{ margin: "0 0 18px", color: "#94a3b8", fontSize: 12 }}>
+          Reçue après ton paiement. Sans clé, ton compte reste en attente.
+        </p>
         {error && <div style={{ background: "#451a1a", padding: 11, borderRadius: 9, marginBottom: 16 }}>{error}</div>}
         {message && (
           <div style={{ background: "#123524", padding: 11, borderRadius: 9, marginBottom: 16 }}>{message}</div>

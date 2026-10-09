@@ -13,17 +13,23 @@ const items = [
   ["/analytics", "↗", "Analytics"],
   ["/messages", "✉", "Messages"],
   ["/admin/clients", "♙", "Clients SaaS"],
+  ["/admin/licenses", "⚿", "Clés d’abonnement"],
   ["/account", "♙", "Mon abonnement"],
   ["/settings", "⚙", "Paramètres"],
 ];
 export default function SaaSSidebar() {
   const pathname = usePathname(),
-    [isAdmin, setIsAdmin] = useState(false);
+    [isAdmin, setIsAdmin] = useState(false),
+    [plan, setPlan] = useState<{ active: boolean; days: number | null } | null>(null);
   useEffect(() => {
     fetch("/api/auth/context", { cache: "no-store" })
       .then((r) => (r.ok ? r.json() : null))
       .then((x) => setIsAdmin(!!x?.is_platform_admin))
       .catch(() => setIsAdmin(false));
+    fetch("/api/license", { cache: "no-store" })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((x) => x && setPlan({ active: !!x.active, days: x.days_left ?? null }))
+      .catch(() => setPlan(null));
   }, []);
   return (
     <aside className="dash-side">
@@ -41,7 +47,7 @@ export default function SaaSSidebar() {
       </div>
       <nav className="dash-nav">
         {items
-          .filter(([href]) => href !== "/admin/clients" || isAdmin)
+          .filter(([href]) => !href.startsWith("/admin/") || isAdmin)
           .map(([href, icon, label]) => {
             const active = href === "/" ? pathname === "/" : pathname === href || pathname.startsWith(href + "/");
             return (
@@ -52,11 +58,19 @@ export default function SaaSSidebar() {
             );
           })}
       </nav>
-      <div className="sidebar-plan">
-        <small>PLAN ACTUEL</small>
-        <b>Pro</b>
-        <span>LandPro SaaS</span>
-      </div>
+      <Link href="/account" className={"sidebar-plan" + (plan && !plan.active ? " is-off" : "")}>
+        <small>ABONNEMENT</small>
+        <b>{!plan ? "LandPro" : plan.active ? "Actif" : "Expiré"}</b>
+        <span>
+          {!plan
+            ? "Mon abonnement"
+            : plan.active
+              ? plan.days !== null
+                ? `${plan.days} jour${plan.days === 1 ? "" : "s"} restant${plan.days === 1 ? "" : "s"}`
+                : "Sans date de fin"
+              : "Activer une clé"}
+        </span>
+      </Link>
     </aside>
   );
 }
