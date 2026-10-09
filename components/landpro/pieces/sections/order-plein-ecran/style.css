@@ -1,0 +1,89 @@
+/* order-plein-ecran : formulaire COD sur un écran entier, couleurs du thème inversées */
+.lpx .pc-orp {
+  --pc-orp-ink: var(--bg);
+  --pc-orp-pane: var(--text);
+  --pc-orp-soft: color-mix(in srgb, var(--bg) 62%, var(--text));
+  --pc-orp-field: color-mix(in srgb, var(--bg) 7%, var(--text));
+  --pc-orp-line: color-mix(in srgb, var(--bg) 18%, var(--text));
+  position: relative; isolation: isolate; overflow: hidden;
+  min-height: 100svh; display: flex; align-items: center; justify-content: center;
+  padding: 88px 20px; scroll-margin-top: 0;
+  background: var(--pc-orp-pane); color: var(--pc-orp-ink);
+}
+.lpx .pc-orp-glow {
+  position: absolute; inset: 0; z-index: -1; pointer-events: none;
+  background:
+    radial-gradient(50% 45% at 50% 0%, color-mix(in srgb, var(--primary) 34%, transparent), transparent 72%),
+    radial-gradient(40% 40% at 50% 110%, color-mix(in srgb, var(--accent) 20%, transparent), transparent 70%);
+}
+.lpx .pc-orp-in { width: 100%; max-width: 820px; display: flex; flex-direction: column; align-items: center; }
+.lpx .pc-orp-chip {
+  display: inline-flex; align-items: center; gap: 10px; max-width: 100%; padding: 6px 16px 6px 6px; margin-bottom: 22px;
+  border-radius: 999px; background: var(--pc-orp-field); border: 1px solid var(--pc-orp-line); font-weight: 600; font-size: 14px;
+}
+.lpx[dir="rtl"] .pc-orp-chip { padding: 6px 6px 6px 16px; }
+.lpx .pc-orp-thumb { flex: none; width: 34px; height: 34px; border-radius: 50%; overflow: hidden; background: var(--bg); }
+.lpx .pc-orp-thumb img { width: 100%; height: 100%; object-fit: cover; }
+.lpx .pc-orp-name { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+.lpx .pc-orp-title { color: var(--pc-orp-ink); text-align: center; font-size: clamp(28px, 3.6cqi, 46px); margin: 0 0 34px; max-width: 24ch; text-wrap: balance; }
+.lpx .pc-orp-form { width: 100%; max-width: 500px; display: flex; flex-direction: column; gap: 16px; }
+.lpx .pc-orp-group { display: flex; flex-direction: column; gap: 8px; }
+.lpx .pc-orp-lab, .lpx .pc-orp-field > span { font-size: 13px; font-weight: 600; color: var(--pc-orp-soft); }
+.lpx .pc-orp-lab b { color: var(--pc-orp-ink); }
+.lpx .pc-orp-offers { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 8px; }
+.lpx .pc-orp-offer {
+  position: relative; display: flex; flex-direction: column; gap: 2px; padding: 14px 14px 12px; cursor: pointer;
+  border-radius: calc(var(--radius) / 1.4); background: var(--pc-orp-field); border: 1.5px solid var(--pc-orp-line);
+  transition: border-color 0.2s, background 0.2s;
+}
+.lpx .pc-orp-offer input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+.lpx .pc-orp-offer:has(input:focus-visible) { outline: 2px solid var(--primary); outline-offset: 2px; }
+.lpx .pc-orp-offer b { font-size: 15px; line-height: 1.25; overflow-wrap: anywhere; }
+.lpx .pc-orp-offer > span:last-child { font-size: 14px; color: var(--pc-orp-soft); font-weight: 600; }
+.lpx .pc-orp-offer.on { border-color: var(--primary); background: color-mix(in srgb, var(--primary) 18%, var(--pc-orp-field)); }
+.lpx .pc-orp-offer.on > span:last-child { color: var(--pc-orp-ink); }
+.lpx .pc-orp-badge {
+  align-self: flex-start; margin-bottom: 4px; font-size: 10.5px; font-weight: 700; padding: 3px 8px; border-radius: 999px;
+  background: var(--primary); color: var(--primary-text); line-height: 1.2;
+}
+.lpx .pc-orp-vars { display: flex; flex-wrap: wrap; gap: 8px; }
+.lpx .pc-orp-var {
+  display: inline-flex; align-items: center; gap: 8px; padding: 9px 14px; border-radius: 999px; cursor: pointer;
+  background: var(--pc-orp-field); border: 1.5px solid var(--pc-orp-line); color: var(--pc-orp-ink); font-weight: 600; font-size: 14px;
+}
+.lpx .pc-orp-var.on { border-color: var(--primary); box-shadow: inset 0 0 0 1px var(--primary); }
+.lpx .pc-orp-var:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+.lpx .pc-orp-sw { width: 16px; height: 16px; border-radius: 50%; box-shadow: 0 0 0 1.5px color-mix(in srgb, var(--pc-orp-ink) 45%, transparent); }
+.lpx .pc-orp-fields { display: grid; gap: 14px; }
+.lpx .pc-orp-field { display: flex; flex-direction: column; gap: 7px; min-width: 0; }
+.lpx .pc-orp-field input {
+  width: 100%; height: 54px; padding: 0 16px; outline: none; font-size: 15.5px;
+  border-radius: calc(var(--radius) / 1.4); background: var(--pc-orp-field); color: var(--pc-orp-ink);
+  border: 1.5px solid var(--pc-orp-line); transition: border-color 0.2s, box-shadow 0.2s;
+}
+.lpx .pc-orp-field input::placeholder { color: color-mix(in srgb, var(--pc-orp-soft) 75%, transparent); }
+.lpx .pc-orp-field input:focus { border-color: var(--primary); box-shadow: 0 0 0 4px color-mix(in srgb, var(--primary) 25%, transparent); }
+.lpx[dir="rtl"] .pc-orp-field input[dir="ltr"] { text-align: right; }
+.lpx .pc-orp-ship { display: flex; justify-content: space-between; font-size: 14px; color: var(--pc-orp-soft); }
+.lpx .pc-orp-go {
+  margin-top: 6px; min-height: 60px; padding: 0 24px; border: 0; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 14px;
+  border-radius: var(--btn-radius); background: var(--primary); color: var(--primary-text); font-weight: 800; font-size: 17px;
+  box-shadow: 0 20px 40px -18px var(--primary); transition: transform 0.2s, filter 0.2s;
+}
+.lpx .pc-orp-go:hover { transform: translateY(-2px); filter: brightness(1.05); }
+.lpx .pc-orp-go:focus-visible { outline: 3px solid var(--pc-orp-ink); outline-offset: 3px; }
+.lpx .pc-orp-sep { width: 4px; height: 4px; border-radius: 50%; background: currentColor; opacity: 0.6; }
+.lpx .pc-orp-go b { white-space: nowrap; }
+.lpx .pc-orp-wa {
+  display: flex; align-items: center; justify-content: center; gap: 10px; min-height: 54px; padding: 0 20px; text-align: center;
+  border-radius: var(--btn-radius); background: #25d366; color: #fff; font-weight: 700; text-decoration: none;
+}
+.lpx .pc-orp-wa svg { font-size: 20px; flex: none; }
+.lpx .pc-orp-note { margin: 4px 0 0; display: flex; align-items: center; justify-content: center; gap: 8px; text-align: center; font-size: 13.5px; color: var(--pc-orp-soft); }
+.lpx .pc-orp-note svg { flex: none; }
+@container lpx (max-width: 560px) {
+  .lpx .pc-orp { padding: 64px 16px; min-height: auto; }
+  .lpx .pc-orp-title { margin-bottom: 26px; }
+  .lpx .pc-orp-offers { grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); }
+  .lpx .pc-orp-go { font-size: 16px; gap: 10px; flex-wrap: wrap; padding-block: 10px; }
+}

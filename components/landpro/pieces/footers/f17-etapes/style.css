@@ -1,0 +1,174 @@
+/* F17 — les étapes de la commande COD + barre marque/liens */
+.lpx .pc-f17 {
+  background: var(--surface);
+  color: var(--text);
+  font-family: var(--font);
+  border-top: 1px solid var(--border);
+}
+.lpx .pc-f17-in {
+  max-width: 1160px;
+  margin: 0 auto;
+  padding: 64px 40px 32px;
+}
+.lpx .pc-f17-title {
+  margin: 0 0 36px;
+  font-family: var(--heading);
+  font-weight: var(--hw);
+  text-transform: var(--htt);
+  font-size: 24px;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+}
+.lpx .pc-f17-steps {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(var(--pc-f17-n, 4), minmax(0, 1fr));
+  gap: 28px;
+}
+.lpx .pc-f17-step {
+  position: relative;
+  min-width: 0;
+}
+/* trait pointillé entre les pastilles */
+.lpx .pc-f17-step:not(:last-child)::after {
+  content: "";
+  position: absolute;
+  top: 24px;
+  inset-inline-start: 64px;
+  inset-inline-end: -12px;
+  border-top: 2px dashed color-mix(in srgb, var(--primary) 40%, var(--border));
+}
+.lpx .pc-f17-num {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: var(--primary);
+  color: var(--primary-text);
+  font-weight: 800;
+  font-size: 18px;
+  box-shadow: 0 0 0 6px color-mix(in srgb, var(--primary) 14%, var(--surface));
+}
+.lpx .pc-f17-txt {
+  margin-top: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 14.5px;
+  line-height: 1.5;
+}
+.lpx .pc-f17-txt b {
+  font-size: 16.5px;
+  font-weight: 700;
+}
+.lpx .pc-f17-txt span {
+  color: var(--muted);
+}
+.lpx .pc-f17-txt span::first-letter {
+  text-transform: uppercase;
+}
+
+.lpx .pc-f17-bar {
+  margin-top: 48px;
+  padding-top: 22px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px 28px;
+  flex-wrap: wrap;
+}
+.lpx .pc-f17-name {
+  font-family: var(--heading);
+  font-weight: var(--hw);
+  text-transform: var(--htt);
+  font-size: 26px;
+  line-height: 1.1;
+  overflow-wrap: anywhere;
+}
+.lpx .pc-f17-links {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 0;
+  font-size: 13.5px;
+  color: var(--muted);
+}
+.lpx .pc-f17-links > * + *::before {
+  content: "·";
+  margin-inline: 10px;
+  color: var(--border);
+}
+.lpx .pc-f17-links a {
+  text-decoration: none;
+}
+.lpx .pc-f17-links a:hover,
+.lpx .pc-f17-links a:focus-visible {
+  color: var(--primary);
+}
+
+@container lpx (max-width: 900px) {
+  .lpx .pc-f17-in {
+    padding: 56px 28px 28px;
+  }
+  .lpx .pc-f17-steps {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    row-gap: 36px;
+  }
+  .lpx .pc-f17-step:not(:last-child)::after {
+    display: none;
+  }
+}
+@container lpx (max-width: 560px) {
+  .lpx .pc-f17-in {
+    padding: 44px 20px 24px;
+  }
+  .lpx .pc-f17-title {
+    font-size: 21px;
+    margin-bottom: 28px;
+  }
+  .lpx .pc-f17-steps {
+    grid-template-columns: 1fr;
+    row-gap: 0;
+  }
+  .lpx .pc-f17-step {
+    display: grid;
+    grid-template-columns: 44px minmax(0, 1fr);
+    column-gap: 16px;
+    padding-bottom: 24px;
+  }
+  .lpx .pc-f17-num {
+    width: 44px;
+    height: 44px;
+    font-size: 16px;
+  }
+  .lpx .pc-f17-step:not(:last-child)::after {
+    display: block;
+    top: 52px;
+    bottom: 6px;
+    inset-inline-start: 21px;
+    inset-inline-end: auto;
+    border-top: 0;
+    border-inline-start: 2px dashed color-mix(in srgb, var(--primary) 40%, var(--border));
+  }
+  .lpx .pc-f17-txt {
+    margin-top: 2px;
+  }
+  .lpx .pc-f17-bar {
+    margin-top: 28px;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .lpx .pc-f17-legal {
+    flex-basis: 100%;
+    margin-top: 8px;
+  }
+  .lpx .pc-f17-links > .pc-f17-legal::before {
+    display: none;
+  }
+}

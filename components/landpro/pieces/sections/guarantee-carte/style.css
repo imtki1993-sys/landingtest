@@ -1,0 +1,32 @@
+/* guarantee-carte : carte centrée sur fond teinté */
+.lpx .pc-gcar {
+  padding: 96px 20px;
+  background:
+    radial-gradient(60% 80% at 50% 50%, color-mix(in srgb, var(--primary) 7%, transparent), transparent 70%),
+    color-mix(in srgb, var(--text) 5%, var(--bg));
+}
+.lpx .pc-gcar-card {
+  max-width: 720px; margin: 0 auto; display: flex; align-items: flex-start; gap: 28px; padding: 40px 44px;
+  background: var(--surface); border: 1px solid color-mix(in srgb, var(--border) 60%, transparent);
+  border-radius: calc(var(--radius) * 1.2);
+  box-shadow: 0 30px 60px -36px rgba(0, 0, 0, 0.45), 0 2px 6px -2px rgba(0, 0, 0, 0.06);
+}
+.lpx .pc-gcar-ico {
+  flex: none; width: 72px; height: 72px; border-radius: 50%; display: grid; place-items: center; font-size: 34px;
+  background: var(--primary); color: var(--primary-text);
+  box-shadow: 0 0 0 6px color-mix(in srgb, var(--primary) 14%, transparent), 0 14px 26px -14px var(--primary);
+}
+.lpx .pc-gcar-ico svg { stroke-width: 1.9; }
+.lpx .pc-gcar-body { min-width: 0; flex: 1; padding-top: 4px; }
+.lpx .pc-gcar-title { font-size: clamp(24px, 2.6cqi, 32px); margin: 0 0 10px; overflow-wrap: anywhere; }
+.lpx .pc-gcar-text { margin: 0; color: var(--muted); font-size: 16.5px; line-height: 1.7; max-width: 58ch; overflow-wrap: anywhere; }
+@container lpx (max-width: 900px) {
+  .lpx .pc-gcar { padding: 72px 20px; }
+}
+@container lpx (max-width: 560px) {
+  .lpx .pc-gcar { padding: 52px 16px; }
+  .lpx .pc-gcar-card { flex-direction: column; align-items: center; text-align: center; gap: 18px; padding: 32px 22px; }
+  .lpx .pc-gcar-ico { width: 60px; height: 60px; font-size: 28px; }
+  .lpx .pc-gcar-body { padding-top: 0; }
+  .lpx .pc-gcar-text { font-size: 15.5px; }
+}

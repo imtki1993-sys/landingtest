@@ -1,0 +1,304 @@
+@import url("https://fonts.googleapis.com/css2?family=Caveat:wght@500;600;700&display=swap");
+
+/* hero-manuscrit : accroche manuscrite + polaroïd */
+.lpx .pc-hms {
+  position: relative;
+  overflow: hidden;
+  color: var(--text);
+  padding: 80px 24px 88px;
+  background:
+    radial-gradient(ellipse 60% 70% at 85% 30%, color-mix(in srgb, var(--accent) 12%, transparent), transparent 70%),
+    radial-gradient(ellipse 50% 60% at 0% 100%, color-mix(in srgb, var(--primary) 9%, transparent), transparent 70%),
+    var(--hero-bg, var(--bg));
+}
+.lpx .pc-hms-in {
+  max-width: 1140px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1.15fr 1fr;
+  gap: 64px;
+  align-items: center;
+}
+.lpx .pc-hms-copy {
+  min-width: 0;
+}
+.lpx .pc-hms-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 12.5px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 18px;
+}
+.lpx .pc-hms-eyebrow::before {
+  content: "";
+  width: 28px;
+  height: 1.5px;
+  background: var(--primary);
+}
+.lpx .pc-hms .pc-hms-title {
+  font-family: "Caveat", "Segoe Print", "Bradley Hand", cursive;
+  font-weight: 700;
+  text-transform: none;
+  letter-spacing: 0;
+  font-size: clamp(50px, 7cqi, 92px);
+  line-height: 0.95;
+  color: var(--primary);
+  margin: 0;
+  max-width: 13em;
+  transform: rotate(-2.5deg);
+  transform-origin: 0 100%;
+  overflow-wrap: anywhere;
+}
+.lpx .pc-hms-title em {
+  font-style: normal;
+  color: var(--text);
+}
+.lpx .pc-hms-scribble {
+  display: block;
+  width: min(220px, 60%);
+  height: 16px;
+  margin: 14px 0 22px;
+  fill: none;
+  stroke: color-mix(in srgb, var(--accent) 70%, var(--primary));
+  stroke-width: 3;
+  stroke-linecap: round;
+  opacity: 0.75;
+  transform: rotate(-2deg);
+}
+.lpx .pc-hms-sub {
+  font-size: 18px;
+  line-height: 1.65;
+  color: var(--muted);
+  margin: 0 0 30px;
+  max-width: 460px;
+}
+.lpx .pc-hms-buy {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+.lpx .pc-hms-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 54px;
+  padding: 0 30px;
+  border: 0;
+  border-radius: var(--btn-radius);
+  background: var(--primary);
+  color: var(--primary-text);
+  font-weight: 700;
+  font-size: 16px;
+  cursor: pointer;
+  box-shadow: 0 14px 30px -12px color-mix(in srgb, var(--primary) 70%, transparent);
+  transition:
+    transform 0.2s,
+    box-shadow 0.2s;
+}
+.lpx .pc-hms-cta:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 18px 34px -12px color-mix(in srgb, var(--primary) 80%, transparent);
+}
+.lpx .pc-hms-cta:focus-visible {
+  outline: 2px solid var(--text);
+  outline-offset: 3px;
+}
+.lpx .pc-hms-price {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.lpx .pc-hms-price b {
+  font-size: 26px;
+  font-weight: 800;
+  line-height: 1;
+  color: var(--text);
+}
+.lpx .pc-hms-price s {
+  font-size: 16px;
+  color: var(--muted);
+}
+.lpx .pc-hms-price i {
+  font-family: "Caveat", cursive;
+  font-style: normal;
+  font-weight: 700;
+  font-size: 22px;
+  line-height: 1;
+  color: var(--accent);
+  transform: rotate(-6deg);
+}
+.lpx .pc-hms-deliv {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 22px 0 0;
+  font-size: 14px;
+  color: var(--muted);
+}
+.lpx .pc-hms-deliv .lpx-ico {
+  flex: none;
+  font-size: 18px;
+  color: var(--primary);
+}
+
+/* polaroïds */
+.lpx .pc-hms-visual {
+  position: relative;
+  display: grid;
+  place-items: center;
+  padding: 24px 0;
+  min-width: 0;
+}
+.lpx .pc-hms-pola {
+  margin: 0;
+  width: min(380px, 100%);
+  background: color-mix(in srgb, var(--surface) 94%, var(--text));
+  padding: 16px 16px 0;
+  border-radius: 3px;
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.1),
+    0 28px 50px -22px rgba(0, 0, 0, 0.5);
+  outline: 1px solid color-mix(in srgb, var(--border) 70%, transparent);
+}
+.lpx .pc-hms-pola.front {
+  position: relative;
+  z-index: 2;
+  transform: rotate(3.5deg);
+  transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.lpx .pc-hms-pola.front:hover {
+  transform: rotate(1.5deg) translateY(-4px);
+}
+.lpx .pc-hms-visual.two .pc-hms-pola.front {
+  transform: rotate(4deg) translate(6%, 4%);
+}
+.lpx .pc-hms-pola.back {
+  position: absolute;
+  z-index: 1;
+  width: min(300px, 78%);
+  padding-bottom: 46px;
+  transform: rotate(-7deg) translate(-22%, -8%);
+  opacity: 0.92;
+}
+.lpx .pc-hms-shot {
+  aspect-ratio: 1 / 1.08;
+  overflow: hidden;
+  background: var(--surface2);
+}
+.lpx .pc-hms-img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.lpx .pc-hms-pola figcaption {
+  font-family: "Caveat", "Segoe Print", cursive;
+  font-weight: 600;
+  font-size: 26px;
+  line-height: 1.1;
+  text-align: center;
+  color: var(--text);
+  padding: 14px 6px 18px;
+  min-height: 64px;
+  display: grid;
+  place-items: center;
+  overflow-wrap: anywhere;
+}
+.lpx .pc-hms-tape {
+  position: absolute;
+  top: -14px;
+  left: 50%;
+  width: 110px;
+  height: 30px;
+  transform: translateX(-50%) rotate(-3deg);
+  background: color-mix(in srgb, var(--accent) 30%, rgba(255, 255, 255, 0.55));
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+  opacity: 0.85;
+}
+
+/* arabe : police de titre du thème à la place de Caveat */
+.lpx[dir="rtl"] .pc-hms .pc-hms-title {
+  font-family: var(--heading);
+  font-size: clamp(40px, 5.6cqi, 70px);
+  line-height: 1.2;
+  transform: rotate(2deg);
+  transform-origin: 100% 100%;
+}
+.lpx[dir="rtl"] .pc-hms-pola figcaption,
+.lpx[dir="rtl"] .pc-hms-price i {
+  font-family: var(--heading);
+  font-size: 20px;
+}
+.lpx[dir="rtl"] .pc-hms-cta .lpx-ico {
+  transform: scaleX(-1);
+}
+.lpx[dir="rtl"] .pc-hms-scribble {
+  transform: scaleX(-1) rotate(-2deg);
+}
+.lpx[dir="rtl"] .pc-hms-pola.front {
+  transform: rotate(-3.5deg);
+}
+.lpx[dir="rtl"] .pc-hms-visual.two .pc-hms-pola.front {
+  transform: rotate(-4deg) translate(-6%, 4%);
+}
+.lpx[dir="rtl"] .pc-hms-pola.back {
+  transform: rotate(7deg) translate(22%, -8%);
+}
+
+@container lpx (max-width: 900px) {
+  .lpx .pc-hms {
+    padding: 56px 20px 64px;
+  }
+  .lpx .pc-hms-in {
+    grid-template-columns: 1fr;
+    gap: 36px;
+  }
+  .lpx .pc-hms-visual {
+    order: -1;
+    padding: 12px 0 0;
+  }
+  .lpx .pc-hms-pola {
+    width: min(320px, 78%);
+  }
+  .lpx .pc-hms-pola.back {
+    width: min(250px, 60%);
+  }
+}
+@container lpx (max-width: 560px) {
+  .lpx .pc-hms .pc-hms-title {
+    font-size: clamp(44px, 13cqi, 58px);
+  }
+  .lpx[dir="rtl"] .pc-hms .pc-hms-title {
+    font-size: clamp(32px, 9cqi, 42px);
+  }
+  .lpx .pc-hms-sub {
+    font-size: 16px;
+    margin-bottom: 24px;
+  }
+  .lpx .pc-hms-pola {
+    width: 70%;
+    padding: 10px 10px 0;
+  }
+  .lpx .pc-hms-pola.back {
+    width: 54%;
+    padding-bottom: 34px;
+  }
+  .lpx .pc-hms-pola figcaption {
+    font-size: 21px;
+    padding: 10px 4px 12px;
+    min-height: 48px;
+  }
+  .lpx .pc-hms-buy {
+    gap: 16px;
+  }
+  .lpx .pc-hms-cta {
+    flex: 1 1 auto;
+    justify-content: center;
+  }
+}

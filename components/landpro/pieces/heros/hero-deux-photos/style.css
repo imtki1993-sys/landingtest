@@ -1,0 +1,49 @@
+/* hero-deux-photos — deux moitiés photo + carte centrale */
+.lpx .pc-dp { position: relative; color: var(--text); background: var(--hero-bg, var(--bg)); min-height: clamp(560px, 48cqi, 680px); display: grid; place-items: center; padding: 56px 24px; overflow: hidden; isolation: isolate; }
+.lpx .pc-dp-halves { position: absolute; inset: 0; z-index: -1; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+.lpx .pc-dp-half { position: relative; overflow: hidden; display: flex; align-items: center; }
+.lpx .pc-dp-half.is-a { justify-content: flex-start; background: linear-gradient(160deg, color-mix(in srgb, var(--primary) 12%, var(--bg)), color-mix(in srgb, var(--primary) 30%, var(--bg))); }
+.lpx .pc-dp-half.is-b { justify-content: flex-end; background: linear-gradient(200deg, color-mix(in srgb, var(--accent) 10%, color-mix(in srgb, var(--text) 6%, var(--bg))), color-mix(in srgb, var(--accent) 24%, color-mix(in srgb, var(--text) 12%, var(--bg)))); }
+.lpx .pc-dp-half.is-b { background: linear-gradient(200deg, color-mix(in srgb, oklch(from var(--primary) l c calc(h + 45)) 12%, var(--bg)), color-mix(in srgb, oklch(from var(--primary) l c calc(h + 45)) 30%, var(--bg))); }
+/* fine bordure claire entre les deux moitiés */
+.lpx .pc-dp-half.is-b::before { content: ""; position: absolute; inset-block: 0; inset-inline-start: 0; width: 1px; background: color-mix(in srgb, var(--bg) 60%, transparent); }
+.lpx .pc-dp-img {
+  width: auto; height: auto; max-width: 52%; max-height: 72%; object-fit: contain; margin-inline: 9%;
+  border-radius: var(--radius); filter: drop-shadow(0 30px 34px rgba(0,0,0,.25)); transition: transform .8s cubic-bezier(.2,.7,.2,1);
+}
+.lpx .pc-dp-half.is-same .pc-dp-img { transform: scaleX(-1) rotate(-6deg); }
+.lpx .pc-dp:hover .pc-dp-half.is-a .pc-dp-img { transform: translateY(-6px) rotate(-1.5deg); }
+.lpx .pc-dp:hover .pc-dp-half.is-b:not(.is-same) .pc-dp-img { transform: translateY(-6px) rotate(1.5deg); }
+
+.lpx .pc-dp-card {
+  width: min(440px, 100%); text-align: center; padding: 40px 36px 32px;
+  background: var(--surface); border: 1px solid color-mix(in srgb, var(--border) 70%, transparent);
+  border-radius: calc(var(--radius) + 6px); box-shadow: 0 40px 70px -34px rgba(0,0,0,.5), 0 2px 6px rgba(0,0,0,.05);
+}
+.lpx .pc-dp-eyebrow { display: block; font-size: 12px; font-weight: 700; letter-spacing: .2em; text-transform: uppercase; color: var(--primary); margin-bottom: 14px; }
+.lpx .pc-dp-title { font-size: clamp(26px, 2.8cqi, 36px); line-height: 1.15; letter-spacing: -0.01em; margin: 0; text-wrap: balance; }
+.lpx .pc-dp-price { display: flex; justify-content: center; align-items: baseline; flex-wrap: wrap; gap: 6px 10px; margin: 18px 0 22px; }
+.lpx .pc-dp-price b { font-family: var(--heading); font-weight: var(--hw, 800); font-size: 28px; line-height: 1; }
+.lpx .pc-dp-price s { color: var(--muted); font-size: 16px; }
+.lpx .pc-dp-price span { align-self: center; font-size: 12px; font-weight: 800; padding: 3px 8px; border-radius: 999px; color: var(--primary); background: color-mix(in srgb, var(--primary) 14%, var(--surface)); }
+.lpx .pc-dp-title + .pc-dp-cta { margin-top: 22px; }
+.lpx .pc-dp-cta {
+  display: flex; align-items: center; justify-content: center; width: 100%; min-height: 54px; padding: 0 24px;
+  border: 0; cursor: pointer; border-radius: 999px; background: var(--primary); color: var(--primary-text);
+  font-weight: 700; font-size: 16px; box-shadow: 0 14px 30px -14px var(--primary); transition: transform .15s, filter .15s;
+}
+.lpx .pc-dp-cta:hover { transform: translateY(-2px); filter: brightness(1.06); }
+.lpx .pc-dp-cta:focus-visible { outline: 2px solid var(--text); outline-offset: 3px; }
+.lpx .pc-dp-cod { margin: 14px 0 0; font-size: 13px; color: var(--muted); }
+
+@container lpx (max-width: 900px) {
+  .lpx .pc-dp-img { max-width: 64%; margin-inline: 5%; }
+}
+@container lpx (max-width: 560px) {
+  .lpx .pc-dp { display: block; min-height: 0; padding: 0 0 32px; }
+  .lpx .pc-dp-halves { position: relative; z-index: 0; height: 300px; }
+  .lpx .pc-dp-half { justify-content: center !important; align-items: flex-start; padding-top: 34px; }
+  .lpx .pc-dp-img { max-width: 78%; max-height: 190px; margin: 0; }
+  .lpx .pc-dp-card { position: relative; width: auto; margin: -84px 16px 0; padding: 30px 22px 24px; }
+  .lpx .pc-dp-title { font-size: 26px; }
+}

@@ -1,0 +1,252 @@
+/* h14-onglets — logo | onglets pleine hauteur soulignés | prix + bouton */
+/* .lpx a overflow-x: hidden, qui empêche tout header collant : clip garde la protection sans casser sticky. */
+.lpx:has(> .pc-h14) {
+  overflow-x: clip;
+}
+.lpx .pc-h14 {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  background: color-mix(in srgb, var(--surface) 90%, transparent);
+  backdrop-filter: saturate(1.4) blur(14px);
+  -webkit-backdrop-filter: saturate(1.4) blur(14px);
+  border-bottom: 1px solid var(--border);
+  color: var(--text);
+}
+.lpx .pc-h14-in {
+  max-width: 1240px;
+  margin: 0 auto;
+  padding-inline: 40px;
+  height: 80px;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  grid-template-areas: "logo tabs buy";
+  align-items: stretch;
+  column-gap: 56px;
+}
+.lpx .pc-h14.no-tabs .pc-h14-in {
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas: "logo buy";
+}
+.lpx .pc-h14-logo {
+  grid-area: logo;
+  align-self: center;
+  display: inline-flex;
+  align-items: baseline;
+  min-width: 0;
+  max-width: 260px;
+  color: var(--text);
+  text-decoration: none;
+  font-family: var(--heading);
+  font-weight: 700;
+  font-size: 20px;
+  line-height: 1.2;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.lpx[dir="rtl"] .pc-h14-logo {
+  letter-spacing: 0;
+}
+.lpx .pc-h14-logo.long {
+  font-size: 17px;
+  letter-spacing: 0.03em;
+  max-width: 300px;
+}
+.lpx .pc-h14-logo.long .pc-h14-dot {
+  display: none;
+}
+.lpx .pc-h14-short {
+  display: none;
+}
+.lpx .pc-h14-name {
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.lpx .pc-h14-dot {
+  color: var(--primary);
+  flex: none;
+}
+.lpx .pc-h14-tabs {
+  grid-area: tabs;
+  display: flex;
+  align-items: stretch;
+  gap: 30px;
+  min-width: 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.lpx .pc-h14-tabs::-webkit-scrollbar {
+  display: none;
+}
+.lpx .pc-h14-tab {
+  position: relative;
+  flex: none;
+  display: flex;
+  align-items: center;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--muted);
+  text-decoration: none;
+  white-space: nowrap;
+  transition: color 0.2s;
+}
+.lpx .pc-h14-tab::after {
+  content: "";
+  position: absolute;
+  inset-inline: 0;
+  bottom: 0;
+  height: 3px;
+  border-radius: 3px 3px 0 0;
+  background: var(--primary);
+  transform: scaleX(0);
+  transition: transform 0.25s ease;
+}
+.lpx .pc-h14-tab:hover {
+  color: var(--text);
+}
+.lpx .pc-h14-tab.on {
+  color: var(--text);
+}
+.lpx .pc-h14-tab.on::after {
+  transform: scaleX(1);
+}
+.lpx .pc-h14-tab:focus-visible {
+  outline: none;
+  color: var(--text);
+}
+.lpx .pc-h14-tab:focus-visible::before {
+  content: "";
+  position: absolute;
+  inset: 22px -8px;
+  border-radius: 6px;
+  outline: 2px solid var(--primary);
+}
+.lpx .pc-h14-buy {
+  grid-area: buy;
+  align-self: center;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+.lpx .pc-h14-price {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 8px;
+  white-space: nowrap;
+  line-height: 1;
+}
+.lpx .pc-h14-price s {
+  font-size: 13px;
+  color: var(--muted);
+}
+.lpx .pc-h14-price b {
+  font-family: var(--heading);
+  font-weight: 700;
+  font-size: 18px;
+  font-variant-numeric: tabular-nums;
+}
+.lpx .pc-h14-cta {
+  height: 44px;
+  padding: 0 22px;
+  display: inline-flex;
+  align-items: center;
+  cursor: pointer;
+  border: 0;
+  border-radius: min(var(--btn-radius), 10px);
+  background: var(--primary);
+  color: var(--primary-text);
+  font-weight: 700;
+  font-size: 14px;
+  white-space: nowrap;
+  box-shadow: 0 10px 22px -14px var(--primary);
+  transition:
+    transform 0.15s,
+    filter 0.15s;
+}
+.lpx .pc-h14-cta:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.08);
+}
+.lpx .pc-h14-cta:focus-visible,
+.lpx .pc-h14-logo:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 3px;
+}
+@container lpx (max-width: 1100px) {
+  .lpx .pc-h14-in {
+    column-gap: 32px;
+    padding-inline: 28px;
+  }
+  .lpx .pc-h14-tabs {
+    gap: 24px;
+  }
+  .lpx .pc-h14-price s {
+    display: none;
+  }
+}
+/* Tablette / mobile : logo + achat en haut, rangée d'onglets défilante dessous. */
+@container lpx (max-width: 900px) {
+  .lpx .pc-h14-in {
+    height: auto;
+    padding-inline: 0;
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas:
+      "logo buy"
+      "tabs tabs";
+    column-gap: 12px;
+  }
+  .lpx .pc-h14-logo {
+    padding-inline-start: 24px;
+    height: 60px;
+    align-items: center;
+    max-width: none;
+  }
+  .lpx .pc-h14-buy {
+    padding-inline-end: 24px;
+  }
+  .lpx .pc-h14-tabs {
+    height: 44px;
+    border-top: 1px solid var(--border);
+    padding-inline: 24px;
+    gap: 26px;
+  }
+}
+@container lpx (max-width: 560px) {
+  .lpx .pc-h14-logo {
+    padding-inline-start: 16px;
+    height: 56px;
+    font-size: 17px;
+  }
+  .lpx .pc-h14-buy {
+    padding-inline-end: 16px;
+    gap: 12px;
+  }
+  .lpx .pc-h14-price b {
+    font-size: 16px;
+  }
+  .lpx .pc-h14-long {
+    display: none;
+  }
+  .lpx .pc-h14-short {
+    display: inline;
+  }
+  .lpx .pc-h14-cta {
+    height: 38px;
+    padding: 0 14px;
+    font-size: 13px;
+  }
+  .lpx .pc-h14-tabs {
+    height: 42px;
+    padding-inline: 16px;
+    gap: 22px;
+    mask-image: linear-gradient(90deg, #000 85%, transparent);
+  }
+  .lpx[dir="rtl"] .pc-h14-tabs {
+    mask-image: linear-gradient(270deg, #000 85%, transparent);
+  }
+  .lpx .pc-h14-tab {
+    font-size: 13px;
+  }
+}

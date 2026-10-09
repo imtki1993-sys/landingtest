@@ -1,0 +1,113 @@
+/* F18 — pied de page en dégradé profond (couleurs du thème assombries) */
+.lpx .pc-f18 {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  color: #fff;
+  font-family: var(--font);
+  background: linear-gradient(
+    120deg,
+    color-mix(in srgb, var(--primary) 22%, #000) 0%,
+    color-mix(in srgb, var(--primary) 62%, #000) 52%,
+    color-mix(in srgb, var(--accent) 78%, #000) 112%
+  );
+}
+.lpx[dir="rtl"] .pc-f18 {
+  background: linear-gradient(
+    240deg,
+    color-mix(in srgb, var(--primary) 22%, #000) 0%,
+    color-mix(in srgb, var(--primary) 62%, #000) 52%,
+    color-mix(in srgb, var(--accent) 78%, #000) 112%
+  );
+}
+/* halo doux pour donner de la profondeur */
+.lpx .pc-f18::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  width: 620px;
+  height: 620px;
+  inset-inline-end: -160px;
+  bottom: -340px;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, color-mix(in srgb, var(--accent) 45%, transparent), transparent);
+  opacity: 0.7;
+}
+.lpx .pc-f18-in {
+  max-width: 1160px;
+  margin: 0 auto;
+  padding: 72px 40px 36px;
+  display: grid;
+  grid-template-columns: minmax(0, 1.3fr) repeat(2, minmax(0, 1fr));
+  gap: 40px;
+}
+.lpx .pc-f18-name {
+  display: block;
+  font-family: var(--heading);
+  font-weight: var(--hw);
+  text-transform: var(--htt);
+  font-size: 34px;
+  line-height: 1.05;
+  letter-spacing: -0.01em;
+  overflow-wrap: anywhere;
+}
+.lpx .pc-f18-dot {
+  color: color-mix(in srgb, var(--accent) 70%, #fff);
+}
+.lpx .pc-f18-tag {
+  margin: 14px 0 0;
+  max-width: 30ch;
+  font-size: 15.5px;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.74);
+}
+.lpx .pc-f18-col {
+  display: flex;
+  flex-direction: column;
+  gap: 11px;
+  padding-top: 6px;
+  font-size: 15px;
+}
+.lpx .pc-f18-col b {
+  font-weight: 700;
+  margin-bottom: 3px;
+}
+.lpx .pc-f18-col a {
+  width: max-content;
+  max-width: 100%;
+  color: rgba(255, 255, 255, 0.72);
+  text-decoration: none;
+  transition: color 0.15s;
+}
+.lpx .pc-f18-col a:hover,
+.lpx .pc-f18-col a:focus-visible {
+  color: #fff;
+}
+.lpx .pc-f18-legal {
+  grid-column: 1 / -1;
+  margin: 40px 0 0;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+@container lpx (max-width: 900px) {
+  .lpx .pc-f18-in {
+    padding: 60px 28px 30px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .lpx .pc-f18-brand {
+    grid-column: 1 / -1;
+  }
+}
+@container lpx (max-width: 560px) {
+  .lpx .pc-f18-in {
+    padding: 48px 20px 26px;
+    gap: 32px 20px;
+  }
+  .lpx .pc-f18-name {
+    font-size: 30px;
+  }
+  .lpx .pc-f18-legal {
+    margin-top: 16px;
+  }
+}

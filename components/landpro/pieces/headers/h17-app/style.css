@@ -1,0 +1,83 @@
+/* h17-app — barre classique en large, onglets d'application fixés en bas en étroit */
+.lpx .pc-h17 {
+  position: sticky; top: 0; z-index: 30;
+  background: color-mix(in srgb, var(--surface) 55%, var(--bg));
+  border-bottom: 1px solid color-mix(in srgb, var(--border) 70%, transparent);
+  box-shadow: 0 10px 30px -24px rgba(0, 0, 0, .45);
+}
+.lpx .pc-h17-in {
+  max-width: 1180px; margin: 0 auto; padding-inline: 28px; height: 76px;
+  display: flex; align-items: center; gap: 30px;
+}
+.lpx .pc-h17-brand {
+  display: inline-flex; align-items: baseline; min-width: 0; max-width: 34%;
+  text-decoration: none; color: var(--text);
+  font-family: var(--heading); font-weight: var(--hw); text-transform: var(--htt);
+  font-size: 22px; letter-spacing: -.01em; line-height: 1;
+}
+.lpx .pc-h17-name { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding-block: 4px; }
+.lpx .pc-h17-dot { color: var(--accent); flex: none; }
+.lpx .pc-h17-links { display: flex; align-items: center; gap: 6px; min-width: 0; }
+.lpx .pc-h17-link {
+  position: relative; padding: 9px 12px; font-size: 14.5px; font-weight: 500; color: color-mix(in srgb, var(--text) 78%, var(--bg));
+  text-decoration: none; white-space: nowrap; transition: color .15s;
+}
+.lpx .pc-h17-link::after {
+  content: ""; position: absolute; inset-inline: 12px; bottom: 3px; height: 2px; border-radius: 2px;
+  background: var(--accent); transform: scaleX(0); transition: transform .2s;
+}
+.lpx .pc-h17-link:hover { color: var(--text); }
+.lpx .pc-h17-link:hover::after { transform: scaleX(1); }
+.lpx .pc-h17-cta {
+  margin-inline-start: auto; flex: none;
+  display: inline-flex; align-items: center; gap: 8px; height: 46px; padding-inline: 22px;
+  cursor: pointer; border: 0; border-radius: calc(var(--btn-radius) * .8 + 2px);
+  background: var(--primary); color: var(--primary-text);
+  font: inherit; font-weight: 700; font-size: 14.5px; white-space: nowrap;
+  box-shadow: 0 10px 24px -14px var(--primary); transition: transform .15s, filter .15s;
+}
+.lpx .pc-h17-cta:hover { transform: translateY(-1px); filter: brightness(1.07); }
+.lpx .pc-h17-cta:focus-visible, .lpx .pc-h17-item:focus-visible, .lpx .pc-h17-link:focus-visible {
+  outline: 2px solid var(--accent); outline-offset: 2px;
+}
+.lpx .pc-h17-sep { opacity: .55; }
+.lpx .pc-h17-price { font-weight: 800; }
+
+/* barre d'onglets : masquée en large */
+.lpx .pc-h17-tab { display: none; }
+
+@container lpx (max-width: 900px) {
+  .lpx .pc-h17-in { gap: 18px; padding-inline: 20px; }
+  .lpx .pc-h17-links { display: none; }
+}
+@container lpx (max-width: 560px) {
+  .lpx .pc-h17-in { height: 56px; padding-inline: 16px; justify-content: center; }
+  .lpx .pc-h17-brand { max-width: 80%; font-size: 20px; }
+  .lpx .pc-h17-cta { display: none; }
+  .lpx .pc-h17-tab {
+    display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); align-items: stretch;
+    position: fixed; inset-inline: 0; bottom: 0; z-index: 60;
+    padding: 6px 6px calc(6px + env(safe-area-inset-bottom, 0px));
+    background: color-mix(in srgb, var(--surface) 96%, transparent);
+    backdrop-filter: blur(16px);
+    border-top: 1px solid var(--border);
+    box-shadow: 0 -12px 30px -20px rgba(0, 0, 0, .45);
+  }
+  .lpx .pc-h17-item {
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; min-width: 0;
+    background: none; border: 0; padding: 5px 2px; cursor: pointer; color: var(--muted);
+    font: inherit; font-size: 11px; font-weight: 600; border-radius: var(--radius); transition: color .15s;
+  }
+  .lpx .pc-h17-ic {
+    font-size: 21px; display: grid; place-items: center; height: 30px; width: 54px; border-radius: 999px;
+    transition: background .2s, color .2s, transform .2s;
+  }
+  .lpx .pc-h17-item.on { color: var(--primary); }
+  .lpx .pc-h17-item.on .pc-h17-ic { background: color-mix(in srgb, var(--primary) 14%, transparent); }
+  .lpx .pc-h17-item.cta { color: var(--text); }
+  .lpx .pc-h17-item.cta .pc-h17-ic {
+    background: var(--primary); color: var(--primary-text); box-shadow: 0 6px 16px -8px var(--primary);
+  }
+  .lpx .pc-h17-item:active .pc-h17-ic { transform: scale(.92); }
+  .lpx .pc-h17-lb { line-height: 1.1; max-width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+}

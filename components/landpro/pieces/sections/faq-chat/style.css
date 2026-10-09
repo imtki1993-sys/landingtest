@@ -1,0 +1,57 @@
+/* faq-chat : conversation en bulles */
+.lpx .pc-fqc {
+  padding: 88px 20px;
+  background:
+    radial-gradient(120% 60% at 100% 0%, color-mix(in srgb, var(--primary) 9%, transparent), transparent 60%),
+    color-mix(in srgb, var(--primary) 6%, var(--bg));
+}
+.lpx .pc-fqc-in { max-width: 820px; margin: 0 auto; }
+.lpx .pc-fqc-title { font-size: clamp(26px, 3.4cqi, 40px); margin: 0 0 36px; text-align: start; max-width: 22ch; }
+.lpx .pc-fqc-feed { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 22px; }
+.lpx .pc-fqc-turn { display: flex; flex-direction: column; gap: 10px; animation: pc-fqc-pop 0.45s ease both; animation-delay: var(--d, 0ms); }
+.lpx .pc-fqc-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.lpx .pc-fqc-q {
+  align-self: flex-end; max-width: min(72%, 560px); margin: 0; padding: 13px 18px;
+  background: var(--primary); color: var(--primary-text); font-weight: 600; font-size: 16px; line-height: 1.45;
+  border-radius: 20px 20px 6px 20px; box-shadow: 0 14px 28px -20px color-mix(in srgb, var(--primary) 90%, transparent);
+  overflow-wrap: anywhere;
+}
+.lpx[dir="rtl"] .pc-fqc-q { border-radius: 20px 20px 20px 6px; }
+.lpx .pc-fqc-a { align-self: flex-start; max-width: min(80%, 620px); display: flex; align-items: flex-end; gap: 10px; }
+.lpx .pc-fqc-av {
+  flex: none; width: 32px; height: 32px; border-radius: 50%; display: grid; place-items: center;
+  font-family: var(--heading); font-weight: 800; font-size: 13px;
+  background: var(--surface); color: var(--primary); border: 1px solid var(--border);
+}
+.lpx .pc-fqc-a p {
+  margin: 0; padding: 13px 18px; background: var(--surface); color: var(--text); font-size: 15.5px; line-height: 1.6;
+  border: 1px solid color-mix(in srgb, var(--border) 70%, transparent);
+  border-radius: 20px 20px 20px 6px; box-shadow: 0 10px 24px -20px rgba(0, 0, 0, 0.35);
+  overflow-wrap: anywhere;
+}
+.lpx[dir="rtl"] .pc-fqc-a p { border-radius: 20px 20px 6px 20px; }
+.lpx .pc-fqc-more {
+  margin-top: 36px; padding-top: 24px; border-top: 1px dashed color-mix(in srgb, var(--text) 18%, transparent);
+  display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; color: var(--muted); font-weight: 600;
+}
+.lpx .pc-fqc-wa {
+  display: inline-flex; align-items: center; gap: 10px; padding: 12px 20px; border-radius: var(--btn-radius);
+  background: #25d366; color: #fff; text-decoration: none; font-weight: 700; font-size: 15px;
+}
+.lpx .pc-fqc-wa svg { font-size: 20px; }
+.lpx .pc-fqc-wa:hover { filter: brightness(1.05); }
+@keyframes pc-fqc-pop { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+@container lpx (max-width: 900px) {
+  .lpx .pc-fqc { padding: 68px 20px; }
+}
+@container lpx (max-width: 560px) {
+  .lpx .pc-fqc { padding: 52px 16px; }
+  .lpx .pc-fqc-title { margin-bottom: 26px; }
+  .lpx .pc-fqc-feed { gap: 18px; }
+  .lpx .pc-fqc-q { max-width: 88%; font-size: 15px; padding: 11px 15px; }
+  .lpx .pc-fqc-a { max-width: 94%; gap: 8px; }
+  .lpx .pc-fqc-av { width: 26px; height: 26px; font-size: 11px; }
+  .lpx .pc-fqc-a p { font-size: 15px; padding: 11px 15px; }
+  .lpx .pc-fqc-more { flex-direction: column; align-items: stretch; text-align: center; }
+  .lpx .pc-fqc-wa { justify-content: center; }
+}

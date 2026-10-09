@@ -1,0 +1,166 @@
+/* showcase-defilante : bande de photos défilante */
+.lpx .pc-sd {
+  padding: 96px 0;
+  background: var(--bg);
+  overflow: hidden;
+}
+.lpx .pc-sd-head {
+  max-width: 1180px;
+  margin: 0 auto 36px;
+  padding-inline: 20px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 20px;
+}
+.lpx .pc-sd-title {
+  text-align: start;
+  font-size: clamp(30px, 5cqi, 60px);
+  line-height: 1;
+  margin: 0;
+  min-width: 0;
+}
+.lpx .pc-sd-ctl {
+  flex: none;
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  color: var(--text);
+  background: transparent;
+  border: 1.5px solid var(--border);
+  transition:
+    background 0.2s,
+    color 0.2s,
+    border-color 0.2s;
+}
+.lpx .pc-sd-ctl:hover,
+.lpx .pc-sd-ctl:focus-visible {
+  background: var(--text);
+  color: var(--bg);
+  border-color: var(--text);
+}
+.lpx .pc-sd-view {
+  direction: ltr;
+  overflow: hidden;
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 4%, #000 96%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 4%, #000 96%, transparent);
+}
+.lpx .pc-sd-track {
+  display: flex;
+  gap: 18px;
+  width: max-content;
+  padding-inline-end: 18px;
+  animation: pc-sd-run 60s linear infinite;
+}
+.lpx[dir="rtl"] .pc-sd-track {
+  animation-direction: reverse;
+}
+.lpx .pc-sd-view:hover .pc-sd-track,
+.lpx .pc-sd-view.paused .pc-sd-track {
+  animation-play-state: paused;
+}
+@keyframes pc-sd-run {
+  to {
+    transform: translateX(-50%);
+  }
+}
+.lpx .pc-sd-item {
+  margin: 0;
+  flex: none;
+  width: 300px;
+  aspect-ratio: 6 / 7;
+  position: relative;
+  border-radius: var(--radius);
+  overflow: hidden;
+  background: linear-gradient(160deg, var(--surface), var(--surface2, var(--surface)));
+  border: 1px solid var(--border);
+}
+.lpx .pc-sd-item.alt {
+  padding: 16px;
+  border: 0;
+  background: linear-gradient(
+    160deg,
+    var(--primary),
+    color-mix(in srgb, var(--primary) 78%, #000)
+  );
+}
+.lpx .pc-sd-ph {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+.lpx .pc-sd-item.alt .pc-sd-ph {
+  border-radius: calc(var(--radius) * 0.7);
+  box-shadow: 0 18px 30px -18px rgba(0, 0, 0, 0.55);
+}
+.lpx .pc-sd-ph img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.7s ease;
+}
+.lpx .pc-sd-item:hover .pc-sd-ph img {
+  transform: scale(1.06);
+}
+.lpx .pc-sd-item figcaption {
+  position: absolute;
+  inset-inline-start: 14px;
+  bottom: 14px;
+  max-width: calc(100% - 28px);
+  padding: 7px 13px;
+  border-radius: 99px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #fff;
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(6px);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.lpx .pc-sd-item.alt figcaption {
+  inset-inline-start: 26px;
+  bottom: 26px;
+  max-width: calc(100% - 52px);
+}
+.lpx[dir="rtl"] .pc-sd-item {
+  direction: rtl;
+}
+
+@container lpx (max-width: 900px) {
+  .lpx .pc-sd {
+    padding: 72px 0;
+  }
+  .lpx .pc-sd-item {
+    width: 250px;
+  }
+}
+@container lpx (max-width: 560px) {
+  .lpx .pc-sd {
+    padding: 56px 0;
+  }
+  .lpx .pc-sd-head {
+    margin-bottom: 24px;
+  }
+  .lpx .pc-sd-ctl {
+    width: 40px;
+    height: 40px;
+  }
+  .lpx .pc-sd-track {
+    gap: 12px;
+    padding-inline-end: 12px;
+  }
+  .lpx .pc-sd-item {
+    width: 200px;
+  }
+  .lpx .pc-sd-item.alt {
+    padding: 10px;
+  }
+  .lpx .pc-sd-item.alt figcaption {
+    inset-inline-start: 20px;
+    bottom: 20px;
+  }
+}

@@ -1,0 +1,211 @@
+/* F20 — carte de visite centrée */
+.lpx .pc-f20 {
+  background: color-mix(in srgb, var(--primary) 8%, color-mix(in srgb, var(--text) 5%, var(--bg)));
+  color: var(--text);
+  font-family: var(--font);
+  border-top: 1px solid var(--border);
+}
+.lpx .pc-f20-in {
+  max-width: 1160px;
+  margin: 0 auto;
+  padding: 80px 20px 28px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.lpx .pc-f20-card {
+  position: relative;
+  width: min(540px, 100%);
+  min-height: 260px;
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+  padding: 36px 40px 32px;
+  background: var(--surface);
+  border-radius: min(var(--radius), 10px);
+  box-shadow:
+    0 30px 50px -28px rgba(0, 0, 0, 0.5),
+    0 2px 6px rgba(0, 0, 0, 0.06);
+  transform: rotate(-0.8deg);
+  transition: transform 0.4s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+.lpx .pc-f20-card:hover {
+  transform: none;
+}
+.lpx[dir="rtl"] .pc-f20-card {
+  transform: rotate(0.8deg);
+}
+.lpx[dir="rtl"] .pc-f20-card:hover {
+  transform: none;
+}
+/* fin liseré intérieur, comme un carton imprimé */
+.lpx .pc-f20-card::before {
+  content: "";
+  position: absolute;
+  inset: 10px;
+  border: 1px solid color-mix(in srgb, var(--primary) 18%, transparent);
+  border-radius: inherit;
+  pointer-events: none;
+}
+.lpx .pc-f20-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+}
+.lpx .pc-f20-id {
+  min-width: 0;
+}
+.lpx .pc-f20-name {
+  display: block;
+  font-family: var(--heading);
+  font-weight: var(--hw);
+  font-size: 30px;
+  line-height: 1.1;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  overflow-wrap: anywhere;
+}
+.lpx .pc-f20-name.is-long {
+  font-size: 22px;
+  letter-spacing: 0.1em;
+  line-height: 1.2;
+}
+.lpx[dir="rtl"] .pc-f20-name {
+  letter-spacing: 0;
+}
+.lpx .pc-f20-tag {
+  margin: 8px 0 0;
+  font-family: var(--heading);
+  font-style: italic;
+  font-size: 16px;
+  line-height: 1.45;
+  color: color-mix(in srgb, var(--primary) 55%, var(--muted));
+}
+.lpx .pc-f20-seal {
+  flex: none;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  padding: 3px;
+  border: 1.5px solid var(--primary);
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+}
+.lpx .pc-f20-seal img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+}
+.lpx .pc-f20-seal > span {
+  font-family: var(--heading);
+  font-weight: var(--hw);
+  font-size: 24px;
+  color: var(--primary);
+}
+.lpx .pc-f20-bottom {
+  margin-top: auto;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px 28px;
+  font-size: 14px;
+  line-height: 1.6;
+}
+.lpx .pc-f20-contact {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  color: color-mix(in srgb, var(--text) 78%, var(--surface));
+}
+.lpx .pc-f20-wa {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  width: max-content;
+  max-width: 100%;
+  text-decoration: none;
+  font-weight: 600;
+  color: var(--text);
+}
+.lpx .pc-f20-wa .lpx-ico {
+  flex: none;
+  font-size: 17px;
+  color: #25d366;
+}
+.lpx .pc-f20-wa:hover > span {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.lpx .pc-f20-links {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+}
+.lpx .pc-f20-links a {
+  color: color-mix(in srgb, var(--text) 78%, var(--surface));
+  text-decoration: none;
+}
+.lpx .pc-f20-links a:hover,
+.lpx .pc-f20-links a:focus-visible {
+  color: var(--primary);
+}
+.lpx .pc-f20-legal {
+  margin: 48px 0 0;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+@container lpx (max-width: 560px) {
+  .lpx .pc-f20-in {
+    padding: 56px 16px 24px;
+  }
+  .lpx .pc-f20-card {
+    padding: 28px 24px 24px;
+    gap: 32px;
+    min-height: 0;
+    transform: none;
+  }
+  .lpx[dir="rtl"] .pc-f20-card {
+    transform: none;
+  }
+  .lpx .pc-f20-name {
+    font-size: 23px;
+    letter-spacing: 0.12em;
+  }
+  .lpx .pc-f20-name.is-long {
+    font-size: 18px;
+    letter-spacing: 0.08em;
+  }
+  .lpx .pc-f20-tag {
+    font-size: 14.5px;
+  }
+  .lpx .pc-f20-seal {
+    width: 48px;
+    height: 48px;
+  }
+  .lpx .pc-f20-bottom {
+    flex-direction: column;
+    align-items: flex-start;
+    font-size: 13.5px;
+  }
+  .lpx .pc-f20-links {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 4px 18px;
+  }
+  .lpx .pc-f20-legal {
+    margin-top: 32px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lpx .pc-f20-card {
+    transition: none;
+  }
+}

@@ -1,0 +1,45 @@
+/* f12-rappel-prix */
+.lpx .pc-f12 { --f12-ink: rgba(255,255,255,.95); --f12-soft: rgba(255,255,255,.62); --f12-line: rgba(255,255,255,.13); background: color-mix(in srgb, var(--primary) 9%, rgb(14 14 14)); color: var(--f12-ink); font-family: var(--font); }
+.lpx .pc-f12-in { max-width: 1120px; margin: 0 auto; padding: 56px 24px 36px; }
+.lpx .pc-f12-top { display: flex; align-items: center; gap: 28px; padding-bottom: 40px; border-bottom: 1px solid var(--f12-line); }
+.lpx .pc-f12-thumb { flex: none; width: 92px; height: 92px; border-radius: calc(var(--radius) * .6 + 6px); overflow: hidden; background: rgba(255,255,255,.08); box-shadow: 0 0 0 1px var(--f12-line); }
+.lpx .pc-f12-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.lpx .pc-f12-prod { flex: 1; min-width: 0; }
+.lpx .pc-f12-name { margin: 0; font-family: var(--heading); font-weight: var(--hw, 600); text-transform: var(--htt); font-size: 30px; line-height: 1.15; color: #fff; }
+.lpx .pc-f12-deliv { margin: 8px 0 0; color: var(--f12-soft); font-size: 15px; line-height: 1.5; max-width: 46ch; }
+.lpx .pc-f12-price { flex: none; display: flex; flex-direction: column; align-items: flex-end; gap: 6px; text-align: end; }
+.lpx .pc-f12-price strong { font-family: var(--heading); font-weight: var(--hw, 800); font-size: 40px; line-height: 1; white-space: nowrap; color: #fff; letter-spacing: -.01em; }
+.lpx .pc-f12-was { display: inline-flex; align-items: center; gap: 8px; font-size: 15px; color: var(--f12-soft); white-space: nowrap; }
+.lpx .pc-f12-was em { font-style: normal; font-weight: 800; font-size: 12px; padding: 3px 8px; border-radius: 999px; background: color-mix(in srgb, var(--primary) 30%, transparent); color: color-mix(in srgb, var(--primary) 55%, white); }
+.lpx .pc-f12-btn { flex: none; display: inline-flex; align-items: center; justify-content: center; min-height: 58px; padding: 0 34px; border: 0; cursor: pointer; border-radius: var(--btn-radius); background: var(--primary); color: var(--primary-text); font-family: var(--font); font-weight: 800; font-size: 14.5px; letter-spacing: .14em; text-transform: uppercase; box-shadow: 0 16px 30px -16px var(--primary); transition: transform .15s, filter .15s; }
+.lpx[dir="rtl"] .pc-f12-btn { letter-spacing: 0; font-size: 16px; }
+.lpx .pc-f12-btn:hover { transform: translateY(-2px); filter: brightness(1.06); }
+.lpx .pc-f12-bottom { display: flex; align-items: center; flex-wrap: wrap; gap: 14px 28px; padding-top: 26px; }
+.lpx .pc-f12-brand { min-width: 0; max-width: 46%; font-family: var(--heading); font-weight: var(--hw, 700); font-size: 14.5px; letter-spacing: .18em; text-transform: uppercase; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.lpx[dir="rtl"] .pc-f12-brand { letter-spacing: 0; }
+.lpx .pc-f12-links { margin-inline-start: auto; display: flex; flex-wrap: wrap; align-items: center; font-size: 14.5px; }
+.lpx .pc-f12-links a { color: var(--f12-soft); text-decoration: none; transition: color .15s; }
+.lpx .pc-f12-links a + a::before { content: "·"; display: inline-block; margin-inline: 10px; color: var(--f12-soft); }
+.lpx .pc-f12-links a:hover { color: #fff; }
+.lpx .pc-f12-copy { font-size: 13px; color: var(--f12-soft); }
+
+@container lpx (max-width: 900px) {
+  .lpx .pc-f12-top { flex-wrap: wrap; }
+  .lpx .pc-f12-prod { flex-basis: calc(100% - 140px); }
+  .lpx .pc-f12-price { align-items: flex-start; text-align: start; }
+  .lpx .pc-f12-btn { flex: 1; }
+}
+@container lpx (max-width: 560px) {
+  .lpx .pc-f12-in { padding: 40px 16px 28px; }
+  .lpx .pc-f12-top { gap: 18px 16px; padding-bottom: 28px; }
+  .lpx .pc-f12-thumb { width: 72px; height: 72px; }
+  .lpx .pc-f12-prod { flex-basis: calc(100% - 100px); }
+  .lpx .pc-f12-name { font-size: 22px; }
+  .lpx .pc-f12-deliv { font-size: 14px; }
+  .lpx .pc-f12-price { flex-direction: row; align-items: baseline; flex-wrap: wrap; gap: 6px 12px; width: 100%; }
+  .lpx .pc-f12-price strong { font-size: 34px; }
+  .lpx .pc-f12-btn { flex-basis: 100%; }
+  .lpx .pc-f12-bottom { flex-direction: column; align-items: center; text-align: center; gap: 14px; }
+  .lpx .pc-f12-links { margin-inline-start: 0; justify-content: center; }
+  .lpx .pc-f12-brand { max-width: 100%; letter-spacing: .12em; }
+}
