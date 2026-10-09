@@ -4,11 +4,10 @@ import { generateProfessionalStore } from "../../../lib/store-ai-generator";
 import { NextResponse } from "next/server";
 import { authContext } from "../../../lib/server-auth";
 import OpenAI from "openai";
-import { decryptIntegrationSecret } from "../../../lib/integration-secrets";
 import { createStoreProV2Config } from "../../../lib/store-pro-v2";
 import { getStoreTemplate, seedStoreSettings, STORE_TEMPLATE_IDS } from "../../../lib/store-templates";
 import { generateTemplateStore } from "../../../lib/store-templates/ai";
-import { metaAsk, MetaModelError } from "../../../lib/meta-model";
+import { metaAsk, MetaModelError, resolveMetaKey } from "../../../lib/meta-model";
 import { aiProductList } from "../../../lib/store-templates/ai-input";
 function slugify(v: string) {
   return (
@@ -98,25 +97,13 @@ export async function POST(req: Request) {
       // Template de série : boutique prête tout de suite, textes du template dans la langue choisie
       settings = seedStoreSettings(seriesTemplate, locale);
     } else if (b.generateWithAI === true) {
-      const { data: integration, error: integrationError } = await s
-        .from("workspace_integrations")
-        .select("openai_api_key_enc")
-        .eq("workspace_id", workspaceId)
-        .maybeSingle();
-      if (integrationError) throw integrationError;
       let metaKey: string | null = null;
       try {
-        metaKey = decryptIntegrationSecret(integration?.openai_api_key_enc) || process.env.MODEL_API_KEY || null;
-      } catch (secretError: any) {
-        console.error("Meta key decrypt failed", { message: secretError?.message });
-        return NextResponse.json(
-          {
-            error:
-              "La clé Meta Model API est enregistrée mais son déchiffrement a échoué. Réenregistre la clé dans Paramètres > Intégrations.",
-            code: "META_AI_KEY_DECRYPT_FAILED",
-          },
-          { status: 500 },
-        );
+        metaKey = (await resolveMetaKey(s, workspaceId)).key;
+      } catch (keyError: any) {
+        if (keyError instanceof MetaModelError && keyError.code !== "META_AI_KEY_MISSING")
+          return NextResponse.json({ error: keyError.message, code: keyError.code }, { status: keyError.status });
+        if (!(keyError instanceof MetaModelError)) throw keyError;
       }
       if (metaKey) {
         try {

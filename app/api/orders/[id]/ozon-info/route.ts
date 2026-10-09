@@ -2,6 +2,7 @@ import { publicMessage } from "../../../../../lib/public-error";
 import { reportError } from "../../../../../lib/monitoring";
 import { NextResponse } from "next/server";
 import { authContext } from "../../../../../lib/server-auth";
+import { openCarrierSettings } from "../../../../../lib/carrier-secrets";
 import { syncOzonOrder } from "../../../../../lib/ozon";
 export async function POST(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
@@ -23,7 +24,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
       .maybeSingle();
     if (!c || c.code !== "OZON_EXPRESS")
       return NextResponse.json({ error: "Cette commande n’est pas liée à Ozon" }, { status: 400 });
-    const cfg: any = c.settings || {};
+    const cfg: any = openCarrierSettings(c.settings);
     if (!cfg.client_id || !cfg.api_key)
       return NextResponse.json({ error: "Configuration Ozon incomplète" }, { status: 400 });
     const x = await syncOzonOrder(s, o, cfg);

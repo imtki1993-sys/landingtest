@@ -31,4 +31,20 @@ describe("proxy (ex-middleware) — accès sans connexion", () => {
       expect(passes(await call(p)), p).toBe(true);
     }
   });
+
+  it("laisse passer les formulaires publics et les tâches planifiées", async () => {
+    const req = (path: string, method: string) =>
+      middleware(new NextRequest("https://landpro.online" + path, { method }));
+    for (const [p, m] of [
+      ["/api/external-orders", "POST"],
+      ["/api/external-orders", "OPTIONS"],
+      ["/api/store-contact", "POST"],
+      ["/api/cron/analytics-rollup", "GET"],
+      ["/api/cron/ozon-sync", "GET"],
+    ]) {
+      expect(passes(await req(p, m)), `${m} ${p}`).toBe(true);
+    }
+    // mais pas la lecture des messages de contact
+    expect((await req("/api/store-contact", "GET")).status).toBe(401);
+  });
 });

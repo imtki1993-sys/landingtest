@@ -2,6 +2,7 @@ import { publicMessage } from "../../../../../lib/public-error";
 import { reportError } from "../../../../../lib/monitoring";
 import { NextResponse } from "next/server";
 import { authContext } from "../../../../../lib/server-auth";
+import { openCarrierSettings } from "../../../../../lib/carrier-secrets";
 export async function POST(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params,
@@ -24,7 +25,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
       .eq("is_active", true)
       .maybeSingle();
     if (!carrier) return NextResponse.json({ error: "Ozon n’est pas activé" }, { status: 400 });
-    const cfg: any = carrier.settings || {};
+    const cfg: any = openCarrierSettings(carrier.settings);
     if (!cfg.client_id || !cfg.api_key)
       return NextResponse.json({ error: "Configure Client ID + API Key Ozon" }, { status: 400 });
     const { data: lead } = await s

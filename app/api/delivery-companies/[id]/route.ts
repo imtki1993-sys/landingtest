@@ -2,6 +2,7 @@ import { publicMessage } from "../../../../lib/public-error";
 import { reportError } from "../../../../lib/monitoring";
 import { NextResponse } from "next/server";
 import { authContext } from "../../../../lib/server-auth";
+import { sealCarrierSettings } from "../../../../lib/carrier-secrets";
 const clean = (v: any, n = 500) =>
   String(v || "")
     .trim()
@@ -28,7 +29,7 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
     settings.configured_at = new Date().toISOString();
     const { data, error } = await s
       .from("delivery_companies")
-      .update({ settings })
+      .update({ settings: sealCarrierSettings(settings) })
       .eq("id", id)
       .eq("workspace_id", workspaceId)
       .select("id,name,code,is_active,settings")
