@@ -2,6 +2,7 @@ import { publicMessage } from "../../../../lib/public-error";
 import { reportError } from "../../../../lib/monitoring";
 import { NextResponse } from "next/server";
 import { authContext } from "../../../../lib/server-auth";
+import { AGENT_ROLE } from "../../../../lib/team";
 const leadStatuses = [
   "NEW",
   "CONTACTED",
@@ -16,9 +17,20 @@ const leadStatuses = [
 export async function PATCH(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params,
-      { s, workspaceId } = await authContext(req),
+      { s, workspaceId, role, user } = await authContext(req),
       b = await req.json(),
       patch: any = {};
+    // Un agent ne modifie que les clients de commandes qui lui sont attribuées
+    if (role === AGENT_ROLE) {
+      const { data: mine } = await s
+        .from("orders")
+        .select("id")
+        .eq("workspace_id", workspaceId)
+        .eq("lead_id", id)
+        .eq("assigned_to", user.id)
+        .limit(1);
+      if (!mine?.length) return NextResponse.json({ error: "Commande non attribuée à toi" }, { status: 403 });
+    }
     if (b.status !== undefined) {
       if (!leadStatuses.includes(b.status))
         return NextResponse.json({ error: "Statut lead invalide" }, { status: 400 });
@@ -26,6 +38,25 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
       if (b.status === "CONTACTED") patch.contacted_at = new Date().toISOString();
       if (b.status === "CONFIRMED") patch.confirmed_at = new Date().toISOString();
     }
+    // Appels de confirmation : compteur + date du dernier appel, rappel planifié
+    const callStatus = ["CONTACTED", "NO_ANSWER", "CALL_BACK", "CONFIRMED", "CANCELLED"].includes(b.status);
+    let callPatch: any = null;
+    if (callStatus) {
+      const { data: cur } = await s
+        .from("leads")
+        .select("call_attempts")
+        .eq("id", id)
+        .eq("workspace_id", workspaceId)
+        .maybeSingle();
+      if (cur && "call_attempts" in cur) {
+        callPatch = { call_attempts: Number(cur.call_attempts || 0) + 1, last_call_at: new Date().toISOString() };
+        if (b.status === "CALL_BACK") {
+          const at = b.callback_at ? new Date(b.callback_at) : null;
+          callPatch.callback_at = at && !isNaN(at.getTime()) ? at.toISOString() : null;
+        } else callPatch.callback_at = null;
+      }
+    }
+    if (callPatch) Object.assign(patch, callPatch);
     if (b.notes !== undefined) patch.notes = String(b.notes || "").slice(0, 4000);
     if (b.full_name !== undefined) {
       const name = String(b.full_name || "").trim();
@@ -74,7 +105,10 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
             order_id: o.id,
             source: "CRM",
             status: "LEAD_" + b.status,
-            note: "Statut commercial : " + b.status,
+            note:
+              "Statut commercial : " +
+              b.status +
+              (role === AGENT_ROLE ? " (agent " + (user.email || user.id) + ")" : ""),
           })),
         );
     }

@@ -1,4 +1,5 @@
 import { createClient } from "@supabase/supabase-js";
+import { agentCanAccess, AGENT_ROLE } from "./team";
 let cachedAdmin: any = null;
 export function adminDb() {
   if (cachedAdmin) return cachedAdmin;
@@ -23,5 +24,13 @@ export async function authContext(req: Request) {
   if (!ctx) throw new Error("Profil introuvable");
   if (ctx.approval_status !== "approved") throw new Error("Compte en attente d’approbation");
   if (!ctx.workspace_id) throw new Error("Workspace introuvable");
+  // Agent de confirmation : uniquement les routes des commandes (lib/team.ts)
+  if (ctx.role === AGENT_ROLE && !ctx.is_platform_admin) {
+    let path = "";
+    try {
+      path = new URL(req.url).pathname;
+    } catch {}
+    if (!agentCanAccess(req.method || "GET", path)) throw new Error("Accès réservé au propriétaire du compte");
+  }
   return { s, user, workspaceId: ctx.workspace_id, role: ctx.role, isPlatformAdmin: !!ctx.is_platform_admin };
 }

@@ -52,7 +52,48 @@ export default function Orders() {
     [orderCursor, setOrderCursor] = useState<string | null>(null),
     [hasMoreOrders, setHasMoreOrders] = useState(false),
     [pageSize, setPageSize] = useState(20),
+    [me, setMe] = useState<{ role: string; name: string } | null>(null),
+    [team, setTeam] = useState<any[]>([]),
+    [assignTo, setAssignTo] = useState(""),
     [page, setPage] = useState(1);
+  const isAgent = me?.role === "agent";
+  useEffect(() => {
+    fetch("/api/team/me", { cache: "no-store" })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((x) => {
+        setMe(x);
+        if (x && x.role !== "agent")
+          fetch("/api/team", { cache: "no-store" })
+            .then((r) => (r.ok ? r.json() : { agents: [] }))
+            .then((t) => setTeam((t.agents || []).filter((a: any) => a.active)))
+            .catch(() => setTeam([]));
+      })
+      .catch(() => setMe(null));
+  }, []);
+  async function bulkAssign() {
+    if (!selectedIds.length) return;
+    const r = await fetch("/api/orders/assign", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ order_ids: selectedIds, agent_id: assignTo === "none" ? null : assignTo }),
+      }),
+      x = await r.json().catch(() => ({}));
+    if (!r.ok) return alert(x.error || "Attribution impossible");
+    const agent = team.find((a) => a.id === assignTo);
+    setOrders((list) =>
+      list.map((o) =>
+        selectedIds.includes(o.id)
+          ? {
+              ...o,
+              assigned_to: agent?.id || null,
+              agent: agent ? { id: agent.id, name: agent.full_name || agent.email } : null,
+            }
+          : o,
+      ),
+    );
+    setSelectedIds([]);
+    setAssignTo("");
+  }
   async function loadMoreOrders() {
     if (!orderCursor) return;
     const r = await fetch("/api/orders?cursor=" + encodeURIComponent(orderCursor), { cache: "no-store" }),
@@ -214,15 +255,31 @@ export default function Orders() {
     await leadStatus(o, v);
   }
   async function leadStatus(o: any, v: string) {
+    let callback_at: string | undefined;
+    if (v === "CALL_BACK") {
+      const d = new Date(Date.now() + 2 * 3600 * 1000);
+      const def = d.toLocaleString("sv-SE", { timeZone: "Africa/Casablanca" }).slice(0, 16);
+      const when = prompt("Rappeler quand ? (AAAA-MM-JJ HH:MM, heure du Maroc)", def);
+      if (when === null) return;
+      const t = new Date(when.trim().replace(" ", "T") + ":00+01:00");
+      if (!isNaN(t.getTime())) callback_at = t.toISOString();
+    }
     const r = await fetch("/api/leads/" + o.lead_id, {
         method: "PATCH",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ status: v }),
+        body: JSON.stringify({ status: v, callback_at }),
       }),
       x = await r.json();
     if (!r.ok) return alert(x.error || "Modification impossible");
-    setOrders((a) => a.map((z) => (z.id === o.id ? { ...z, lead: { ...z.lead, status: x.status } } : z)));
-    setSelected((s: any) => (s?.id === o.id ? { ...s, lead: { ...s.lead, status: x.status } } : s));
+    const counted = ["CONTACTED", "NO_ANSWER", "CALL_BACK", "CONFIRMED", "CANCELLED"].includes(v);
+    const patchLead = (l: any) => ({
+      ...l,
+      status: x.status,
+      call_attempts: counted ? Number(l?.call_attempts || 0) + 1 : l?.call_attempts,
+      callback_at: v === "CALL_BACK" ? callback_at || null : counted ? null : l?.callback_at,
+    });
+    setOrders((a) => a.map((z) => (z.id === o.id ? { ...z, lead: patchLead(z.lead) } : z)));
+    setSelected((s: any) => (s?.id === o.id ? { ...s, lead: patchLead(s.lead) } : s));
   }
   async function saveShipping(o: any) {
     const r = await fetch("/api/orders/" + o.id, {
@@ -643,10 +700,14 @@ export default function Orders() {
         <header className="dash-header orders-page-head">
           <div>
             <span className="eyebrow">LANDING PAGE MOTOR</span>
-            <h1>Commandes COD</h1>
+            <h1>{isAgent ? "Mes commandes à confirmer" : "Commandes COD"}</h1>
             <p>Gère et suis toutes vos commandes en un seul endroit.</p>
           </div>
-          <button className="primary orders-add-btn orders-add-btn-v2" onClick={() => setManualOpen(true)}>
+          <button
+            className="primary orders-add-btn orders-add-btn-v2"
+            hidden={isAgent}
+            onClick={() => setManualOpen(true)}
+          >
             + Ajouter une commande
           </button>
         </header>
@@ -793,7 +854,23 @@ export default function Orders() {
                 />
                 <strong>{selectedIds.length} sélectionnée(s)</strong>
               </div>
-              <div className="orders-bulk-actions">
+              <div className="orders-bulk-actions" hidden={isAgent}>
+                {team.length > 0 && (
+                  <span className="orders-assign">
+                    <select value={assignTo} onChange={(e) => setAssignTo(e.target.value)}>
+                      <option value="">Attribuer à…</option>
+                      {team.map((a) => (
+                        <option key={a.id} value={a.id}>
+                          {a.full_name || a.email}
+                        </option>
+                      ))}
+                      <option value="none">Personne (retirer)</option>
+                    </select>
+                    <button onClick={bulkAssign} disabled={!selectedIds.length || !assignTo}>
+                      Attribuer ({selectedIds.length})
+                    </button>
+                  </span>
+                )}
                 <button className="primary confirm-bulk" onClick={bulkConfirm} disabled={!selectedIds.length}>
                   ✓ Confirmer ({selectedIds.length})
                 </button>
@@ -1032,6 +1109,25 @@ export default function Orders() {
                           <option value="CALL_BACK">Rappeler</option>
                           <option value="CANCELLED">Annulée</option>
                         </select>
+                        {(Number(o.lead?.call_attempts) > 0 || o.lead?.callback_at) && (
+                          <small className="order-calls">
+                            {Number(o.lead?.call_attempts) > 0 &&
+                              `📞 ${o.lead.call_attempts} appel${o.lead.call_attempts > 1 ? "s" : ""}`}
+                            {o.lead?.callback_at &&
+                              ` · rappel ${new Date(o.lead.callback_at).toLocaleString("fr-MA", {
+                                timeZone: "Africa/Casablanca",
+                                day: "2-digit",
+                                month: "2-digit",
+                                hour: "2-digit",
+                                minute: "2-digit",
+                              })}`}
+                          </small>
+                        )}
+                        {!isAgent && (
+                          <small className="order-agent">
+                            {o.agent ? "👤 " + o.agent.name : team.length ? "Non attribuée" : ""}
+                          </small>
+                        )}
                       </td>
                       <td>
                         <select
@@ -1095,14 +1191,16 @@ export default function Orders() {
                                 WhatsApp : confirmer
                               </a>
                             )}
-                            {o.lead?.phone_e164 && (
+                            {o.lead?.phone_e164 && !isAgent && (
                               <button onClick={() => toggleBlock(o)}>
                                 {o.risk?.level === "blocked" ? "Débloquer le numéro" : "Bloquer le numéro"}
                               </button>
                             )}
-                            <button className="order-delete" onClick={() => remove(o)}>
-                              Supprimer
-                            </button>
+                            {!isAgent && (
+                              <button className="order-delete" onClick={() => remove(o)}>
+                                Supprimer
+                              </button>
+                            )}
                           </div>
                         </details>
                       </td>

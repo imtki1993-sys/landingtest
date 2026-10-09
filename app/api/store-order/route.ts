@@ -1,7 +1,7 @@
 import { publicMessage } from "../../../lib/public-error";
 import { reportError } from "../../../lib/monitoring";
 import { NextResponse, after } from "next/server";
-import { cancelIfBlacklisted } from "../../../lib/blacklist";
+import { afterPublicOrder } from "../../../lib/team";
 import { adminDb } from "../../../lib/server-auth";
 function phoneE164(v: string) {
   let x = v.replace(/[^0-9+]/g, "");
@@ -118,7 +118,7 @@ export async function POST(req: Request) {
     const orderIds = [result?.order_id, ...(Array.isArray(result?.order_ids) ? result.order_ids : [])]
       .filter(Boolean)
       .map(String);
-    if (orderIds.length) after(() => Promise.all(orderIds.map((id) => cancelIfBlacklisted(s, id))).catch(() => []));
+    if (orderIds.length) after(() => Promise.all(orderIds.map((id) => afterPublicOrder(s, id))).catch(() => []));
     return NextResponse.json(result, { status: 201 });
   } catch (e: any) {
     reportError(e, "api/store-order");

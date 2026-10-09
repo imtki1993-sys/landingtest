@@ -5,7 +5,9 @@ import { createClient } from "@supabase/supabase-js";
 import { authContext, adminDb } from "../../../lib/server-auth";
 import { sendMetaPurchase } from "../../../lib/meta-capi";
 import { customerRisk } from "../../../lib/order-risk";
-import { blacklistedPhones, cancelIfBlacklisted } from "../../../lib/blacklist";
+import { blacklistedPhones } from "../../../lib/blacklist";
+import { afterPublicOrder, AGENT_ROLE } from "../../../lib/team";
+import { isMissingColumn } from "../../../lib/db-errors";
 function db() {
   const u = process.env.NEXT_PUBLIC_SUPABASE_URL,
     k = process.env.SUPABASE_SECRET_KEY;
@@ -14,7 +16,8 @@ function db() {
 }
 export async function GET(req: Request) {
   try {
-    const { s: supabase, workspaceId } = await authContext(req),
+    const { s: supabase, workspaceId, role, user } = await authContext(req),
+      isAgent = role === AGENT_ROLE,
       url = new URL(req.url),
       requested = Number(url.searchParams.get("limit") || 50),
       limit = Math.min(100, Math.max(1, Number.isFinite(requested) ? requested : 50)),
@@ -27,6 +30,7 @@ export async function GET(req: Request) {
         .from("orders")
         .select("total,shipment_status,tracking_number,lead_id,created_at")
         .eq("workspace_id", workspaceId);
+      if (isAgent) kpiQuery = kpiQuery.eq("assigned_to", user.id);
       if (dateFrom) kpiQuery = kpiQuery.gte("created_at", dateFrom + "T00:00:00");
       if (dateTo)
         kpiQuery = kpiQuery.lt(
@@ -61,16 +65,22 @@ export async function GET(req: Request) {
       };
       return NextResponse.json({ kpis });
     }
-    let ordersQuery = supabase
-      .from("orders")
-      .select(
-        "id,order_number,lead_id,landing_page_id,store_id,product_id,quantity,unit_price,subtotal,shipping_price,discount,total,currency,shipment_status,tracking_number,delivery_company_id,carrier_city_id,carrier_city_name,shipped_at,delivered_at,returned_at,created_at",
-      )
-      .eq("workspace_id", workspaceId)
-      .order("created_at", { ascending: false })
-      .limit(limit + 1);
-    if (cursor) ordersQuery = ordersQuery.lt("created_at", cursor);
-    const { data: orders, error } = await ordersQuery;
+    const ORDER_COLS =
+      "id,order_number,lead_id,landing_page_id,store_id,product_id,quantity,unit_price,subtotal,shipping_price,discount,total,currency,shipment_status,tracking_number,delivery_company_id,carrier_city_id,carrier_city_name,shipped_at,delivered_at,returned_at,created_at";
+    // Colonnes de l'équipe (assigned_to…) : ignorées tant que la migration n'est pas exécutée
+    const runOrders = (withTeam: boolean) => {
+      let q = supabase
+        .from("orders")
+        .select(withTeam ? ORDER_COLS + ",assigned_to,assigned_at" : ORDER_COLS)
+        .eq("workspace_id", workspaceId)
+        .order("created_at", { ascending: false })
+        .limit(limit + 1);
+      if (cursor) q = q.lt("created_at", cursor);
+      if (isAgent) q = q.eq("assigned_to", user.id);
+      return q;
+    };
+    let { data: orders, error } = await runOrders(true);
+    if (error && isMissingColumn(error) && !isAgent) ({ data: orders, error } = await runOrders(false));
     if (error) throw error;
     const fetched = orders || [],
       hasMore = fetched.length > limit,
@@ -82,11 +92,12 @@ export async function GET(req: Request) {
       carrierIds = [...new Set(base.map((o: any) => o.delivery_company_id).filter(Boolean))];
     const [leadsQ, productsQ, landingsQ, storesQ, carriersQ] = await Promise.all([
       leadIds.length
-        ? supabase
-            .from("leads")
-            .select("id,full_name,phone_raw,phone_e164,city_name,address,status,notes")
-            .eq("workspace_id", workspaceId)
-            .in("id", leadIds)
+        ? (async () => {
+            const cols = "id,full_name,phone_raw,phone_e164,city_name,address,status,notes";
+            const q = (c: string) => supabase.from("leads").select(c).eq("workspace_id", workspaceId).in("id", leadIds);
+            const r = await q(cols + ",call_attempts,last_call_at,callback_at");
+            return r.error && isMissingColumn(r.error) ? q(cols) : r;
+          })()
         : Promise.resolve({ data: [] }),
       productIds.length
         ? supabase.from("products").select("id,name,images").eq("workspace_id", workspaceId).in("id", productIds)
@@ -140,8 +151,15 @@ export async function GET(req: Request) {
         blacklisted: blocked.get(lead.phone_e164) || null,
       });
     };
+    // Noms des agents attribués (vue du propriétaire)
+    const agentIds = [...new Set(base.map((o: any) => o.assigned_to).filter(Boolean))];
+    const { data: agentRows } = agentIds.length
+      ? await supabase.from("users").select("id,full_name,email").in("id", agentIds)
+      : { data: [] as any[] };
+    const agentName = new Map((agentRows || []).map((u: any) => [u.id, u.full_name || u.email]));
     const rows = base.map((o: any) => ({
       ...o,
+      agent: o.assigned_to ? { id: o.assigned_to, name: agentName.get(o.assigned_to) || "Agent" } : null,
       risk: riskOf(o),
       lead: leads.get(o.lead_id) || null,
       product: products.get(o.product_id) || null,
@@ -153,6 +171,7 @@ export async function GET(req: Request) {
       .from("orders")
       .select("total,shipment_status,tracking_number,lead_id,created_at")
       .eq("workspace_id", workspaceId);
+    if (isAgent) kpiQuery = kpiQuery.eq("assigned_to", user.id);
     if (dateFrom) kpiQuery = kpiQuery.gte("created_at", dateFrom + "T00:00:00");
     if (dateTo)
       kpiQuery = kpiQuery.lt("created_at", new Date(new Date(dateTo + "T00:00:00").getTime() + 86400000).toISOString());
@@ -231,7 +250,7 @@ export async function POST(req: Request) {
     if (error) throw error;
     if (data?.order_id) {
       const orderId = String(data.order_id);
-      after(() => cancelIfBlacklisted(s, orderId).catch(() => false));
+      after(() => afterPublicOrder(s, orderId).catch(() => undefined));
       // URL exacte de la page (envoyée par la landing), sinon le Referer ; jamais une autre origine
       const referer = req.headers.get("referer") || "",
         pageUrl = typeof b.page_url === "string" ? b.page_url.slice(0, 1000) : "";

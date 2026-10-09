@@ -1,7 +1,7 @@
 import { publicMessage } from "../../../lib/public-error";
 import { reportError } from "../../../lib/monitoring";
 import { NextResponse } from "next/server";
-import { cancelIfBlacklisted } from "../../../lib/blacklist";
+import { afterPublicOrder } from "../../../lib/team";
 import { adminDb } from "../../../lib/server-auth";
 function cleanPhone(v: string) {
   return v.replace(/[^0-9+]/g, "");
@@ -151,7 +151,7 @@ export async function POST(req: Request) {
       .select("id,order_number,total")
       .single();
     if (oe) throw oe;
-    await cancelIfBlacklisted(s, order.id);
+    await afterPublicOrder(s, order.id);
     return NextResponse.json(
       { ok: true, order_id: order.id, order_number: order.order_number, total: order.total },
       { status: 201, headers: cors },
