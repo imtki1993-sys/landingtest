@@ -69,7 +69,7 @@ export default function Login() {
         >
           M
         </div>
-        <h1 style={{ margin: "0 0 8px", fontSize: 28 }}>Landing Page Motor</h1>
+        <h1 style={{ margin: "0 0 8px", fontSize: 28 }}>LandPro</h1>
         <p style={{ margin: "0 0 26px", color: "#94a3b8" }}>Connexion sécurisée à ton espace d'administration.</p>
         <label style={{ display: "block", fontSize: 13, marginBottom: 7 }}>Email</label>
         <input

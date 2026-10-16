@@ -83,7 +83,7 @@ export default function Settings() {
           <div>
             <span className="eyebrow">CONFIGURATION</span>
             <h1>Paramètres</h1>
-            <p>Configure les valeurs par défaut de Landing Page Motor.</p>
+            <p>Configure les valeurs par défaut de LandPro.</p>
           </div>
         </header>
         <form className="settings-grid" onSubmit={save}>

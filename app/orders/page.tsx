@@ -401,7 +401,7 @@ export default function Orders() {
         JSON.stringify(x.parcel, null, 2) +
         "\n\nStatut détecté : " +
         (x.ozon_status || "AUCUN") +
-        "\nStatut Landing Motor : " +
+        "\nStatut LandPro : " +
         (x.shipment_status || "PENDING"),
     );
   }
@@ -708,15 +708,18 @@ export default function Orders() {
       <section className="dash-content orders-dashboard">
         <header className="dash-header orders-page-head">
           <div>
-            <span className="eyebrow">LANDING PAGE MOTOR</span>
+            <span className="eyebrow">LANDPRO</span>
             <h1>{isAgent ? "Mes commandes à confirmer" : "Commandes COD"}</h1>
             <p>Gère et suis toutes vos commandes en un seul endroit.</p>
           </div>
-          {ownerUI && (
-            <button className="primary orders-add-btn orders-add-btn-v2" onClick={() => setManualOpen(true)}>
-              + Ajouter une commande
-            </button>
-          )}
+          {/* Emplacement toujours présent : sans lui, l'en-tête se décale pour un agent */}
+          <div className="orders-page-head-actions">
+            {ownerUI && (
+              <button className="primary orders-add-btn orders-add-btn-v2" onClick={() => setManualOpen(true)}>
+                + Ajouter une commande
+              </button>
+            )}
+          </div>
         </header>
         <div className="orders-status-tabs">
           <button className={quickFilter === "ALL" ? "active" : ""} onClick={() => setQuickFilter("ALL")}>

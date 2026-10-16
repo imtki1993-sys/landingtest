@@ -84,7 +84,7 @@ export default function Delivery() {
       <section className="dash-content delivery-dashboard">
         <header className="dash-header">
           <div>
-            <span className="eyebrow">LANDING PAGE MOTOR</span>
+            <span className="eyebrow">LANDPRO</span>
             <h1>Intégrations livraison COD</h1>
             <p>Choisis les sociétés de livraison que tu utilises au Maroc.</p>
           </div>
