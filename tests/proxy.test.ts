@@ -53,8 +53,10 @@ describe("proxy (ex-middleware) — accès sans connexion", () => {
     expect(home.headers.get("x-middleware-rewrite")).toContain("/site");
     const ar = await call("/ar");
     expect(ar.headers.get("x-middleware-rewrite")).toContain("/site/ar");
-    for (const p of ["/site", "/site/ar", "/template-showcase"]) {
+    for (const p of ["/site", "/site/ar"]) {
       expect(passes(await call(p)), p).toBe(true);
     }
+    // Le catalogue des templates reste réservé aux comptes connectés
+    expect((await call("/template-showcase")).status).toBe(307);
   });
 });

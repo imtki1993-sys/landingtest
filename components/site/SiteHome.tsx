@@ -92,17 +92,15 @@ export default function SiteHome({ lang, salesPhone }: { lang: SiteLang; salesPh
           <p className="mj-muted">{t.templates.text}</p>
         </div>
         <div className="mj-strip">
-          {t.templates.items.map(([file, name], i) => (
+          {t.templates.items.map(([file, name, price], i) => (
             <figure key={file} className={"mj-tpl" + (i % 2 ? " mj-tpl-low" : "")}>
               <img src={`/site/${file}.webp`} alt={name} width={390} height={844} loading="lazy" />
-              <figcaption>{name}</figcaption>
+              <figcaption>
+                {name}
+                <span>{price}</span>
+              </figcaption>
             </figure>
           ))}
-        </div>
-        <div className="mj-wrap">
-          <a href="/template-showcase" className="mj-link">
-            {t.templates.link}
-          </a>
         </div>
       </section>
 
