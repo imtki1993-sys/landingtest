@@ -9,7 +9,6 @@ const PUBLIC_GET = [
   "/landing/",
   "/store/",
   "/site/",
-  "/template-showcase",
   "/_next/",
   "/favicon.ico",
 ];

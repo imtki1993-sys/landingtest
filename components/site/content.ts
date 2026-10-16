@@ -10,7 +10,7 @@ export const SITE = {
       description:
         "Landing pages COD, commandes, équipe de confirmation et livraison Ozon Express réunies dans un seul outil pour les vendeurs au Maroc. Dès 599 DH pour 3 mois.",
     },
-    nav: { templates: "Templates", trajet: "Comment ça marche", equipe: "Équipe", tarifs: "Tarifs" },
+    nav: { templates: "Exemples", trajet: "Comment ça marche", equipe: "Équipe", tarifs: "Tarifs" },
     login: "Se connecter",
     activate: "Activer LandPro",
     otherLang: { label: "العربية", href: "/ar", lang: "ar" },
@@ -30,16 +30,15 @@ export const SITE = {
       phoneB: "Landing LandPro en arabe pour une abaya",
     },
     templates: {
-      title: "149 landings prêtes à vendre, en arabe et en français.",
-      text: "Chaque template arrive avec son formulaire de commande, ses offres 1, 2 ou 3 pièces et des textes écrits par l'IA pour ton produit.",
-      link: "Voir les 149 templates",
+      title: "Des landings qui vendent, en arabe et en français.",
+      text: "Quelques landings faites avec LandPro. Chacune a son formulaire de commande, ses offres 1, 2 ou 3 pièces et des textes écrits par l'IA pour le produit.",
       items: [
-        ["tpl-montre-orbite-360", "Montre Orbite"],
-        ["tpl-serum-avant-apres", "Sérum, avant et après"],
-        ["tpl-hoodie-graffiti", "Hoodie Graffiti"],
-        ["tpl-parfum-aube", "Parfum Aube"],
-        ["tpl-support-flash-stock", "Support, prix cassé"],
-        ["tpl-ecouteurs-aurora", "Écouteurs Aurora"],
+        ["tpl-montre-orbite-360", "Montre automatique", "1 290 DH"],
+        ["tpl-serum-avant-apres", "Sérum visage", "189 DH"],
+        ["tpl-hoodie-graffiti", "Hoodie oversize", "349 DH"],
+        ["tpl-parfum-aube", "Eau de parfum oud", "390 DH"],
+        ["tpl-support-flash-stock", "Support téléphone voiture", "199 DH"],
+        ["tpl-ecouteurs-aurora", "Écouteurs sans fil", "299 DH"],
       ],
     },
     trajet: {
@@ -76,7 +75,7 @@ export const SITE = {
         },
       ],
       included:
-        "Chaque formule comprend les 149 landings et 50 boutiques, les commandes, le filtre des fausses commandes, l'équipe de confirmation, Ozon Express, le Pixel Meta et ton domaine.",
+        "Chaque formule comprend la création de landings et de boutiques, les commandes, le filtre des fausses commandes, l'équipe de confirmation, Ozon Express, le Pixel Meta et ton domaine.",
       whatsapp: (months: number) => `Bonjour, je veux activer LandPro pour ${months} mois.`,
     },
     faq: {
@@ -115,7 +114,7 @@ export const SITE = {
       description:
         "صفحات البيع، الطلبات، فريق التأكيد و التوصيل مع Ozon Express ف أداة وحدة للبائعين ف المغرب. من 599 درهم لـ 3 شهور.",
     },
-    nav: { templates: "القوالب", trajet: "كيفاش كيخدم", equipe: "الفريق", tarifs: "الأثمنة" },
+    nav: { templates: "أمثلة", trajet: "كيفاش كيخدم", equipe: "الفريق", tarifs: "الأثمنة" },
     login: "دخول",
     activate: "فعّل LandPro",
     otherLang: { label: "Français", href: "/", lang: "fr" },
@@ -135,16 +134,15 @@ export const SITE = {
       phoneB: "صفحة بيع LandPro بالعربية ديال عباية",
     },
     templates: {
-      title: "149 صفحة بيع واجدة، بالعربية و بالفرنسية.",
-      text: "كل قالب فيه فورمولير الطلب، العروض ديال 1 و 2 و 3 حبات، و نصوص كيكتبها الذكاء الاصطناعي على حساب المنتوج ديالك.",
-      link: "شوف 149 قالب",
+      title: "صفحات بيع كتبيع، بالعربية و بالفرنسية.",
+      text: "شوية ديال صفحات البيع مصاوبين ب LandPro. كل وحدة فيها فورمولير الطلب، العروض ديال 1 و 2 و 3 حبات، و نصوص كتبها الذكاء الاصطناعي على حساب المنتوج.",
       items: [
-        ["tpl-montre-orbite-360", "ساعة Orbite"],
-        ["tpl-serum-avant-apres", "سيروم، قبل و بعد"],
-        ["tpl-hoodie-graffiti", "هودي Graffiti"],
-        ["tpl-parfum-aube", "عطر Aube"],
-        ["tpl-support-flash-stock", "حامل التيليفون، ثمن مكسور"],
-        ["tpl-ecouteurs-aurora", "كيتمان Aurora"],
+        ["tpl-montre-orbite-360", "ساعة أوتوماتيكية", "1290 درهم"],
+        ["tpl-serum-avant-apres", "سيروم للوجه", "189 درهم"],
+        ["tpl-hoodie-graffiti", "هودي واسع", "349 درهم"],
+        ["tpl-parfum-aube", "عطر العود", "390 درهم"],
+        ["tpl-support-flash-stock", "حامل التيليفون للطوموبيل", "199 درهم"],
+        ["tpl-ecouteurs-aurora", "كيتمان بلا خيط", "299 درهم"],
       ],
     },
     trajet: {
@@ -175,7 +173,7 @@ export const SITE = {
         { months: 12, price: "1699", label: "12 شهر، أحسن ثمن", perMonth: "142 درهم ف الشهر", cta: "خود 12 شهر" },
       ],
       included:
-        "كل عرض فيه 149 صفحة بيع و 50 متجر، الطلبات، كشف الطلبات المزيفة، فريق التأكيد، Ozon Express، Pixel ديال Meta و الدومين ديالك.",
+        "كل عرض فيه إنشاء صفحات البيع و المتاجر، الطلبات، كشف الطلبات المزيفة، فريق التأكيد، Ozon Express، Pixel ديال Meta و الدومين ديالك.",
       whatsapp: (months: number) => `السلام، بغيت نفعّل LandPro لمدة ${months} شهور.`,
     },
     faq: {
