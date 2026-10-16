@@ -41,7 +41,7 @@ async function PATCHHandler(req: Request) {
     const { error: we } = await s
       .from("workspaces")
       .update({
-        name: b.name || "Landing Motor",
+        name: b.name || "LandPro",
         default_country: "MA",
         default_currency: "MAD",
         default_locale: b.locale || "ar-MA",

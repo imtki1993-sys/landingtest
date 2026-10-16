@@ -62,9 +62,9 @@ export default function SaaSSidebar() {
   return (
     <aside className="dash-side">
       <div className="dash-brand">
-        <div className="brand-mark">M</div>
+        <div className="brand-mark">L</div>
         <div>
-          <b>Landing Motor</b>
+          <b>LandPro</b>
           <small>AI COD BUILDER</small>
         </div>
       </div>

@@ -26,9 +26,9 @@ export default function AdminUsers() {
     <main className="dash-shell">
       <aside className="dash-side">
         <div className="dash-brand">
-          <div className="brand-mark">M</div>
+          <div className="brand-mark">L</div>
           <div>
-            <b>Landing Motor</b>
+            <b>LandPro</b>
             <small>ADMIN</small>
           </div>
         </div>

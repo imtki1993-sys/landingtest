@@ -81,7 +81,7 @@ export default function Signup() {
           M
         </div>
         <h1 style={{ margin: "0 0 8px", fontSize: 28 }}>Créer un compte</h1>
-        <p style={{ margin: "0 0 26px", color: "#94a3b8" }}>Inscris-toi pour accéder à Landing Page Motor.</p>
+        <p style={{ margin: "0 0 26px", color: "#94a3b8" }}>Inscris-toi pour accéder à LandPro.</p>
         <label style={{ display: "block", fontSize: 13, marginBottom: 7 }}>Email</label>
         <input
           type="email"

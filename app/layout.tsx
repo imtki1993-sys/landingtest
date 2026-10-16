@@ -1,7 +1,7 @@
 // Layout racine : aucun CSS global ici. Le tableau de bord charge globals.css via
 // ses propres layouts ; les landing pages chargent les styles des templates LandPro
 // et les boutiques store-public.css (généré, beaucoup plus léger).
-export const metadata = { title: "Landing Page Motor", description: "Générateur de landing pages COD" };
+export const metadata = { title: "LandPro", description: "Générateur de landing pages COD" };
 
 // Mode sombre du tableau de bord appliqué avant l'affichage, sur toutes les pages du
 // tableau de bord (éditeurs compris), jamais sur les boutiques et landing pages publiques.
