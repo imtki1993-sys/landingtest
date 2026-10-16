@@ -47,4 +47,14 @@ describe("proxy (ex-middleware) — accès sans connexion", () => {
     // mais pas la lecture des messages de contact
     expect((await req("/api/store-contact", "GET")).status).toBe(401);
   });
+
+  it("affiche le site de présentation aux visiteurs non connectés", async () => {
+    const home = await call("/");
+    expect(home.headers.get("x-middleware-rewrite")).toContain("/site");
+    const ar = await call("/ar");
+    expect(ar.headers.get("x-middleware-rewrite")).toContain("/site/ar");
+    for (const p of ["/site", "/site/ar", "/template-showcase"]) {
+      expect(passes(await call(p)), p).toBe(true);
+    }
+  });
 });

@@ -8,6 +8,8 @@ const PUBLIC_GET = [
   "/api/landing/",
   "/landing/",
   "/store/",
+  "/site/",
+  "/template-showcase",
   "/_next/",
   "/favicon.ico",
 ];
@@ -113,6 +115,13 @@ export async function proxy(req: NextRequest) {
       }
     } catch {}
   }
+  // Site de présentation : « /ar » est la version arabe, publique pour tout le monde.
+  if (path === "/ar" || path === "/ar/") {
+    const url = req.nextUrl.clone();
+    url.pathname = "/site/ar";
+    return NextResponse.rewrite(url);
+  }
+  if (path === "/site") return NextResponse.next();
   if (isPublic(req)) return NextResponse.next();
   if (await valid(req.cookies.get("lm_access")?.value)) return NextResponse.next();
   const session = await refresh(req);
@@ -136,6 +145,12 @@ export async function proxy(req: NextRequest) {
     return res;
   }
   if (path.startsWith("/api/")) return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
+  // Visiteur non connecté sur la racine : le site de présentation (le tableau de bord reste sur « / » une fois connecté).
+  if (path === "/") {
+    const url = req.nextUrl.clone();
+    url.pathname = "/site";
+    return NextResponse.rewrite(url);
+  }
   const url = req.nextUrl.clone();
   url.pathname = "/login";
   url.searchParams.set("next", path);
