@@ -372,3 +372,36 @@
 .lpx-styled[style*="background-color"] > section, .lpx-styled[style*="background-color"] > div:not(.lpx-block-tag) { background: transparent; }
 .lpx-styled > section { color: inherit; text-align: inherit; }
 .lpx-styled[style*="--lpx-sec-pad"] > section { padding-top: var(--lpx-sec-pad); padding-bottom: var(--lpx-sec-pad); }
+
+/* ─── Réglages de style de l'éditeur (voir styles.ts) ───
+   Thème de la page : attributs data-sx-* sur .lpx. Section : sur .lpx-styled (prioritaire).
+   Tablette ≤ 1023 px et mobile ≤ 599 px de largeur de page (container queries : l'aperçu
+   de l'éditeur suit la même logique que la vraie page). */
+.lpx[data-sx-gap] .lpx-section { padding-block: var(--sx-gap); }
+.lpx-styled[data-sx-pt] > section, .lpx-styled[data-sx-pt] > div:not(.lpx-block-tag) { padding-top: var(--sx-pt) !important; }
+.lpx-styled[data-sx-pb] > section, .lpx-styled[data-sx-pb] > div:not(.lpx-block-tag) { padding-bottom: var(--sx-pb) !important; }
+.lpx-styled[data-sx-bg] > section, .lpx-styled[data-sx-bg] > div:not(.lpx-block-tag) { background: transparent !important; }
+.lpx-styled[data-sx-text] > section { color: inherit; }
+.lpx-styled[data-sx-title] :is(h1, h2, h3, .lpx-section-title) { color: var(--sx-title) !important; }
+.lpx-styled[data-sx-align] :is(h1, h2, h3, p, .lpx-section-title, .lpx-section-sub) { text-align: inherit !important; }
+.lpx-styled[data-sx-align="left"] .lpx-section-sub { margin-inline: 0 auto; }
+.lpx-styled[data-sx-align="right"] .lpx-section-sub { margin-inline: auto 0; }
+.lpx-styled[data-sx-w] .lpx-container { max-width: var(--sx-w) !important; }
+
+/* Tailles : le titre de section/hero (h1, h2) et le texte courant */
+:is(.lpx, .lpx-styled)[data-sx-h] :is(h1, h2, .lpx-section-title) { font-size: var(--sx-h-d) !important; }
+:is(.lpx, .lpx-styled)[data-sx-p] :is(p, li, blockquote, summary, .lpx-section-sub) { font-size: var(--sx-p-d) !important; }
+@container lpx (max-width: 1023px) {
+  :is(.lpx, .lpx-styled)[data-sx-h] :is(h1, h2, .lpx-section-title) { font-size: var(--sx-h-t, var(--sx-h-d)) !important; }
+  :is(.lpx, .lpx-styled)[data-sx-p] :is(p, li, blockquote, summary, .lpx-section-sub) { font-size: var(--sx-p-t, var(--sx-p-d)) !important; }
+}
+@container lpx (max-width: 599px) {
+  :is(.lpx, .lpx-styled)[data-sx-h] :is(h1, h2, .lpx-section-title) { font-size: var(--sx-h-m, var(--sx-h-t, var(--sx-h-d))) !important; }
+  :is(.lpx, .lpx-styled)[data-sx-p] :is(p, li, blockquote, summary, .lpx-section-sub) { font-size: var(--sx-p-m, var(--sx-p-t, var(--sx-p-d))) !important; }
+  .lpx:not(.lpx-builder) .lpx-styled[data-sx-hide-m] { display: none !important; }
+  .lpx-builder .lpx-styled[data-sx-hide-m] { opacity: .35; }
+}
+@container lpx (min-width: 1024px) {
+  .lpx:not(.lpx-builder) .lpx-styled[data-sx-hide-d] { display: none !important; }
+  .lpx-builder .lpx-styled[data-sx-hide-d] { opacity: .35; }
+}

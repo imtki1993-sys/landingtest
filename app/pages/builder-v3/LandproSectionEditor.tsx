@@ -466,38 +466,7 @@ export function LandproTemplatePanel({
       <button type="button" onClick={() => apply(current.id, true)}>
         ↺ Remettre les sections par défaut du template
       </button>
-      <label>
-        Couleur principale
-        <input
-          type="color"
-          value={draft.theme_primary || current.theme.primary}
-          onChange={(e) => patch("theme_primary", e.target.value)}
-        />
-      </label>
-      <label>
-        Couleur d'accent (prix, badges)
-        <input
-          type="color"
-          value={draft.theme_accent || current.theme.accent}
-          onChange={(e) => patch("theme_accent", e.target.value)}
-        />
-      </label>
-      {(draft.theme_primary || draft.theme_accent) && (
-        <button type="button" onClick={() => commit({ ...draft, theme_primary: "", theme_accent: "" })}>
-          Revenir aux couleurs du template
-        </button>
-      )}
-      <label>
-        Mode de commande
-        <select
-          value={draft.order_mode || current.options?.orderMode || "form"}
-          onChange={(e) => patch("order_mode", e.target.value)}
-        >
-          <option value="form">Formulaire COD</option>
-          <option value="both">Formulaire + WhatsApp</option>
-          <option value="whatsapp">WhatsApp uniquement</option>
-        </select>
-      </label>
+      <small>Couleurs, polices et tailles : onglet Thème. Mode de commande : section Formulaire COD.</small>
       <hr />
     </div>
   );
