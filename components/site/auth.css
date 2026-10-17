@@ -316,3 +316,46 @@
     transition: none;
   }
 }
+
+/* Connexion : note pour les agents et lien sur la ligne du libellé */
+.mja-note {
+  display: grid;
+  gap: 6px;
+  max-width: 26em;
+  padding-left: 18px;
+  border-left: 3px solid var(--mj-saffron);
+}
+.mja-note b {
+  font-weight: 900;
+  font-stretch: 112%;
+  font-size: 20px;
+}
+.mja-note span {
+  color: #e4e1ff;
+}
+.mja-field-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+}
+.mja-field-row a {
+  color: var(--mj-blue);
+  font-weight: 700;
+  font-size: 14px;
+}
+.mja-linkbtn {
+  border: 0;
+  padding: 0;
+  background: none;
+  color: var(--mj-blue);
+  font: inherit;
+  font-weight: 800;
+  text-decoration: underline;
+  cursor: pointer;
+}
+@media (max-width: 480px) {
+  .mja-hide-sm {
+    display: none;
+  }
+}
