@@ -718,6 +718,37 @@
   line-height: 1.5;
 }
 
+/* Vidéo de présentation */
+.mj-videosec {
+  background: var(--mj-ink);
+  color: #fff;
+  padding-block: clamp(56px, 8vw, 104px);
+}
+.mj-video-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px 48px;
+  margin-bottom: 36px;
+}
+.mj-video-head .mj-on-ink {
+  margin: 0;
+}
+.mj-video-frame {
+  border-radius: 18px;
+  overflow: hidden;
+  background: var(--mj-blue);
+  box-shadow: 0 50px 90px -40px rgba(0, 0, 0, 0.75);
+  aspect-ratio: 16 / 9;
+}
+.mj-video {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
 /* Tablette */
 @media (max-width: 1080px) {
   .mj-nav {

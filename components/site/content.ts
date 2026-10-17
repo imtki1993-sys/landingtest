@@ -36,6 +36,11 @@ export const SITE = {
       phoneA: "Landing LandPro « Runner Velocity » sur téléphone",
       phoneB: "Landing LandPro en arabe pour une abaya",
     },
+    video: {
+      title: "LandPro en 40 secondes.",
+      text: "De la landing au colis livré, tout le trajet d'une commande.",
+      label: "Vidéo de présentation de LandPro, 40 secondes, sans son",
+    },
     templates: {
       title: "Des landings qui vendent, en arabe et en français.",
       text: "Quelques landings faites avec LandPro. Chacune a son formulaire de commande, ses offres 1, 2 ou 3 pièces et des textes écrits par l'IA pour le produit.",
@@ -204,6 +209,11 @@ export const SITE = {
       },
       phoneA: "صفحة بيع LandPro ديال سبرديلة على التيليفون",
       phoneB: "صفحة بيع LandPro بالعربية ديال عباية",
+    },
+    video: {
+      title: "LandPro ف 40 ثانية.",
+      text: "من صفحة البيع حتى الطرد يوصل، الطريق كامل ديال الطلبية.",
+      label: "فيديو تقديم LandPro، 40 ثانية، بلا صوت",
     },
     templates: {
       title: "صفحات بيع كتبيع، بالعربية و بالفرنسية.",
