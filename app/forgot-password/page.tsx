@@ -1,5 +1,6 @@
 "use client";
 import { FormEvent, useState } from "react";
+import AuthShell from "../../components/site/AuthShell";
 export default function ForgotPassword() {
   const [email, setEmail] = useState("");
   const [msg, setMsg] = useState("");
@@ -17,7 +18,7 @@ export default function ForgotPassword() {
         body: JSON.stringify({ email }),
       });
       const x = await r.json();
-      if (!r.ok) throw new Error(x.error || "Erreur");
+      if (!r.ok) throw new Error(x.error || "Envoi impossible. Réessaie dans un instant.");
       setMsg(x.message);
     } catch (e: any) {
       setError(e.message);
@@ -26,86 +27,54 @@ export default function ForgotPassword() {
     }
   }
   return (
-    <main
-      style={{
-        minHeight: "100vh",
-        display: "grid",
-        placeItems: "center",
-        background: "#070b14",
-        padding: 24,
-        fontFamily: "Arial,sans-serif",
-      }}
-    >
-      <form
-        onSubmit={submit}
-        style={{
-          width: "100%",
-          maxWidth: 420,
-          background: "#101827",
-          border: "1px solid #243044",
-          borderRadius: 20,
-          padding: 32,
-          color: "white",
-        }}
-      >
-        <div
-          style={{
-            width: 48,
-            height: 48,
-            borderRadius: 14,
-            display: "grid",
-            placeItems: "center",
-            background: "#ff6b00",
-            fontWeight: 900,
-            fontSize: 24,
-            marginBottom: 22,
-          }}
-        >
-          M
+    <AuthShell
+      title="On t'aide à retrouver ton compte."
+      arabic="ماشي مشكل"
+      top={<a href="/login">Retour à la connexion</a>}
+      side={
+        <div className="mja-note">
+          <b>Tu es agent de confirmation ?</b>
+          <span>Demande à ton vendeur de te donner un nouveau mot de passe depuis sa page Équipe.</span>
         </div>
-        <h1>Mot de passe oublié</h1>
-        <p style={{ color: "#94a3b8" }}>
-          Entre ton email. Nous t'enverrons un lien pour choisir un nouveau mot de passe.
-        </p>
-        <label>Email</label>
-        <input
-          type="email"
-          required
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          style={{
-            width: "100%",
-            boxSizing: "border-box",
-            padding: 14,
-            borderRadius: 10,
-            margin: "8px 0 18px",
-            background: "#0b1220",
-            color: "white",
-            border: "1px solid #334155",
-          }}
-        />
-        {error && <p style={{ color: "#fca5a5" }}>{error}</p>}
-        {msg && <p style={{ color: "#86efac" }}>{msg}</p>}
-        <button
-          disabled={loading}
-          style={{
-            width: "100%",
-            padding: 14,
-            border: 0,
-            borderRadius: 10,
-            background: "#ff6b00",
-            color: "white",
-            fontWeight: 800,
-          }}
-        >
-          {loading ? "Envoi..." : "Envoyer le lien"}
-        </button>
-        <p style={{ textAlign: "center" }}>
-          <a href="/login" style={{ color: "#ff8a3d" }}>
-            Retour à la connexion
-          </a>
-        </p>
-      </form>
-    </main>
+      }
+    >
+      {msg ? (
+        <section className="mja-card" aria-live="polite">
+          <h2 className="mja-h2">Regarde tes emails</h2>
+          <p className="mja-lead">{msg}</p>
+          <p className="mja-help">
+            Rien reçu après quelques minutes ? Vérifie les spams, ou{" "}
+            <button type="button" className="mja-linkbtn" onClick={() => setMsg("")}>
+              renvoie le lien
+            </button>
+            .
+          </p>
+        </section>
+      ) : (
+        <form className="mja-card" onSubmit={submit}>
+          <h2 className="mja-h2">Mot de passe oublié</h2>
+          <p className="mja-lead">Saisis ton email : on t&apos;envoie un lien pour choisir un nouveau mot de passe.</p>
+          <label className="mja-field">
+            <span>Email</span>
+            <input
+              type="email"
+              required
+              autoComplete="email"
+              inputMode="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+          </label>
+          {error && (
+            <p className="mja-alert" role="alert">
+              {error}
+            </p>
+          )}
+          <button className="mja-btn" disabled={loading}>
+            {loading ? "Envoi…" : "Envoyer le lien"}
+          </button>
+        </form>
+      )}
+    </AuthShell>
   );
 }

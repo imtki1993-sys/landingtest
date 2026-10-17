@@ -1,10 +1,13 @@
 "use client";
 import { FormEvent, useEffect, useRef, useState } from "react";
 import { createClient } from "@supabase/supabase-js";
+import AuthShell from "../../components/site/AuthShell";
 export default function ResetPassword() {
   const [p, setP] = useState(""),
     [confirm, setConfirm] = useState(""),
     [msg, setMsg] = useState(""),
+    [done, setDone] = useState(false),
+    [show, setShow] = useState(false),
     [ready, setReady] = useState(false),
     [loading, setLoading] = useState(true);
   const clientRef = useRef<any>(null);
@@ -61,10 +64,6 @@ export default function ResetPassword() {
       setMsg("Le mot de passe doit contenir au moins 8 caractères.");
       return;
     }
-    if (p !== confirm) {
-      setMsg("Les deux mots de passe ne correspondent pas.");
-      return;
-    }
     setLoading(true);
     const s = clientRef.current;
     if (!s) {
@@ -79,118 +78,66 @@ export default function ResetPassword() {
       return;
     }
     await s.auth.signOut();
-    setMsg("Mot de passe modifié avec succès. Redirection vers la connexion...");
+    setDone(true);
+    setMsg("Mot de passe modifié. On t'emmène à la connexion…");
     setTimeout(() => (location.href = "/login"), 1200);
   }
   return (
-    <main
-      style={{
-        minHeight: "100vh",
-        display: "grid",
-        placeItems: "center",
-        background: "#070b14",
-        padding: 24,
-        fontFamily: "Arial,sans-serif",
-      }}
-    >
-      <form
-        onSubmit={submit}
-        style={{
-          width: "100%",
-          maxWidth: 420,
-          background: "#101827",
-          border: "1px solid #243044",
-          borderRadius: 20,
-          padding: 32,
-          color: "white",
-        }}
-      >
-        <div
-          style={{
-            width: 48,
-            height: 48,
-            borderRadius: 14,
-            display: "grid",
-            placeItems: "center",
-            background: "#ff6b00",
-            fontWeight: 900,
-            fontSize: 24,
-            marginBottom: 22,
-          }}
-        >
-          M
-        </div>
-        <h1>Nouveau mot de passe</h1>
-        <p style={{ color: "#94a3b8" }}>
-          {loading
-            ? "Vérification du lien..."
-            : ready
-              ? "Choisis ton nouveau mot de passe."
-              : "Ce lien n’est pas valide ou a expiré."}
-        </p>
-        {ready && (
-          <>
-            <input
-              type="password"
-              minLength={8}
-              autoComplete="new-password"
-              required
-              value={p}
-              onChange={(e) => setP(e.target.value)}
-              placeholder="Nouveau mot de passe"
-              style={{
-                width: "100%",
-                boxSizing: "border-box",
-                padding: 14,
-                borderRadius: 10,
-                margin: "8px 0 12px",
-                background: "#0b1220",
-                color: "white",
-                border: "1px solid #334155",
-              }}
-            />
-            <input
-              type="password"
-              minLength={8}
-              autoComplete="new-password"
-              required
-              value={confirm}
-              onChange={(e) => setConfirm(e.target.value)}
-              placeholder="Confirmer le mot de passe"
-              style={{
-                width: "100%",
-                boxSizing: "border-box",
-                padding: 14,
-                borderRadius: 10,
-                margin: "0 0 18px",
-                background: "#0b1220",
-                color: "white",
-                border: "1px solid #334155",
-              }}
-            />
-            <button
-              disabled={loading}
-              style={{
-                width: "100%",
-                padding: 14,
-                border: 0,
-                borderRadius: 10,
-                background: "#ff6b00",
-                color: "white",
-                fontWeight: 800,
-              }}
-            >
-              {loading ? "Modification..." : "Modifier le mot de passe"}
-            </button>
-          </>
-        )}
-        {msg && <p style={{ color: ready ? "#e2e8f0" : "#fca5a5" }}>{msg}</p>}
-        <p style={{ textAlign: "center" }}>
-          <a href={ready ? "/login" : "/forgot-password"} style={{ color: "#ff8a3d" }}>
-            {ready ? "Se connecter" : "Demander un nouveau lien"}
-          </a>
-        </p>
-      </form>
-    </main>
+    <AuthShell title="Choisis un nouveau mot de passe." arabic="مرحبا بيك" top={<a href="/login">Se connecter</a>}>
+      {ready && !done ? (
+        <form className="mja-card" onSubmit={submit}>
+          <h2 className="mja-h2">Nouveau mot de passe</h2>
+          <p className="mja-lead">Tu l&apos;utiliseras pour te connecter à LandPro.</p>
+          <label className="mja-field">
+            <span>Mot de passe</span>
+            <div className="mja-pass">
+              <input
+                type={show ? "text" : "password"}
+                minLength={8}
+                autoComplete="new-password"
+                required
+                value={p}
+                onChange={(e) => setP(e.target.value)}
+              />
+              <button type="button" onClick={() => setShow((v) => !v)} aria-pressed={show}>
+                {show ? "Masquer" : "Afficher"}
+              </button>
+            </div>
+            <small className={p && p.length < 8 ? "is-warn" : ""}>
+              {p && p.length < 8
+                ? `Encore ${8 - p.length} caractère${8 - p.length > 1 ? "s" : ""}`
+                : "8 caractères minimum"}
+            </small>
+          </label>
+          {msg && (
+            <p className="mja-alert" role="alert">
+              {msg}
+            </p>
+          )}
+          <button className="mja-btn" disabled={loading}>
+            {loading ? "Modification…" : "Enregistrer le mot de passe"}
+          </button>
+        </form>
+      ) : (
+        <section className="mja-card" aria-live="polite">
+          <h2 className="mja-h2">
+            {done ? "C'est fait" : loading ? "Vérification du lien…" : "Ce lien ne marche plus"}
+          </h2>
+          <p className="mja-lead">
+            {done
+              ? msg
+              : loading
+                ? "Un instant."
+                : msg ||
+                  "Le lien n'est pas valide ou a expiré. Demande un nouveau lien, il arrive en quelques secondes."}
+          </p>
+          {!loading && !done && (
+            <a href="/forgot-password" className="mja-btn">
+              Demander un nouveau lien
+            </a>
+          )}
+        </section>
+      )}
+    </AuthShell>
   );
 }
