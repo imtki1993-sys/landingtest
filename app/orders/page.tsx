@@ -1015,7 +1015,7 @@ export default function Orders() {
                       key={o.id}
                       className={operationalAlert(o) ? "order-needs-action " + operationalAlert(o)?.level : ""}
                     >
-                      <td>
+                      <td className="oc-check">
                         <input
                           type="checkbox"
                           checked={selectedIds.includes(o.id)}
@@ -1026,7 +1026,7 @@ export default function Orders() {
                           }
                         />
                       </td>
-                      <td className="order-number-cell">
+                      <td className="order-number-cell oc-num">
                         {o.product?.images?.[0] ? (
                           <img className="order-product-thumb" src={o.product.images[0]} alt="" />
                         ) : (
@@ -1041,7 +1041,7 @@ export default function Orders() {
                           )}
                         </div>
                       </td>
-                      <td>
+                      <td className="oc-date">
                         <b>{new Date(o.created_at).toLocaleDateString("fr-MA", { timeZone: "Africa/Casablanca" })}</b>
                         <small>
                           {new Date(o.created_at).toLocaleTimeString("fr-MA", {
@@ -1051,7 +1051,7 @@ export default function Orders() {
                           })}
                         </small>
                       </td>
-                      <td>
+                      <td className="oc-client">
                         {o.lead?.full_name || "—"}
                         {o.risk && (
                           <small className={"order-risk " + o.risk.level} title={o.risk.detail}>
@@ -1059,9 +1059,17 @@ export default function Orders() {
                           </small>
                         )}
                       </td>
-                      <td>{o.lead?.phone_raw || "—"}</td>
-                      <td>{o.lead?.city_name || "—"}</td>
-                      <td>
+                      <td className="oc-phone">
+                        {o.lead?.phone_raw ? (
+                          <a className="order-call" href={"tel:" + o.lead.phone_raw.replace(/[^\d+]/g, "")}>
+                            {o.lead.phone_raw}
+                          </a>
+                        ) : (
+                          "—"
+                        )}
+                      </td>
+                      <td className="oc-city">{o.lead?.city_name || "—"}</td>
+                      <td className="oc-ozon">
                         {ozonCities.length && !o.tracking_number ? (
                           <div style={{ minWidth: 190 }}>
                             <input
@@ -1099,18 +1107,18 @@ export default function Orders() {
                           <small>{o.carrier_city_name || "—"}</small>
                         )}
                       </td>
-                      <td className="order-product">
+                      <td className="order-product oc-product">
                         <b>{o.product?.name || "Produit"}</b>
                         <small>{o.landing?.name || "—"}</small>
                       </td>
-                      <td>{o.quantity || 1}</td>
-                      <td>
+                      <td className="oc-qty">×{o.quantity || 1}</td>
+                      <td className="oc-total">
                         <b>
                           {o.total} {o.currency}
                         </b>
                         {Number(o.shipping_price) > 0 && <small> + livraison {o.shipping_price}</small>}
                       </td>
-                      <td>
+                      <td className="oc-conf" data-label="Confirmation">
                         <select
                           className={
                             "order-select confirmation-status status-" + String(o.lead?.status || "NEW").toLowerCase()
@@ -1145,7 +1153,7 @@ export default function Orders() {
                           </small>
                         )}
                       </td>
-                      <td>
+                      <td className="oc-deliv" data-label="Livraison">
                         <select
                           className={
                             "order-select delivery-status status-" +
@@ -1167,7 +1175,7 @@ export default function Orders() {
                           <option value="CANCELLED">Annulée</option>
                         </select>
                       </td>
-                      <td className="order-tracking">
+                      <td className="order-tracking oc-track">
                         {o.tracking_number ? (
                           <>
                             <button
@@ -1192,7 +1200,7 @@ export default function Orders() {
                           <small>—</small>
                         )}
                       </td>
-                      <td>
+                      <td className="oc-actions">
                         <details className="order-action-menu">
                           <summary>Actions ▾</summary>
                           <div className="order-action-list">
