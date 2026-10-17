@@ -29,8 +29,9 @@ export default function SiteHome({ lang, salesPhone }: { lang: SiteLang; salesPh
           </a>
           <nav aria-label={ar ? "القائمة الرئيسية" : "Navigation principale"} className="mj-nav">
             <a href="#templates">{t.nav.templates}</a>
+            <a href="#boutique">{t.nav.boutique}</a>
             <a href="#trajet">{t.nav.trajet}</a>
-            <a href="#equipe">{t.nav.equipe}</a>
+            <a href="#fonctions">{t.nav.fonctions}</a>
             <a href="#tarifs">{t.nav.tarifs}</a>
           </nav>
           <div className="mj-header-actions">
@@ -104,6 +105,43 @@ export default function SiteHome({ lang, salesPhone }: { lang: SiteLang; salesPh
         </div>
       </section>
 
+      <section id="boutique" className="mj-boutique">
+        <div className="mj-wrap mj-boutique-grid">
+          <div className="mj-boutique-copy">
+            <h2 className="mj-h2">{t.boutique.title}</h2>
+            <p className="mj-on-ink">{t.boutique.text}</p>
+            <dl className="mj-points">
+              {t.boutique.points.map(([k, v]) => (
+                <div key={k}>
+                  <dt>{k}</dt>
+                  <dd>{v}</dd>
+                </div>
+              ))}
+            </dl>
+          </div>
+          <div className="mj-browsers">
+            <figure className="mj-browser mj-browser-a">
+              <div className="mj-browser-bar" aria-hidden="true">
+                <i />
+                <i />
+                <i />
+                <span dir="ltr">{t.boutique.url}</span>
+              </div>
+              <img src="/site/store-fr.webp" alt={t.boutique.shotFr} width={1920} height={1200} loading="lazy" />
+            </figure>
+            <figure className="mj-browser mj-browser-b">
+              <div className="mj-browser-bar" aria-hidden="true">
+                <i />
+                <i />
+                <i />
+                <span dir="ltr">{t.boutique.url}</span>
+              </div>
+              <img src="/site/store-ar.webp" alt={t.boutique.shotAr} width={1920} height={1200} loading="lazy" />
+            </figure>
+          </div>
+        </div>
+      </section>
+
       <section id="trajet" className="mj-trajet">
         <div className="mj-wrap">
           <h2 className="mj-h2 mj-h2-narrow">{t.trajet.title}</h2>
@@ -130,6 +168,28 @@ export default function SiteHome({ lang, salesPhone }: { lang: SiteLang; salesPh
         </div>
         <div className="mj-shot">
           <img src="/site/dash-equipe.webp" alt={t.equipe.shot} width={2880} height={1560} loading="lazy" />
+        </div>
+      </section>
+
+      <section id="fonctions" className="mj-wrap mj-fonctions">
+        <div className="mj-split-head">
+          <h2 className="mj-h2">{t.fonctions.title}</h2>
+          <p className="mj-muted">{t.fonctions.text}</p>
+        </div>
+        <div className="mj-groups">
+          {t.fonctions.groups.map((g) => (
+            <section key={g.name} className="mj-group" aria-label={g.name}>
+              <h3>{g.name}</h3>
+              <dl>
+                {g.items.map(([k, v]) => (
+                  <div key={k}>
+                    <dt>{k}</dt>
+                    <dd>{v}</dd>
+                  </div>
+                ))}
+              </dl>
+            </section>
+          ))}
         </div>
       </section>
 
@@ -205,6 +265,8 @@ export default function SiteHome({ lang, salesPhone }: { lang: SiteLang; salesPh
           </div>
           <nav aria-label={ar ? "روابط أسفل الصفحة" : "Pied de page"} className="mj-footer-nav">
             <a href="#templates">{t.nav.templates}</a>
+            <a href="#boutique">{t.nav.boutique}</a>
+            <a href="#fonctions">{t.nav.fonctions}</a>
             <a href="#tarifs">{t.nav.tarifs}</a>
             <a href="/login">{t.login}</a>
             <a href={t.otherLang.href} lang={t.otherLang.lang}>

@@ -10,13 +10,20 @@ export const SITE = {
       description:
         "Landing pages COD, commandes, équipe de confirmation et livraison Ozon Express réunies dans un seul outil pour les vendeurs au Maroc. Dès 599 DH pour 3 mois.",
     },
-    nav: { templates: "Exemples", trajet: "Comment ça marche", equipe: "Équipe", tarifs: "Tarifs" },
+    nav: {
+      templates: "Exemples",
+      boutique: "Boutiques",
+      trajet: "Comment ça marche",
+      equipe: "Équipe",
+      fonctions: "Fonctions",
+      tarifs: "Tarifs",
+    },
     login: "Se connecter",
     activate: "Activer LandPro",
     otherLang: { label: "العربية", href: "/ar", lang: "ar" },
     hero: {
       title: ["Vends.", "Confirme.", "Livre."],
-      text: "LandPro réunit tout le travail du vendeur en paiement à la livraison : ta landing, tes commandes, ton équipe d'appel et l'envoi chez Ozon Express.",
+      text: "LandPro réunit tout le travail du vendeur en paiement à la livraison : ta landing ou ta boutique, tes commandes, ton équipe d'appel et l'envoi chez Ozon Express.",
       cta: "Activer LandPro dès 599 DH",
       secondary: "Suivre une commande de bout en bout",
       slip: {
@@ -41,6 +48,22 @@ export const SITE = {
         ["tpl-ecouteurs-aurora", "Écouteurs sans fil", "299 DH"],
       ],
     },
+    boutique: {
+      title: "Une boutique complète, pas seulement une page.",
+      text: "Pour vendre plusieurs produits, LandPro génère aussi ta boutique en ligne : accueil, catalogue, fiche produit, panier, livraison, contact, FAQ et pages légales. Ton client remplit son panier et paie à la livraison.",
+      points: [
+        ["Un modèle, ton style", "Choisis un modèle, puis change couleurs, textes et ordre des sections de l'accueil."],
+        ["En français ou en arabe", "La boutique, le panier et les pages passent en arabe, de droite à gauche."],
+        ["Les textes par l'IA", "L'IA écrit les textes de ta boutique et propose des idées de photos."],
+        [
+          "Tu publies quand c'est prêt",
+          "Tu modifies un brouillon ; le site en ligne change seulement quand tu publies.",
+        ],
+      ],
+      url: "landpro.online/store/maison-atlas",
+      shotFr: "Boutique LandPro en français",
+      shotAr: "Boutique LandPro en arabe",
+    },
     trajet: {
       title: "Le trajet d'une commande, du clic au cash.",
       text: "Suis la commande LP-1042 : à chaque étape, LandPro fait le tri, l'appel et l'envoi avec toi.",
@@ -58,6 +81,48 @@ export const SITE = {
       p1: "Tu crées un compte par agent. Chacun voit seulement ses commandes et ne peut que changer leur statut d'appel. Toi, tu vois qui confirme le mieux.",
       p2: "Les nouvelles commandes se répartissent toutes seules vers l'agent le moins chargé. Chaque appel est compté, chaque rappel a son heure.",
       shot: "Page Équipe de LandPro avec la performance de chaque agent",
+    },
+    fonctions: {
+      title: "Tout ce qu'il y a dans LandPro",
+      text: "Chaque formule donne accès à tout. Rien à installer, rien à brancher en plus pour commencer.",
+      groups: [
+        {
+          name: "Créer",
+          items: [
+            ["Éditeur de landings", "Sections à glisser, dupliquer ou annuler, aperçu ordinateur, tablette et mobile."],
+            ["Générateur de boutiques", "Boutique complète avec catalogue, panier et pages prêtes."],
+            ["Textes par l'IA", "En darija, en arabe ou en français, à partir des photos du produit."],
+            ["Import de produit", "Colle un lien AliExpress ou Alibaba pour démarrer la fiche."],
+            ["Variantes et offres", "Taille, couleur, prix et stock par variante, offres 1, 2 ou 3 pièces."],
+            ["Ton adresse", "Chaque landing a son adresse .landpro.online, ou ton propre domaine."],
+          ],
+        },
+        {
+          name: "Vendre",
+          items: [
+            ["Formulaire ou WhatsApp", "Ton client commande par formulaire, par WhatsApp, ou au choix."],
+            ["Landings hors LandPro", "Un script relie le formulaire de ta landing existante à tes commandes."],
+            ["Pixel Meta", "Événements du Pixel et achat envoyé depuis le serveur par l'API Conversions."],
+          ],
+        },
+        {
+          name: "Confirmer",
+          items: [
+            ["Filtre des fausses commandes", "Doublons, numéros invalides, clients qui retournent et liste noire."],
+            ["Équipe d'appel", "Comptes agents, répartition automatique et taux de confirmation par agent."],
+            ["WhatsApp en un clic", "Message de confirmation prêt, ouvert sur le numéro du client."],
+            ["Suivi des appels", "Pas de réponse, rappel avec date et heure, tableau ou Kanban, export CSV."],
+          ],
+        },
+        {
+          name: "Livrer et mesurer",
+          items: [
+            ["Ozon Express", "Colis créé en un clic, statuts mis à jour toutes les 30 minutes."],
+            ["Statistiques", "Visites, conversion, taux de confirmation, de livraison et de retour, chiffre livré."],
+            ["Messages", "Les messages du formulaire de contact de tes boutiques, au même endroit."],
+          ],
+        },
+      ],
     },
     tarifs: {
       title: "Tout est inclus. Tu choisis la durée.",
@@ -114,13 +179,20 @@ export const SITE = {
       description:
         "صفحات البيع، الطلبات، فريق التأكيد و التوصيل مع Ozon Express ف أداة وحدة للبائعين ف المغرب. من 599 درهم لـ 3 شهور.",
     },
-    nav: { templates: "أمثلة", trajet: "كيفاش كيخدم", equipe: "الفريق", tarifs: "الأثمنة" },
+    nav: {
+      templates: "أمثلة",
+      boutique: "المتاجر",
+      trajet: "كيفاش كيخدم",
+      equipe: "الفريق",
+      fonctions: "الخدمات",
+      tarifs: "الأثمنة",
+    },
     login: "دخول",
     activate: "فعّل LandPro",
     otherLang: { label: "Français", href: "/", lang: "fr" },
     hero: {
       title: ["بيع.", "أكّد.", "وصّل."],
-      text: "LandPro كيجمع ليك كلشي ف بلاصة وحدة: صفحة البيع، الطلبات، فريق التأكيد، و الإرسال مع Ozon Express.",
+      text: "LandPro كيجمع ليك كلشي ف بلاصة وحدة: صفحة البيع ولا المتجر، الطلبات، فريق التأكيد، و الإرسال مع Ozon Express.",
       cta: "فعّل LandPro من 599 درهم",
       secondary: "تبّع طلبية من البداية حتى التوصيل",
       slip: {
@@ -145,6 +217,19 @@ export const SITE = {
         ["tpl-ecouteurs-aurora", "كيتمان بلا خيط", "299 درهم"],
       ],
     },
+    boutique: {
+      title: "متجر كامل، ماشي غير صفحة وحدة.",
+      text: "إلا بغيتي تبيع بزاف ديال المنتوجات، LandPro كيصاوب ليك حتى المتجر ديالك: الرئيسية، الكاتالوغ، صفحة المنتوج، السلة، التوصيل، التواصل، الأسئلة و الصفحات القانونية. الزبون كيعمّر السلة و كيخلّص عند الاستلام.",
+      points: [
+        ["موديل، و الستيل ديالك", "ختار موديل، و بدّل الألوان، النصوص و الترتيب ديال الأقسام ف الرئيسية."],
+        ["بالعربية ولا بالفرنسية", "المتجر، السلة و الصفحات كيدوزو للعربية، من اليمين لليسار."],
+        ["النصوص بالذكاء الاصطناعي", "الذكاء الاصطناعي كيكتب النصوص ديال المتجر و كيعطيك أفكار للتصاور."],
+        ["كتنشر ملي يكون واجد", "كتبدّل ف مسودة، و الموقع ما كيتبدّلش حتى تنشر."],
+      ],
+      url: "landpro.online/store/maison-atlas",
+      shotFr: "متجر LandPro بالفرنسية",
+      shotAr: "متجر LandPro بالعربية",
+    },
     trajet: {
       title: "الطريق ديال الطلبية، من الكليك حتى الفلوس.",
       text: "تبّع الطلبية LP-1042: ف كل مرحلة، LandPro كيعاونك ف الفرز، المكالمة و الإرسال.",
@@ -162,6 +247,48 @@ export const SITE = {
       p1: "كتصاوب حساب لكل موظف. كل واحد كيشوف غير الطلبات ديالو و يقدر غير يبدّل حالة المكالمة. و نتا كتشوف شكون كيأكد أحسن.",
       p2: "الطلبات الجديدة كتتوزع بوحدها على الموظف اللي عندو أقل خدمة. كل مكالمة كتتحسب، و كل رجوع للمكالمة عندو الوقت ديالو.",
       shot: "صفحة الفريق ف LandPro مع النتائج ديال كل موظف",
+    },
+    fonctions: {
+      title: "كلشي اللي كاين ف LandPro",
+      text: "كل عرض كيعطيك كلشي. ما كاين ما تثبّت، و ما كاين ما تربط زايد باش تبدا.",
+      groups: [
+        {
+          name: "صاوب",
+          items: [
+            ["محرر صفحات البيع", "أقسام كتجرّها، كتنسخها ولا كترجعها، و معاينة ف البيسي، التابليت و التيليفون."],
+            ["مولّد المتاجر", "متجر كامل فيه الكاتالوغ، السلة و الصفحات واجدين."],
+            ["النصوص بالذكاء الاصطناعي", "بالدارجة، بالعربية ولا بالفرنسية، من التصاور ديال المنتوج."],
+            ["استيراد المنتوج", "لصق رابط AliExpress ولا Alibaba باش تبدا الفيشة."],
+            ["الأنواع و العروض", "المقاس، اللون، الثمن و السطوك لكل نوع، و عروض 1 و 2 و 3 حبات."],
+            ["العنوان ديالك", "كل صفحة عندها عنوان .landpro.online، ولا الدومين ديالك."],
+          ],
+        },
+        {
+          name: "بيع",
+          items: [
+            ["فورمولير ولا واتساب", "الزبون كيطلب بالفورمولير، بالواتساب، ولا بجوج."],
+            ["صفحات برا LandPro", "سكريبت كيربط الفورمولير ديال الصفحة اللي عندك مع الطلبات ديالك."],
+            ["Pixel ديال Meta", "أحداث الـ Pixel و الشراء كيتصيفط من السيرفر بـ API Conversions."],
+          ],
+        },
+        {
+          name: "أكّد",
+          items: [
+            ["كشف الطلبات المزيفة", "الطلبات المكررة، الأرقام الغالطة، الزبناء اللي كيرجعو و اللائحة السوداء."],
+            ["فريق التأكيد", "حسابات للموظفين، توزيع أوتوماتيكي و نسبة التأكيد لكل موظف."],
+            ["واتساب بكليكة", "رسالة التأكيد واجدة، كتتحل على الرقم ديال الزبون."],
+            ["تتبّع المكالمات", "ما جاوبش، عاود عيّط مع النهار و الساعة، جدول ولا Kanban، و تصدير CSV."],
+          ],
+        },
+        {
+          name: "وصّل و تبّع",
+          items: [
+            ["Ozon Express", "الطرد كيتسجل بكليكة، و الحالة كتتحدث كل 30 دقيقة."],
+            ["الإحصائيات", "الزيارات، التحويل، نسبة التأكيد، التوصيل و الرجوع، و الفلوس اللي دخلات."],
+            ["الرسائل", "الرسائل ديال فورمولير التواصل ف المتاجر ديالك، ف بلاصة وحدة."],
+          ],
+        },
+      ],
     },
     tarifs: {
       title: "كلشي داخل. نتا غير ختار المدة.",
