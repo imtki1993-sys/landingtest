@@ -2,6 +2,7 @@
 // Composant serveur sans JavaScript côté navigateur : la FAQ utilise <details>.
 import DocumentLang from "../public/DocumentLang";
 import { SITE, type SiteLang } from "./content";
+import SiteVideo from "./SiteVideo";
 import "./site.css";
 
 const FONTS =
@@ -83,6 +84,22 @@ export default function SiteHome({ lang, salesPhone }: { lang: SiteLang; salesPh
               </div>
               <div className="mj-stamp">{t.hero.slip.stamp}</div>
             </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="video" className="mj-videosec">
+        <div className="mj-wrap">
+          <div className="mj-video-head">
+            <h2 className="mj-h2">{t.video.title}</h2>
+            <p className="mj-on-ink">{t.video.text}</p>
+          </div>
+          <div className="mj-video-frame">
+            <SiteVideo
+              base={`/site/landpro-${lang}`}
+              poster={`/site/landpro-${lang}-poster.webp`}
+              label={t.video.label}
+            />
           </div>
         </div>
       </section>
