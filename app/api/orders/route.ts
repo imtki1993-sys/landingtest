@@ -4,6 +4,7 @@ import { NextResponse, after } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { authContext, adminDb } from "../../../lib/server-auth";
 import { sendMetaPurchase } from "../../../lib/meta-capi";
+import { hasRecentOrderFromPhone } from "../../../lib/meta-dedupe";
 import { customerRisk } from "../../../lib/order-risk";
 import { blacklistedPhones } from "../../../lib/blacklist";
 import { afterPublicOrder, AGENT_ROLE } from "../../../lib/team";
@@ -239,6 +240,13 @@ export async function POST(req: Request) {
       .maybeSingle();
     if (!lp || lp.status !== "PUBLISHED")
       return NextResponse.json({ error: "Cette landing page n’est pas publiée" }, { status: 404 });
+    // Renvoi du formulaire par la même personne : la commande est enregistrée, mais Meta ne
+    // recompte pas l'achat (voir lib/meta-dedupe.ts). Vérifié avant de créer la nouvelle commande.
+    const repeat = await hasRecentOrderFromPhone(s, {
+      workspaceId: lp.workspace_id,
+      landingPageId: lp.id,
+      phone: String(b.phone),
+    });
     const { data, error } = await s.rpc("capture_public_order", {
       p_slug: slug,
       p_full_name: String(b.name).trim().slice(0, 160),
@@ -264,28 +272,32 @@ export async function POST(req: Request) {
       const eventSourceUrl = pageUrl && sameHost(pageUrl) ? pageUrl : referer || undefined;
       const ip2 =
         (req.headers.get("x-forwarded-for") || req.headers.get("x-real-ip") || "").split(",")[0].trim() || undefined;
-      after(() =>
-        sendMetaPurchase({
-          workspaceId: lp.workspace_id,
-          landingPageId: lp.id,
-          orderId: data.order_id,
-          value: Number(data.total || 0),
-          currency: String(data.currency || "MAD"),
-          quantity: Math.min(10, Math.max(1, Number(b.quantity || 1))),
-          contentName: lp.name || undefined,
-          phone: String(b.phone),
-          name: String(b.name),
-          city: b.city ? String(b.city) : undefined,
-          eventSourceUrl,
-          clientIp: ip2,
-          userAgent: req.headers.get("user-agent") || undefined,
-          fbp: typeof b.fbp === "string" ? b.fbp : undefined,
-          fbc: typeof b.fbc === "string" ? b.fbc : undefined,
-          externalId: typeof b.visitor_id === "string" ? b.visitor_id.slice(0, 80) : undefined,
-        }).catch(() => {}),
-      );
+      if (!repeat)
+        after(() =>
+          sendMetaPurchase({
+            workspaceId: lp.workspace_id,
+            landingPageId: lp.id,
+            orderId: data.order_id,
+            value: Number(data.total || 0),
+            currency: String(data.currency || "MAD"),
+            quantity: Math.min(10, Math.max(1, Number(b.quantity || 1))),
+            contentName: lp.name || undefined,
+            phone: String(b.phone),
+            name: String(b.name),
+            city: b.city ? String(b.city) : undefined,
+            eventSourceUrl,
+            clientIp: ip2,
+            userAgent: req.headers.get("user-agent") || undefined,
+            fbp: typeof b.fbp === "string" ? b.fbp : undefined,
+            fbc: typeof b.fbc === "string" ? b.fbc : undefined,
+            externalId: typeof b.visitor_id === "string" ? b.visitor_id.slice(0, 80) : undefined,
+          }).catch(() => {}),
+        );
     }
-    return NextResponse.json(data, { status: 201 });
+    // meta_repeat : la landing n'envoie pas non plus Lead / Purchase au Pixel
+    return NextResponse.json(data && typeof data === "object" ? { ...data, meta_repeat: repeat } : data, {
+      status: 201,
+    });
   } catch (e: any) {
     reportError(e, "api/orders");
     const m = String(e.message || "");

@@ -50,6 +50,7 @@ export default function LandingClient({
     [sent, setSent] = useState(false),
     [error, setError] = useState("");
   const trackedForm = useRef(false);
+  const sending = useRef(false);
 
   // Éditeur : les données viennent du brouillon en cours de modification
   useEffect(() => {
@@ -179,9 +180,24 @@ export default function LandingClient({
 
   async function submit(e: React.FormEvent<HTMLFormElement>, qty: number) {
     e.preventDefault();
+    // Double clic ou réseau lent : un seul envoi à la fois (sinon plusieurs commandes et plusieurs achats Meta)
+    if (sending.current) return;
+    sending.current = true;
+    const form = e.currentTarget;
+    const buttons = Array.from(form.querySelectorAll<HTMLButtonElement>("button[type=submit], button:not([type])"));
+    buttons.forEach((btn) => (btn.disabled = true));
+    try {
+      await sendOrder(form, qty);
+    } finally {
+      sending.current = false;
+      buttons.forEach((btn) => (btn.disabled = false));
+    }
+  }
+
+  async function sendOrder(formEl: HTMLFormElement, qty: number) {
     setError("");
     (window as any).lmTrack?.("FORM_SUBMIT");
-    const f = new FormData(e.currentTarget),
+    const f = new FormData(formEl),
       r = await fetch("/api/orders", {
         method: "POST",
         headers: { "content-type": "application/json" },
@@ -205,7 +221,8 @@ export default function LandingClient({
     }
     const result = await r.json().catch(() => ({}));
     setSent(true);
-    if (result?.order_id) {
+    // meta_repeat : même personne qui a déjà commandé il y a peu → pas de nouvel achat pour Meta
+    if (result?.order_id && !result?.meta_repeat) {
       const params = {
         content_type: "product",
         content_ids: [String(data?.id || "")],
