@@ -459,7 +459,7 @@
   margin-top: 10px;
   white-space: nowrap;
 }
-.mj-price span {
+.mj-price .mj-cur {
   font-size: 0.4em;
   font-stretch: 100%;
 }
@@ -747,6 +747,42 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
+}
+
+/* Mouvements (voir motion.tsx) */
+.mj-hero {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+}
+.mj-hero > :not(.mj-hero-rays) {
+  position: relative;
+  z-index: 1;
+}
+.mj-hero-rays {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+.mj-h1-line {
+  display: block;
+}
+.mj .star-border.mj-btn {
+  padding: 10px 20px;
+  font-weight: 800;
+  line-height: 1.2;
+}
+.mj .star-border.mj-btn-lg {
+  padding: 14px 26px;
+}
+@media (prefers-reduced-motion: reduce) {
+  /* Titre du hero affiché tout de suite, sans flou ni déplacement */
+  .mj-h1 [aria-hidden="true"] span {
+    opacity: 1 !important;
+    filter: none !important;
+    transform: none !important;
+  }
 }
 
 /* Tablette */

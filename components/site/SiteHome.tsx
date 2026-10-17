@@ -1,8 +1,9 @@
 // Site de présentation de LandPro (direction « Majorelle »), en français ou en darija.
-// Composant serveur sans JavaScript côté navigateur : la FAQ utilise <details>.
+// Composant serveur ; les mouvements (Lenis, GSAP, React Bits) sont dans ./motion.
 import DocumentLang from "../public/DocumentLang";
 import { SITE, type SiteLang } from "./content";
 import SiteVideo from "./SiteVideo";
+import { Count, HeroRays, HeroTitle, PrimaryCta, SiteMotion } from "./motion";
 import "./site.css";
 
 const FONTS =
@@ -22,8 +23,10 @@ export default function SiteHome({ lang, salesPhone }: { lang: SiteLang; salesPh
       <DocumentLang locale={ar ? "ar-MA" : "fr"} />
       <link rel="preconnect" href="https://fonts.googleapis.com" />
       <link rel="stylesheet" href={FONTS} precedence="default" />
+      <SiteMotion />
 
       <section id="top" className="mj-hero">
+        <HeroRays />
         <header className="mj-wrap mj-header">
           <a href={ar ? "/ar" : "/"} className="mj-logo">
             landpro
@@ -50,16 +53,12 @@ export default function SiteHome({ lang, salesPhone }: { lang: SiteLang; salesPh
 
         <div className="mj-wrap mj-hero-grid">
           <div className="mj-hero-copy">
-            <h1 className="mj-h1">
-              {t.hero.title.map((w) => (
-                <span key={w}>{w}</span>
-              ))}
-            </h1>
+            <HeroTitle lines={t.hero.title} />
             <p className="mj-hero-text">{t.hero.text}</p>
             <div className="mj-hero-actions">
-              <a href="#tarifs" className="mj-btn mj-btn-saffron mj-btn-lg">
+              <PrimaryCta href="#tarifs" className="mj-btn mj-btn-saffron mj-btn-lg">
                 {t.hero.cta}
-              </a>
+              </PrimaryCta>
               <a href="#trajet" className="mj-link-light">
                 {t.hero.secondary}
               </a>
@@ -90,11 +89,11 @@ export default function SiteHome({ lang, salesPhone }: { lang: SiteLang; salesPh
 
       <section id="video" className="mj-videosec">
         <div className="mj-wrap">
-          <div className="mj-video-head">
+          <div className="mj-video-head" data-reveal>
             <h2 className="mj-h2">{t.video.title}</h2>
             <p className="mj-on-ink">{t.video.text}</p>
           </div>
-          <div className="mj-video-frame">
+          <div className="mj-video-frame" data-reveal>
             <SiteVideo
               base={`/site/landpro-${lang}`}
               poster={`/site/landpro-${lang}-poster.webp`}
@@ -105,11 +104,11 @@ export default function SiteHome({ lang, salesPhone }: { lang: SiteLang; salesPh
       </section>
 
       <section id="templates" className="mj-templates">
-        <div className="mj-wrap mj-split-head">
+        <div className="mj-wrap mj-split-head" data-reveal>
           <h2 className="mj-h2">{t.templates.title}</h2>
           <p className="mj-muted">{t.templates.text}</p>
         </div>
-        <div className="mj-strip">
+        <div className="mj-strip" data-reveal>
           {t.templates.items.map(([file, name, price], i) => (
             <figure key={file} className={"mj-tpl" + (i % 2 ? " mj-tpl-low" : "")}>
               <img src={`/site/${file}.webp`} alt={name} width={390} height={844} loading="lazy" />
@@ -124,7 +123,7 @@ export default function SiteHome({ lang, salesPhone }: { lang: SiteLang; salesPh
 
       <section id="boutique" className="mj-boutique">
         <div className="mj-wrap mj-boutique-grid">
-          <div className="mj-boutique-copy">
+          <div className="mj-boutique-copy" data-reveal>
             <h2 className="mj-h2">{t.boutique.title}</h2>
             <p className="mj-on-ink">{t.boutique.text}</p>
             <dl className="mj-points">
@@ -136,7 +135,7 @@ export default function SiteHome({ lang, salesPhone }: { lang: SiteLang; salesPh
               ))}
             </dl>
           </div>
-          <div className="mj-browsers">
+          <div className="mj-browsers" data-reveal>
             <figure className="mj-browser mj-browser-a">
               <div className="mj-browser-bar" aria-hidden="true">
                 <i />
@@ -161,9 +160,13 @@ export default function SiteHome({ lang, salesPhone }: { lang: SiteLang; salesPh
 
       <section id="trajet" className="mj-trajet">
         <div className="mj-wrap">
-          <h2 className="mj-h2 mj-h2-narrow">{t.trajet.title}</h2>
-          <p className="mj-muted mj-lead">{t.trajet.text}</p>
-          <ol className="mj-route">
+          <h2 className="mj-h2 mj-h2-narrow" data-reveal>
+            {t.trajet.title}
+          </h2>
+          <p className="mj-muted mj-lead" data-reveal>
+            {t.trajet.text}
+          </p>
+          <ol className="mj-route" data-reveal>
             {t.trajet.steps.map(([name, text], i) => (
               <li key={name} className={i === t.trajet.steps.length - 1 ? "is-done" : ""}>
                 <b>{name}</b>
@@ -171,29 +174,29 @@ export default function SiteHome({ lang, salesPhone }: { lang: SiteLang; salesPh
               </li>
             ))}
           </ol>
-          <div className="mj-shot mj-shot-bleed">
+          <div className="mj-shot mj-shot-bleed" data-reveal>
             <img src="/site/dash-commandes.webp" alt={t.trajet.shot} width={2880} height={1620} loading="lazy" />
           </div>
         </div>
       </section>
 
       <section id="equipe" className="mj-wrap mj-equipe">
-        <div className="mj-equipe-copy">
+        <div className="mj-equipe-copy" data-reveal>
           <h2 className="mj-h2">{t.equipe.title}</h2>
           <p className="mj-muted">{t.equipe.p1}</p>
           <p className="mj-muted">{t.equipe.p2}</p>
         </div>
-        <div className="mj-shot">
+        <div className="mj-shot" data-reveal>
           <img src="/site/dash-equipe.webp" alt={t.equipe.shot} width={2880} height={1560} loading="lazy" />
         </div>
       </section>
 
       <section id="fonctions" className="mj-wrap mj-fonctions">
-        <div className="mj-split-head">
+        <div className="mj-split-head" data-reveal>
           <h2 className="mj-h2">{t.fonctions.title}</h2>
           <p className="mj-muted">{t.fonctions.text}</p>
         </div>
-        <div className="mj-groups">
+        <div className="mj-groups" data-reveal>
           {t.fonctions.groups.map((g) => (
             <section key={g.name} className="mj-group" aria-label={g.name}>
               <h3>{g.name}</h3>
@@ -212,17 +215,17 @@ export default function SiteHome({ lang, salesPhone }: { lang: SiteLang; salesPh
 
       <section id="tarifs" className="mj-tarifs">
         <div className="mj-wrap">
-          <div className="mj-split-head">
+          <div className="mj-split-head" data-reveal>
             <h2 className="mj-h2">{t.tarifs.title}</h2>
             <p className="mj-on-blue">{t.tarifs.text}</p>
           </div>
-          <div className="mj-tickets">
+          <div className="mj-tickets" data-reveal>
             {t.tarifs.plans.map((p) => (
               <article key={p.months} className={"mj-ticket" + (p.months === 12 ? " is-best" : "")}>
                 <div className="mj-ticket-label">{p.label}</div>
                 <div className="mj-price">
-                  {p.price}
-                  <span> {t.tarifs.currency}</span>
+                  <Count value={Number(p.price.replace(/\D/g, ""))} separator={p.price.includes(" ") ? " " : ""} />
+                  <span className="mj-cur"> {t.tarifs.currency}</span>
                 </div>
                 <div className="mj-ticket-sub">{p.perMonth}</div>
                 <a
@@ -235,13 +238,17 @@ export default function SiteHome({ lang, salesPhone }: { lang: SiteLang; salesPh
               </article>
             ))}
           </div>
-          <p className="mj-on-blue mj-included">{t.tarifs.included}</p>
+          <p className="mj-on-blue mj-included" data-reveal>
+            {t.tarifs.included}
+          </p>
         </div>
       </section>
 
       <section id="faq" className="mj-wrap mj-faq">
-        <h2 className="mj-h2 mj-faq-title">{t.faq.title}</h2>
-        <div className="mj-faq-list">
+        <h2 className="mj-h2 mj-faq-title" data-reveal>
+          {t.faq.title}
+        </h2>
+        <div className="mj-faq-list" data-reveal>
           {t.faq.items.map(([q, a], i) => (
             <details key={q} open={i === 0}>
               <summary>{q}</summary>
@@ -252,7 +259,7 @@ export default function SiteHome({ lang, salesPhone }: { lang: SiteLang; salesPh
       </section>
 
       <section className="mj-final">
-        <div className="mj-wrap mj-final-row">
+        <div className="mj-wrap mj-final-row" data-reveal>
           <div>
             <p lang="ar" className="mj-final-ar">
               {t.final.arabic}
