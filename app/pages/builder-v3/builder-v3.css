@@ -135,3 +135,40 @@ html[data-theme="dark"] .bv3-save-notice {
 html[data-theme="dark"] .bv3-media-preview {
   border-color: var(--bd-border);
 }
+
+/* ─── Panneaux Thème et Style (StylePanels.tsx) ─── */
+.bv3-settings-tabs { grid-template-columns: repeat(4, 1fr) !important; }
+.bv3-sx { display: grid; gap: 10px; }
+.bv3-sx h4 { margin: 14px 0 0; padding-top: 12px; border-top: 1px solid #e2e8f0; font-size: 12px; font-weight: 800; color: #172033; }
+.bv3-sx h4:first-of-type { border-top: 0; padding-top: 0; }
+.bv3-sx-intro { margin: 0; font-size: 12px; line-height: 1.5; color: #64748b; }
+.bv3-sx-sub { display: block; margin-top: 14px; font-size: 12px; }
+.bv3-right .bv3-sx-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 10px; margin: 0; font-size: 12px; font-weight: 600; color: #475569; }
+.bv3-right .bv3-sx-row > input, .bv3-right .bv3-sx-row > select { grid-column: 1 / -1; width: 100%; padding: 9px 10px; border: 1px solid #d7deea; border-radius: 9px; background: #fff; font-size: 13px; }
+.bv3-sx-color { display: flex; align-items: center; gap: 6px; }
+.bv3-right .bv3-sx-color input[type="color"] { width: 34px; height: 30px; padding: 2px; border-radius: 8px; cursor: pointer; }
+.bv3-sx-color code { font-size: 11px; color: #334155; min-width: 62px; }
+.bv3-sx-color em { font-style: normal; font-size: 10px; font-weight: 700; color: #94a3b8; min-width: 50px; text-align: right; }
+.bv3 .bv3-sx-color button { padding: 4px 9px; border-radius: 7px; font-size: 13px; min-width: 50px; }
+.bv3-sx-px { display: inline-flex; align-items: center; gap: 6px; color: #94a3b8; font-size: 11px; }
+.bv3-right .bv3-sx-px input { width: 72px; padding: 7px 8px; }
+.bv3-sx-block { display: grid; gap: 6px; }
+.bv3-sx-label { font-size: 12px; font-weight: 700; color: #475569; }
+.bv3-sx-sizes { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
+.bv3-right .bv3-sx-sizes label { margin: 0; gap: 3px; padding: 6px; border: 1px solid #e2e8f0; border-radius: 9px; }
+.bv3-right .bv3-sx-sizes label.is-current { border-color: #2563eb; background: #eff6ff; }
+.bv3-right .bv3-sx-sizes small { margin: 0; font-size: 10px; font-weight: 700; }
+.bv3-right .bv3-sx-sizes input { width: 100%; padding: 6px 7px; }
+.bv3-right .bv3-sx-block > small { margin: 0; font-size: 11px; }
+.bv3-sx-seg { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; }
+.bv3 .bv3-sx-seg button { padding: 7px 4px; font-size: 11px; border-radius: 8px; }
+.bv3 .bv3-sx-seg button.active { background: #2563eb; border-color: #2563eb; color: #fff; }
+.bv3 .bv3-sx-reset { margin-top: 10px; border-style: dashed; color: #b42318; }
+.bv3-right .bv3-check { display: flex; align-items: center; gap: 8px; margin: 6px 0; font-weight: 600; }
+html[data-theme="dark"] .bv3-sx h4 { color: #e6eef8; border-color: #203652; }
+html[data-theme="dark"] .bv3-right .bv3-sx-row > :is(input, select) { background: #0d1a2c; color: #e6eef8; border-color: #29415f; }
+html[data-theme="dark"] .bv3-sx-color code { color: #dce8f7; }
+html[data-theme="dark"] .bv3-right .bv3-sx-sizes label { border-color: #29415f; }
+html[data-theme="dark"] .bv3-right .bv3-sx-sizes label.is-current { background: #0f2747; border-color: #4ea0ff; }
+.bv3-sx-note { margin: 0; padding: 9px 11px; border-radius: 9px; background: #fff7e6; border: 1px solid #fde3a7; color: #8a5a00; font-size: 12px; line-height: 1.45; }
+html[data-theme="dark"] .bv3-sx-note { background: #2b2210; border-color: #5c4614; color: #f5c66b; }

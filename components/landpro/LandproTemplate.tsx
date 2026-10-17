@@ -13,6 +13,7 @@ import { Hero } from "./Hero";
 import { EMPTY_HINT, isEmpty, renderSection } from "./Sections";
 import { DESIGNS } from "./designs";
 import { PIECES } from "./pieces";
+import { pageThemeVars, sectionStyleProps } from "./styles";
 import type { PieceChoice } from "./pieces/types";
 import "./landpro.css";
 
@@ -28,17 +29,6 @@ export interface LandproTemplateProps {
   onSubmit?: (e: React.FormEvent<HTMLFormElement>, qty: number) => void;
   /** pièces imposées (aperçu des pièces, choix du marchand) : remplacent celles du template */
   pieces?: PieceChoice;
-}
-
-/** Couleur de texte lisible sur un fond #rrggbb (sombre sur fond clair, claire sur fond sombre). */
-function readableOn(bg: string): string | undefined {
-  const m = /^#?([0-9a-f]{6})$/i.exec(bg.trim());
-  if (!m) return undefined;
-  const [r, g, b] = [0, 2, 4].map((i) => {
-    const v = parseInt(m[1].slice(i, i + 2), 16) / 255;
-    return v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4;
-  });
-  return 0.2126 * r + 0.7152 * g + 0.0722 * b > 0.45 ? "#111318" : "#f3f4f6";
 }
 
 export default function LandproTemplate({
@@ -77,13 +67,20 @@ export default function LandproTemplate({
     document.head.appendChild(l);
   }, [designFonts, vm.t.id]);
 
-  const theme = {
-    ...vm.t.theme,
-    ...(vm.themeOverride.primary ? { primary: vm.themeOverride.primary } : {}),
-    ...(vm.themeOverride.accent ? { accent: vm.themeOverride.accent } : {}),
-    ...(vm.rtl ? { font: "arabic" as const, heading: "arabic" as const } : {}),
-  };
+  // Thème du template, puis réglages du vendeur (une valeur vide garde celle du template)
+  const ov = vm.themeOverride;
+  const pick = <T,>(v: T | undefined) => (v !== undefined && v !== null && v !== ("" as unknown) ? { v } : null);
+  const theme = { ...vm.t.theme };
+  for (const k of ["primary", "accent", "bg", "surface", "text", "muted", "radius"] as const) {
+    const o = pick(ov[k]);
+    if (o) (theme as Record<string, unknown>)[k] = o.v;
+  }
+  // Arabe : police arabe par défaut, sauf police choisie par le vendeur
+  if (vm.rtl) Object.assign(theme, { font: "arabic", heading: "arabic" });
+  if (ov.font) theme.font = ov.font;
+  if (ov.heading) theme.heading = ov.heading;
   const style = themeVars(theme);
+  const pageSx = pageThemeVars(ov);
   const sp = { vm, qty, setQty, variant, setVariant, preview: preview || builderMode, onSubmit };
   // pièces combinables : celles imposées, sinon celles du template (un design sur mesure reste prioritaire)
   const pc: PieceChoice = { ...(vm.t.pieces || {}), ...(pieces || {}) };
@@ -94,29 +91,15 @@ export default function LandproTemplate({
   const keys = vm.order;
   const announcementOn = keys.includes("announcement") && (!vm.hidden.has("announcement") || builderMode);
 
-  // Styles de section enregistrés par l'éditeur (fond, couleur du texte, alignement, marges)
-  const styleOf = (key: string): React.CSSProperties | undefined => {
-    const st = vm.sectionStyles[key];
-    if (!st || typeof st !== "object") return undefined;
-    const pad = st.padding === "" || st.padding == null ? NaN : Number(st.padding);
-    const out: Record<string, string | undefined> = {
-      backgroundColor: st.background || undefined,
-      // Fond choisi sans couleur de texte : texte sombre ou clair selon le fond, pour rester lisible
-      color: st.color || (st.background ? readableOn(String(st.background)) : undefined),
-      textAlign: st.align || undefined,
-      // marge appliquée à la section intérieure (voir landpro.css)
-      ["--lpx-sec-pad" as string]: Number.isFinite(pad) ? `${pad}px` : undefined,
-    };
-    return Object.values(out).some((v) => v !== undefined) ? (out as React.CSSProperties) : undefined;
-  };
-
   const block = (key: string, node: React.ReactNode) => {
     const hidden = vm.hidden.has(key);
-    const style = styleOf(key);
+    // Style de section réglé dans l'éditeur (fond, couleurs, tailles par appareil, marges…)
+    const sx = sectionStyleProps(vm.sectionStyles[key]);
+    const style = sx?.style as React.CSSProperties | undefined;
     if (!builderMode) {
       if (hidden) return null;
-      return style ? (
-        <div key={key} className={cx("styled")} style={style}>
+      return sx ? (
+        <div key={key} className={cx("styled")} style={style} {...sx.attrs}>
           {node}
         </div>
       ) : (
@@ -130,8 +113,9 @@ export default function LandproTemplate({
       <div
         key={key}
         data-lpx-section={key}
-        className={cx("block", hidden && "is-hidden", style && "styled")}
+        className={cx("block", hidden && "is-hidden", sx && "styled")}
         style={style}
+        {...(sx?.attrs || {})}
         onClick={() => onSectionSelect?.(key)}
       >
         <span className={cx("block-tag")}>
@@ -178,9 +162,13 @@ export default function LandproTemplate({
           .join(" ")}
         style={{
           ...style,
-          ["--font" as string]: (!vm.rtl && design?.font) || fonts[theme.font],
-          ["--heading" as string]: (!vm.rtl && design?.heading) || fonts[theme.heading],
+          ...pageSx.vars,
+          // police choisie par le vendeur > police du design sur mesure > police du thème
+          ["--font" as string]: (ov.font && fonts[ov.font]) || (!vm.rtl && design?.font) || fonts[theme.font],
+          ["--heading" as string]:
+            (ov.heading && fonts[ov.heading]) || (!vm.rtl && design?.heading) || fonts[theme.heading],
         }}
+        {...pageSx.attrs}
         dir={vm.rtl ? "rtl" : "ltr"}
         lang={vm.lang}
         data-landing-template={vm.t.id}

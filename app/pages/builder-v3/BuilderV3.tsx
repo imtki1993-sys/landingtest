@@ -6,6 +6,7 @@ import LandingClient from "../../landing/[slug]/LandingClient";
 import { LANDPRO_SECTIONS } from "../../../components/landpro/types";
 import { SECTION_LABELS } from "../../../components/landpro/registry";
 import LandproSectionEditor, { LandproTemplatePanel } from "./LandproSectionEditor";
+import { SectionStylePanel, ThemePanel } from "./StylePanels";
 const BUILTIN_ADDABLE: string[] = ["benefits", "problem", "features", "how", "trust", "faq", ...LANDPRO_SECTIONS];
 const library = ["text", "imageText", "gallery", "ctaBlock", "vertical916", ...BUILTIN_ADDABLE];
 const labels: any = {
@@ -45,9 +46,7 @@ export default function BuilderV3({
     [history, setHistory] = useState<any[]>([]),
     [future, setFuture] = useState<any[]>([]),
     [uploading, setUploading] = useState(false),
-    [settingsTab, setSettingsTab] = useState<"content" | "template" | "hero" | "footer" | "form">("content"),
-    [heroTab, setHeroTab] = useState<"content" | "layout" | "media" | "visibility">("layout"),
-    [heroAdvanced, setHeroAdvanced] = useState(false),
+    [settingsTab, setSettingsTab] = useState<"content" | "style" | "theme" | "template">("content"),
     [uiLibrary, setUiLibrary] = useState<any>({ styles: [], patterns: [], colors: [], typography: [] });
   useEffect(() => {
     fetch("/api/uiux-library")
@@ -566,1008 +565,40 @@ export default function BuilderV3({
         </main>
         <aside className="bv3-right">
           <h3>Propriétés · {labels[selected] || selected}</h3>
-          <div className="bv3-settings-tabs">
-            <button className={settingsTab === "content" ? "active" : ""} onClick={() => setSettingsTab("content")}>
-              Contenu
-            </button>
-            <button className={settingsTab === "template" ? "active" : ""} onClick={() => setSettingsTab("template")}>
-              Template
-            </button>
-            <button
-              className={settingsTab === "hero" ? "active" : ""}
-              onClick={() => {
-                setSettingsTab("hero");
-                setSelected("hero");
-              }}
-            >
-              Hero
-            </button>
-            <button className={settingsTab === "footer" ? "active" : ""} onClick={() => setSettingsTab("footer")}>
-              Footer
-            </button>
-            <button className={settingsTab === "form" ? "active" : ""} onClick={() => setSettingsTab("form")}>
-              Formulaire COD
-            </button>
+          <div className="bv3-settings-tabs" role="tablist">
+            {(
+              [
+                ["content", "Contenu"],
+                ["style", "Style"],
+                ["theme", "Thème"],
+                ["template", "Template"],
+              ] as const
+            ).map(([id, name]) => (
+              <button
+                key={id}
+                role="tab"
+                aria-selected={settingsTab === id}
+                className={settingsTab === id ? "active" : ""}
+                onClick={() => setSettingsTab(id)}
+              >
+                {name}
+              </button>
+            ))}
           </div>
           {settingsTab === "template" && (
             <div className="bv3-template-panel">
               <LandproTemplatePanel draft={draft} commit={commit} patch={patch} />
-              <label>
-                Style visuel
-                <select
-                  value={draft.builder_template || ""}
-                  onChange={(e) => patch("builder_template", e.target.value)}
-                >
-                  <option value="">UI/UX Pro Max automatique · {ds.style?.["Style Category"] || "recommandé"}</option>
-                  {uiLibrary.styles.map((x: any) => (
-                    <option key={x.id || x.name} value={x.id || x.name}>
-                      {x.name}
-                    </option>
-                  ))}
-                </select>
-              </label>
-              <label>
-                Landing Pattern
-                <select
-                  value={draft.builder_pattern || ""}
-                  onChange={(e) =>
-                    commit({
-                      ...draft,
-                      builder_pattern: e.target.value,
-                      hero_architecture: "auto",
-                      section_architecture: "auto",
-                      builder_v3: { ...doc, viewport },
-                    })
-                  }
-                >
-                  <option value="">Automatique · {ds.landing?.["Pattern Name"] || "recommandé"}</option>
-                  {uiLibrary.patterns.map((x: any) => (
-                    <option key={x.id || x.name} value={x.id || x.name}>
-                      {x.name}
-                    </option>
-                  ))}
-                </select>
-              </label>
-              <label>
-                Palette
-                <select value={draft.builder_palette || ""} onChange={(e) => patch("builder_palette", e.target.value)}>
-                  <option value="">Automatique · {ds.productType || "produit"}</option>
-                  {uiLibrary.colors.map((x: any) => (
-                    <option key={x.name} value={x.name}>
-                      {x.name}
-                    </option>
-                  ))}
-                </select>
-              </label>
-              <label>
-                Typographie
-                <select
-                  value={draft.builder_typography || ""}
-                  onChange={(e) => patch("builder_typography", e.target.value)}
-                >
-                  <option value="">Automatique · {ds.typography?.["Font Pairing Name"] || "recommandée"}</option>
-                  {uiLibrary.typography.map((x: any) => (
-                    <option key={x.name} value={x.name}>
-                      {x.name}
-                    </option>
-                  ))}
-                </select>
-              </label>
-              <div className="bv3-help">
-                {uiLibrary.styles.length} styles · {uiLibrary.patterns.length} patterns · {uiLibrary.colors.length}{" "}
-                palettes · {uiLibrary.typography.length} typographies chargés depuis UI/UX Pro Max.
-              </div>
             </div>
           )}
-          {settingsTab === "hero" && (
-            <div className="bv3-template-panel bv3-hero-panel">
-              <div className="bv3-help">
-                <b>Hero Studio</b>
-                <br />
-                Réglages organisés par fonction. Le preview se met à jour immédiatement.
-              </div>
-              <div className="bv3-hero-tabs">
-                <button className={heroTab === "content" ? "active" : ""} onClick={() => setHeroTab("content")}>
-                  Contenu
-                </button>
-                <button className={heroTab === "layout" ? "active" : ""} onClick={() => setHeroTab("layout")}>
-                  Layout
-                </button>
-                <button className={heroTab === "media" ? "active" : ""} onClick={() => setHeroTab("media")}>
-                  Galerie produit
-                </button>
-                <button className={heroTab === "visibility" ? "active" : ""} onClick={() => setHeroTab("visibility")}>
-                  Visibilité
-                </button>
-              </div>
-              {heroTab === "content" && (
-                <div className="bv3-hero-subpanel">
-                  <label>
-                    Titre
-                    <input value={draft.headline || ""} onChange={(e) => patch("headline", e.target.value)} />
-                  </label>
-                  <label>
-                    Sous-titre
-                    <textarea value={draft.subheadline || ""} onChange={(e) => patch("subheadline", e.target.value)} />
-                  </label>
-                  <label>
-                    Prix
-                    <input type="number" value={draft.price || ""} onChange={(e) => patch("price", e.target.value)} />
-                  </label>
-                  <label>
-                    Ancien prix
-                    <input
-                      type="number"
-                      value={draft.oldPrice || ""}
-                      onChange={(e) => patch("oldPrice", e.target.value)}
-                    />
-                  </label>
-                  <label>
-                    CTA
-                    <input value={draft.cta || ""} onChange={(e) => patch("cta", e.target.value)} />
-                  </label>
-                </div>
-              )}
-              {heroTab === "layout" && (
-                <div className="bv3-hero-subpanel">
-                  <label>
-                    Module Hero
-                    <select value={draft.hero_module || "auto"} onChange={(e) => patch("hero_module", e.target.value)}>
-                      <option value="auto">Automatique UI/UX Pro Max</option>
-                      <option value="split-product">Split Produit</option>
-                      <option value="fullscreen">Fullscreen Image</option>
-                      <option value="center-product">Produit Centré</option>
-                      <option value="gallery-commerce">Galerie E-commerce</option>
-                      <option value="minimal">Minimal</option>
-                      <option value="editorial">Editorial Premium</option>
-                      <option value="conversion">Conversion COD</option>
-                      <option value="form-integrated">Formulaire intégré</option>
-                      <option value="background">Image Background</option>
-                      <option value="luxury">E-commerce Luxury</option>
-                      <option value="lifestyle">UGC / Lifestyle</option>
-                      <option value="mobile-first">Mobile First</option>
-                      <optgroup label="Motion / Immersive">
-                        <option value="motion-scroll-gallery">Scroll Gallery</option>
-                        <option value="motion-sticky-story">Sticky Image Story</option>
-                        <option value="motion-parallax">Parallax Produit</option>
-                        <option value="motion-zoom">Zoom au scroll</option>
-                        <option value="motion-video-full">Vidéo Cinématique Fullscreen</option>
-                        <option value="motion-video-ugc">Vidéo UGC Verticale</option>
-                      </optgroup>
-                    </select>
-                  </label>
-                  <label>
-                    Architecture
-                    <select
-                      value={draft.hero_architecture || "auto"}
-                      onChange={(e) => patch("hero_architecture", e.target.value)}
-                    >
-                      <option value="auto">Automatique</option>
-                      <option value="conversion">Conversion</option>
-                      <option value="editorial">Editorial</option>
-                      <option value="impact">Impact</option>
-                      <option value="centered">Centered</option>
-                      <option value="split">Split</option>
-                    </select>
-                  </label>
-                  <label>
-                    Hauteur Hero
-                    <select
-                      value={draft.hero_height || "compact"}
-                      onChange={(e) => patch("hero_height", e.target.value)}
-                    >
-                      <option value="compact">Compact</option>
-                      <option value="balanced">Équilibré</option>
-                      <option value="large">Grand</option>
-                      <option value="screen">Plein écran</option>
-                    </select>
-                  </label>
-                  <label>
-                    Taille du titre
-                    <select
-                      value={draft.hero_title_size || "auto"}
-                      onChange={(e) => patch("hero_title_size", e.target.value)}
-                    >
-                      <option value="auto">Automatique</option>
-                      <option value="small">Petite</option>
-                      <option value="medium">Moyenne</option>
-                      <option value="large">Grande</option>
-                      <option value="xl">Impact XL</option>
-                    </select>
-                  </label>
-                  <label>
-                    Largeur du texte
-                    <select
-                      value={draft.hero_text_width || "medium"}
-                      onChange={(e) => patch("hero_text_width", e.target.value)}
-                    >
-                      <option value="narrow">Étroite</option>
-                      <option value="medium">Moyenne</option>
-                      <option value="wide">Large</option>
-                    </select>
-                  </label>
-                  <label>
-                    Alignement
-                    <select
-                      value={draft.hero_text_align || "auto"}
-                      onChange={(e) => patch("hero_text_align", e.target.value)}
-                    >
-                      <option value="auto">Selon le module</option>
-                      <option value="left">Gauche</option>
-                      <option value="center">Centré</option>
-                      <option value="right">Droite</option>
-                    </select>
-                  </label>
-                  <label>
-                    Position média
-                    <select
-                      value={draft.hero_media_position || "auto"}
-                      onChange={(e) => patch("hero_media_position", e.target.value)}
-                    >
-                      <option value="auto">Selon le module</option>
-                      <option value="left">Image à gauche</option>
-                      <option value="right">Image à droite</option>
-                      <option value="top">Image en haut</option>
-                      <option value="background">Arrière-plan</option>
-                    </select>
-                  </label>
-                </div>
-              )}
-              <button type="button" className="bv3-advanced-toggle" onClick={() => setHeroAdvanced((v) => !v)}>
-                {heroAdvanced ? "Fermer les réglages avancés" : "⚙ Réglages avancés · tailles & pixels"}
-              </button>
-              {heroAdvanced && (
-                <div className="bv3-hero-advanced">
-                  <div className="bv3-help">
-                    <b>Hero Engine V2 · Réglages précis</b>
-                    <br />
-                    Valeurs indépendantes PC, tablette et mobile.
-                  </div>
-                  <label>
-                    Texte badge
-                    <input
-                      value={draft.hero_badge_text || ""}
-                      placeholder="الدفع عند الاستلام"
-                      onChange={(e) => patch("hero_badge_text", e.target.value)}
-                    />
-                  </label>
-                  <label>
-                    Couleur arrière-plan Hero
-                    <input
-                      type="color"
-                      value={draft.hero_bg_color || "#ffffff"}
-                      onChange={(e) => patch("hero_bg_color", e.target.value)}
-                    />
-                  </label>
-                  <label>
-                    Couleur titre
-                    <input
-                      type="color"
-                      value={draft.hero_title_color || "#111827"}
-                      onChange={(e) => patch("hero_title_color", e.target.value)}
-                    />
-                  </label>
-                  <label>
-                    Couleur sous-titre
-                    <input
-                      type="color"
-                      value={draft.hero_subtitle_color || "#475569"}
-                      onChange={(e) => patch("hero_subtitle_color", e.target.value)}
-                    />
-                  </label>
-                  <label>
-                    Fond bouton
-                    <input
-                      type="color"
-                      value={draft.hero_cta_bg || "#111827"}
-                      onChange={(e) => patch("hero_cta_bg", e.target.value)}
-                    />
-                  </label>
-                  <label>
-                    Texte bouton
-                    <input
-                      type="color"
-                      value={draft.hero_cta_color || "#ffffff"}
-                      onChange={(e) => patch("hero_cta_color", e.target.value)}
-                    />
-                  </label>
-                  <label>
-                    Fond badge
-                    <input
-                      type="color"
-                      value={draft.hero_badge_bg || "#f59e0b"}
-                      onChange={(e) => patch("hero_badge_bg", e.target.value)}
-                    />
-                  </label>
-                  <label>
-                    Texte badge
-                    <input
-                      type="color"
-                      value={draft.hero_badge_color || "#111111"}
-                      onChange={(e) => patch("hero_badge_color", e.target.value)}
-                    />
-                  </label>
-                  <label>
-                    Overlay image fond · {Number(draft.hero_overlay || 38)}%
-                    <input
-                      type="range"
-                      min="0"
-                      max="90"
-                      value={Number(draft.hero_overlay || 38)}
-                      onChange={(e) => patch("hero_overlay", Number(e.target.value))}
-                    />
-                  </label>
-                  <label>
-                    Titre PC · {Number(draft.hero_title_px || 56)} px
-                    <input
-                      type="range"
-                      min="28"
-                      max="96"
-                      value={Number(draft.hero_title_px || 56)}
-                      onChange={(e) => patch("hero_title_px", Number(e.target.value))}
-                    />
-                  </label>
-                  <label>
-                    Titre tablette · {Number(draft.hero_title_px_tablet || 44)} px
-                    <input
-                      type="range"
-                      min="24"
-                      max="72"
-                      value={Number(draft.hero_title_px_tablet || 44)}
-                      onChange={(e) => patch("hero_title_px_tablet", Number(e.target.value))}
-                    />
-                  </label>
-                  <label>
-                    Titre mobile · {Number(draft.hero_title_px_mobile || 34)} px
-                    <input
-                      type="range"
-                      min="20"
-                      max="56"
-                      value={Number(draft.hero_title_px_mobile || 34)}
-                      onChange={(e) => patch("hero_title_px_mobile", Number(e.target.value))}
-                    />
-                  </label>
-                  <label>
-                    Sous-titre PC · {Number(draft.hero_subtitle_px || 18)} px
-                    <input
-                      type="range"
-                      min="12"
-                      max="32"
-                      value={Number(draft.hero_subtitle_px || 18)}
-                      onChange={(e) => patch("hero_subtitle_px", Number(e.target.value))}
-                    />
-                  </label>
-                  <label>
-                    Sous-titre mobile · {Number(draft.hero_subtitle_px_mobile || 16)} px
-                    <input
-                      type="range"
-                      min="11"
-                      max="26"
-                      value={Number(draft.hero_subtitle_px_mobile || 16)}
-                      onChange={(e) => patch("hero_subtitle_px_mobile", Number(e.target.value))}
-                    />
-                  </label>
-                  <label>
-                    Texte bouton · {Number(draft.hero_cta_font_px || 17)} px
-                    <input
-                      type="range"
-                      min="12"
-                      max="28"
-                      value={Number(draft.hero_cta_font_px || 17)}
-                      onChange={(e) => patch("hero_cta_font_px", Number(e.target.value))}
-                    />
-                  </label>
-                  <label>
-                    Hauteur bouton · {Number(draft.hero_cta_height || 56)} px
-                    <input
-                      type="range"
-                      min="40"
-                      max="84"
-                      value={Number(draft.hero_cta_height || 56)}
-                      onChange={(e) => patch("hero_cta_height", Number(e.target.value))}
-                    />
-                  </label>
-                  <label>
-                    Arrondi bouton · {Number(draft.hero_cta_radius || 14)} px
-                    <input
-                      type="range"
-                      min="0"
-                      max="40"
-                      value={Number(draft.hero_cta_radius || 14)}
-                      onChange={(e) => patch("hero_cta_radius", Number(e.target.value))}
-                    />
-                  </label>
-                  <label>
-                    Largeur bouton
-                    <select
-                      value={draft.hero_cta_width || "auto"}
-                      onChange={(e) => patch("hero_cta_width", e.target.value)}
-                    >
-                      <option value="auto">Selon contenu</option>
-                      <option value="full">Pleine largeur</option>
-                    </select>
-                  </label>
-                  <label>
-                    Espacement vertical Hero · {Number(draft.hero_padding_y || 72)} px
-                    <input
-                      type="range"
-                      min="20"
-                      max="160"
-                      value={Number(draft.hero_padding_y || 72)}
-                      onChange={(e) => patch("hero_padding_y", Number(e.target.value))}
-                    />
-                  </label>
-                  <label>
-                    Espace texte / média · {Number(draft.hero_gap || 48)} px
-                    <input
-                      type="range"
-                      min="8"
-                      max="120"
-                      value={Number(draft.hero_gap || 48)}
-                      onChange={(e) => patch("hero_gap", Number(e.target.value))}
-                    />
-                  </label>
-                </div>
-              )}
-              {heroTab === "media" && (
-                <div className="bv3-hero-subpanel">
-                  <div className="bv3-gallery-head">
-                    <div>
-                      <b>Galerie produit Hero</b>
-                      <span>Slider, autoplay, miniatures et défilement des images produit.</span>
-                    </div>
-                    <span className="bv3-gallery-count">{(draft.hero_images || []).length} image(s)</span>
-                  </div>
-                  <label>
-                    Mode galerie
-                    <select
-                      value={draft.hero_gallery_mode || "fixed"}
-                      onChange={(e) => patch("hero_gallery_mode", e.target.value)}
-                    >
-                      <option value="fixed">Image fixe</option>
-                      <option value="arrows">Slider + flèches</option>
-                      <option value="autoplay">Défilement automatique</option>
-                      <option value="arrows-autoplay">Flèches + autoplay</option>
-                      <option value="fade">Fondu automatique</option>
-                      <option value="slide">Slide horizontal</option>
-                      <option value="thumbs">Carrousel + miniatures</option>
-                      <option value="marquee">Défilement continu</option>
-                    </select>
-                  </label>
-                  <label>
-                    Délai autoplay · {Number(draft.hero_gallery_delay || 3500)} ms
-                    <input
-                      type="range"
-                      min="1000"
-                      max="10000"
-                      step="250"
-                      value={Number(draft.hero_gallery_delay || 3500)}
-                      onChange={(e) => patch("hero_gallery_delay", Number(e.target.value))}
-                    />
-                  </label>
-                  <label>
-                    Vitesse transition · {Number(draft.hero_gallery_speed || 500)} ms
-                    <input
-                      type="range"
-                      min="150"
-                      max="1500"
-                      step="50"
-                      value={Number(draft.hero_gallery_speed || 500)}
-                      onChange={(e) => patch("hero_gallery_speed", Number(e.target.value))}
-                    />
-                  </label>
-                  <label className="builder-toggle">
-                    <input
-                      type="checkbox"
-                      checked={draft.hero_gallery_loop !== false}
-                      onChange={(e) => patch("hero_gallery_loop", e.target.checked)}
-                    />{" "}
-                    Boucle infinie
-                  </label>
-                  <label className="builder-toggle">
-                    <input
-                      type="checkbox"
-                      checked={draft.hero_gallery_arrows !== false}
-                      onChange={(e) => patch("hero_gallery_arrows", e.target.checked)}
-                    />{" "}
-                    Afficher flèches
-                  </label>
-                  <label className="builder-toggle">
-                    <input
-                      type="checkbox"
-                      checked={draft.hero_gallery_dots !== false}
-                      onChange={(e) => patch("hero_gallery_dots", e.target.checked)}
-                    />{" "}
-                    Afficher points
-                  </label>
-                  <label className="builder-toggle">
-                    <input
-                      type="checkbox"
-                      checked={draft.hero_gallery_thumbs === true || draft.hero_gallery_mode === "thumbs"}
-                      onChange={(e) => patch("hero_gallery_thumbs", e.target.checked)}
-                    />{" "}
-                    Afficher miniatures
-                  </label>
-                  <label>
-                    Ajustement image
-                    <select
-                      value={draft.hero_media_fit || "contain"}
-                      onChange={(e) => patch("hero_media_fit", e.target.value)}
-                    >
-                      <option value="contain">Produit entier · contain</option>
-                      <option value="cover">Remplir · cover</option>
-                    </select>
-                  </label>
-                  <label>
-                    Largeur image · {Number(draft.hero_media_width || 100)}%
-                    <input
-                      type="range"
-                      min="20"
-                      max="100"
-                      step="1"
-                      value={Number(draft.hero_media_width || 100)}
-                      onChange={(e) => patch("hero_media_width", Number(e.target.value))}
-                    />
-                  </label>
-                  <label>
-                    Hauteur image · {Number(draft.hero_media_height || 520)} px
-                    <input
-                      type="range"
-                      min="120"
-                      max="1000"
-                      step="10"
-                      value={Number(draft.hero_media_height || 520)}
-                      onChange={(e) => patch("hero_media_height", Number(e.target.value))}
-                    />
-                  </label>
-                  <label>
-                    Format / ratio
-                    <select
-                      value={draft.hero_media_aspect || "auto"}
-                      onChange={(e) => patch("hero_media_aspect", e.target.value)}
-                    >
-                      <option value="auto">Automatique</option>
-                      <option value="1:1">Carré · 1:1</option>
-                      <option value="4:5">Portrait · 4:5</option>
-                      <option value="3:4">Portrait · 3:4</option>
-                      <option value="4:3">Paysage · 4:3</option>
-                      <option value="16:9">Large · 16:9</option>
-                    </select>
-                  </label>
-                  <label>
-                    Arrondi image · {Number(draft.hero_media_radius || 24)} px
-                    <input
-                      type="range"
-                      min="0"
-                      max="60"
-                      step="2"
-                      value={Number(draft.hero_media_radius || 24)}
-                      onChange={(e) => patch("hero_media_radius", Number(e.target.value))}
-                    />
-                  </label>
-                  <div className="bv3-help">
-                    <b>Images spéciales Hero</b>
-                    <br />
-                    Ajoutez au moins 2 images pour activer un défilement continu.
-                  </div>
-                  <label className="bv3-upload">
-                    Uploader images Hero
-                    <input
-                      type="file"
-                      accept="image/*"
-                      multiple
-                      disabled={uploading}
-                      onChange={(e) => uploadHeroSpecial(Array.from(e.target.files || []))}
-                    />
-                    <span>{uploading ? "Chargement…" : "Choisir images Hero"}</span>
-                  </label>
-                  <div className="bv3-media-grid">
-                    {(draft.hero_images || []).map((x: string, i: number) => (
-                      <div key={x + i} className={i === 0 ? "main" : ""}>
-                        <img src={x} alt="" />
-                        <div>
-                          <button type="button" onClick={() => setHeroSpecialMain(i)}>
-                            {i === 0 ? "Principale Hero" : "Mettre principale"}
-                          </button>
-                          <button type="button" onClick={() => removeHeroSpecial(i)}>
-                            ×
-                          </button>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                  <label className="bv3-check bv3-scroll-toggle">
-                    <input
-                      type="checkbox"
-                      checked={draft.hero_image_scroll === true}
-                      onChange={(e) => patch("hero_image_scroll", e.target.checked)}
-                    />
-                    <span>
-                      <b>Activer défilement images</b>
-                      <small>
-                        {(draft.hero_images || []).length < 2
-                          ? "Ajoutez au moins 2 images Hero"
-                          : "Carousel prêt · " + (draft.hero_images || []).length + " images"}
-                      </small>
-                    </span>
-                  </label>
-                  <div
-                    className={draft.hero_image_scroll === true ? "bv3-scroll-settings active" : "bv3-scroll-settings"}
-                  >
-                    <label>
-                      Direction
-                      <select
-                        disabled={draft.hero_image_scroll !== true}
-                        value={draft.hero_scroll_direction || "left"}
-                        onChange={(e) => patch("hero_scroll_direction", e.target.value)}
-                      >
-                        <option value="left">← Vers la gauche</option>
-                        <option value="right">Vers la droite →</option>
-                      </select>
-                    </label>
-                    <label>
-                      Vitesse · {Number(draft.hero_scroll_speed || 18)} s
-                      <input
-                        disabled={draft.hero_image_scroll !== true}
-                        type="range"
-                        min="5"
-                        max="60"
-                        step="1"
-                        value={Number(draft.hero_scroll_speed || 18)}
-                        onChange={(e) => patch("hero_scroll_speed", Number(e.target.value))}
-                      />
-                    </label>
-                    <label className="bv3-check">
-                      <input
-                        disabled={draft.hero_image_scroll !== true}
-                        type="checkbox"
-                        checked={draft.hero_scroll_pause_hover !== false}
-                        onChange={(e) => patch("hero_scroll_pause_hover", e.target.checked)}
-                      />{" "}
-                      Pause au survol
-                    </label>
-                  </div>
-                </div>
-              )}
-              {heroTab === "visibility" && (
-                <div className="bv3-hero-subpanel">
-                  <label className="bv3-check">
-                    <input
-                      type="checkbox"
-                      checked={draft.hero_show_subtitle !== false}
-                      onChange={(e) => patch("hero_show_subtitle", e.target.checked)}
-                    />{" "}
-                    Afficher sous-titre
-                  </label>
-                  <label className="bv3-check">
-                    <input
-                      type="checkbox"
-                      checked={draft.hero_show_price !== false}
-                      onChange={(e) => patch("hero_show_price", e.target.checked)}
-                    />{" "}
-                    Afficher prix
-                  </label>
-                  <label className="bv3-check">
-                    <input
-                      type="checkbox"
-                      checked={draft.hero_show_cta !== false}
-                      onChange={(e) => patch("hero_show_cta", e.target.checked)}
-                    />{" "}
-                    Afficher CTA
-                  </label>
-                  <label className="bv3-check">
-                    <input
-                      type="checkbox"
-                      checked={draft.hero_show_badge !== false}
-                      onChange={(e) => patch("hero_show_badge", e.target.checked)}
-                    />{" "}
-                    Afficher badge COD
-                  </label>
-                  <button
-                    type="button"
-                    onClick={() =>
-                      commit({
-                        ...draft,
-                        hero_height: "compact",
-                        hero_title_size: "auto",
-                        hero_text_width: "medium",
-                        hero_text_align: "auto",
-                        hero_media_position: "auto",
-                        hero_media_fit: "contain",
-                        hero_media_width: 100,
-                        hero_media_height: 520,
-                        hero_media_aspect: "auto",
-                        hero_media_radius: 24,
-                        hero_image_scroll: false,
-                        hero_show_subtitle: true,
-                        hero_show_price: true,
-                        hero_show_cta: true,
-                        hero_show_badge: true,
-                      })
-                    }
-                  >
-                    Réinitialiser Hero
-                  </button>
-                </div>
-              )}
-            </div>
-          )}
-          {settingsTab === "footer" && (
-            <div className="bv3-template-panel bv3-footer-panel">
-              <div className="bv3-help">
-                <b>Footer Studio</b>
-                <br />
-                Personnalisez le footer comme le Hero. Le preview se met à jour immédiatement.
-              </div>
-              <label>
-                Couleur arrière-plan
-                <input
-                  type="color"
-                  value={draft.footer_bg_color || "#cbdcf8"}
-                  onChange={(e) => patch("footer_bg_color", e.target.value)}
-                />
-              </label>
-              <label>
-                Couleur texte
-                <input
-                  type="color"
-                  value={draft.footer_text_color || "#0f172a"}
-                  onChange={(e) => patch("footer_text_color", e.target.value)}
-                />
-              </label>
-              <label>
-                Couleur liens
-                <input
-                  type="color"
-                  value={draft.footer_link_color || "#0f172a"}
-                  onChange={(e) => patch("footer_link_color", e.target.value)}
-                />
-              </label>
-              <label>
-                Taille nom produit · {Number(draft.footer_title_px || 28)} px
-                <input
-                  type="range"
-                  min="14"
-                  max="56"
-                  value={Number(draft.footer_title_px || 28)}
-                  onChange={(e) => patch("footer_title_px", Number(e.target.value))}
-                />
-              </label>
-              <label>
-                Taille texte · {Number(draft.footer_text_px || 15)} px
-                <input
-                  type="range"
-                  min="11"
-                  max="24"
-                  value={Number(draft.footer_text_px || 15)}
-                  onChange={(e) => patch("footer_text_px", Number(e.target.value))}
-                />
-              </label>
-              <label>
-                Espacement vertical · {Number(draft.footer_padding_y || 48)} px
-                <input
-                  type="range"
-                  min="16"
-                  max="120"
-                  value={Number(draft.footer_padding_y || 48)}
-                  onChange={(e) => patch("footer_padding_y", Number(e.target.value))}
-                />
-              </label>
-              <label>
-                Alignement
-                <select value={draft.footer_align || "center"} onChange={(e) => patch("footer_align", e.target.value)}>
-                  <option value="left">Gauche</option>
-                  <option value="center">Centré</option>
-                  <option value="right">Droite</option>
-                </select>
-              </label>
-              <label className="bv3-check">
-                <input
-                  type="checkbox"
-                  checked={draft.footer_show_brand !== false}
-                  onChange={(e) => patch("footer_show_brand", e.target.checked)}
-                />{" "}
-                Afficher nom produit
-              </label>
-              <label className="bv3-check">
-                <input
-                  type="checkbox"
-                  checked={draft.footer_show_trust !== false}
-                  onChange={(e) => patch("footer_show_trust", e.target.checked)}
-                />{" "}
-                Afficher Livraison / COD
-              </label>
-              <label className="bv3-check">
-                <input
-                  type="checkbox"
-                  checked={draft.footer_show_links !== false}
-                  onChange={(e) => patch("footer_show_links", e.target.checked)}
-                />{" "}
-                Afficher liens
-              </label>
-              <label className="bv3-check">
-                <input
-                  type="checkbox"
-                  checked={draft.footer_show_copyright !== false}
-                  onChange={(e) => patch("footer_show_copyright", e.target.checked)}
-                />{" "}
-                Afficher copyright
-              </label>
-            </div>
-          )}
-          {settingsTab === "form" && (
-            <div className="bv3-template-panel">
-              <label>
-                Style formulaire
-                <select
-                  value={draft.order_form_style || "classic"}
-                  onChange={(e) => patch("order_form_style", e.target.value)}
-                >
-                  <option value="classic">Classique</option>
-                  <option value="compact">Compact</option>
-                  <option value="card">Carte</option>
-                  <option value="minimal">Minimal</option>
-                </select>
-              </label>
-              <label>
-                Architecture
-                <select
-                  value={draft.order_form_architecture || "auto"}
-                  onChange={(e) => patch("order_form_architecture", e.target.value)}
-                >
-                  <option value="auto">UI/UX Pro Max automatique</option>
-                  <option value="compact">Compact 2 colonnes</option>
-                  <option value="trust">Centré confiance</option>
-                  <option value="editorial">Editorial</option>
-                </select>
-              </label>
-              <label className="bv3-check">
-                <input
-                  type="checkbox"
-                  checked={draft.order_show_address !== false}
-                  onChange={(e) => patch("order_show_address", e.target.checked)}
-                />{" "}
-                Afficher adresse
-              </label>
-              <label className="bv3-check">
-                <input
-                  type="checkbox"
-                  checked={draft.order_whatsapp !== false}
-                  onChange={(e) => patch("order_whatsapp", e.target.checked)}
-                />{" "}
-                Bouton WhatsApp
-              </label>
-              <label className="bv3-check">
-                <input
-                  type="checkbox"
-                  checked={draft.order_pump !== false}
-                  onChange={(e) => patch("order_pump", e.target.checked)}
-                />{" "}
-                Animation CTA
-              </label>
-              <div className="bv3-help">
-                <b>Prix par quantité</b>
-                <br />
-                Ajoutez librement vos offres. Le prix saisi est le prix total de l’offre et sera recalculé côté serveur
-                lors de la commande.
-              </div>
-              {(() => {
-                const offers = (
-                  Array.isArray(draft.quantity_offers) && draft.quantity_offers.length
-                    ? draft.quantity_offers
-                    : [{ qty: 1, label: "1 pièce", price: Number(draft.price || 0) }]
-                ).map((x: any) => ({ ...x, qty: Number(x.qty) || 1 }));
-                const updateOffer = (i: number, key: string, value: any) => {
-                  const next = offers.map((x: any, j: number) => (j === i ? { ...x, [key]: value } : x));
-                  patch("quantity_offers", next);
-                };
-                const removeOffer = (i: number) => {
-                  const next = offers.filter((_: any, j: number) => j !== i);
-                  patch("quantity_offers", next);
-                  if (Number(draft.quantity_default_qty || 1) === Number(offers[i]?.qty))
-                    patch("quantity_default_qty", Number(next[0]?.qty || 1));
-                };
-                const moveOffer = (i: number, d: number) => {
-                  const j = i + d;
-                  if (j < 0 || j >= offers.length) return;
-                  const next = [...offers],
-                    [x] = next.splice(i, 1);
-                  next.splice(j, 0, x);
-                  patch("quantity_offers", next);
-                };
-                return (
-                  <div className="bv3-offers-editor">
-                    {offers.map((o: any, i: number) => (
-                      <div className="bv3-quantity-price" key={i}>
-                        <div className="bv3-offer-head">
-                          <b>Offre {i + 1}</b>
-                          <div>
-                            <button type="button" disabled={i === 0} onClick={() => moveOffer(i, -1)}>
-                              ↑
-                            </button>
-                            <button type="button" disabled={i === offers.length - 1} onClick={() => moveOffer(i, 1)}>
-                              ↓
-                            </button>
-                            <button type="button" disabled={offers.length === 1} onClick={() => removeOffer(i)}>
-                              ×
-                            </button>
-                          </div>
-                        </div>
-                        <label>
-                          Quantité
-                          <input
-                            type="number"
-                            min="1"
-                            max="10"
-                            step="1"
-                            value={o.qty}
-                            onChange={(e) =>
-                              updateOffer(i, "qty", Math.min(10, Math.max(1, Number(e.target.value) || 1)))
-                            }
-                          />
-                        </label>
-                        <label>
-                          Libellé
-                          <input
-                            value={o.label || ""}
-                            placeholder={o.qty + " pièces"}
-                            onChange={(e) => updateOffer(i, "label", e.target.value)}
-                          />
-                        </label>
-                        <label>
-                          Prix total
-                          <input
-                            type="number"
-                            min="0"
-                            step="1"
-                            value={o.price ?? ""}
-                            onChange={(e) =>
-                              updateOffer(i, "price", e.target.value === "" ? "" : Number(e.target.value))
-                            }
-                          />
-                        </label>
-                        <label className="bv3-check">
-                          <input
-                            type="radio"
-                            name="default-quantity-offer"
-                            checked={Number(draft.quantity_default_qty || offers[0]?.qty || 1) === Number(o.qty)}
-                            onChange={() => patch("quantity_default_qty", Number(o.qty))}
-                          />{" "}
-                          Offre sélectionnée par défaut
-                        </label>
-                      </div>
-                    ))}
-                    <button
-                      type="button"
-                      onClick={() => {
-                        const used = new Set(offers.map((x: any) => Number(x.qty)));
-                        let qty = 1;
-                        while (used.has(qty) && qty < 10) qty++;
-                        patch("quantity_offers", [
-                          ...offers,
-                          {
-                            qty,
-                            label: qty === 1 ? "1 pièce" : qty + " pièces",
-                            price: Number(draft.price || 0) * qty,
-                          },
-                        ]);
-                      }}
-                    >
-                      + Ajouter une offre
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        patch("quantity_offers", []);
-                        patch("quantity_default_qty", 1);
-                      }}
-                    >
-                      Réinitialiser · Prix × quantité
-                    </button>
-                  </div>
-                );
-              })()}
-            </div>
+          {settingsTab === "theme" && <ThemePanel draft={draft} patch={patch} commit={commit} viewport={viewport} />}
+          {settingsTab === "style" && (
+            <SectionStylePanel
+              draft={draft}
+              selected={selected}
+              sectionLabel={labels[selected] || (selected.startsWith("custom-") ? "Bloc personnalisé" : selected)}
+              patch={patch}
+              viewport={viewport}
+            />
           )}
           <div style={{ display: settingsTab === "content" ? "contents" : "none" }}>
             {selected === "hero" && (
@@ -1634,6 +665,194 @@ export default function BuilderV3({
                     </div>
                   ))}
                 </div>
+              </>
+            )}
+            {selected === "hero" && (
+              <>
+                <label>
+                  Texte badge
+                  <input
+                    value={draft.hero_badge_text || ""}
+                    placeholder="الدفع عند الاستلام"
+                    onChange={(e) => patch("hero_badge_text", e.target.value)}
+                  />
+                </label>
+                <b className="bv3-sx-sub">Éléments affichés</b>
+                <label className="bv3-check">
+                  <input
+                    type="checkbox"
+                    checked={draft.hero_show_subtitle !== false}
+                    onChange={(e) => patch("hero_show_subtitle", e.target.checked)}
+                  />{" "}
+                  Afficher sous-titre
+                </label>
+                <label className="bv3-check">
+                  <input
+                    type="checkbox"
+                    checked={draft.hero_show_price !== false}
+                    onChange={(e) => patch("hero_show_price", e.target.checked)}
+                  />{" "}
+                  Afficher prix
+                </label>
+                <label className="bv3-check">
+                  <input
+                    type="checkbox"
+                    checked={draft.hero_show_cta !== false}
+                    onChange={(e) => patch("hero_show_cta", e.target.checked)}
+                  />{" "}
+                  Afficher CTA
+                </label>
+                <label className="bv3-check">
+                  <input
+                    type="checkbox"
+                    checked={draft.hero_show_badge !== false}
+                    onChange={(e) => patch("hero_show_badge", e.target.checked)}
+                  />{" "}
+                  Afficher badge COD
+                </label>
+              </>
+            )}
+            {selected === "order" && (
+              <>
+                <label>
+                  Mode de commande
+                  <select value={draft.order_mode || ""} onChange={(e) => patch("order_mode", e.target.value)}>
+                    <option value="">Celui du template</option>
+                    <option value="form">Formulaire COD</option>
+                    <option value="both">Formulaire + WhatsApp</option>
+                    <option value="whatsapp">WhatsApp uniquement</option>
+                  </select>
+                </label>
+                <label className="bv3-check">
+                  <input
+                    type="checkbox"
+                    checked={draft.order_show_address !== false}
+                    onChange={(e) => patch("order_show_address", e.target.checked)}
+                  />{" "}
+                  Afficher adresse
+                </label>
+                <div className="bv3-help">
+                  <b>Prix par quantité</b>
+                  <br />
+                  Ajoutez librement vos offres. Le prix saisi est le prix total de l’offre et sera recalculé côté
+                  serveur lors de la commande.
+                </div>
+                {(() => {
+                  const offers = (
+                    Array.isArray(draft.quantity_offers) && draft.quantity_offers.length
+                      ? draft.quantity_offers
+                      : [{ qty: 1, label: "1 pièce", price: Number(draft.price || 0) }]
+                  ).map((x: any) => ({ ...x, qty: Number(x.qty) || 1 }));
+                  const updateOffer = (i: number, key: string, value: any) => {
+                    const next = offers.map((x: any, j: number) => (j === i ? { ...x, [key]: value } : x));
+                    patch("quantity_offers", next);
+                  };
+                  const removeOffer = (i: number) => {
+                    const next = offers.filter((_: any, j: number) => j !== i);
+                    patch("quantity_offers", next);
+                    if (Number(draft.quantity_default_qty || 1) === Number(offers[i]?.qty))
+                      patch("quantity_default_qty", Number(next[0]?.qty || 1));
+                  };
+                  const moveOffer = (i: number, d: number) => {
+                    const j = i + d;
+                    if (j < 0 || j >= offers.length) return;
+                    const next = [...offers],
+                      [x] = next.splice(i, 1);
+                    next.splice(j, 0, x);
+                    patch("quantity_offers", next);
+                  };
+                  return (
+                    <div className="bv3-offers-editor">
+                      {offers.map((o: any, i: number) => (
+                        <div className="bv3-quantity-price" key={i}>
+                          <div className="bv3-offer-head">
+                            <b>Offre {i + 1}</b>
+                            <div>
+                              <button type="button" disabled={i === 0} onClick={() => moveOffer(i, -1)}>
+                                ↑
+                              </button>
+                              <button type="button" disabled={i === offers.length - 1} onClick={() => moveOffer(i, 1)}>
+                                ↓
+                              </button>
+                              <button type="button" disabled={offers.length === 1} onClick={() => removeOffer(i)}>
+                                ×
+                              </button>
+                            </div>
+                          </div>
+                          <label>
+                            Quantité
+                            <input
+                              type="number"
+                              min="1"
+                              max="10"
+                              step="1"
+                              value={o.qty}
+                              onChange={(e) =>
+                                updateOffer(i, "qty", Math.min(10, Math.max(1, Number(e.target.value) || 1)))
+                              }
+                            />
+                          </label>
+                          <label>
+                            Libellé
+                            <input
+                              value={o.label || ""}
+                              placeholder={o.qty + " pièces"}
+                              onChange={(e) => updateOffer(i, "label", e.target.value)}
+                            />
+                          </label>
+                          <label>
+                            Prix total
+                            <input
+                              type="number"
+                              min="0"
+                              step="1"
+                              value={o.price ?? ""}
+                              onChange={(e) =>
+                                updateOffer(i, "price", e.target.value === "" ? "" : Number(e.target.value))
+                              }
+                            />
+                          </label>
+                          <label className="bv3-check">
+                            <input
+                              type="radio"
+                              name="default-quantity-offer"
+                              checked={Number(draft.quantity_default_qty || offers[0]?.qty || 1) === Number(o.qty)}
+                              onChange={() => patch("quantity_default_qty", Number(o.qty))}
+                            />{" "}
+                            Offre sélectionnée par défaut
+                          </label>
+                        </div>
+                      ))}
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const used = new Set(offers.map((x: any) => Number(x.qty)));
+                          let qty = 1;
+                          while (used.has(qty) && qty < 10) qty++;
+                          patch("quantity_offers", [
+                            ...offers,
+                            {
+                              qty,
+                              label: qty === 1 ? "1 pièce" : qty + " pièces",
+                              price: Number(draft.price || 0) * qty,
+                            },
+                          ]);
+                        }}
+                      >
+                        + Ajouter une offre
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          patch("quantity_offers", []);
+                          patch("quantity_default_qty", 1);
+                        }}
+                      >
+                        Réinitialiser · Prix × quantité
+                      </button>
+                    </div>
+                  );
+                })()}
               </>
             )}
             {selected === "benefits" && (

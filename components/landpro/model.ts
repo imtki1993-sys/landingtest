@@ -10,6 +10,7 @@ import { CORE_SECTIONS, LANDPRO_SECTIONS } from "./types";
 import { defaultSectionOrder, getTemplate, SECTION_LABELS } from "./registry";
 import { getDemoProduct } from "./demo-products";
 import { ui, type UI } from "./i18n";
+import { pageThemeFrom, type PageTheme } from "./styles";
 
 export interface Item {
   icon: string;
@@ -76,7 +77,7 @@ export interface VM {
   hidden: Set<string>;
   custom: Record<string, any>;
   sectionStyles: Record<string, any>;
-  themeOverride: { primary?: string; accent?: string };
+  themeOverride: PageTheme;
 }
 
 const ICONS = ["⚡", "🛡️", "✨", "🚚", "💎", "🎯", "🔒", "💡"];
@@ -354,6 +355,7 @@ export function buildVM(data: LandingV4Data, opts: { demo?: boolean } = {}): VM 
     hidden: new Set(arr(c.hidden_sections).map(String)),
     custom: c.custom_sections && typeof c.custom_sections === "object" ? c.custom_sections : {},
     sectionStyles: c.section_styles && typeof c.section_styles === "object" ? c.section_styles : {},
-    themeOverride: { primary: str(c.theme_primary) || undefined, accent: str(c.theme_accent) || undefined },
+    // thème de la page réglé par le vendeur (couleurs, polices, arrondi, tailles, espacement)
+    themeOverride: pageThemeFrom(c),
   };
 }
