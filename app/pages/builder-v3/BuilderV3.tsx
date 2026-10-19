@@ -47,7 +47,15 @@ export default function BuilderV3({
     [future, setFuture] = useState<any[]>([]),
     [uploading, setUploading] = useState(false),
     [settingsTab, setSettingsTab] = useState<"content" | "style" | "theme" | "template">("content"),
-    [uiLibrary, setUiLibrary] = useState<any>({ styles: [], patterns: [], colors: [], typography: [] });
+    [uiLibrary, setUiLibrary] = useState<any>({ styles: [], patterns: [], colors: [], typography: [] }),
+    [workspaceWhatsapp, setWorkspaceWhatsapp] = useState("");
+  // Numéro WhatsApp du compte (Paramètres), utilisé par la page publiée quand la page n'en a pas
+  useEffect(() => {
+    fetch("/api/settings", { cache: "no-store" })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((x) => setWorkspaceWhatsapp(String(x?.workspace?.settings?.whatsapp_phone || "").replace(/\D/g, "")))
+      .catch(() => {});
+  }, []);
   useEffect(() => {
     fetch("/api/uiux-library")
       .then((r) => (r.ok ? r.json() : Promise.reject()))
@@ -73,6 +81,8 @@ export default function BuilderV3({
     onChange(next);
   };
   const patch = (k: string, v: any) => commit({ ...draft, [k]: v, builder_v3: { ...doc, viewport } });
+  // plusieurs champs en un seul changement (deux patch() de suite : le second effaçait le premier)
+  const patchMany = (values: Record<string, any>) => commit({ ...draft, ...values, builder_v3: { ...doc, viewport } });
   const setOrder = (order: string[]) =>
     commit({
       ...draft,
@@ -555,7 +565,14 @@ export default function BuilderV3({
                     oldPrice: draft.oldPrice ? Number(draft.oldPrice) : null,
                     images: draft.images || draft.product_images || [],
                     content: { ...draft, uiux_library: uiLibrary, design_system: { ...(draft.design_system || {}) } },
-                    whatsappPhone: editing?.whatsappPhone || editing?.whatsapp_phone || null,
+                    // même numéro que la page publiée : sans numéro, le mode de commande retombe sur « formulaire »
+                    whatsappPhone:
+                      editing?.whatsappPhone ||
+                      editing?.whatsapp_phone ||
+                      editing?.seo?.whatsapp_phone ||
+                      draft.whatsapp_phone ||
+                      workspaceWhatsapp ||
+                      null,
                     metaPixelId: null,
                   }}
                 />
@@ -757,9 +774,11 @@ export default function BuilderV3({
                   };
                   const removeOffer = (i: number) => {
                     const next = offers.filter((_: any, j: number) => j !== i);
-                    patch("quantity_offers", next);
-                    if (Number(draft.quantity_default_qty || 1) === Number(offers[i]?.qty))
-                      patch("quantity_default_qty", Number(next[0]?.qty || 1));
+                    patchMany(
+                      Number(draft.quantity_default_qty || 1) === Number(offers[i]?.qty)
+                        ? { quantity_offers: next, quantity_default_qty: Number(next[0]?.qty || 1) }
+                        : { quantity_offers: next },
+                    );
                   };
                   const moveOffer = (i: number, d: number) => {
                     const j = i + d;
@@ -852,8 +871,7 @@ export default function BuilderV3({
                       <button
                         type="button"
                         onClick={() => {
-                          patch("quantity_offers", []);
-                          patch("quantity_default_qty", 1);
+                          patchMany({ quantity_offers: [], quantity_default_qty: 1 });
                         }}
                       >
                         Réinitialiser · Prix × quantité

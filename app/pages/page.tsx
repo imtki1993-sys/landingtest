@@ -437,6 +437,9 @@ export default function Pages() {
           : contentImages;
     setEditorImages(savedImages);
     setDraft({
+      // Tous les réglages enregistrés (mode de commande, texte du bouton du formulaire…) : sans ça,
+      // un champ absent de la liste ci-dessous était perdu à l'ouverture puis effacé à la publication.
+      ...a,
       images: savedImages,
       price: Number(p.products?.price ?? 149),
       oldPrice: p.products?.compare_at_price ?? "",
