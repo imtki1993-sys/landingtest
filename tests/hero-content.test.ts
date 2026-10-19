@@ -33,4 +33,12 @@ describe("contenu du hero", () => {
     expect(v.name).toBe("Orbite 360");
     expect([v.show.trust, v.show.cta2, v.show.rating, v.show.kicker]).toEqual([false, false, true, true]);
   });
+  it("liste à cocher du hero : une ligne par point, sinon titres des bénéfices", () => {
+    const a = vm({ hero_points: "Aimant puissant\n\n Rotation 360° ", hero_show_points: false });
+    expect(a.hero.points).toEqual(["Aimant puissant", "Rotation 360°"]);
+    expect(a.show.points).toBe(false);
+    const b = vm({ benefits: [{ title: "Solide" }, { title: "Léger" }] });
+    expect(b.hero.points).toEqual(b.benefits.map((x) => x.title));
+    expect(b.show.points).toBe(true);
+  });
 });

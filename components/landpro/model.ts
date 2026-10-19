@@ -59,6 +59,7 @@ export interface VM {
     rating: boolean;
     kicker: boolean;
     cta2: boolean;
+    points: boolean;
   };
   /** Contenu propre au hero, modifiable dans l'éditeur (vide = texte du template). */
   hero: {
@@ -72,6 +73,8 @@ export interface VM {
     trust: string[];
     /** true quand le vendeur a écrit ses propres avantages pour le hero */
     trustCustom: boolean;
+    /** liste à coches du hero (vide = titres de la section Bénéfices) */
+    points: string[];
   };
   benefits: Item[];
   features: Item[];
@@ -286,6 +289,10 @@ export function buildVM(data: LandingV4Data, opts: { demo?: boolean } = {}): VM 
     .map((x: unknown) => String(x ?? "").trim())
     .filter(Boolean)
     .slice(0, 6);
+  const heroPoints = (Array.isArray(c.hero_points) ? c.hero_points : String(c.hero_points || "").split("\n"))
+    .map((x: unknown) => String(x ?? "").trim())
+    .filter(Boolean)
+    .slice(0, 8);
 
   return {
     t,
@@ -324,6 +331,7 @@ export function buildVM(data: LandingV4Data, opts: { demo?: boolean } = {}): VM 
       rating: c.hero_show_rating !== false,
       kicker: c.hero_show_kicker !== false,
       cta2: c.hero_show_cta2 !== false,
+      points: c.hero_show_points !== false,
     },
     hero: {
       kicker: str(c.hero_kicker),
@@ -331,6 +339,7 @@ export function buildVM(data: LandingV4Data, opts: { demo?: boolean } = {}): VM 
       cta2Target: str(c.hero_cta2_target),
       trust: heroTrust.length ? heroTrust : trustList,
       trustCustom: heroTrust.length > 0,
+      points: heroPoints.length ? heroPoints : benefits.map((b) => b.title).filter(Boolean),
     },
     benefits,
     features,

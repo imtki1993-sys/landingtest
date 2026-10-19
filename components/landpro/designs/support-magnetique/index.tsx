@@ -205,14 +205,14 @@ function Hero(p: SectionProps) {
               ))}
             </p>
           ) : null}
-          {vm.benefits.length ? (
+          {vm.show.points && vm.hero.points.length ? (
             <ul className="sm-hero-icons">
-              {vm.benefits.slice(0, 4).map((b, k) => (
+              {vm.hero.points.slice(0, 4).map((b, k) => (
                 <li key={k}>
                   <span className="sm-roundico">
                     <G name={iconAt(HERO_ICONS, k)} />
                   </span>
-                  <small>{b.title}</small>
+                  <small>{b}</small>
                 </li>
               ))}
             </ul>

@@ -56,7 +56,7 @@ export default function HeroContentPanel({ draft, patch, editing }: { draft: any
         price: Number(draft.price || 0),
         oldPrice: draft.oldPrice ? Number(draft.oldPrice) : null,
         images: draft.images || [],
-        content: { ...draft, hero_trust: "", hero_kicker: "", hero_cta2_text: "" },
+        content: { ...draft, hero_trust: "", hero_points: "", hero_kicker: "", hero_cta2_text: "" },
       } as any),
     [draft, editing?.name, editing?.locale],
   );
@@ -154,6 +154,16 @@ export default function HeroContentPanel({ draft, patch, editing }: { draft: any
         onChange={(v) => patch("hero_trust", v)}
       />
 
+      <b className="bv3-sx-sub">Liste à cocher</b>
+      <Field
+        label="Un point par ligne"
+        area
+        value={Array.isArray(draft.hero_points) ? draft.hero_points.join("\n") : draft.hero_points}
+        placeholder={vm.hero.points.slice(0, 5).join("\n")}
+        hint="Liste avec coches à côté de l'image (selon le template). Vide = titres de la section Bénéfices."
+        onChange={(v) => patch("hero_points", v)}
+      />
+
       <b className="bv3-sx-sub">Éléments affichés</b>
       <Toggle draft={draft} patch={patch} k="hero_show_kicker" label="Accroche promo" />
       <Toggle draft={draft} patch={patch} k="hero_show_badge" label="Badge" />
@@ -162,6 +172,7 @@ export default function HeroContentPanel({ draft, patch, editing }: { draft: any
       <Toggle draft={draft} patch={patch} k="hero_show_cta" label="Bouton principal" />
       <Toggle draft={draft} patch={patch} k="hero_show_cta2" label="Bouton secondaire" />
       <Toggle draft={draft} patch={patch} k="hero_show_trust" label="Avantages" />
+      <Toggle draft={draft} patch={patch} k="hero_show_points" label="Liste à cocher" />
       <Toggle draft={draft} patch={patch} k="hero_show_rating" label="Note des avis clients" />
       <b className="bv3-sx-sub">Images</b>
     </div>
