@@ -221,7 +221,7 @@ function Hero({ vm }: SectionProps) {
           <Skyline />
         </div>
         <ul className="or-words">
-          {vm.trust.slice(0, 3).map((t, i) => (
+          {(vm.show.trust ? vm.hero.trust : []).slice(0, 3).map((t, i) => (
             <li key={i}>{t}</li>
           ))}
         </ul>

@@ -14,6 +14,7 @@ import {
   Go,
   goTo,
   Headline,
+  heroKicker,
   Icon,
   iconAt,
   Img,
@@ -149,7 +150,7 @@ function Hero({ vm }: SectionProps) {
       <div className="cc-wrap cc-hero-grid">
         <div className="cc-feat">
           <p className="cc-feat-label">
-            {vm.eyebrow && vm.show.badge ? vm.eyebrow : tr(vm, "Pièce à la une", "قطعة مميزة")}
+            {vm.eyebrow && vm.show.badge ? vm.eyebrow : heroKicker(vm, tr(vm, "Pièce à la une", "قطعة مميزة"))}
           </p>
           <div className="cc-feat-img">
             <Img vm={vm} i={1} />

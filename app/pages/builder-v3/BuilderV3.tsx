@@ -7,6 +7,7 @@ import { LANDPRO_SECTIONS } from "../../../components/landpro/types";
 import { SECTION_LABELS } from "../../../components/landpro/registry";
 import LandproSectionEditor, { LandproTemplatePanel } from "./LandproSectionEditor";
 import { SectionStylePanel, ThemePanel } from "./StylePanels";
+import HeroContentPanel from "./HeroContentPanel";
 const BUILTIN_ADDABLE: string[] = ["benefits", "problem", "features", "how", "trust", "faq", ...LANDPRO_SECTIONS];
 const library = ["text", "imageText", "gallery", "ctaBlock", "vertical916", ...BUILTIN_ADDABLE];
 const labels: any = {
@@ -620,38 +621,7 @@ export default function BuilderV3({
           <div style={{ display: settingsTab === "content" ? "contents" : "none" }}>
             {selected === "hero" && (
               <>
-                <label>
-                  Titre
-                  <input value={draft.headline || ""} onChange={(e) => patch("headline", e.target.value)} />
-                </label>
-                <label>
-                  Sous-titre
-                  <textarea value={draft.subheadline || ""} onChange={(e) => patch("subheadline", e.target.value)} />
-                </label>
-                <label>
-                  Prix
-                  <input type="number" value={draft.price || ""} onChange={(e) => patch("price", e.target.value)} />
-                </label>
-                <label>
-                  Ancien prix
-                  <input
-                    type="number"
-                    value={draft.oldPrice || ""}
-                    onChange={(e) => patch("oldPrice", e.target.value)}
-                  />
-                </label>
-                <label>
-                  CTA <small>boutons qui mènent au formulaire</small>
-                  <input value={draft.cta || ""} onChange={(e) => patch("cta", e.target.value)} />
-                </label>
-                <label>
-                  Bouton du formulaire <small>celui qui envoie la commande</small>
-                  <input
-                    value={draft.form_cta || ""}
-                    placeholder={draft.cta || "Même texte que le CTA"}
-                    onChange={(e) => patch("form_cta", e.target.value)}
-                  />
-                </label>
+                <HeroContentPanel draft={draft} patch={patch} editing={editing} />
                 <label>
                   Image principale
                   <input
@@ -690,51 +660,6 @@ export default function BuilderV3({
                     </div>
                   ))}
                 </div>
-              </>
-            )}
-            {selected === "hero" && (
-              <>
-                <label>
-                  Texte badge
-                  <input
-                    value={draft.hero_badge_text || ""}
-                    placeholder="الدفع عند الاستلام"
-                    onChange={(e) => patch("hero_badge_text", e.target.value)}
-                  />
-                </label>
-                <b className="bv3-sx-sub">Éléments affichés</b>
-                <label className="bv3-check">
-                  <input
-                    type="checkbox"
-                    checked={draft.hero_show_subtitle !== false}
-                    onChange={(e) => patch("hero_show_subtitle", e.target.checked)}
-                  />{" "}
-                  Afficher sous-titre
-                </label>
-                <label className="bv3-check">
-                  <input
-                    type="checkbox"
-                    checked={draft.hero_show_price !== false}
-                    onChange={(e) => patch("hero_show_price", e.target.checked)}
-                  />{" "}
-                  Afficher prix
-                </label>
-                <label className="bv3-check">
-                  <input
-                    type="checkbox"
-                    checked={draft.hero_show_cta !== false}
-                    onChange={(e) => patch("hero_show_cta", e.target.checked)}
-                  />{" "}
-                  Afficher CTA
-                </label>
-                <label className="bv3-check">
-                  <input
-                    type="checkbox"
-                    checked={draft.hero_show_badge !== false}
-                    onChange={(e) => patch("hero_show_badge", e.target.checked)}
-                  />{" "}
-                  Afficher badge COD
-                </label>
               </>
             )}
             {selected === "order" && (

@@ -177,7 +177,14 @@ function Hero({ vm }: SectionProps) {
           ) : null}
           <div className="se-hero-ctas">
             {vm.show.cta ? <Buy vm={vm} className="se-btn se-btn-dark" arrow /> : null}
-            {vm.videoUrl ? (
+            {!vm.show.cta2 ? null : vm.hero.cta2 ? (
+              <Go to={vm.hero.cta2Target || "benefits"} className="se-play">
+                <span>
+                  <Icon name="down" />
+                </span>
+                {vm.hero.cta2}
+              </Go>
+            ) : vm.videoUrl ? (
               <a className="se-play" href={vm.videoUrl} target="_blank" rel="noopener noreferrer">
                 <span>
                   <Icon name="play" />

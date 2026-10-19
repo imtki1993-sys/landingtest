@@ -165,9 +165,11 @@ function Hero({ vm }: SectionProps) {
           ) : null}
           <div className="vd-hero-btns">
             {vm.show.cta ? <Buy vm={vm} className="vd-btn" arrow /> : null}
-            <Go to={second || "order"} className="vd-btn-ghost">
-              {second ? tr(vm, "Voir les modèles", "شوف الموديلات") : tr(vm, "Réserver", "احجز")}
-            </Go>
+            {vm.show.cta2 ? (
+              <Go to={vm.hero.cta2Target || second || "order"} className="vd-btn-ghost">
+                {vm.hero.cta2 || (second ? tr(vm, "Voir les modèles", "شوف الموديلات") : tr(vm, "Réserver", "احجز"))}
+              </Go>
+            ) : null}
           </div>
           <Go to={more} className="vd-watch">
             <span>

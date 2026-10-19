@@ -405,3 +405,9 @@
   .lpx:not(.lpx-builder) .lpx-styled[data-sx-hide-d] { display: none !important; }
   .lpx-builder .lpx-styled[data-sx-hide-d] { opacity: .35; }
 }
+
+/* Ancre de section (boutons qui font défiler vers une section) */
+.lpx-anchor { display: block; height: 0; scroll-margin-top: 70px; }
+/* Accroche promo et bouton secondaire du hero (réglables dans l'éditeur) */
+.lpx-kicker { display: inline-block; margin: 0 0 10px; font-weight: 800; font-size: 13px; letter-spacing: .02em; color: var(--accent); }
+.lpx-hero-actions .lpx-btn.lpx-ghost { padding: 15px 24px; }

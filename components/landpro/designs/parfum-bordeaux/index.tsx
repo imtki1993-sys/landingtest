@@ -101,7 +101,7 @@ function Hero({ vm }: SectionProps) {
           {vm.show.cta ? <Buy vm={vm} className="pb-btn" /> : null}
         </div>
         <ul className="pb-hero-trust">
-          {vm.trust.slice(0, 4).map((t, i) => (
+          {(vm.show.trust ? vm.hero.trust : []).slice(0, 4).map((t, i) => (
             <li key={i}>
               <Icon name={iconAt(TRUST_ICONS, i)} />
               <span>{t}</span>

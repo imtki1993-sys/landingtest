@@ -14,6 +14,7 @@ import {
   Go,
   goTo,
   Headline,
+  heroKicker,
   Icon,
   iconAt,
   Img,
@@ -126,10 +127,12 @@ function Hero({ vm }: SectionProps) {
         <Img vm={vm} i={0} className="ls-hero-img" />
         <div className="ls-flash">
           <Bolt className="ls-flash-bolt" />
-          <small>{tr(vm, "Vente flash", "عرض خاص")}</small>
+          <small>{heroKicker(vm, tr(vm, "Vente flash", "عرض خاص"))}</small>
           {d ? <b>-{d}%</b> : <b className="ls-flash-cod">COD</b>}
           <small>
-            {d ? tr(vm, "Sur ce modèle", "على هذا الموديل") : tr(vm, "Paiement à la livraison", "الدفع عند الاستلام")}
+            {d
+              ? tr(vm, "Sur ce modèle", "على هذا الموديل")
+              : vm.hero.trust[1] || tr(vm, "Paiement à la livraison", "الدفع عند الاستلام")}
           </small>
         </div>
       </div>
@@ -146,9 +149,11 @@ function Hero({ vm }: SectionProps) {
           ) : null}
           <div className="ls-ctas">
             {vm.show.cta ? <Buy vm={vm} className="ls-btn" arrow /> : null}
-            <Go to="showcase" className="ls-btn-out">
-              {tr(vm, "Voir les modèles", "شوف الموديلات")}
-            </Go>
+            {vm.show.cta2 ? (
+              <Go to={vm.hero.cta2Target || "showcase"} className="ls-btn-out">
+                {vm.hero.cta2 || tr(vm, "Voir les modèles", "شوف الموديلات")}
+              </Go>
+            ) : null}
           </div>
           {stat ? (
             <div className="ls-proof">

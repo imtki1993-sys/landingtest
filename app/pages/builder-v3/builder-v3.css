@@ -172,3 +172,14 @@ html[data-theme="dark"] .bv3-right .bv3-sx-sizes label { border-color: #29415f; 
 html[data-theme="dark"] .bv3-right .bv3-sx-sizes label.is-current { background: #0f2747; border-color: #4ea0ff; }
 .bv3-sx-note { margin: 0; padding: 9px 11px; border-radius: 9px; background: #fff7e6; border: 1px solid #fde3a7; color: #8a5a00; font-size: 12px; line-height: 1.45; }
 html[data-theme="dark"] .bv3-sx-note { background: #2b2210; border-color: #5c4614; color: #f5c66b; }
+/* Contenu du hero (HeroContentPanel.tsx) */
+.bv3-hero-content { display: grid; }
+.bv3-hero-content .bv3-sx-sub { display: block; margin: 18px 0 2px; padding-top: 14px; border-top: 1px solid #e2e8f0; color: #172033; font-size: 13px; font-weight: 800; }
+.bv3-hero-content .bv3-sx-sub:first-child { border-top: 0; padding-top: 0; margin-top: 4px; }
+.bv3-right .bv3-hero-content label { margin: 10px 0; }
+.bv3-right .bv3-hero-content label.bv3-check { display: flex !important; align-items: center; justify-content: flex-start !important; gap: 8px; margin: 6px 0; font-weight: 600; }
+.bv3-right .bv3-hero-content label.bv3-check input { width: 16px; height: 16px; margin: 0; flex: 0 0 auto; }
+.bv3-right .bv3-hero-content :is(textarea, input:not([type=checkbox])) { font: inherit; font-weight: 400; font-size: 13px; }
+.bv3-right .bv3-hero-content textarea { min-height: 76px; }
+.bv3-right .bv3-hero-content select { width: 100%; padding: 10px; border: 1px solid #d7deea; border-radius: 9px; background: #fff; }
+html[data-theme="dark"] .bv3-hero-content .bv3-sx-sub { color: #e6eef8; border-color: #203652; }

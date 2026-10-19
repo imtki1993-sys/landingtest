@@ -16,6 +16,7 @@ import {
   Go,
   goTo,
   Headline,
+  heroKicker,
   Icon,
   iconAt,
   Img,
@@ -94,9 +95,12 @@ function Header({ vm, qty }: SectionProps) {
 function Hero({ vm }: SectionProps) {
   const d = discount(vm);
   const hasVideo = !!vm.videoUrl && vm.order.includes("video") && !vm.hidden.has("video");
-  const trust = vm.features.length
-    ? vm.features.slice(0, 3).map((f) => [f.title, f.text])
-    : vm.trust.slice(0, 3).map((t) => [t, ""]);
+  // avantages écrits pour le hero > caractéristiques > section Confiance
+  const trust = !vm.show.trust
+    ? []
+    : !vm.hero.trustCustom && vm.features.length
+      ? vm.features.slice(0, 3).map((f) => [f.title, f.text])
+      : vm.hero.trust.slice(0, 3).map((t) => [t, ""]);
   return (
     <section className="gr-hero" id={sid("hero")}>
       <div className="gr-hero-art">
@@ -105,12 +109,12 @@ function Hero({ vm }: SectionProps) {
           {d ? (
             <>
               <b>-{d}%</b>
-              <small>{tr(vm, "Offre de lancement", "عرض الإطلاق")}</small>
+              <small>{heroKicker(vm, tr(vm, "Offre de lancement", "عرض الإطلاق"))}</small>
             </>
           ) : (
             <>
               <b>{tr(vm, "COD", "COD")}</b>
-              <small>{tr(vm, "Paiement à la livraison", "الدفع عند الاستلام")}</small>
+              <small>{vm.hero.trust[1] || tr(vm, "Paiement à la livraison", "الدفع عند الاستلام")}</small>
             </>
           )}
         </span>
@@ -122,12 +126,18 @@ function Hero({ vm }: SectionProps) {
           {vm.show.subtitle && vm.subheadline ? <p className="gr-lead">{vm.subheadline}</p> : null}
           <div className="gr-hero-ctas">
             {vm.show.cta ? <Buy vm={vm} className="gr-btn" arrow /> : null}
-            <button type="button" className="gr-play" onClick={() => goTo(hasVideo ? "video" : "benefits")}>
-              <span>
-                <Icon name="play" />
-              </span>
-              {hasVideo ? tr(vm, "Voir la vidéo", "شوف الفيديو") : tr(vm, "Découvrir", "اكتشف")}
-            </button>
+            {vm.show.cta2 ? (
+              <button
+                type="button"
+                className="gr-play"
+                onClick={() => goTo(vm.hero.cta2Target || (hasVideo ? "video" : "benefits"))}
+              >
+                <span>
+                  <Icon name="play" />
+                </span>
+                {vm.hero.cta2 || (hasVideo ? tr(vm, "Voir la vidéo", "شوف الفيديو") : tr(vm, "Découvrir", "اكتشف"))}
+              </button>
+            ) : null}
           </div>
           <ul className="gr-hero-trust">
             {trust.map(([t, s], i) => (
