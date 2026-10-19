@@ -81,3 +81,16 @@ describe("toItem", () => {
     expect(toItem("⚡ Rapide", 0)).toMatchObject({ icon: "⚡", title: "Rapide" });
   });
 });
+
+describe("texte des boutons", () => {
+  it("le bouton du formulaire a son propre texte (form_cta)", () => {
+    const vm = buildVM(page({ cta: "اطلب دابا 👇", form_cta: "أكد الطلب ديالي" }));
+    expect(vm.cta).toBe("اطلب دابا 👇");
+    expect(vm.submitCta).toBe("أكد الطلب ديالي");
+  });
+
+  it("sans form_cta, le bouton du formulaire garde le texte du CTA", () => {
+    const vm = buildVM(page({ cta: "طلب دابا والدفع ملي توصلك" }));
+    expect(vm.submitCta).toBe("طلب دابا والدفع ملي توصلك");
+  });
+});

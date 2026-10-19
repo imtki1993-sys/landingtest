@@ -624,8 +624,16 @@ export default function BuilderV3({
                   />
                 </label>
                 <label>
-                  CTA
+                  CTA <small>boutons qui mènent au formulaire</small>
                   <input value={draft.cta || ""} onChange={(e) => patch("cta", e.target.value)} />
+                </label>
+                <label>
+                  Bouton du formulaire <small>celui qui envoie la commande</small>
+                  <input
+                    value={draft.form_cta || ""}
+                    placeholder={draft.cta || "Même texte que le CTA"}
+                    onChange={(e) => patch("form_cta", e.target.value)}
+                  />
                 </label>
                 <label>
                   Image principale
@@ -931,8 +939,16 @@ export default function BuilderV3({
                   <input value={draft.delivery || ""} onChange={(e) => patch("delivery", e.target.value)} />
                 </label>
                 <label>
-                  CTA
+                  CTA <small>boutons qui mènent au formulaire</small>
                   <input value={draft.cta || ""} onChange={(e) => patch("cta", e.target.value)} />
+                </label>
+                <label>
+                  Bouton du formulaire <small>celui qui envoie la commande</small>
+                  <input
+                    value={draft.form_cta || ""}
+                    placeholder={draft.cta || "Même texte que le CTA"}
+                    onChange={(e) => patch("form_cta", e.target.value)}
+                  />
                 </label>
                 <label className="bv3-check">
                   <input

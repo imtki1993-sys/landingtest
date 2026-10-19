@@ -45,6 +45,8 @@ export interface VM {
   /** légendes des photos (content.showcase_labels) */
   imageLabels: string[];
   cta: string;
+  /** texte du bouton qui envoie le formulaire (content.form_cta), distinct des boutons qui y mènent */
+  submitCta: string;
   delivery: string;
   show: { badge: boolean; cta: boolean; price: boolean; subtitle: boolean; address: boolean };
   benefits: Item[];
@@ -277,6 +279,8 @@ export function buildVM(data: LandingV4Data, opts: { demo?: boolean } = {}): VM 
     images,
     imageLabels: labels.length ? labels : demo ? p.imageLabels || [] : [],
     cta: str(c.cta) || u.orderNow,
+    // vide : même texte que le CTA (pages existantes inchangées)
+    submitCta: str(c.form_cta) || str(c.cta) || u.form.submit,
     delivery: str(c.delivery) || `${u.cod} · ${deliveryWord}`,
     show: {
       badge: c.hero_show_badge !== false,

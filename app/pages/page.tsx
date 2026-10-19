@@ -449,6 +449,7 @@ export default function Pages() {
       problem: a.problem || "",
       solution: a.solution || "",
       cta: a.cta || "",
+      form_cta: a.form_cta || "",
       delivery: a.delivery || "",
       delivery_price: Number(a.delivery_price || 0),
       benchmark_niche: a.benchmark_niche || a.design_system?.blueprint?.id || "",
@@ -2139,10 +2140,18 @@ export default function Pages() {
                           />
                         </label>
                         <label>
-                          CTA
+                          CTA <small>boutons qui mènent au formulaire</small>
                           <input
                             value={draft.cta || ""}
                             onChange={(e) => setDraft({ ...draft, cta: e.target.value })}
+                          />
+                        </label>
+                        <label>
+                          Bouton du formulaire <small>celui qui envoie la commande</small>
+                          <input
+                            value={draft.form_cta || ""}
+                            placeholder={draft.cta || "Même texte que le CTA"}
+                            onChange={(e) => setDraft({ ...draft, form_cta: e.target.value })}
                           />
                         </label>
                         <label>
@@ -2716,8 +2725,16 @@ export default function Pages() {
                         />
                       </label>
                       <label>
-                        CTA
+                        CTA <small>boutons qui mènent au formulaire</small>
                         <input value={draft.cta || ""} onChange={(e) => setDraft({ ...draft, cta: e.target.value })} />
+                      </label>
+                      <label>
+                        Bouton du formulaire <small>celui qui envoie la commande</small>
+                        <input
+                          value={draft.form_cta || ""}
+                          placeholder={draft.cta || "Même texte que le CTA"}
+                          onChange={(e) => setDraft({ ...draft, form_cta: e.target.value })}
+                        />
                       </label>
                       <div className="form-style-picker">
                         <div className="editor-section-title">

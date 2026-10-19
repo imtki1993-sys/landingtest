@@ -374,7 +374,7 @@ export function OrderForm({
 
       {!waOnly && (
         <button className={cx("btn block lg pulse")} type={preview ? "button" : "submit"}>
-          {vm.cta || u.form.submit}
+          {vm.submitCta || u.form.submit}
         </button>
       )}
       {vm.orderMode !== "form" && (
