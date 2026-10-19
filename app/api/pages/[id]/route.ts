@@ -3,7 +3,38 @@ import { reportError } from "../../../../lib/monitoring";
 import { withLandingInvalidation } from "../../../../lib/landing-cache";
 import { NextResponse } from "next/server";
 import { revalidateTag } from "next/cache";
-import { authContext } from "../../../../lib/server-auth";
+import { adminDb, authContext } from "../../../../lib/server-auth";
+
+/** Recopie le contenu publié (seo.ai_content, images, pixel) dans la version publiée de la page. */
+async function syncPublishedVersion(landingPageId: string, workspaceId: string, liveSeo: any) {
+  const db = adminDb();
+  const { data: lp, error } = await db
+    .from("landing_pages")
+    .select("published_version_id")
+    .eq("id", landingPageId)
+    .eq("workspace_id", workspaceId)
+    .maybeSingle();
+  if (error) throw error;
+  if (!lp?.published_version_id) return;
+  const { data: v, error: ve } = await db
+    .from("landing_page_versions")
+    .select("config")
+    .eq("id", lp.published_version_id)
+    .eq("landing_page_id", landingPageId)
+    .maybeSingle();
+  if (ve) throw ve;
+  if (!v) return;
+  const config: any = v.config && typeof v.config === "object" ? v.config : {};
+  const seo: any = { ...(config.seo || {}), ai_content: liveSeo.ai_content };
+  if (Array.isArray(liveSeo.images)) seo.images = liveSeo.images;
+  if (liveSeo.meta_pixel_id !== undefined) seo.meta_pixel_id = liveSeo.meta_pixel_id;
+  const { error: ue } = await db
+    .from("landing_page_versions")
+    .update({ config: { ...config, seo } })
+    .eq("id", lp.published_version_id)
+    .eq("landing_page_id", landingPageId);
+  if (ue) throw ue;
+}
 
 export async function GET(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
@@ -90,6 +121,13 @@ async function PATCHHandler(req: Request, { params }: { params: Promise<{ id: st
         .eq("id", id)
         .eq("workspace_id", workspaceId);
       if (syncError) throw syncError;
+      // La page publique lit d'abord la version publiée (lib/public-landing.ts) : elle doit contenir
+      // exactement le contenu envoyé par l'éditeur (offres par quantité, mode de commande…),
+      // même si la fonction SQL de publication n'en garde qu'une partie.
+      // En cas d'échec, la publication reste valide ; la vérification de l'éditeur signale l'écart.
+      await syncPublishedVersion(id, workspaceId, liveSeo).catch((e) =>
+        reportError(e, "api/pages/[id] sync version publiée"),
+      );
       revalidateTag("landing:" + current.slug, { expire: 0 });
       return NextResponse.json(data);
     }
