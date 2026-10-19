@@ -16,6 +16,7 @@ import {
   Go,
   goTo,
   Headline,
+  heroKicker,
   Icon,
   iconAt,
   Img,
@@ -121,10 +122,12 @@ function Hero({ vm }: SectionProps) {
             ) : null}
             <div className="ic-hero-btns">
               {vm.show.cta ? <Buy vm={vm} className="ic-btn" arrow /> : null}
-              <Go to="showcase" className="ic-btn-line">
-                <Icon name="play" />
-                <span>{tr(vm, "Voir l'appli", "شوف التطبيق")}</span>
-              </Go>
+              {vm.show.cta2 ? (
+                <Go to={vm.hero.cta2Target || "showcase"} className="ic-btn-line">
+                  <Icon name="play" />
+                  <span>{vm.hero.cta2 || tr(vm, "Voir l'appli", "شوف التطبيق")}</span>
+                </Go>
+              ) : null}
             </div>
           </div>
           {vm.features.length ? (
@@ -156,7 +159,7 @@ function Hero({ vm }: SectionProps) {
               </div>
               <Avatars vm={vm} />
               <button type="button" onClick={scrollToOrder}>
-                {tr(vm, "Rejoignez la communauté !", "انضم للمجموعة دابا !")}
+                {heroKicker(vm, tr(vm, "Rejoignez la communauté !", "انضم للمجموعة دابا !")) || vm.cta}
               </button>
             </div>
           ) : null}

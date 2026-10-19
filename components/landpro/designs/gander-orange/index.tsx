@@ -178,7 +178,7 @@ function Hero({ vm, variant, setVariant }: SectionProps) {
           </span>
           <span>
             <b>{top ? `${top.value} ${top.label}` : vm.name}</b>
-            <small>{vm.eyebrow && vm.show.badge ? vm.eyebrow : vm.trust[0]}</small>
+            <small>{vm.eyebrow && vm.show.badge ? vm.eyebrow : vm.show.trust ? vm.hero.trust[0] : ""}</small>
           </span>
         </div>
         <div className="go-h1-row">
@@ -195,9 +195,11 @@ function Hero({ vm, variant, setVariant }: SectionProps) {
 
       <div className="go-hero-end">
         {vm.show.subtitle && vm.subheadline ? <p className="go-lead">{vm.subheadline}</p> : null}
-        <Go to="features" className="go-ulink">
-          {tr(vm, "Comment ça marche ?", "كيفاش خدام؟")}
-        </Go>
+        {vm.show.cta2 ? (
+          <Go to={vm.hero.cta2Target || "features"} className="go-ulink">
+            {vm.hero.cta2 || tr(vm, "Comment ça marche ?", "كيفاش خدام؟")}
+          </Go>
+        ) : null}
         <div className="go-card">
           <h3>{vm.orderTitle}</h3>
           <p>{vm.delivery}</p>

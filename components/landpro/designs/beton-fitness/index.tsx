@@ -88,7 +88,7 @@ function Header({ vm, qty }: SectionProps) {
           <i>{qty}</i>
         </button>
         <Buy vm={vm} className="bf-btn bf-btn-sm">
-          {tr(vm, "Commander", "اطلب")}
+          {vm.cta}
         </Buy>
       </div>
     </header>
@@ -150,7 +150,7 @@ function Hero({ vm }: SectionProps) {
                 <span>
                   <b>{money(vm, vm.price)}</b>
                   {vm.oldPrice ? <s>{money(vm, vm.oldPrice)}</s> : null}
-                  {vm.trust[1] ? <em>{vm.trust[1]}</em> : null}
+                  {vm.show.trust && vm.hero.trust[1] ? <em>{vm.hero.trust[1]}</em> : null}
                 </span>
               </li>
             ) : null}

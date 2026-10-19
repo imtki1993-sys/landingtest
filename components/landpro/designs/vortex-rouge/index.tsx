@@ -10,7 +10,22 @@ import type { Design } from "../types";
 import type { SectionProps } from "../../Sections";
 import type { VM } from "../../model";
 import { VideoFrame } from "../../parts";
-import { Buy, discount, Go, goTo, Icon, iconAt, Img, money, navOf, OrderBox, scrollToOrder, sid, tr } from "../kit";
+import {
+  Buy,
+  discount,
+  Go,
+  goTo,
+  heroKicker,
+  Icon,
+  iconAt,
+  Img,
+  money,
+  navOf,
+  OrderBox,
+  scrollToOrder,
+  sid,
+  tr,
+} from "../kit";
 import "./style.css";
 
 const FEAT_ICONS = ["eye", "sun", "target", "spring", "shield", "box"];
@@ -137,7 +152,7 @@ function Hero({ vm }: SectionProps) {
           <span className="vr-sign-name">{vm.name}</span>
           {vm.show.price && vm.price ? (
             <small>
-              {tr(vm, "Prix de lancement", "ثمن الإطلاق")}
+              {heroKicker(vm, tr(vm, "Prix de lancement", "ثمن الإطلاق"))}
               <br />
               <b>{money(vm, vm.price)}</b>
               {vm.oldPrice ? <s>{money(vm, vm.oldPrice)}</s> : null}

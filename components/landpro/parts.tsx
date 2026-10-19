@@ -52,6 +52,14 @@ export function PriceRow({ vm, center }: { vm: VM; center?: boolean }) {
 export const scrollToOrder = () =>
   document.getElementById("order")?.scrollIntoView({ behavior: "smooth", block: "start" });
 
+/** Fait défiler jusqu'à une section (ancre du design ou ancre générale), sinon jusqu'au formulaire. */
+export function scrollToSection(key?: string) {
+  const el =
+    key && key !== "order" ? document.getElementById("lpx-s-" + key) || document.getElementById("lpx-a-" + key) : null;
+  if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+  else scrollToOrder();
+}
+
 export function waHref(vm: VM, extra = "") {
   if (!vm.whatsapp) return "#order";
   const msg =

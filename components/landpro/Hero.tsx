@@ -4,7 +4,18 @@
 import React from "react";
 import type { VM } from "./model";
 import { formatPrice } from "./i18n";
-import { Countdown, cx, PriceRow, scrollToOrder, Stage, starText, ThumbGallery, VideoFrame, waHref } from "./parts";
+import {
+  Countdown,
+  cx,
+  PriceRow,
+  scrollToOrder,
+  scrollToSection,
+  Stage,
+  starText,
+  ThumbGallery,
+  VideoFrame,
+  waHref,
+} from "./parts";
 
 function Title({ vm }: { vm: VM }) {
   const { headline, highlight } = vm;
@@ -20,7 +31,7 @@ function Title({ vm }: { vm: VM }) {
 }
 
 function Rating({ vm }: { vm: VM }) {
-  if (!vm.reviews.length) return null;
+  if (!vm.show.rating || !vm.reviews.length) return null;
   const avg = vm.reviews.reduce((n, r) => n + r.rating, 0) / vm.reviews.length;
   return (
     <div className={cx("rating")}>
@@ -50,14 +61,34 @@ function Actions({ vm, wa }: { vm: VM; wa?: boolean }) {
           💬 {vm.u.orderWhatsapp}
         </a>
       )}
+      <Cta2 vm={vm} />
     </div>
   );
 }
 
+/** Bouton secondaire : affiché seulement si le vendeur lui a donné un texte. */
+function Cta2({ vm }: { vm: VM }) {
+  if (!vm.show.cta2 || !vm.hero.cta2) return null;
+  return (
+    <button
+      type="button"
+      className={cx("btn ghost lg")}
+      onClick={() => scrollToSection(vm.hero.cta2Target || "benefits")}
+    >
+      {vm.hero.cta2}
+    </button>
+  );
+}
+
+/** Accroche promo au-dessus du titre (vide = rien). */
+const Kicker = ({ vm }: { vm: VM }) =>
+  vm.show.kicker && vm.hero.kicker ? <span className={cx("kicker")}>{vm.hero.kicker}</span> : null;
+
 function Chips({ vm }: { vm: VM }) {
+  if (!vm.show.trust || !vm.hero.trust.length) return null;
   return (
     <div className={cx("chips")}>
-      {vm.trust.slice(0, 3).map((t, i) => (
+      {vm.hero.trust.slice(0, 3).map((t, i) => (
         <span className={cx("chip")} key={i}>
           {["🚚", "💵", "↩️"][i] || "✓"} {t}
         </span>
@@ -78,6 +109,7 @@ const Sub = ({ vm, style }: { vm: VM; style?: React.CSSProperties }) =>
 function Copy({ vm, chips = true }: { vm: VM; chips?: boolean }) {
   return (
     <div>
+      <Kicker vm={vm} />
       <Eyebrow vm={vm} />
       <Title vm={vm} />
       <Sub vm={vm} />
@@ -131,12 +163,14 @@ export function Hero({ vm }: { vm: VM }) {
               </div>
             ) : null}
             <div className={cx("line")} />
+            <Kicker vm={vm} />
             <Title vm={vm} />
             <Sub vm={vm} style={{ margin: "0 auto" }} />
             <div className={cx("line")} />
             <Stage src={img} alt={vm.name} extra="bare" />
             <PriceRow vm={vm} center />
             <CtaButton vm={vm} extra="lg" />
+            <Cta2 vm={vm} />
           </div>
         </section>
       );
@@ -173,6 +207,7 @@ export function Hero({ vm }: { vm: VM }) {
           <div className={cx("container hero-grid")}>
             <div>
               {vm.show.badge && vm.eyebrow ? <span className={cx("flash-top")}>⚡ {vm.eyebrow}</span> : null}
+              <Kicker vm={vm} />
               <Title vm={vm} />
               <Sub vm={vm} />
               <div style={{ margin: "18px 0", display: "flex" }}>
@@ -217,6 +252,7 @@ export function Hero({ vm }: { vm: VM }) {
         <section className={cx("hero hero-whatsapp")}>
           <div className={cx("container hero-grid")}>
             <div>
+              <Kicker vm={vm} />
               <Eyebrow vm={vm} />
               <Title vm={vm} />
               <Sub vm={vm} />
@@ -274,10 +310,12 @@ export function Hero({ vm }: { vm: VM }) {
                   {vm.eyebrow}
                 </div>
               ) : null}
+              <Kicker vm={vm} />
               <Title vm={vm} />
               <Sub vm={vm} />
               <PriceRow vm={vm} />
-              <CtaButton vm={vm} label={`${vm.u.buyNow} →`} extra="lg" />
+              <CtaButton vm={vm} label={`${vm.cta} →`} extra="lg" />
+              <Cta2 vm={vm} />
             </div>
             <div className={cx("ed-grid")}>
               <Stage src={img} alt={vm.name} />
@@ -301,11 +339,13 @@ export function Hero({ vm }: { vm: VM }) {
         <section className={cx("hero hero-sport")}>
           <div className={cx("container hero-grid")}>
             <div>
+              <Kicker vm={vm} />
               <Eyebrow vm={vm} />
               <Title vm={vm} />
               <Sub vm={vm} />
               <PriceRow vm={vm} />
-              <CtaButton vm={vm} label={`${vm.u.buyNow} →`} extra="lg" />
+              <CtaButton vm={vm} label={`${vm.cta} →`} extra="lg" />
+              <Cta2 vm={vm} />
             </div>
             <Stage src={img} alt={vm.name} />
           </div>
@@ -317,6 +357,7 @@ export function Hero({ vm }: { vm: VM }) {
           <div className={cx("container mk-grid")}>
             <ThumbGallery vm={vm} />
             <div className={cx("buy-box")}>
+              <Kicker vm={vm} />
               <Eyebrow vm={vm} />
               <h1 style={{ fontSize: "clamp(26px,3.4cqi,36px)", marginTop: 12 }}>{vm.headline}</h1>
               <Rating vm={vm} />
@@ -328,7 +369,7 @@ export function Hero({ vm }: { vm: VM }) {
                   ))}
                 </ul>
               ) : null}
-              <CtaButton vm={vm} label={vm.u.buyNow} extra="block lg pulse" />
+              <CtaButton vm={vm} label={vm.cta} extra="block lg pulse" />
               <Chips vm={vm} />
             </div>
           </div>
@@ -338,11 +379,13 @@ export function Hero({ vm }: { vm: VM }) {
       return (
         <section className={cx("hero hero-minimal hero-centered")}>
           <div className={cx("container narrow")}>
+            <Kicker vm={vm} />
             <Title vm={vm} />
             <Sub vm={vm} />
             <Stage src={img} alt={vm.name} />
             <PriceRow vm={vm} center />
             <CtaButton vm={vm} extra="lg" />
+            <Cta2 vm={vm} />
           </div>
         </section>
       );
@@ -353,6 +396,7 @@ export function Hero({ vm }: { vm: VM }) {
             <div className={cx("os-card")}>
               <Stage src={img} alt={vm.name} />
               <div>
+                <Kicker vm={vm} />
                 <Title vm={vm} />
                 {vm.benefits.length ? (
                   <ul className={cx("check-list")}>

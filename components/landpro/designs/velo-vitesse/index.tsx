@@ -99,7 +99,7 @@ function Hero({ vm }: SectionProps) {
       <div className="vv-hero-media">
         <Img vm={vm} i={0} className="vv-hero-img" />
       </div>
-      <Rail n={num(vm, "hero")} words={vm.trust.slice(0, 4)} className="vv-hero-rail" />
+      <Rail n={num(vm, "hero")} words={(vm.show.trust ? vm.hero.trust : []).slice(0, 4)} className="vv-hero-rail" />
       <div className="vv-hero-copy">
         {vm.eyebrow && vm.show.badge ? <small className="vv-eyebrow vv-eyebrow-wide">{vm.eyebrow}</small> : null}
         <Headline vm={vm} className="vv-h1" />
@@ -112,12 +112,14 @@ function Hero({ vm }: SectionProps) {
         ) : null}
         <div className="vv-hero-ctas">
           {vm.show.cta ? <Buy vm={vm} className="vv-btn" arrow /> : null}
-          <button type="button" className="vv-play" onClick={() => goTo("story")}>
-            <span className="vv-play-ring">
-              <Icon name="play" />
-            </span>
-            <span>{tr(vm, "Découvrir la technologie", "اكتشف التكنولوجيا")}</span>
-          </button>
+          {vm.show.cta2 ? (
+            <button type="button" className="vv-play" onClick={() => goTo(vm.hero.cta2Target || "story")}>
+              <span className="vv-play-ring">
+                <Icon name="play" />
+              </span>
+              <span>{vm.hero.cta2 || tr(vm, "Découvrir la technologie", "اكتشف التكنولوجيا")}</span>
+            </button>
+          ) : null}
         </div>
       </div>
       <div className="vv-scroll" aria-hidden="true">

@@ -98,12 +98,18 @@ export default function LandproTemplate({
     const style = sx?.style as React.CSSProperties | undefined;
     if (!builderMode) {
       if (hidden) return null;
+      // ancre pour les boutons qui mènent à une section (bouton secondaire du hero…)
+      const anchor = <span id={"lpx-a-" + key} className={cx("anchor")} aria-hidden="true" />;
       return sx ? (
         <div key={key} className={cx("styled")} style={style} {...sx.attrs}>
+          {anchor}
           {node}
         </div>
       ) : (
-        <React.Fragment key={key}>{node}</React.Fragment>
+        <React.Fragment key={key}>
+          {anchor}
+          {node}
+        </React.Fragment>
       );
     }
     const label = key.startsWith("custom-")

@@ -27,7 +27,7 @@ function Render({ vm }: SectionProps) {
   const caption =
     vm.imageLabels[cur] || vm.benefits[cur]?.title || vm.features[cur]?.title || vm.subheadline || vm.headline;
   const initial = (vm.name.trim()[0] || "•").toUpperCase();
-  const trust = vm.trust.slice(0, 3);
+  const trust = (vm.show.trust ? vm.hero.trust : []).slice(0, 3);
   const stopped = paused || hold;
 
   return (

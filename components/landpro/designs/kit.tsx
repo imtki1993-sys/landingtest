@@ -14,7 +14,8 @@ export const sid = (key: string) => "lpx-s-" + key;
 
 /** Fait défiler jusqu'à une section ; à défaut, jusqu'au formulaire. */
 export function goTo(key: string) {
-  const el = document.getElementById(sid(key)) || document.getElementById("order");
+  const el =
+    document.getElementById(sid(key)) || document.getElementById("lpx-a-" + key) || document.getElementById("order");
   el?.scrollIntoView({ behavior: "smooth", block: "start" });
 }
 
@@ -43,6 +44,19 @@ export const money = (vm: VM, v: number) => formatPrice(v, vm.currency);
 export const discount = (vm: VM) =>
   vm.oldPrice && vm.oldPrice > vm.price ? Math.round((1 - vm.price / vm.oldPrice) * 100) : 0;
 export const tr = (vm: VM, fr: string, ar: string) => (vm.lang === "ar" ? ar : fr);
+
+/**
+ * Bouton secondaire du hero : texte et section visée réglables dans l'éditeur
+ * (vide = texte et cible du design). null quand le vendeur l'a masqué.
+ */
+export function heroCta2(vm: VM, fallbackText: string, fallbackTarget: string) {
+  if (!vm.show.cta2) return null;
+  const target = vm.hero.cta2Target || fallbackTarget;
+  return { text: vm.hero.cta2 || fallbackText, go: () => goTo(target) };
+}
+
+/** Accroche promo du hero (« Offre de lancement »…) : réglable, masquable. */
+export const heroKicker = (vm: VM, fallback: string) => (vm.show.kicker ? vm.hero.kicker || fallback : "");
 
 /** Bouton qui mène au formulaire de commande. */
 export function Buy({

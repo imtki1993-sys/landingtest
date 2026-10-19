@@ -48,7 +48,31 @@ export interface VM {
   /** texte du bouton qui envoie le formulaire (content.form_cta), distinct des boutons qui y mènent */
   submitCta: string;
   delivery: string;
-  show: { badge: boolean; cta: boolean; price: boolean; subtitle: boolean; address: boolean };
+  show: {
+    badge: boolean;
+    cta: boolean;
+    price: boolean;
+    subtitle: boolean;
+    address: boolean;
+    /** éléments du hero qui viennent d'autres sections ou du template */
+    trust: boolean;
+    rating: boolean;
+    kicker: boolean;
+    cta2: boolean;
+  };
+  /** Contenu propre au hero, modifiable dans l'éditeur (vide = texte du template). */
+  hero: {
+    /** petite accroche promo (« Offre de lancement », « Vente flash »…) */
+    kicker: string;
+    /** texte du bouton secondaire */
+    cta2: string;
+    /** section visée par le bouton secondaire (vide = celle du template) */
+    cta2Target: string;
+    /** avantages affichés sous les boutons (vide = ceux de la section Confiance) */
+    trust: string[];
+    /** true quand le vendeur a écrit ses propres avantages pour le hero */
+    trustCustom: boolean;
+  };
   benefits: Item[];
   features: Item[];
   steps: Item[];
@@ -256,15 +280,23 @@ export function buildVM(data: LandingV4Data, opts: { demo?: boolean } = {}): VM 
     .map((x: any) => str(x))
     .filter(Boolean);
 
+  const trustList = trustRaw.length ? trustRaw : [deliveryWord, ...DEFAULT_TRUST[lang].slice(1)];
+  // avantages du hero : une ligne par avantage (texte libre ou liste)
+  const heroTrust = (Array.isArray(c.hero_trust) ? c.hero_trust : String(c.hero_trust || "").split("\n"))
+    .map((x: unknown) => String(x ?? "").trim())
+    .filter(Boolean)
+    .slice(0, 6);
+
   return {
     t,
     rtl,
     lang,
     u,
     demo,
-    name: str(data.name) || (demo ? dc.name : ""),
+    name: str(c.product_name) || str(data.name) || (demo ? dc.name : ""),
     headline: str(c.headline) || (demo ? t.hero.title : str(data.name)),
-    highlight: !str(c.headline) && demo ? t.hero.highlight : undefined,
+    // mot mis en valeur dans le titre : choisi par le vendeur, sinon celui du template en démo
+    highlight: str(c.hero_highlight) || (!str(c.headline) && demo ? t.hero.highlight : undefined),
     subheadline:
       str(c.subheadline) ||
       str(data.description) ||
@@ -288,11 +320,22 @@ export function buildVM(data: LandingV4Data, opts: { demo?: boolean } = {}): VM 
       price: c.hero_show_price !== false,
       subtitle: c.hero_show_subtitle !== false,
       address: c.order_show_address !== false,
+      trust: c.hero_show_trust !== false,
+      rating: c.hero_show_rating !== false,
+      kicker: c.hero_show_kicker !== false,
+      cta2: c.hero_show_cta2 !== false,
+    },
+    hero: {
+      kicker: str(c.hero_kicker),
+      cta2: str(c.hero_cta2_text),
+      cta2Target: str(c.hero_cta2_target),
+      trust: heroTrust.length ? heroTrust : trustList,
+      trustCustom: heroTrust.length > 0,
     },
     benefits,
     features,
     steps,
-    trust: trustRaw.length ? trustRaw : [deliveryWord, ...DEFAULT_TRUST[lang].slice(1)],
+    trust: trustList,
     faq,
     problem: { pains, solution: str(c.solution) || (demo ? p.problem?.solution || dc.description : "") },
     reviews,

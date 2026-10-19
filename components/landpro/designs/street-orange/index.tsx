@@ -193,16 +193,16 @@ function Hero({ vm }: SectionProps) {
           ) : null}
           <div className="so-hero-btns">
             {vm.show.cta ? <Buy vm={vm} className="so-btn" arrow /> : null}
-            {shown(vm, "variants") && vm.variants.length ? (
-              <Go to="variants" className="so-btn-line">
-                {tr(vm, "Voir les coloris", "شوف الألوان")} <Icon name={vm.rtl ? "back" : "arrow"} />
+            {vm.show.cta2 && (vm.hero.cta2 || (shown(vm, "variants") && vm.variants.length)) ? (
+              <Go to={vm.hero.cta2Target || "variants"} className="so-btn-line">
+                {vm.hero.cta2 || tr(vm, "Voir les coloris", "شوف الألوان")} <Icon name={vm.rtl ? "back" : "arrow"} />
               </Go>
             ) : null}
           </div>
         </div>
         <div className="so-hero-foot">
           <ul className="so-hero-trust">
-            {vm.trust.slice(0, 3).map((t, i) => {
+            {(vm.show.trust ? vm.hero.trust : []).slice(0, 3).map((t, i) => {
               const [h, ...s] = t.split(/\s+[:–—-]\s+/);
               return (
                 <li key={i}>
