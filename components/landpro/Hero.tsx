@@ -80,6 +80,18 @@ function Cta2({ vm }: { vm: VM }) {
   );
 }
 
+/** Liste à coches du hero (points écrits pour le hero, sinon titres des bénéfices). */
+function Points({ vm }: { vm: VM }) {
+  if (!vm.show.points || !vm.hero.points.length) return null;
+  return (
+    <ul className={cx("check-list")}>
+      {vm.hero.points.slice(0, 6).map((p, i) => (
+        <li key={i}>{p}</li>
+      ))}
+    </ul>
+  );
+}
+
 /** Accroche promo au-dessus du titre (vide = rien). */
 const Kicker = ({ vm }: { vm: VM }) =>
   vm.show.kicker && vm.hero.kicker ? <span className={cx("kicker")}>{vm.hero.kicker}</span> : null;
@@ -362,13 +374,7 @@ export function Hero({ vm }: { vm: VM }) {
               <h1 style={{ fontSize: "clamp(26px,3.4cqi,36px)", marginTop: 12 }}>{vm.headline}</h1>
               <Rating vm={vm} />
               <PriceRow vm={vm} />
-              {vm.benefits.length ? (
-                <ul className={cx("check-list")}>
-                  {vm.benefits.slice(0, 5).map((b, i) => (
-                    <li key={i}>{b.title}</li>
-                  ))}
-                </ul>
-              ) : null}
+              <Points vm={vm} />
               <CtaButton vm={vm} label={vm.cta} extra="block lg pulse" />
               <Chips vm={vm} />
             </div>
@@ -398,13 +404,7 @@ export function Hero({ vm }: { vm: VM }) {
               <div>
                 <Kicker vm={vm} />
                 <Title vm={vm} />
-                {vm.benefits.length ? (
-                  <ul className={cx("check-list")}>
-                    {vm.benefits.slice(0, 5).map((b, i) => (
-                      <li key={i}>{b.title}</li>
-                    ))}
-                  </ul>
-                ) : null}
+                <Points vm={vm} />
                 <Rating vm={vm} />
                 <PriceRow vm={vm} />
                 <Actions vm={vm} wa />
