@@ -384,7 +384,7 @@ function Render({ vm, qty, setQty, variant, setVariant, preview, onSubmit }: Sec
               </button>
             ) : !waOnly ? (
               <button className="pc-ore-next pc-ore-go" type={preview ? "button" : "submit"}>
-                {vm.cta || u.form.submit}
+                {vm.submitCta || u.form.submit}
                 <Icon name="check" />
               </button>
             ) : null}

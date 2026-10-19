@@ -412,7 +412,7 @@ export default function BuilderCanvasCore(p: Props) {
               <b>{base + ship} DH</b>
             </div>
             <button className={draft.order_pump === false ? "" : "builder-pump"}>
-              {draft.cta || "Commander maintenant"} — {base + ship} DH
+              {draft.form_cta || draft.cta || "Commander maintenant"} — {base + ship} DH
             </button>
             {draft.order_whatsapp !== false && (
               <button type="button" className="builder-whatsapp">

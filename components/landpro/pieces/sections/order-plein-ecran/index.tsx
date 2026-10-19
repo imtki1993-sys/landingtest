@@ -188,7 +188,7 @@ function Render({ vm, qty, setQty, variant, setVariant, preview, onSubmit }: Sec
 
           {!waOnly ? (
             <button className="pc-orp-go" type={preview ? "button" : "submit"}>
-              <span>{vm.cta || u.form.submit}</span>
+              <span>{vm.submitCta || u.form.submit}</span>
               <span className="pc-orp-sep" aria-hidden="true" />
               <b>{money(vm, total)}</b>
             </button>
