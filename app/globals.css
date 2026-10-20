@@ -4803,3 +4803,14 @@ html[data-theme="dark"] .orders-dashboard .kanban-card b,html[data-theme="dark"]
 html[data-theme="dark"] .orders-dashboard .kanban-card p{color:#b8c6d8}
 html[data-theme="dark"] .orders-dashboard .kanban-card small,html[data-theme="dark"] .orders-dashboard .kanban-card span{color:#93a4bb}
 html[data-theme="dark"] .orders-dashboard .kanban-card select{background:#0b1728;border-color:#29415f;color:#e6eef8}
+/* Cartes du kanban : restent dans leur colonne, même avec un nom long (email, arabe). */
+.orders-dashboard .kanban-col,.orders-dashboard .kanban-list,.orders-dashboard .kanban-card{min-width:0}
+.orders-dashboard .kanban-card{overflow:hidden}
+.orders-dashboard .kanban-card>div:first-child{display:grid!important;grid-template-columns:minmax(0,1fr);gap:2px!important;align-items:start!important}
+.orders-dashboard .kanban-card>div:first-child b{font-size:14px;line-height:1.25;overflow-wrap:anywhere}
+.orders-dashboard .kanban-card>div:first-child small{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.orders-dashboard .kanban-card>div{min-width:0}
+.orders-dashboard .kanban-card>div span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.orders-dashboard .kanban-card>div strong{flex:0 0 auto}
+.orders-dashboard .kanban-card p{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.orders-dashboard .kanban-card select{max-width:100%;box-sizing:border-box}
