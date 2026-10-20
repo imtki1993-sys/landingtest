@@ -3,6 +3,10 @@
   "regions": ["dub1"],
   "crons": [
     {
+      "path": "/api/cron/warm",
+      "schedule": "*/5 * * * *"
+    },
+    {
       "path": "/api/cron/ozon-sync",
       "schedule": "*/30 * * * *"
     },
