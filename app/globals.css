@@ -4771,3 +4771,35 @@ html[data-theme="dark"] .order-risk-panel{background:#111827;border-color:#25314
 .order-calls,.order-agent{display:block;margin-top:4px;font-size:7.5px;color:#64748b;white-space:nowrap}.order-agent{color:#2563eb;font-weight:700}
 .orders-assign{display:inline-flex;gap:4px;align-items:center}.orders-assign select{height:30px;border:1px solid #dbe3ec;border-radius:7px;padding:0 6px;font-size:9px;background:#fff}
 html[data-theme="dark"] .account-key-form .team-secondary{background:#111827;border-color:#1e40af;color:#93c5fd}html[data-theme="dark"] .orders-assign select{background:#111827;border-color:#253147;color:#e5e7eb}
+
+/* Kanban des commandes : passe au-dessus du fond décoratif de la barre de filtres
+   (.orders-sticky-command::before, en position absolue sur tout le panneau sur ordinateur). */
+.orders-dashboard .orders-ref-panel .cod-kanban{position:relative;z-index:1}
+/* Barre d'actions : sur écran étroit (≈1024 px) ses boutons passent à la ligne ; la hauteur
+   fixe de 58 px faisait déborder « Afficher / Tableau / Kanban » sous le tableau. */
+.orders-dashboard .orders-ref-actions{height:auto!important;flex-wrap:wrap!important;row-gap:8px!important}
+.orders-dashboard .orders-ref-actions .orders-ref-view{margin-left:auto}
+/* Le kanban défile dans le panneau, comme le tableau. */
+.orders-dashboard .orders-ref-panel .cod-kanban{flex:1 1 auto;min-height:0;overflow:auto}
+/* Écran d'ordinateur peu haut (portable 720–800 px) : le panneau gardait ~80 px pour la liste.
+   La page défile et le panneau garde une hauteur utilisable. */
+@media (min-width:1000px) and (max-height:860px){
+  .orders-dashboard{overflow-y:auto!important}
+  .orders-dashboard .orders-ref-panel{flex:0 0 auto!important;height:620px!important;min-height:620px!important}
+}
+/* Colonnes alignées en haut : une règle globale « section{margin:auto} » les centrait. */
+.orders-dashboard .cod-kanban{align-items:start}
+.orders-dashboard .kanban-col{margin:0!important;max-width:none}
+.orders-dashboard .kanban-col>header{margin:0!important}
+.orders-dashboard .kanban-list{align-content:start}
+/* Mode sombre : mêmes couleurs que le tableau */
+html[data-theme="dark"] .orders-dashboard .kanban-col{background:#0b1728;border-color:#203652}
+html[data-theme="dark"] .orders-dashboard .kanban-col>header b{color:#e6eef8}
+html[data-theme="dark"] .orders-dashboard .kanban-col>header span{background:#203652;color:#e6eef8}
+html[data-theme="dark"] .orders-dashboard .kanban-col>header small{color:#93a4bb}
+html[data-theme="dark"] .orders-dashboard .kanban-card{background:#101f34;border-color:#29415f;box-shadow:none}
+html[data-theme="dark"] .orders-dashboard .kanban-card:hover{border-color:#4a6a92}
+html[data-theme="dark"] .orders-dashboard .kanban-card b,html[data-theme="dark"] .orders-dashboard .kanban-card strong{color:#e6eef8}
+html[data-theme="dark"] .orders-dashboard .kanban-card p{color:#b8c6d8}
+html[data-theme="dark"] .orders-dashboard .kanban-card small,html[data-theme="dark"] .orders-dashboard .kanban-card span{color:#93a4bb}
+html[data-theme="dark"] .orders-dashboard .kanban-card select{background:#0b1728;border-color:#29415f;color:#e6eef8}
