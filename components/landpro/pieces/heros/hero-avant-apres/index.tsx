@@ -49,7 +49,7 @@ function Render({ vm }: SectionProps) {
           onPointerUp={slider ? () => setDrag(false) : undefined}
           onPointerCancel={slider ? () => setDrag(false) : undefined}
         >
-          <Img vm={vm} i={0} className="pc-hba-img" alt={slider ? `${vm.name} — ${before}` : vm.name} />
+          <Img vm={vm} i={0} main={false} className="pc-hba-img" alt={slider ? `${vm.name} — ${before}` : vm.name} />
           {slider ? (
             <>
               <div className="pc-hba-after">

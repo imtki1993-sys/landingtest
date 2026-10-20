@@ -194,7 +194,7 @@ export function Hero({ vm }: { vm: VM }) {
             <div className={cx("creator-card")}>
               <span className={cx("live")}>● LIVE</span>
               <div className={cx("face")}>😍</div>
-              <img className={cx("held")} src={img} alt={vm.name} />
+              <img className={cx("held")} src={img} alt={vm.name} data-hero-main="" />
               {vm.ugc[0]?.handle ? <span className={cx("handle")}>{vm.ugc[0].handle}</span> : null}
             </div>
           </div>
@@ -207,7 +207,7 @@ export function Hero({ vm }: { vm: VM }) {
             <Copy vm={vm} />
             <div className={cx("pain-grid")}>
               {[img, img2, img3, vm.images[3] || img].map((src, i) => (
-                <Stage key={i} src={src} alt="" />
+                <Stage key={i} src={src} alt="" main={i === 0} />
               ))}
             </div>
           </div>

@@ -10,7 +10,7 @@ import { CORE_SECTIONS, LANDPRO_SECTIONS } from "./types";
 import { defaultSectionOrder, getTemplate, SECTION_LABELS } from "./registry";
 import { getDemoProduct } from "./demo-products";
 import { ui, type UI } from "./i18n";
-import { pageThemeFrom, type PageTheme } from "./styles";
+import { heroImageFrom, pageThemeFrom, type HeroImageStyle, type PageTheme } from "./styles";
 
 export interface Item {
   icon: string;
@@ -107,6 +107,8 @@ export interface VM {
   custom: Record<string, any>;
   sectionStyles: Record<string, any>;
   themeOverride: PageTheme;
+  /** forme de l'image principale du hero (éditeur → Contenu du hero) */
+  heroImage: HeroImageStyle;
 }
 
 const ICONS = ["⚡", "🛡️", "✨", "🚚", "💎", "🎯", "🔒", "💡"];
@@ -413,5 +415,6 @@ export function buildVM(data: LandingV4Data, opts: { demo?: boolean } = {}): VM 
     sectionStyles: c.section_styles && typeof c.section_styles === "object" ? c.section_styles : {},
     // thème de la page réglé par le vendeur (couleurs, polices, arrondi, tailles, espacement)
     themeOverride: pageThemeFrom(c),
+    heroImage: heroImageFrom(c),
   };
 }

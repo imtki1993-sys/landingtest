@@ -5,7 +5,7 @@ import React from "react";
 import type { VM } from "../model";
 import type { SectionProps } from "../Sections";
 import { formatPrice } from "../i18n";
-import { cx, OrderForm, scrollToOrder } from "../parts";
+import { cx, OrderForm, scrollToOrder, useHeroMain } from "../parts";
 
 export { cx, scrollToOrder };
 
@@ -28,16 +28,23 @@ export function Img({
   src,
   className,
   alt,
+  main: isMain,
 }: {
   vm: VM;
   i?: number;
   src?: string;
   className?: string;
   alt?: string;
+  /** force l'image principale du hero (quand ce n'est pas la première photo, ou une image sans alt) */
+  main?: boolean;
 }) {
   const s = src || pic(vm, i);
+  // Image principale du hero : la première photo, sauf une copie décorative (alt vide)
+  const main = useHeroMain(isMain ?? (!src && i === 0 && alt !== ""));
   if (!s) return null;
-  return <img className={className} src={s} alt={alt ?? vm.name} loading={i ? "lazy" : "eager"} decoding="async" />;
+  return (
+    <img className={className} src={s} alt={alt ?? vm.name} loading={i ? "lazy" : "eager"} decoding="async" {...main} />
+  );
 }
 
 export const money = (vm: VM, v: number) => formatPrice(v, vm.currency);

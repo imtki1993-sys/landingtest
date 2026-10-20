@@ -222,3 +222,76 @@ export function sectionStyleProps(raw: unknown): { style: Record<string, string>
   if (s.hideDesktop) attrs["data-sx-hide-d"] = "";
   return Object.keys(style).length || Object.keys(attrs).length ? { style, attrs } : null;
 }
+
+// ─── Forme de l'image principale du hero (content.hero_img_*) ───
+export const HERO_IMG_SHAPES = ["square", "rounded", "soft", "arch", "circle"] as const;
+export const HERO_IMG_RATIOS = ["1/1", "4/5", "3/4", "4/3", "16/9", "9/16"] as const;
+export interface HeroImageStyle {
+  shape?: (typeof HERO_IMG_SHAPES)[number];
+  ratio?: (typeof HERO_IMG_RATIOS)[number];
+  fit?: "cover" | "contain";
+  pos?: "top" | "center" | "bottom";
+  /** largeur en % de la place prévue par le template */
+  size?: number;
+  shadow?: "none" | "soft" | "strong";
+}
+
+const oneOf = <T extends string>(v: unknown, list: readonly T[]) => (list.includes(v as T) ? (v as T) : undefined);
+
+export function heroImageFrom(c: Record<string, any>): HeroImageStyle {
+  return {
+    shape: oneOf(c.hero_img_shape, HERO_IMG_SHAPES),
+    ratio: oneOf(c.hero_img_ratio, HERO_IMG_RATIOS),
+    fit: oneOf(c.hero_img_fit, ["cover", "contain"] as const),
+    pos: oneOf(c.hero_img_pos, ["top", "center", "bottom"] as const),
+    size: px(c.hero_img_size, 40, 100),
+    shadow: oneOf(c.hero_img_shadow, ["none", "soft", "strong"] as const),
+  };
+}
+
+const RADIUS: Record<string, string> = {
+  square: "0px",
+  rounded: "16px",
+  soft: "32px",
+  arch: "999px 999px 18px 18px",
+  circle: "50%",
+};
+const SHADOW: Record<string, string> = {
+  none: "none",
+  soft: "drop-shadow(0 14px 24px rgba(0,0,0,.18))",
+  strong: "drop-shadow(0 28px 44px rgba(0,0,0,.38))",
+};
+
+/** Variables + attributs posés sur la racine ; les règles CSS visent [data-hero-main]. */
+export function heroImageVars(h: HeroImageStyle): { vars: Vars; attrs: Attrs } {
+  const vars: Vars = {};
+  const attrs: Attrs = {};
+  const ratio = h.shape === "circle" ? "1/1" : h.ratio;
+  if (ratio) {
+    vars["--hx-ratio"] = ratio.replace("/", " / ");
+    attrs["data-hx-ratio"] = "";
+  }
+  if (h.shape) {
+    vars["--hx-radius"] = RADIUS[h.shape];
+    attrs["data-hx-shape"] = h.shape;
+  }
+  if (h.fit) {
+    vars["--hx-fit"] = h.fit;
+    attrs["data-hx-fit"] = h.fit;
+  }
+  // Cadre imposé (proportions ou forme) : une photo dans un cadre .lpx-stage le remplit
+  if (ratio || h.shape) attrs["data-hx-frame"] = "";
+  if (h.pos) {
+    vars["--hx-pos"] = `center ${h.pos}`;
+    attrs["data-hx-pos"] = "";
+  }
+  if (h.size && h.size < 100) {
+    vars["--hx-size"] = `${h.size}%`;
+    attrs["data-hx-size"] = "";
+  }
+  if (h.shadow) {
+    vars["--hx-shadow"] = SHADOW[h.shadow];
+    attrs["data-hx-shadow"] = "";
+  }
+  return { vars, attrs };
+}

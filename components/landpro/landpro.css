@@ -411,3 +411,21 @@
 /* Accroche promo et bouton secondaire du hero (réglables dans l'éditeur) */
 .lpx-kicker { display: inline-block; margin: 0 0 10px; font-weight: 800; font-size: 13px; letter-spacing: .02em; color: var(--accent); }
 .lpx-hero-actions .lpx-btn.lpx-ghost { padding: 15px 24px; }
+
+/* ─── Forme de l'image principale du hero (réglée par le vendeur) ───
+   [data-hero-main] = l'image elle-même (img) ou son cadre (.lpx-stage). */
+.lpx[data-hx-size] [data-hero-main] { width: var(--hx-size) !important; max-width: var(--hx-size) !important; margin-inline: auto !important; }
+.lpx[data-hx-ratio] [data-hero-main] { aspect-ratio: var(--hx-ratio) !important; height: auto !important; min-height: 0 !important; max-height: none !important; align-self: center !important; flex: 0 0 auto !important; }
+.lpx[data-hx-shape] [data-hero-main] { border-radius: var(--hx-radius) !important; overflow: hidden !important; }
+.lpx[data-hx-shape] .lpx-stage[data-hero-main] img { border-radius: 0 !important; }
+/* image détourée (PNG) : un fond rend la forme visible */
+.lpx[data-hx-shape] img[data-hero-main] { background: color-mix(in srgb, var(--primary) 8%, var(--surface2, var(--surface, #f3f4f6))); }
+.lpx[data-hx-frame] .lpx-stage.lpx-photo[data-hero-main] img { width: 100% !important; height: 100% !important; object-fit: cover; transform: none !important; }
+.lpx[data-hx-fit] img[data-hero-main], .lpx[data-hx-fit] .lpx-stage[data-hero-main] img { object-fit: var(--hx-fit) !important; }
+.lpx[data-hx-fit="cover"] .lpx-stage[data-hero-main] img { width: 100% !important; height: 100% !important; transform: none !important; }
+.lpx[data-hx-pos] img[data-hero-main], .lpx[data-hx-pos] [data-hero-main] img { object-position: var(--hx-pos) !important; }
+.lpx[data-hx-shadow] img[data-hero-main], .lpx[data-hx-shadow] .lpx-stage[data-hero-main] { filter: var(--hx-shadow) !important; }
+.lpx[data-hx-shadow] .lpx-stage[data-hero-main] img { filter: none !important; }
+/* Cercle / arche : l'étiquette de remise reste dans la forme */
+.lpx[data-hx-shape="circle"] .lpx-stage[data-hero-main] .lpx-tag,
+.lpx[data-hx-shape="arch"] .lpx-stage[data-hero-main] .lpx-tag { top: 16%; inset-inline-start: 16%; }

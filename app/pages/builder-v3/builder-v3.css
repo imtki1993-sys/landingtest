@@ -183,3 +183,21 @@ html[data-theme="dark"] .bv3-sx-note { background: #2b2210; border-color: #5c461
 .bv3-right .bv3-hero-content textarea { min-height: 76px; }
 .bv3-right .bv3-hero-content select { width: 100%; padding: 10px; border: 1px solid #d7deea; border-radius: 9px; background: #fff; }
 html[data-theme="dark"] .bv3-hero-content .bv3-sx-sub { color: #e6eef8; border-color: #203652; }
+
+/* Contenu du hero : forme de l'image principale */
+.bv3-hx { display: grid; gap: 8px; }
+.bv3-hx .bv3-sx-label { margin-top: 2px; }
+.bv3-hx-seg { grid-template-columns: repeat(auto-fit, minmax(64px, 1fr)); }
+.bv3-hx-shapes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+.bv3-hx-shapes button { display: grid; justify-items: center; gap: 5px; padding: 8px 4px; font-size: 11px; border-radius: 9px; }
+.bv3-hx-shapes button.active { background: #2563eb; border-color: #2563eb; color: #fff; }
+.bv3-hx-ico { display: block; width: 26px; height: 26px; border: 2px solid currentColor; opacity: .75; }
+.bv3-hx-ico.is-tpl { border-style: dashed; border-radius: 6px; }
+.bv3-hx-ico.is-square { border-radius: 0; }
+.bv3-hx-ico.is-rounded { border-radius: 6px; }
+.bv3-hx-ico.is-soft { border-radius: 10px; }
+.bv3-hx-ico.is-arch { border-radius: 13px 13px 3px 3px; width: 22px; height: 28px; }
+.bv3-hx-ico.is-circle { border-radius: 50%; }
+.bv3-hx-size input[type="range"] { flex: 1; min-width: 0; }
+.bv3-hx-size b { font-size: 11px; min-width: 40px; text-align: end; }
+.bv3-sx-row select:disabled { opacity: .6; }
