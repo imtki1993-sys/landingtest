@@ -67,15 +67,18 @@ export default function Orders() {
     // Boutons du propriétaire : seulement une fois le rôle connu (jamais d'éclair chez un agent)
     ownerUI = role !== null && !isAgent;
   useEffect(() => {
+    // L'équipe est demandée en même temps que le rôle (refusée aux agents, sans effet pour eux)
+    const teamP = fetch("/api/team", { cache: "no-store" })
+      .then((r) => (r.ok ? r.json() : { agents: [] }))
+      .catch(() => ({ agents: [] }));
     fetch("/api/team/me", { cache: "no-store" })
       .then((r) => (r.ok ? r.json() : null))
-      .then((x) => {
+      .then(async (x) => {
         setMe(x);
-        if (x && x.role !== "agent")
-          fetch("/api/team", { cache: "no-store" })
-            .then((r) => (r.ok ? r.json() : { agents: [] }))
-            .then((t) => setTeam((t.agents || []).filter((a: any) => a.active)))
-            .catch(() => setTeam([]));
+        if (x && x.role !== "agent") {
+          const t = await teamP;
+          setTeam((t.agents || []).filter((a: any) => a.active));
+        }
       })
       .catch(() => setMe(null));
   }, []);

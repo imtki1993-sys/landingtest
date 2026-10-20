@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
-export async function POST() {
+import { forgetSession } from "../../../../lib/server-auth";
+export async function POST(req: Request) {
+  forgetSession((req.headers.get("cookie") || "").match(/(?:^|;\s*)lm_access=([^;]+)/)?.[1]);
   const r = NextResponse.json({ ok: true });
   r.cookies.set("lm_access", "", {
     httpOnly: true,
