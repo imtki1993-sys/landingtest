@@ -3,6 +3,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import "./dashboard-mobile.css";
+import { clearPages } from "../../lib/page-cache";
 const items = [
   ["/", "⌂", "Dashboard"],
   ["/pages", "▣", "Landing Pages"],
@@ -93,7 +94,7 @@ export default function SaaSSidebar() {
     } catch {}
     try {
       sessionStorage.removeItem("lp_role");
-      sessionStorage.removeItem("lp_plan");
+      clearPages();
     } catch {}
     location.href = "/login";
   }

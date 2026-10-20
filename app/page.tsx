@@ -4,6 +4,7 @@ import Link from "next/link";
 import SaaSSidebar from "./components/SaaSSidebar";
 import SaaSTopbar from "./components/SaaSTopbar";
 import { useEffect, useState } from "react";
+import { readPage, writePage, clearPages } from "../lib/page-cache";
 const Icon = ({ children }: { children: string }) => <span className="dash-icon">{children}</span>;
 const money = (n: any) => Number(n || 0).toLocaleString("fr-MA", { maximumFractionDigits: 0 }) + " DH";
 const pct = (n: any) => Number(n || 0).toLocaleString("fr-MA", { maximumFractionDigits: 1 }) + "%";
@@ -11,6 +12,8 @@ export default function Home() {
   const [data, setData] = useState<any>(null),
     [error, setError] = useState("");
   useEffect(() => {
+    const cached = readPage("home");
+    if (cached) setData(cached);
     // Les deux appels partent en même temps ; les statistiques s'ajoutent dès qu'elles arrivent
     const analytics = fetch("/api/dashboard/analytics", { cache: "no-store" })
       .then(async (ar) => (ar.ok ? await ar.json() : null))
@@ -19,14 +22,20 @@ export default function Home() {
       .then(async (r) => {
         const x = await r.json();
         if (!r.ok) throw new Error(x.error || "Dashboard indisponible");
-        setData(x);
+        // Les statistiques déjà affichées restent en place jusqu'à l'arrivée des nouvelles
+        setData((d: any) => ({
+          ...x,
+          totals: { ...(d?.totals || {}), ...(x.totals || {}) },
+          topLandings: d?.topLandings,
+        }));
         const ax = await analytics;
-        if (ax)
-          setData((d: any) => ({
-            ...d,
-            totals: { ...(d?.totals || {}), ...(ax.totals || {}) },
-            topLandings: ax.topLandings || [],
-          }));
+        const full = {
+          ...x,
+          totals: { ...(x.totals || {}), ...(ax?.totals || {}) },
+          topLandings: ax?.topLandings || [],
+        };
+        if (ax) setData(full);
+        writePage("home", full);
       })
       .catch((e) => setError(e.message));
   }, []);
@@ -34,7 +43,7 @@ export default function Home() {
     await fetch("/api/auth/logout", { method: "POST" });
     try {
       sessionStorage.removeItem("lp_role");
-      sessionStorage.removeItem("lp_plan");
+      clearPages();
     } catch {}
     window.location.href = "/login";
   }

@@ -3,6 +3,7 @@ import Link from "next/link";
 import SaaSSidebar from "../components/SaaSSidebar";
 import SaaSTopbar from "../components/SaaSTopbar";
 import { useEffect, useMemo, useState } from "react";
+import { readPage, writePage } from "../../lib/page-cache";
 import { generateProductVariants } from "../../lib/product-variants";
 const empty = {
   name: "",
@@ -34,6 +35,7 @@ export default function Products() {
   async function load() {
     const r = await fetch("/api/products"),
       x = await r.json();
+    if (r.ok && Array.isArray(x.products)) writePage("products", x.products);
     setProducts(x.products || []);
     setCursor(x.pagination?.nextCursor || null);
     setHasMore(!!x.pagination?.hasMore);
@@ -47,6 +49,8 @@ export default function Products() {
     setHasMore(!!x.pagination?.hasMore);
   }
   useEffect(() => {
+    const cached = readPage("products");
+    if (cached) setProducts(cached);
     load();
   }, []);
   function open(p?: any) {

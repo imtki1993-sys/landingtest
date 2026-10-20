@@ -3,6 +3,7 @@ import Link from "next/link";
 import SaaSSidebar from "../components/SaaSSidebar";
 import SaaSTopbar from "../components/SaaSTopbar";
 import { useEffect, useMemo, useState } from "react";
+import { readPage, writePage } from "../../lib/page-cache";
 export default function Orders() {
   const [orders, setOrders] = useState<any[]>([]),
     [serverKpi, setServerKpi] = useState<any>(null),
@@ -115,9 +116,16 @@ export default function Orders() {
     setHasMoreOrders(!!x.pagination?.hasMore);
   }
   useEffect(() => {
+    const cached = readPage("orders");
+    if (cached) {
+      setOrders(cached.orders || []);
+      setServerKpi(cached.kpis || null);
+      setLoading(false);
+    }
     fetch("/api/orders", { cache: "no-store" })
       .then((r) => r.json())
       .then((x) => {
+        if (Array.isArray(x.orders) && !x.error) writePage("orders", { orders: x.orders, kpis: x.kpis || null });
         setOrders(x.orders || []);
         setServerKpi(x.kpis || null);
         setOrderCursor(x.pagination?.nextCursor || null);
