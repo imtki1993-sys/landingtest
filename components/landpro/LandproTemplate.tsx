@@ -8,12 +8,12 @@ import { buildVM } from "./model";
 import { fonts, googleFontsHref, themeVars } from "./theme";
 import { formatPrice } from "./i18n";
 import { SECTION_LABELS } from "./registry";
-import { cx, scrollToOrder } from "./parts";
+import { cx, HeroScope, scrollToOrder } from "./parts";
 import { Hero } from "./Hero";
 import { EMPTY_HINT, isEmpty, renderSection } from "./Sections";
 import { DESIGNS } from "./designs";
 import { PIECES } from "./pieces";
-import { pageThemeVars, sectionStyleProps } from "./styles";
+import { heroImageVars, pageThemeVars, sectionStyleProps } from "./styles";
 import type { PieceChoice } from "./pieces/types";
 import "./landpro.css";
 
@@ -81,6 +81,7 @@ export default function LandproTemplate({
   if (ov.heading) theme.heading = ov.heading;
   const style = themeVars(theme);
   const pageSx = pageThemeVars(ov);
+  const heroImg = heroImageVars(vm.heroImage);
   const sp = { vm, qty, setQty, variant, setVariant, preview: preview || builderMode, onSubmit };
   // pièces combinables : celles imposées, sinon celles du template (un design sur mesure reste prioritaire)
   const pc: PieceChoice = { ...(vm.t.pieces || {}), ...(pieces || {}) };
@@ -134,7 +135,12 @@ export default function LandproTemplate({
   };
 
   const sectionNode = (key: string) => {
-    if (key === "hero") return design ? design.hero(sp) : (piece(pc.hero) ?? <Hero vm={vm} />);
+    if (key === "hero")
+      return (
+        <HeroScope.Provider value={!design}>
+          {design ? design.hero(sp) : (piece(pc.hero) ?? <Hero vm={vm} />)}
+        </HeroScope.Provider>
+      );
     if (isEmpty(key, vm)) {
       return builderMode ? (
         <section className={cx("section")}>
@@ -169,12 +175,14 @@ export default function LandproTemplate({
         style={{
           ...style,
           ...pageSx.vars,
+          ...heroImg.vars,
           // police choisie par le vendeur > police du design sur mesure > police du thème
           ["--font" as string]: (ov.font && fonts[ov.font]) || (!vm.rtl && design?.font) || fonts[theme.font],
           ["--heading" as string]:
             (ov.heading && fonts[ov.heading]) || (!vm.rtl && design?.heading) || fonts[theme.heading],
         }}
         {...pageSx.attrs}
+        {...heroImg.attrs}
         dir={vm.rtl ? "rtl" : "ltr"}
         lang={vm.lang}
         data-landing-template={vm.t.id}

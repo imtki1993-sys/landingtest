@@ -1,7 +1,7 @@
 "use client";
 // Briques communes + éléments interactifs (formulaire COD, offres, variantes,
 // compte à rebours, galerie à vignettes, vidéo).
-import React, { useEffect, useState } from "react";
+import React, { createContext, useContext, useEffect, useState } from "react";
 import type { VM } from "./model";
 import { formatPrice } from "./i18n";
 
@@ -15,6 +15,17 @@ export const cx = (...names: (string | false | null | undefined)[]) =>
     .map((n) => `lpx-${n}`)
     .join(" ");
 
+/**
+ * Vrai à l'intérieur du hero des templates de base et combinés (pas des designs sur mesure,
+ * dont l'image est une scène composée) : l'image principale y reçoit data-hero-main, cible des
+ * réglages « Forme de l'image principale » de l'éditeur (styles.ts → heroImageVars).
+ */
+export const HeroScope = createContext(false);
+/** Attribut de l'image principale du hero (première image du produit, non décorative). */
+export function useHeroMain(isMain: boolean): { "data-hero-main"?: "" } {
+  return useContext(HeroScope) && isMain ? { "data-hero-main": "" } : {};
+}
+
 export const isPhoto = (src: string) => !!src && !/\.svg(\?|#|$)/i.test(src);
 
 export function Stage({
@@ -22,14 +33,17 @@ export function Stage({
   alt,
   extra = "",
   children,
+  main: isMain,
 }: {
   src: string;
   alt: string;
   extra?: string;
   children?: React.ReactNode;
+  main?: boolean;
 }) {
+  const main = useHeroMain(isMain ?? !!alt);
   return (
-    <div className={cx("stage", extra, isPhoto(src) && "photo")}>
+    <div className={cx("stage", extra, isPhoto(src) && "photo")} {...main}>
       {src ? <img src={src} alt={alt} loading="lazy" decoding="async" /> : null}
       {children}
     </div>

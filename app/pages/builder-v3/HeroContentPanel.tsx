@@ -3,7 +3,9 @@
 // Un champ vide garde le texte du template (affiché en gris dans le champ).
 import React, { useMemo } from "react";
 import { buildVM } from "../../../components/landpro/model";
-import { SECTION_LABELS } from "../../../components/landpro/registry";
+import { getTemplate, SECTION_LABELS } from "../../../components/landpro/registry";
+import { resolvePageTemplate } from "../../../components/landpro/legacy";
+import { DESIGNS } from "../../../components/landpro/designs";
 
 type Patch = (k: string, v: any) => void;
 
@@ -42,6 +44,162 @@ function Toggle({ draft, patch, k, label }: { draft: any; patch: Patch; k: strin
     <label className="bv3-check">
       <input type="checkbox" checked={draft[k] !== false} onChange={(e) => patch(k, e.target.checked)} /> {label}
     </label>
+  );
+}
+
+const SHAPES: [string, string][] = [
+  ["", "Template"],
+  ["square", "Carrée"],
+  ["rounded", "Arrondie"],
+  ["soft", "Très arrondie"],
+  ["arch", "Arche"],
+  ["circle", "Cercle"],
+];
+const RATIOS: [string, string][] = [
+  ["", "Celles du template"],
+  ["1/1", "Carré (1:1)"],
+  ["4/5", "Portrait (4:5)"],
+  ["3/4", "Portrait haut (3:4)"],
+  ["9/16", "Story (9:16)"],
+  ["4/3", "Paysage (4:3)"],
+  ["16/9", "Large (16:9)"],
+];
+const HERO_IMG_KEYS = [
+  "hero_img_shape",
+  "hero_img_ratio",
+  "hero_img_fit",
+  "hero_img_pos",
+  "hero_img_size",
+  "hero_img_shadow",
+];
+
+function Seg({
+  value,
+  options,
+  onChange,
+}: {
+  value: string;
+  options: [string, string][];
+  onChange: (v: string) => void;
+}) {
+  return (
+    <div className="bv3-sx-seg bv3-hx-seg">
+      {options.map(([v, l]) => (
+        <button key={v || "tpl"} type="button" className={value === v ? "active" : ""} onClick={() => onChange(v)}>
+          {l}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+/** Pourquoi la forme de l'image n'a pas d'effet sur ce template (vide = elle en a). */
+function shapeUnsupported(draft: any): string {
+  const id = resolvePageTemplate(draft).templateId;
+  if (DESIGNS[id])
+    return "Ce design sur mesure compose son hero autour d'une image de scène : sa forme reste celle du design.";
+  const t = getTemplate(id);
+  if (t.pieces?.hero === "hero-avant-apres")
+    return "Ce hero compare deux photos avant / après : leur forme reste celle du template.";
+  if (t.hero.variant === "fullbleed")
+    return "Ce template affiche la photo en fond plein écran : elle n'a pas de forme à régler.";
+  if (t.hero.variant === "video") return "Ce template affiche une vidéo à la place de la photo.";
+  if (t.hero.variant === "whatsapp") return "Ce template montre la photo dans une conversation WhatsApp.";
+  return "";
+}
+
+/** Forme de l'image principale du hero : forme, proportions, remplissage, cadrage, taille, ombre. */
+function HeroImageShape({ draft, patch }: { draft: any; patch: Patch }) {
+  const why = shapeUnsupported(draft);
+  if (why) return <p className="bv3-sx-note">{why}</p>;
+  const v = (k: string) => String(draft[k] ?? "");
+  const fit = v("hero_img_fit");
+  const size = Number(draft.hero_img_size) || 100;
+  const touched = HERO_IMG_KEYS.some((k) => v(k) !== "");
+  return (
+    <div className="bv3-hx">
+      <span className="bv3-sx-label">Forme</span>
+      <div className="bv3-hx-shapes">
+        {SHAPES.map(([k, l]) => (
+          <button
+            key={k || "tpl"}
+            type="button"
+            className={v("hero_img_shape") === k ? "active" : ""}
+            onClick={() => patch("hero_img_shape", k)}
+            title={l}
+          >
+            <i className={"bv3-hx-ico is-" + (k || "tpl")} />
+            {l}
+          </button>
+        ))}
+      </div>
+      <label className="bv3-sx-row">
+        <span>Proportions</span>
+        <select
+          value={v("hero_img_shape") === "circle" ? "1/1" : v("hero_img_ratio")}
+          disabled={v("hero_img_shape") === "circle"}
+          onChange={(e) => patch("hero_img_ratio", e.target.value)}
+        >
+          {RATIOS.map(([k, l]) => (
+            <option key={k || "tpl"} value={k}>
+              {l}
+            </option>
+          ))}
+        </select>
+      </label>
+      <span className="bv3-sx-label">Remplissage</span>
+      <Seg
+        value={v("hero_img_fit")}
+        options={[
+          ["", "Template"],
+          ["cover", "Remplir le cadre"],
+          ["contain", "Image entière"],
+        ]}
+        onChange={(x) => patch("hero_img_fit", x)}
+      />
+      {fit === "cover" || (fit !== "contain" && (v("hero_img_ratio") || v("hero_img_shape"))) ? (
+        <>
+          <span className="bv3-sx-label">Partie visible</span>
+          <Seg
+            value={v("hero_img_pos")}
+            options={[
+              ["top", "Haut"],
+              ["", "Centre"],
+              ["bottom", "Bas"],
+            ]}
+            onChange={(x) => patch("hero_img_pos", x)}
+          />
+        </>
+      ) : null}
+      <label className="bv3-sx-row bv3-hx-size">
+        <span>Taille</span>
+        <input
+          type="range"
+          min={40}
+          max={100}
+          step={5}
+          value={size}
+          onChange={(e) => patch("hero_img_size", Number(e.target.value) >= 100 ? "" : Number(e.target.value))}
+        />
+        <b>{size} %</b>
+      </label>
+      <span className="bv3-sx-label">Ombre</span>
+      <Seg
+        value={v("hero_img_shadow")}
+        options={[
+          ["", "Template"],
+          ["none", "Aucune"],
+          ["soft", "Légère"],
+          ["strong", "Forte"],
+        ]}
+        onChange={(x) => patch("hero_img_shadow", x)}
+      />
+      {touched ? (
+        <button type="button" className="bv3-sx-reset" onClick={() => HERO_IMG_KEYS.forEach((k) => patch(k, ""))}>
+          Revenir à l&apos;image du template
+        </button>
+      ) : null}
+    </div>
   );
 }
 
@@ -174,6 +332,8 @@ export default function HeroContentPanel({ draft, patch, editing }: { draft: any
       <Toggle draft={draft} patch={patch} k="hero_show_trust" label="Avantages" />
       <Toggle draft={draft} patch={patch} k="hero_show_points" label="Liste à cocher" />
       <Toggle draft={draft} patch={patch} k="hero_show_rating" label="Note des avis clients" />
+      <b className="bv3-sx-sub">Image principale : forme</b>
+      <HeroImageShape draft={draft} patch={patch} />
       <b className="bv3-sx-sub">Images</b>
     </div>
   );
