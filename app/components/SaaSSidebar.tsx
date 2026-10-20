@@ -93,6 +93,7 @@ export default function SaaSSidebar() {
     } catch {}
     try {
       sessionStorage.removeItem("lp_role");
+      sessionStorage.removeItem("lp_plan");
     } catch {}
     location.href = "/login";
   }
@@ -125,10 +126,27 @@ export default function SaaSSidebar() {
         setIsAdmin(false);
         setReady(true);
       });
-    fetch("/api/license", { cache: "no-store" })
-      .then((r) => (r.ok ? r.json() : null))
-      .then((x) => x && setPlan({ active: !!x.active, days: x.days_left ?? null }))
-      .catch(() => setPlan(null));
+    // Abonnement : redemandé au plus toutes les 5 min dans cet onglet (inutile à chaque page)
+    let fresh = false;
+    try {
+      const c = JSON.parse(sessionStorage.getItem("lp_plan") || "null");
+      if (c && Date.now() - c.at < 300_000) {
+        setPlan(c.plan);
+        fresh = true;
+      }
+    } catch {}
+    if (!fresh)
+      fetch("/api/license", { cache: "no-store" })
+        .then((r) => (r.ok ? r.json() : null))
+        .then((x) => {
+          if (!x) return;
+          const p = { active: !!x.active, days: x.days_left ?? null };
+          setPlan(p);
+          try {
+            sessionStorage.setItem("lp_plan", JSON.stringify({ at: Date.now(), plan: p }));
+          } catch {}
+        })
+        .catch(() => setPlan(null));
   }, []);
   const visible = (ready ? items : []).filter(([href]) =>
     isAgent ? href === "/orders" : !href.startsWith("/admin/") || isAdmin,

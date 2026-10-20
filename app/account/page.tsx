@@ -51,6 +51,9 @@ export default function Account() {
         text: `Clé activée : ${x.months} mois ajoutés. Abonnement valable jusqu’au ${fmtDate(x.periodEnd)}.`,
       });
       setCode("");
+      try {
+        sessionStorage.removeItem("lp_plan");
+      } catch {}
       await loadLicense();
     } catch (err: any) {
       setMsg({ ok: false, text: err.message });

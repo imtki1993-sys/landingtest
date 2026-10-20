@@ -11,22 +11,22 @@ export default function Home() {
   const [data, setData] = useState<any>(null),
     [error, setError] = useState("");
   useEffect(() => {
+    // Les deux appels partent en même temps ; les statistiques s'ajoutent dès qu'elles arrivent
+    const analytics = fetch("/api/dashboard/analytics", { cache: "no-store" })
+      .then(async (ar) => (ar.ok ? await ar.json() : null))
+      .catch(() => null);
     fetch("/api/dashboard", { cache: "no-store" })
       .then(async (r) => {
         const x = await r.json();
         if (!r.ok) throw new Error(x.error || "Dashboard indisponible");
         setData(x);
-        fetch("/api/dashboard/analytics", { cache: "no-store" })
-          .then(async (ar) => {
-            const ax = await ar.json();
-            if (ar.ok)
-              setData((d: any) => ({
-                ...d,
-                totals: { ...(d?.totals || {}), ...(ax.totals || {}) },
-                topLandings: ax.topLandings || [],
-              }));
-          })
-          .catch(() => {});
+        const ax = await analytics;
+        if (ax)
+          setData((d: any) => ({
+            ...d,
+            totals: { ...(d?.totals || {}), ...(ax.totals || {}) },
+            topLandings: ax.topLandings || [],
+          }));
       })
       .catch((e) => setError(e.message));
   }, []);
@@ -34,6 +34,7 @@ export default function Home() {
     await fetch("/api/auth/logout", { method: "POST" });
     try {
       sessionStorage.removeItem("lp_role");
+      sessionStorage.removeItem("lp_plan");
     } catch {}
     window.location.href = "/login";
   }

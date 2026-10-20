@@ -15,6 +15,53 @@ function db() {
   if (!u || !k) throw new Error("Supabase env missing");
   return createClient(u, k, { auth: { persistSession: false } });
 }
+/** Compteurs des commandes (toutes, pas seulement la page affichée). */
+async function orderKpis(
+  supabase: any,
+  workspaceId: string,
+  agentId: string | null,
+  dateFrom: string | null,
+  dateTo: string | null,
+) {
+  let kpiQuery = supabase
+    .from("orders")
+    .select("total,shipment_status,tracking_number,lead_id,created_at")
+    .eq("workspace_id", workspaceId);
+  if (agentId) kpiQuery = kpiQuery.eq("assigned_to", agentId);
+  if (dateFrom) kpiQuery = kpiQuery.gte("created_at", dateFrom + "T00:00:00");
+  if (dateTo)
+    kpiQuery = kpiQuery.lt("created_at", new Date(new Date(dateTo + "T00:00:00").getTime() + 86400000).toISOString());
+  const { data: kpiOrders, error: kpiError } = await kpiQuery;
+  if (kpiError) throw kpiError;
+  const all: any[] = kpiOrders || [],
+    allLeadIds = [...new Set(all.map((o: any) => o.lead_id).filter(Boolean))] as string[];
+  // Statuts des leads par paquets de 300, en parallèle (une seule requête géante devenait lente)
+  const chunks: string[][] = [];
+  for (let i = 0; i < allLeadIds.length; i += 300) chunks.push(allLeadIds.slice(i, i + 300));
+  const parts = await Promise.all(
+    chunks.map((ids) => supabase.from("leads").select("id,status").eq("workspace_id", workspaceId).in("id", ids)),
+  );
+  const leadStatus = new Map<string, string>();
+  for (const r of parts as any[]) {
+    if (r.error) throw r.error;
+    for (const l of r.data || []) leadStatus.set(l.id, l.status);
+  }
+  return {
+    total: all.length,
+    new: all.filter((o) => leadStatus.get(o.lead_id) === "NEW").length,
+    call: all.filter((o) => ["CONTACTED", "NO_ANSWER", "CALL_BACK"].includes(String(leadStatus.get(o.lead_id) || "")))
+      .length,
+    confirmed: all.filter((o) => leadStatus.get(o.lead_id) === "CONFIRMED").length,
+    sent: all.filter((o) => !!o.tracking_number && ["PENDING", "PICKED_UP", "IN_TRANSIT"].includes(o.shipment_status))
+      .length,
+    out: all.filter((o) => o.shipment_status === "OUT_FOR_DELIVERY").length,
+    delivered: all.filter((o) => o.shipment_status === "DELIVERED").length,
+    returns: all.filter((o) => ["FAILED", "RETURNING", "RETURNED", "CANCELLED"].includes(o.shipment_status)).length,
+    deliveredRevenue: all
+      .filter((o) => o.shipment_status === "DELIVERED")
+      .reduce((sum, o) => sum + Number(o.total || 0), 0),
+  };
+}
 export async function GET(req: Request) {
   try {
     const { s: supabase, workspaceId, role, user } = await authContext(req),
@@ -26,46 +73,10 @@ export async function GET(req: Request) {
       dateFrom = url.searchParams.get("dateFrom"),
       dateTo = url.searchParams.get("dateTo"),
       kpiOnly = url.searchParams.get("kpiOnly") === "1";
-    if (kpiOnly) {
-      let kpiQuery = supabase
-        .from("orders")
-        .select("total,shipment_status,tracking_number,lead_id,created_at")
-        .eq("workspace_id", workspaceId);
-      if (isAgent) kpiQuery = kpiQuery.eq("assigned_to", user.id);
-      if (dateFrom) kpiQuery = kpiQuery.gte("created_at", dateFrom + "T00:00:00");
-      if (dateTo)
-        kpiQuery = kpiQuery.lt(
-          "created_at",
-          new Date(new Date(dateTo + "T00:00:00").getTime() + 86400000).toISOString(),
-        );
-      const { data: kpiOrders, error: kpiError } = await kpiQuery;
-      if (kpiError) throw kpiError;
-      const all: any[] = kpiOrders || [],
-        allLeadIds = [...new Set(all.map((o: any) => o.lead_id).filter(Boolean))];
-      const { data: kpiLeads, error: kpiLeadsError } = allLeadIds.length
-        ? await supabase.from("leads").select("id,status").eq("workspace_id", workspaceId).in("id", allLeadIds)
-        : { data: [], error: null };
-      if (kpiLeadsError) throw kpiLeadsError;
-      const leadStatus = new Map((kpiLeads || []).map((l: any) => [l.id, l.status]));
-      const kpis = {
-        total: all.length,
-        new: all.filter((o) => leadStatus.get(o.lead_id) === "NEW").length,
-        call: all.filter((o) =>
-          ["CONTACTED", "NO_ANSWER", "CALL_BACK"].includes(String(leadStatus.get(o.lead_id) || "")),
-        ).length,
-        confirmed: all.filter((o) => leadStatus.get(o.lead_id) === "CONFIRMED").length,
-        sent: all.filter(
-          (o) => !!o.tracking_number && ["PENDING", "PICKED_UP", "IN_TRANSIT"].includes(o.shipment_status),
-        ).length,
-        out: all.filter((o) => o.shipment_status === "OUT_FOR_DELIVERY").length,
-        delivered: all.filter((o) => o.shipment_status === "DELIVERED").length,
-        returns: all.filter((o) => ["FAILED", "RETURNING", "RETURNED", "CANCELLED"].includes(o.shipment_status)).length,
-        deliveredRevenue: all
-          .filter((o) => o.shipment_status === "DELIVERED")
-          .reduce((sum, o) => sum + Number(o.total || 0), 0),
-      };
-      return NextResponse.json({ kpis });
-    }
+    // Compteurs en haut de page : lancés tout de suite, en parallèle de la liste
+    const kpisP = orderKpis(supabase, workspaceId, isAgent ? user.id : null, dateFrom, dateTo);
+    kpisP.catch(() => {}); // erreur relancée plus bas par « await kpisP »
+    if (kpiOnly) return NextResponse.json({ kpis: await kpisP });
     const ORDER_COLS =
       "id,order_number,lead_id,landing_page_id,store_id,product_id,quantity,unit_price,subtotal,shipping_price,discount,total,currency,shipment_status,tracking_number,delivery_company_id,carrier_city_id,carrier_city_name,shipped_at,delivered_at,returned_at,created_at";
     // Colonnes de l'équipe (assigned_to…) : ignorées tant que la migration n'est pas exécutée
@@ -125,7 +136,9 @@ export async function GET(req: Request) {
       carriers = by(carriersQ.data || []);
     // Fiabilité client : toutes les commandes du compte avec le même numéro + liste noire
     const phones = [...new Set([...leads.values()].map((l: any) => l.phone_e164).filter(Boolean))] as string[];
-    const [historyQ, blocked] = await Promise.all([
+    // Noms des agents attribués (vue du propriétaire), chargés en même temps que l'historique
+    const agentIds = [...new Set(base.map((o: any) => o.assigned_to).filter(Boolean))];
+    const [historyQ, blocked, agentQ] = await Promise.all([
       phones.length
         ? supabase
             .from("leads")
@@ -135,6 +148,9 @@ export async function GET(req: Request) {
             .limit(5000)
         : Promise.resolve({ data: [] }),
       blacklistedPhones(supabase, workspaceId, phones),
+      agentIds.length
+        ? supabase.from("users").select("id,full_name,email").in("id", agentIds)
+        : Promise.resolve({ data: [] as any[] }),
     ]);
     const historyByPhone = new Map<string, any[]>();
     for (const h of (historyQ as any).data || [])
@@ -152,11 +168,7 @@ export async function GET(req: Request) {
         blacklisted: blocked.get(lead.phone_e164) || null,
       });
     };
-    // Noms des agents attribués (vue du propriétaire)
-    const agentIds = [...new Set(base.map((o: any) => o.assigned_to).filter(Boolean))];
-    const { data: agentRows } = agentIds.length
-      ? await supabase.from("users").select("id,full_name,email").in("id", agentIds)
-      : { data: [] as any[] };
+    const agentRows = (agentQ as any).data || [];
     const agentName = new Map((agentRows || []).map((u: any) => [u.id, u.full_name || u.email]));
     const rows = base.map((o: any) => ({
       ...o,
@@ -168,42 +180,7 @@ export async function GET(req: Request) {
       store: stores.get(o.store_id) || null,
       delivery_company: carriers.get(o.delivery_company_id) || null,
     }));
-    let kpiQuery = supabase
-      .from("orders")
-      .select("total,shipment_status,tracking_number,lead_id,created_at")
-      .eq("workspace_id", workspaceId);
-    if (isAgent) kpiQuery = kpiQuery.eq("assigned_to", user.id);
-    if (dateFrom) kpiQuery = kpiQuery.gte("created_at", dateFrom + "T00:00:00");
-    if (dateTo)
-      kpiQuery = kpiQuery.lt("created_at", new Date(new Date(dateTo + "T00:00:00").getTime() + 86400000).toISOString());
-    const { data: kpiOrders, error: kpiError } = await kpiQuery;
-    if (kpiError) throw kpiError;
-    const all: any[] = kpiOrders || [],
-      allLeadIds = [...new Set(all.map((o: any) => o.lead_id).filter(Boolean))];
-    const { data: kpiLeads, error: kpiLeadsError } = allLeadIds.length
-      ? await supabase
-          .from("leads")
-          .select("id,status,workspace_id")
-          .eq("workspace_id", workspaceId)
-          .in("id", allLeadIds)
-      : { data: [], error: null };
-    if (kpiLeadsError) throw kpiLeadsError;
-    const leadStatus = new Map((kpiLeads || []).map((l: any) => [l.id, l.status]));
-    const kpis = {
-      total: all.length,
-      new: all.filter((o) => leadStatus.get(o.lead_id) === "NEW").length,
-      call: all.filter((o) => ["CONTACTED", "NO_ANSWER", "CALL_BACK"].includes(String(leadStatus.get(o.lead_id) || "")))
-        .length,
-      confirmed: all.filter((o) => leadStatus.get(o.lead_id) === "CONFIRMED").length,
-      sent: all.filter((o) => !!o.tracking_number && ["PENDING", "PICKED_UP", "IN_TRANSIT"].includes(o.shipment_status))
-        .length,
-      out: all.filter((o) => o.shipment_status === "OUT_FOR_DELIVERY").length,
-      delivered: all.filter((o) => o.shipment_status === "DELIVERED").length,
-      returns: all.filter((o) => ["FAILED", "RETURNING", "RETURNED", "CANCELLED"].includes(o.shipment_status)).length,
-      deliveredRevenue: all
-        .filter((o) => o.shipment_status === "DELIVERED")
-        .reduce((sum, o) => sum + Number(o.total || 0), 0),
-    };
+    const kpis = await kpisP;
     return NextResponse.json({
       orders: rows,
       kpis,
