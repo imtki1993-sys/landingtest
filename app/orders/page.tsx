@@ -4,6 +4,7 @@ import SaaSSidebar from "../components/SaaSSidebar";
 import SaaSTopbar from "../components/SaaSTopbar";
 import { useEffect, useMemo, useState } from "react";
 import { readPage, writePage } from "../../lib/page-cache";
+import { orderStage, type OrderStage } from "../../lib/order-stage";
 export default function Orders() {
   const [orders, setOrders] = useState<any[]>([]),
     [serverKpi, setServerKpi] = useState<any>(null),
@@ -194,33 +195,17 @@ export default function Orders() {
   const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize)),
     safePage = Math.min(page, totalPages),
     pagedFiltered = filtered.slice((safePage - 1) * pageSize, safePage * pageSize);
-  const stages = [
-    {
-      id: "NEW",
-      label: "Nouveau",
-      match: (o: any) => ["NEW", "NO_ANSWER", "CALL_BACK"].includes(o.lead?.status || "NEW"),
-    },
-    { id: "CONTACTED", label: "À appeler", match: (o: any) => o.lead?.status === "CONTACTED" },
-    { id: "CONFIRMED", label: "Confirmé", match: (o: any) => o.lead?.status === "CONFIRMED" },
-    {
-      id: "SHIPPED",
-      label: "Expédié",
-      match: (o: any) =>
-        o.lead?.status === "SHIPPED" || ["PICKED_UP", "IN_TRANSIT", "OUT_FOR_DELIVERY"].includes(o.shipment_status),
-    },
-    {
-      id: "DELIVERED",
-      label: "Livré",
-      match: (o: any) => o.lead?.status === "DELIVERED" || o.shipment_status === "DELIVERED",
-    },
-    {
-      id: "RETURNED",
-      label: "Retour",
-      match: (o: any) =>
-        ["RETURNED", "CANCELLED"].includes(o.lead?.status) ||
-        ["RETURNED", "RETURNING", "CANCELLED", "FAILED"].includes(o.shipment_status),
-    },
-  ];
+  // Une commande = une seule colonne (lib/order-stage.ts)
+  const stages: { id: OrderStage; label: string; match: (o: any) => boolean }[] = (
+    [
+      ["NEW", "Nouveau"],
+      ["CONTACTED", "À appeler"],
+      ["CONFIRMED", "Confirmé"],
+      ["SHIPPED", "Expédié"],
+      ["DELIVERED", "Livré"],
+      ["RETURNED", "Retour"],
+    ] as [OrderStage, string][]
+  ).map(([id, label]) => ({ id, label, match: (o: any) => orderStage(o) === id }));
   const kpiSource = filtered,
     kpi = {
       NEW: kpiSource.filter((o) => o.lead?.status === "NEW").length,
