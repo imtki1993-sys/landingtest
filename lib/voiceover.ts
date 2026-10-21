@@ -25,11 +25,17 @@ export const VOICES: Voice[] = [
   { id: "azure-mouna", label: "Mouna", gender: "f", provider: "azure", hint: "Femme · Azure (arabe du Maroc)" },
 ];
 
+/** Variable d'environnement sans espaces ni guillemets parasites (copier-coller dans Vercel). */
+const env = (k: string) =>
+  String(process.env[k] || "")
+    .trim()
+    .replace(/^["']|["']$/g, "");
+
 /** Fournisseurs configurés sur ce déploiement (variables d'environnement Vercel). */
 export function availableProviders(): VoiceProvider[] {
   const out: VoiceProvider[] = [];
-  if (process.env.TTS_SERVICE_URL && process.env.TTS_SERVICE_TOKEN) out.push("habibi");
-  if (process.env.AZURE_SPEECH_KEY && process.env.AZURE_SPEECH_REGION) out.push("azure");
+  if (env("TTS_SERVICE_URL") && env("TTS_SERVICE_TOKEN")) out.push("habibi");
+  if (env("AZURE_SPEECH_KEY") && env("AZURE_SPEECH_REGION")) out.push("azure");
   return out;
 }
 
@@ -41,11 +47,11 @@ export interface Synthesis {
 
 /** Habibi-TTS sur le service GPU : une phrase à la fois, pauses et volume gérés par le service. */
 async function habibi(sentences: string[], voice: string, speed: number): Promise<Synthesis> {
-  const base = String(process.env.TTS_SERVICE_URL).replace(/\/+$/, "");
+  const base = env("TTS_SERVICE_URL").replace(/\/+$/, "");
   const r = await fetch(base + "/synthesize", {
     method: "POST",
     headers: {
-      authorization: "Bearer " + process.env.TTS_SERVICE_TOKEN,
+      authorization: "Bearer " + env("TTS_SERVICE_TOKEN"),
       "content-type": "application/json",
       accept: "audio/mpeg",
     },
@@ -57,7 +63,7 @@ async function habibi(sentences: string[], voice: string, speed: number): Promis
     const detail = await r.text().catch(() => "");
     throw new Error(
       r.status === 401
-        ? "Le service de voix refuse la clé (TTS_SERVICE_TOKEN)."
+        ? "Le service de voix refuse la clé : TTS_SERVICE_TOKEN dans Vercel doit être exactement la même valeur que le secret GitHub TTS_SERVICE_TOKEN (64 caractères)."
         : `Le service de voix a répondu ${r.status}${detail ? " : " + detail.slice(0, 160) : ""}`,
     );
   }
@@ -79,10 +85,10 @@ async function azure(sentences: string[], voice: string, speed: number): Promise
   const ssml = `<speak version="1.0" xml:lang="ar-MA"><voice name="${name}"><prosody rate="${rate}">${sentences
     .map((s) => esc(s))
     .join('<break time="350ms"/>')}</prosody></voice></speak>`;
-  const r = await fetch(`https://${process.env.AZURE_SPEECH_REGION}.tts.speech.microsoft.com/cognitiveservices/v1`, {
+  const r = await fetch(`https://${env("AZURE_SPEECH_REGION")}.tts.speech.microsoft.com/cognitiveservices/v1`, {
     method: "POST",
     headers: {
-      "Ocp-Apim-Subscription-Key": String(process.env.AZURE_SPEECH_KEY),
+      "Ocp-Apim-Subscription-Key": env("AZURE_SPEECH_KEY"),
       "Content-Type": "application/ssml+xml",
       "X-Microsoft-OutputFormat": "audio-24khz-96kbitrate-mono-mp3",
       "User-Agent": "LandPro",
