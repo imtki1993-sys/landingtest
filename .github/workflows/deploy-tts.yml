@@ -60,7 +60,7 @@ jobs:
       - name: Enregistrer la clé du service dans Modal
         run: modal secret create landpro-tts TTS_SERVICE_TOKEN="$TTS_SERVICE_TOKEN" --force
 
-      - name: Déployer (1re fois ≈ 15-25 min : modèle marocain + 7 voix DODa)
+      - name: "Déployer (1re fois ≈ 15-25 min, modèle marocain + 7 voix DODa)"
         run: |
           modal deploy modal_app.py 2>&1 | tee deploy.log
           url=$(grep -oE 'https://[A-Za-z0-9.-]+\.modal\.run' deploy.log | head -1)
