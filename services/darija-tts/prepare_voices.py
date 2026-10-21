@@ -2,7 +2,7 @@
 
 DODa : 12 743 phrases en darija enregistrées en studio par 7 comédiens marocains (4 femmes, 3 hommes).
 Source utilisée : la copie libre d'accès « Jip7e/doda-darija-cosyvoice2 » (mêmes enregistrements, 24 kHz,
-licence CC-BY-4.0, transcriptions en alphabet arabe, comédien de chaque phrase dans utt2spk).
+licence CC-BY-4.0, transcriptions en alphabet arabe, comédien de chaque phrase dans utt2spk, audio dans wavs.tar.gz).
 L'original « atlasia/DODa-audio-dataset » est protégé (compte Hugging Face requis).
 
 Pour chaque comédien, on garde l'extrait le plus adapté au clonage de voix : 5 à 9 secondes, phrase complète
@@ -80,6 +80,7 @@ def main() -> None:
     def get(name: str) -> str:
         return hf_hub_download(REPO, name, repo_type="dataset")
 
+
     texts: dict[str, str] = {}
     speakers: dict[str, str] = {}
     for split in ("train", "dev"):
@@ -91,28 +92,55 @@ def main() -> None:
         if spk in LABELS and text_ok(texts.get(utt, "")):
             by_spk.setdefault(spk, []).append(utt)
 
+    # extraits candidats : phrases moyennes (≈ 6-8 s) en premier
+    wanted: dict[str, tuple[str, str]] = {}  # « 000123.wav » → (comédien, utt)
+    for spk, utts in by_spk.items():
+        utts.sort(key=lambda u: abs(len(texts[u].split()) - 15))
+        for utt in utts[:CANDIDATES]:
+            wanted[utt.split("_")[-1] + ".wav"] = (spk, utt)
+
+    # l'audio est dans une seule archive (wavs.tar.gz, ~1,2 Go) : lue en flux, seuls les candidats sont décodés,
+    # puis supprimée pour garder l'image légère
+    import io
+    import os
+    import shutil
+    import tarfile
+    import tempfile
+
+    tmp = tempfile.mkdtemp(prefix="doda-")
+    best: dict[str, tuple[float, np.ndarray, int, str]] = {}
+    try:
+        archive = hf_hub_download(REPO, "wavs.tar.gz", repo_type="dataset", local_dir=tmp)
+        found = 0
+        with tarfile.open(archive, mode="r|gz") as tar:
+            for member in tar:
+                name = os.path.basename(member.name)
+                if not member.isfile() or name not in wanted:
+                    continue
+                spk, utt = wanted[name]
+                data = tar.extractfile(member)
+                if data is None:
+                    continue
+                found += 1
+                try:
+                    wave, sr = sf.read(io.BytesIO(data.read()), dtype="float32")
+                except Exception:
+                    continue
+                if wave.ndim > 1:
+                    wave = wave.mean(axis=1)
+                sc = score(wave, sr, texts[utt])
+                if sc is not None and (spk not in best or sc < best[spk][0]):
+                    best[spk] = (sc, wave, sr, texts[utt])
+        print(f"{found} extraits candidats lus dans l'archive")
+    finally:
+        shutil.rmtree(tmp, ignore_errors=True)
+
     meta = {}
     for spk in sorted(LABELS):
-        utts = by_spk.get(spk, [])
-        # phrases moyennes (≈ 6-8 s) en premier, réparties dans tout l'enregistrement
-        utts.sort(key=lambda u: abs(len(texts[u].split()) - 15))
-        best = None
-        for utt in utts[:CANDIDATES]:
-            num = utt.split("_")[-1]
-            try:
-                wave, sr = sf.read(get(f"wavs/{num}.wav"), dtype="float32")
-            except Exception as e:  # fichier absent : on passe au suivant
-                print(f"{utt}: ignoré ({e.__class__.__name__})")
-                continue
-            if wave.ndim > 1:
-                wave = wave.mean(axis=1)
-            sc = score(wave, sr, texts[utt])
-            if sc is not None and (best is None or sc < best[0]):
-                best = (sc, wave, sr, texts[utt])
-        if best is None:
+        if spk not in best:
             print(f"{spk}: aucun extrait valable")
             continue
-        _, wave, sr, text = best
+        _, wave, sr, text = best[spk]
         vid = "doda-" + spk.lower()
         sf.write(out / f"{vid}.wav", resample(wave, sr), TARGET_SR)
         meta[vid] = {"file": f"{vid}.wav", "ref_text": text, "label": LABELS[spk], "speaker": spk, "source": SOURCE}
