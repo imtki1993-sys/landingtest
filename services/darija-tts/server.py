@@ -19,7 +19,7 @@ from fastapi import FastAPI, Header, HTTPException
 from fastapi.responses import JSONResponse, Response
 from pydantic import BaseModel, Field
 
-from audio_utils import SAMPLE_RATE, assemble, expected_seconds, fit_tempo, to_mp3
+from audio_utils import SAMPLE_RATE, assemble, expected_seconds, fit_tempo, sentence_speed, style_of, to_mp3
 
 MAR_CKPT = "hf://SWivid/Habibi-TTS/Specialized/MAR/model_100000.safetensors"
 MAR_VOCAB = "hf://SWivid/Habibi-TTS/Specialized/MAR/vocab.txt"
@@ -58,7 +58,13 @@ def load() -> None:
     voices = {}
     for vid, v in meta.items():
         ref_audio, ref_text = preprocess_ref_audio_text(str(VOICES_DIR / v["file"]), v["ref_text"], show_info=lambda *_: None)
-        voices[vid] = {"ref_audio": ref_audio, "ref_text": ref_text, "label": v.get("label", vid)}
+        voices[vid] = {"ref_audio": ref_audio, "ref_text": ref_text, "label": v.get("label", vid), "styles": {}}
+        # extraits d'intonation du même comédien : question (mélodie qui monte), exclamation (voix vivante)
+        for style, sv in (v.get("styles") or {}).items():
+            path = VOICES_DIR / sv["file"]
+            if path.exists():
+                a, t = preprocess_ref_audio_text(str(path), sv["ref_text"], show_info=lambda *_: None)
+                voices[vid]["styles"][style] = {"ref_audio": a, "ref_text": t}
     _state.update(model=model, vocoder=vocoder, voices=voices)
 
 
@@ -75,15 +81,32 @@ class SynthesizeBody(BaseModel):
     speed: float = Field(default=1.0, ge=0.7, le=1.3)
     pause: float = Field(default=1.0, ge=0.3, le=2.0)
     target_seconds: float | None = Field(default=None, ge=5, le=120)
+    # silence après chaque phrase, calculé par LandPro d'après la ponctuation
+    gaps: list[float] | None = None
+    # intonation selon la ponctuation (référence « question » / « exclamation » du comédien)
+    expressive: bool = True
 
 
-def _generate(sentence: str, voice: dict, speed: float):
+def _reference(sentence: str, voice: dict, expressive: bool) -> dict:
+    """Extrait de référence à imiter : la question pour « ؟ », l'extrait vivant pour « ! », sinon la voix neutre."""
+    if expressive:
+        style = style_of(sentence)
+        if style in voice.get("styles", {}):
+            return voice["styles"][style]
+    return voice
+
+
+def _generate(sentence: str, voice: dict, speed: float, expressive: bool = True):
     from habibi_tts.infer.utils_infer import infer_process
+
+    ref = _reference(sentence, voice, expressive)
+    if expressive:
+        speed = sentence_speed(sentence, speed)
 
     def run(nfe: int):
         wave, sr, _ = infer_process(
-            voice["ref_audio"],
-            voice["ref_text"],
+            ref["ref_audio"],
+            ref["ref_text"],
             sentence,
             _state["model"],
             _state["vocoder"],
@@ -119,6 +142,7 @@ def health():
         "ok": True,
         "loaded": bool(_state),
         "voices": sorted(_state.get("voices", {})),
+        "styles": {k: sorted(v.get("styles", {})) for k, v in _state.get("voices", {}).items()},
         "key": _fingerprint(token),
         "build": os.environ.get("BUILD_ID", ""),
     }
@@ -152,11 +176,12 @@ def synthesize(body: SynthesizeBody, authorization: str | None = Header(default=
     segments = []
     with _lock:
         for s in sentences:
-            wave, sr = _generate(s, voice, body.speed)
+            wave, sr = _generate(s, voice, body.speed, body.expressive)
             if sr != SAMPLE_RATE:
                 raise HTTPException(status_code=500, detail="Fréquence inattendue")
             segments.append((s, wave))
-    final = assemble(segments, pause=body.pause)
+    gaps = body.gaps if body.gaps and len(body.gaps) == len(sentences) else None
+    final = assemble(segments, pause=body.pause, gaps=gaps)
     seconds = len(final) / SAMPLE_RATE
     tempo = fit_tempo(seconds, body.target_seconds)
     mp3 = to_mp3(final, tempo=tempo)

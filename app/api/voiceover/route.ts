@@ -102,6 +102,7 @@ export async function POST(req: Request) {
         speed,
         pause: (b.pause in PAUSES ? b.pause : "normales") as PauseKind,
         targetSeconds: Number(b.target_seconds) || null,
+        gaps: spoken.gaps,
       });
     } catch (e: any) {
       return NextResponse.json({ error: e.message || "Génération de la voix impossible." }, { status: 502 });

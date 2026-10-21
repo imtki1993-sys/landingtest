@@ -48,6 +48,8 @@ export interface SynthesisOptions {
   pause?: PauseKind;
   /** durée visée (s) : l'audio trop long est accéléré sans changer la voix (25 % au plus) */
   targetSeconds?: number | null;
+  /** silence après chaque phrase (s), calculé d'après la ponctuation (normalizeDarija) */
+  gaps?: number[];
 }
 
 export interface Synthesis {
@@ -63,6 +65,7 @@ async function habibi(
   speed: number,
   pause: number,
   target: number | null,
+  gaps: number[] | null,
 ): Promise<Synthesis> {
   const base = env("TTS_SERVICE_URL").replace(/\/+$/, "");
   const r = await fetch(base + "/synthesize", {
@@ -72,7 +75,7 @@ async function habibi(
       "content-type": "application/json",
       accept: "audio/mpeg",
     },
-    body: JSON.stringify({ sentences, voice, speed, pause, target_seconds: target }),
+    body: JSON.stringify({ sentences, voice, speed, pause, target_seconds: target, gaps, expressive: true }),
     cache: "no-store",
     signal: AbortSignal.timeout(240_000),
   });
@@ -96,12 +99,22 @@ const esc = (s: string) =>
   s.replace(/[<>&'"]/g, (c) => ({ "<": "&lt;", ">": "&gt;", "&": "&amp;", "'": "&apos;", '"': "&quot;" })[c]!);
 
 /** Azure Speech, voix ar-MA ; une courte pause entre les phrases. */
-async function azure(sentences: string[], voice: string, speed: number, pause: number): Promise<Synthesis> {
+async function azure(
+  sentences: string[],
+  voice: string,
+  speed: number,
+  pause: number,
+  gaps: number[] | null,
+): Promise<Synthesis> {
   const name = voice === "azure-mouna" ? "ar-MA-MounaNeural" : "ar-MA-JamalNeural";
   const rate = `${Math.round((speed - 1) * 100) >= 0 ? "+" : ""}${Math.round((speed - 1) * 100)}%`;
   const ssml = `<speak version="1.0" xml:lang="ar-MA"><voice name="${name}"><prosody rate="${rate}">${sentences
-    .map((s) => esc(s))
-    .join(`<break time="${Math.round(350 * pause)}ms"/>`)}</prosody></voice></speak>`;
+    .map(
+      (s, i) =>
+        esc(s) +
+        (i < sentences.length - 1 ? `<break time="${Math.round((gaps ? gaps[i] * 1000 : 350) * pause)}ms"/>` : ""),
+    )
+    .join("")}</prosody></voice></speak>`;
   const r = await fetch(`https://${env("AZURE_SPEECH_REGION")}.tts.speech.microsoft.com/cognitiveservices/v1`, {
     method: "POST",
     headers: {
@@ -130,9 +143,13 @@ export async function synthesize(sentences: string[], voiceId: string, o: Synthe
   const s = Math.min(1.3, Math.max(0.7, Number(o.speed) || 1));
   const pause = PAUSES[o.pause as PauseKind] ?? 1;
   const target = Number(o.targetSeconds) >= 5 ? Math.min(90, Number(o.targetSeconds)) : null;
+  const gaps =
+    Array.isArray(o.gaps) && o.gaps.length === sentences.length
+      ? o.gaps.map((g) => Math.min(1.5, Math.max(0, Number(g) || 0)))
+      : null;
   return voice.provider === "habibi"
-    ? habibi(sentences, voice.id, s, pause, target)
-    : azure(sentences, voice.id, s, pause);
+    ? habibi(sentences, voice.id, s, pause, target, gaps)
+    : azure(sentences, voice.id, s, pause, gaps);
 }
 
 // ─── Script ───
@@ -177,10 +194,14 @@ ${p.notes ? "Consignes du vendeur : " + p.notes.slice(0, 400) : ""}
 Règles :
 - Durée lue : ${p.seconds} secondes, soit environ ${words} mots au total (pas plus).
 - Structure : une accroche forte dans la première phrase (question ou situation que le client vit), puis le produit, puis l'offre, puis l'appel à l'action « الخلاص عند الاستلام » et « التوصيل لجميع المدن ».
-- Phrases courtes (5 à 12 mots), une idée par phrase. Chaque phrase finit par « . », « ! » ou « ؟ ».
+- Phrases courtes (5 à 12 mots), une idée par phrase, UNE PHRASE PAR LIGNE.
+- Ponctue comme on parle, la voix suit la ponctuation :
+  « ؟ » pour les vraies questions (واش…؟ علاش…؟ شحال…؟), « ! » pour l'enthousiasme et l'urgence,
+  « ، » pour respirer au milieu d'une phrase, « … » pour un petit suspense avant une révélation (le prix, l'offre).
+- Ajoute 1 ou 2 réactions marocaines naturelles là où elles sonnent vrai (ex. « واو! »، « والله! »، « ياك؟ »، « صافي! »، « يالاه! »، « شوف شوف… »), sans en abuser.
 - DARIJA PARLÉE, jamais d'arabe classique (fusha). Utilise : هاد، هادي، دابا، بزاف، غير، كاين، ماكاينش، ديال، واخا، علاش، فين، شنو، كيفاش، باش، ملي، بغيتي، تقدر، حاجة، زوين، واعر، فابور، خود، طلب.
   N'utilise JAMAIS : هذا، هذه، الآن، جدا، فقط، أيضا، لماذا، ماذا، كيف، سوف، الذي، التي، يمكنك، تستطيع، شيء، رائع، مجانا.
-  Exemple du ton attendu : « واش عييتي من التليفون اللي كيطيح ليك فالطوموبيل؟ هاد الحامل كيشد مزيان. دابا غير ب 199 درهم! »
+  Exemple du ton attendu, une phrase par ligne : « واش عييتي من التليفون اللي كيطيح ليك فالطوموبيل؟ » / « صافي، سالا هاد المشكل! » / « هاد الحامل كيشد مزيان، حتى ف الحفر. » / « والثمن… غير 199 درهم! »
 - Alphabet arabe uniquement : PAS de mots en lettres latines, PAS d'emojis, PAS de hashtags.
 - Écris les prix et les nombres en CHIFFRES suivis de « درهم » (ex. « 199 درهم ») : ils seront lus correctement par la voix.
 - N'invente aucune caractéristique, certification, garantie ou résultat qui n'est pas dans la description. Aucune promesse médicale.

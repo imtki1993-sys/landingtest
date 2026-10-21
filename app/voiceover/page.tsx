@@ -415,6 +415,10 @@ export default function VoiceoverPage() {
                       setSpokenEdit(null);
                     }}
                   />
+                  <p className="vo-hint">
+                    La voix suit ta ponctuation : <b>؟</b> question (la voix monte), <b>!</b> enthousiasme, <b>،</b>{" "}
+                    respiration, <b>…</b> suspense avant le prix, retour à la ligne = petite pause.
+                  </p>
                   {spoken.guessed.length ? (
                     <div className="vo-warn">
                       Mots en lettres latines lus approximativement. Indique comment les dire :
