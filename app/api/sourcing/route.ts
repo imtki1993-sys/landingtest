@@ -49,7 +49,7 @@ export async function GET(req: Request) {
       query,
       s
         .from("sourcing_channels")
-        .select("id,username,title,photo_url,active,last_synced_at,last_error")
+        .select("id,username,title,photo_url,description,active,last_synced_at,last_error")
         .order("title", { ascending: true }),
     ]);
     if (posts.error || channels.error) {
@@ -75,10 +75,19 @@ export async function GET(req: Request) {
       byChan.set(r.channel_id, list);
     }
     const sig = new Map([...byChan].map(([id, texts]) => [id, boilerplateLines(texts)]));
+    // WhatsApp général du canal (description) : utilisé quand le message n'a pas de numéro
+    const chanPhones = new Map<string, string[]>(
+      ((channels.data || []) as any[]).map((c) => [c.id, extractPhones(c.description || "")]),
+    );
     for (const r of rows) {
       const body = stripBoilerplate(r.text || "", sig.get(r.channel_id) || new Set());
       r.body = body;
       r.phones = extractPhones(r.text || "");
+      r.phones_from_channel = false;
+      if (!r.phones.length && chanPhones.get(r.channel_id)?.length) {
+        r.phones = chanPhones.get(r.channel_id);
+        r.phones_from_channel = true;
+      }
       // nom lu par règles : relu sans la signature (l'IA, elle, a déjà ignoré la signature)
       if (r.extracted_by !== "ai") r.name = guessName(body);
       delete r.extracted_by;
@@ -99,7 +108,9 @@ export async function GET(req: Request) {
       channels: (channels.data || [])
         .filter((c: any) => isPlatformAdmin || c.active)
         .map((c: any) =>
-          isPlatformAdmin ? c : { id: c.id, username: c.username, title: c.title, photo_url: c.photo_url },
+          isPlatformAdmin
+            ? { ...c, description: undefined }
+            : { id: c.id, username: c.username, title: c.title, photo_url: c.photo_url },
         ),
     });
   } catch (e: any) {
