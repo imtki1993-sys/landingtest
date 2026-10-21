@@ -1,3 +1,9 @@
+# Versions fixées et compatibles entre elles : Habibi exige torch < 2.9 ; torchaudio et torchcodec doivent
+# correspondre exactement à torch (sinon : « libcudart.so.13 introuvable » au chargement).
+torch==2.8.0
+torchaudio==2.8.0
+torchcodec==0.7.0
+f5-tts==1.1.22
 habibi-tts==0.1.1
 fastapi==0.115.6
 uvicorn[standard]==0.32.1
