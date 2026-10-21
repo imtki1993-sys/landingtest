@@ -1,0 +1,4 @@
+__pycache__/
+voices/
+*.mp3
+*.wav
