@@ -1,4 +1,5 @@
 // Analyse des pubs : lignes du rapport SQL (ads_report) → campagnes, pubs et indicateurs.
+import { decodeName } from "./utm";
 export interface AdsRow {
   campaign: string | null;
   adset: string | null;
@@ -16,9 +17,12 @@ type Counts = Omit<AdsRow, "campaign" | "adset" | "ad">;
 export interface AdLine extends Counts {
   adset: string | null;
   ad: string | null;
+  /** nom donné par le vendeur (quand la pub envoie un numéro) */
+  adLabel?: string;
 }
 export interface Campaign extends Counts {
   campaign: string;
+  label?: string;
   spend: number;
   ads: AdLine[];
 }
@@ -62,28 +66,47 @@ export function metrics(c: Counts, spend: number): Metrics {
   };
 }
 
+/** Nom affichable : décodé, sans valeur vide. */
+const nameOf = (v: string | null) => (v ? decodeName(v) || null : null);
+
 /** Regroupe par campagne ; les commandes sans pub identifiée sont comptées à part. */
-export function buildAdsReport(rows: AdsRow[], spendByCampaign: Record<string, number>) {
+export function buildAdsReport(
+  rows: AdsRow[],
+  spendByCampaign: Record<string, number>,
+  labels: Record<string, string> = {},
+) {
   const map = new Map<string, Campaign>();
   const untracked: Counts = { ...ZERO };
-  for (const r of rows) {
+  for (const raw of rows) {
+    const r = { ...raw, campaign: nameOf(raw.campaign), adset: nameOf(raw.adset), ad: nameOf(raw.ad) };
     if (!r.campaign) {
       add(untracked, r);
       continue;
     }
     let c = map.get(r.campaign);
     if (!c) {
-      c = { campaign: r.campaign, ...ZERO, spend: Number(spendByCampaign[r.campaign] || 0), ads: [] };
+      c = {
+        campaign: r.campaign,
+        label: labels[r.campaign],
+        ...ZERO,
+        spend: Number(spendByCampaign[r.campaign] || 0),
+        ads: [],
+      };
       map.set(r.campaign, c);
     }
     add(c, r);
-    const line: AdLine = { adset: r.adset, ad: r.ad, ...ZERO };
+    // même pub écrite de deux façons (encodée / décodée) : une seule ligne
+    let line = c.ads.find((a) => a.ad === r.ad && a.adset === r.adset);
+    if (!line) {
+      line = { adset: r.adset, ad: r.ad, adLabel: r.ad ? labels[r.ad] : undefined, ...ZERO };
+      c.ads.push(line);
+    }
     add(line, r);
-    c.ads.push(line);
   }
   // dépense saisie pour une campagne sans visite ni commande : elle compte quand même
   for (const [name, amount] of Object.entries(spendByCampaign))
-    if (!map.has(name) && amount > 0) map.set(name, { campaign: name, ...ZERO, spend: amount, ads: [] });
+    if (!map.has(name) && amount > 0)
+      map.set(name, { campaign: name, label: labels[name], ...ZERO, spend: amount, ads: [] });
   const campaigns = [...map.values()]
     .map((c) => ({ ...c, ads: c.ads.sort((a, b) => b.orders - a.orders || b.visits - a.visits) }))
     .sort((a, b) => b.orders - a.orders || b.spend - a.spend || b.visits - a.visits);
@@ -91,3 +114,6 @@ export function buildAdsReport(rows: AdsRow[], spendByCampaign: Record<string, n
   const spend = campaigns.reduce((n, c) => n + c.spend, 0);
   return { campaigns, total: { ...total, spend }, untracked };
 }
+
+/** Une pub envoie un numéro (identifiant Facebook) à la place d'un nom. */
+export const looksLikeId = (v: string) => /^\d{9,}$/.test(v);

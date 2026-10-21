@@ -3,9 +3,22 @@
 export const UTM_KEYS = ["utm_source", "utm_medium", "utm_campaign", "utm_term", "utm_content"] as const;
 export type Utm = Partial<Record<(typeof UTM_KEYS)[number], string>>;
 
+/** Décode un nom resté encodé (« %D8%AD… » : nom arabe encodé deux fois par la pub). */
+export function decodeName(v: string): string {
+  let s = v;
+  for (let i = 0; i < 2 && /%[0-9a-f]{2}/i.test(s); i++) {
+    try {
+      s = decodeURIComponent(s.replace(/\+/g, " "));
+    } catch {
+      break;
+    }
+  }
+  return s.trim();
+}
+
 const clean = (v: unknown) => {
   if (typeof v !== "string") return undefined;
-  const s = v.trim().slice(0, 200);
+  const s = decodeName(v).slice(0, 200);
   // paramètre Facebook non remplacé (aperçu de la pub) : sans valeur
   return s && !/^\{\{.*\}\}$/.test(s) ? s : undefined;
 };
