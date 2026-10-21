@@ -9,7 +9,7 @@ import { cleanLexicon, estimateSeconds, normalizeDarija, type Lexicon } from "..
 export const maxDuration = 300;
 const MAX_CHARS = 1500;
 // voix off par compte et par 24 h ; réglable dans Vercel (VOICEOVER_DAILY_LIMIT)
-const DAILY_LIMIT = Math.max(1, Number(process.env.VOICEOVER_DAILY_LIMIT) || 200);
+const DAILY_LIMIT = Math.max(1, Number(process.env.VOICEOVER_DAILY_LIMIT) || 400_000);
 // stockage dédié à l'audio (le bucket des images refuse audio/mpeg) ; créé au premier usage
 const BUCKET = "voiceovers";
 let bucketReady = false;
