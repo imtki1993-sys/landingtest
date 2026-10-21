@@ -1,7 +1,7 @@
 // Synchronisation des canaux Telegram publics du Sourcing Derb Omar (cron + ajout d'un canal).
 import OpenAI from "openai";
 import { fetchChannelPage, type TgPost } from "./telegram-public";
-import { aiPrompt, parseAiAnswer, regexExtract } from "./sourcing-extract";
+import { aiPrompt, boilerplateLines, parseAiAnswer, regexExtract, stripBoilerplate } from "./sourcing-extract";
 import { META_TEXT_MODEL } from "./store-templates/ai";
 
 export interface ChannelRow {
@@ -10,8 +10,10 @@ export interface ChannelRow {
   last_post_id: number | null;
 }
 
-const rowOf = (channelId: string, p: TgPost) => {
-  const x = regexExtract(p.text, p.photos.length > 0);
+const rowOf = (channelId: string, p: TgPost, signature: Set<string>) => {
+  // fiche lue sur le texte sans la signature du canal (sinon le nom serait « TOP JEMLA »)
+  const x = regexExtract(stripBoilerplate(p.text, signature), p.photos.length > 0);
+  x.phone = x.phone || regexExtract(p.text, true).phone;
   return {
     channel_id: channelId,
     post_id: p.postId,
@@ -52,7 +54,8 @@ export async function syncChannel(s: any, ch: ChannelRow, pages = 1) {
     ? await s.from("sourcing_posts").select("post_id").eq("channel_id", ch.id).in("post_id", ids)
     : { data: [] };
   const knownSet = new Set((known || []).map((k: any) => Number(k.post_id)));
-  const fresh = posts.filter((p) => !knownSet.has(p.postId)).map((p) => rowOf(ch.id, p));
+  const signature = boilerplateLines(posts.map((p) => p.text));
+  const fresh = posts.filter((p) => !knownSet.has(p.postId)).map((p) => rowOf(ch.id, p, signature));
   if (fresh.length) {
     const { error } = await s.from("sourcing_posts").upsert(fresh, { onConflict: "channel_id,post_id" });
     if (error) throw error;

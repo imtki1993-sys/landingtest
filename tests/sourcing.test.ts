@@ -150,3 +150,25 @@ describe("synchronisation d'un canal", () => {
     await expect(fetchChannelPage("prive")).rejects.toThrow("aperçu public désactivé");
   });
 });
+
+describe("WhatsApp et signature du canal", () => {
+  it("tous les numéros du message, liens wa.me compris, sans doublon", async () => {
+    const { extractPhones, formatPhone } = await import("../lib/sourcing-extract");
+    const t =
+      "واتساب:\nhttps://wa.me/212660445670\nhttps://wa.me/212664267036\nhttps://wa.me/212660505949\n📞 الاتصال: 0660445670";
+    expect(extractPhones(t)).toEqual(["212660445670", "212664267036", "212660505949"]);
+    expect(extractPhones("Tel +212 6 12-34-56-78 ou 07 00 11 22 33")).toEqual(["212612345678", "212700112233"]);
+    expect(formatPhone("212660445670")).toBe("06 60 44 56 70");
+  });
+  it("la signature répétée n'est pas le nom du produit", async () => {
+    const { boilerplateLines, stripBoilerplate, guessName } = await import("../lib/sourcing-extract");
+    const sig = "📦 TOP JEMLA\nأفضل السلع بالجملة بأثمنة تنافسية\nواتساب:\nhttps://wa.me/212660445670";
+    const texts = ["حبل حديدي للكلاب", "خيمة للحيوانات قابلة للطي", "قنينة ماء 2 لتر", "لعبة مقود للأطفال"].map(
+      (p) => sig + "\n" + p,
+    );
+    const lines = boilerplateLines(texts);
+    expect(stripBoilerplate(texts[0], lines)).toBe("حبل حديدي للكلاب");
+    expect(guessName(stripBoilerplate(texts[2], lines))).toBe("قنينة ماء 2 لتر");
+    expect(boilerplateLines(texts.slice(0, 2)).size).toBe(0); // trop peu de messages pour décider
+  });
+});

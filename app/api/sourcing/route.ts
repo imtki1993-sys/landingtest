@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import { publicMessage } from "../../../lib/public-error";
 import { reportError } from "../../../lib/monitoring";
 import { authContext } from "../../../lib/server-auth";
+import { boilerplateLines, extractPhones, guessName, stripBoilerplate } from "../../../lib/sourcing-extract";
 
 const missing = (e: any) =>
   ["42P01", "PGRST205"].includes(String(e?.code || "")) || /sourcing_/.test(String(e?.message || ""));
@@ -26,7 +27,7 @@ export async function GET(req: Request) {
 
     let query = s
       .from("sourcing_posts")
-      .select("id,url,posted_at,text,photos,has_video,name,category,price,min_qty,phone,channel_id")
+      .select("id,url,posted_at,text,photos,has_video,name,category,price,min_qty,phone,channel_id,extracted_by")
       .eq("is_product", true)
       .limit(limit + 1);
     if (withPhotos) query = query.neq("photos", "{}");
@@ -56,7 +57,32 @@ export async function GET(req: Request) {
       if (missing(e)) return NextResponse.json({ installed: false, isPlatformAdmin });
       throw e;
     }
-    const rows = posts.data || [];
+    const rows: any[] = posts.data || [];
+    // Signature répétée de chaque canal (nom, slogan, numéros) : retirée du texte affiché et du nom
+    const chanIds = [...new Set(rows.map((r) => r.channel_id))];
+    const sample = chanIds.length
+      ? await s
+          .from("sourcing_posts")
+          .select("channel_id,text")
+          .in("channel_id", chanIds)
+          .order("posted_at", { ascending: false })
+          .limit(60 * chanIds.length)
+      : { data: [] };
+    const byChan = new Map<string, string[]>();
+    for (const r of (sample.data || []) as any[]) {
+      const list = byChan.get(r.channel_id) || [];
+      if (list.length < 60) list.push(r.text || "");
+      byChan.set(r.channel_id, list);
+    }
+    const sig = new Map([...byChan].map(([id, texts]) => [id, boilerplateLines(texts)]));
+    for (const r of rows) {
+      const body = stripBoilerplate(r.text || "", sig.get(r.channel_id) || new Set());
+      r.body = body;
+      r.phones = extractPhones(r.text || "");
+      // nom lu par règles : relu sans la signature (l'IA, elle, a déjà ignoré la signature)
+      if (r.extracted_by !== "ai") r.name = guessName(body);
+      delete r.extracted_by;
+    }
     const hasMore = rows.length > limit;
     const items = hasMore ? rows.slice(0, limit) : rows;
     const next = !hasMore
