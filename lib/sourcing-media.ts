@@ -82,7 +82,9 @@ export async function mirrorFromPage(
   stored: Map<number, string[]>,
   limit = 30,
 ): Promise<number> {
-  const todo = posts.filter((p) => p.photos.length && needsMirror(stored.get(p.postId) ?? p.photos)).slice(0, limit);
+  const todo = posts
+    .filter((p) => p.photos.length && needsMirror(stored.get(p.postId)?.length ? stored.get(p.postId) : p.photos))
+    .slice(0, limit);
   let n = 0;
   await pool(todo, 4, async (p) => {
     const photos = await mirrorPhotos(s, channelId, p.postId, p.photos);
