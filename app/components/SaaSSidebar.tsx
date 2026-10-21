@@ -14,6 +14,7 @@ const items = [
   ["/products", "◇", "Mes produits"],
   ["/domains", "⌁", "Domaines"],
   ["/analytics", "↗", "Analytics"],
+  ["/ads", "◎", "Analyse des pubs"],
   ["/messages", "✉", "Messages"],
   ["/admin/clients", "♙", "Clients SaaS"],
   ["/admin/licenses", "⚿", "Clés d’abonnement"],
