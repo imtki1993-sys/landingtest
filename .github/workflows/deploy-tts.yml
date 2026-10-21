@@ -14,6 +14,12 @@ on:
         description: "Voix de test (doda-f1 … doda-f4, doda-m1 … doda-m3)"
         required: false
         default: "doda-f1"
+      gpu:
+        description: "Carte graphique Modal (T4 = moins chère, L4 / A10G = plus rapides)"
+        required: false
+        default: "T4"
+        type: choice
+        options: ["T4", "L4", "A10G"]
 
 concurrency:
   group: deploy-tts
@@ -30,6 +36,7 @@ jobs:
       MODAL_TOKEN_ID: ${{ secrets.MODAL_TOKEN_ID }}
       MODAL_TOKEN_SECRET: ${{ secrets.MODAL_TOKEN_SECRET }}
       TTS_SERVICE_TOKEN: ${{ secrets.TTS_SERVICE_TOKEN }}
+      MODAL_GPU: ${{ inputs.gpu || 'T4' }}
     steps:
       - name: Vérifier les secrets
         working-directory: .
@@ -84,6 +91,9 @@ jobs:
           url=$(grep -oE 'https://[A-Za-z0-9.-]+\.modal\.run' deploy.log | head -1)
           if [ "$status" != "0" ] || [ -z "$url" ]; then
             # dernières lignes du déploiement, lisibles dans les annotations du lancement
+            if grep -q "add a payment method" deploy.log; then
+              echo "::error title=Moyen de paiement Modal::Modal demande un moyen de paiement pour la carte graphique $MODAL_GPU. modal.com → Settings → Usage and Billing → ajouter une carte (les crédits gratuits mensuels de Modal s'appliquent), puis relancer."
+            fi
             tail_lines=$(grep -v '^\s*$' deploy.log | tail -40 | sed 's/%/%25/g' | awk '{printf "%s%%0A", $0}')
             echo "::error title=Déploiement Modal (fin du journal)::${tail_lines}"
             exit 1

@@ -7,7 +7,12 @@
 L'adresse affichée (https://…modal.run) va dans TTS_SERVICE_URL sur Vercel, la même clé dans TTS_SERVICE_TOKEN.
 """
 
+import os
+
 import modal
+
+# Carte graphique : T4 par défaut (la moins chère) ; L4 / A10G plus rapides. Choix au déploiement : MODAL_GPU=L4
+GPU = os.environ.get("MODAL_GPU", "T4")
 
 image = (
     modal.Image.debian_slim(python_version="3.11")
@@ -28,7 +33,7 @@ app = modal.App("landpro-darija-tts", image=image)
 
 
 @app.cls(
-    gpu="L4",
+    gpu=GPU,
     secrets=[modal.Secret.from_name("landpro-tts")],
     scaledown_window=300,  # le GPU s'éteint après 5 min sans demande
     timeout=600,
