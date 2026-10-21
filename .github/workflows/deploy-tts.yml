@@ -77,9 +77,17 @@ jobs:
 
       - name: "Déployer (1re fois ≈ 15-25 min, modèle marocain + 7 voix DODa)"
         run: |
+          set +e
           modal deploy modal_app.py 2>&1 | tee deploy.log
+          status=${PIPESTATUS[0]}
+          set -e
           url=$(grep -oE 'https://[A-Za-z0-9.-]+\.modal\.run' deploy.log | head -1)
-          if [ -z "$url" ]; then echo "::error::Adresse du service introuvable dans la sortie de Modal"; exit 1; fi
+          if [ "$status" != "0" ] || [ -z "$url" ]; then
+            # dernières lignes du déploiement, lisibles dans les annotations du lancement
+            tail_lines=$(grep -v '^\s*$' deploy.log | tail -40 | sed 's/%/%25/g' | awk '{printf "%s%%0A", $0}')
+            echo "::error title=Déploiement Modal (fin du journal)::${tail_lines}"
+            exit 1
+          fi
           echo "TTS_URL=$url" >> "$GITHUB_ENV"
 
       - name: Tester une voix
