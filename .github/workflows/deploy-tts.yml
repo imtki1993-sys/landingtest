@@ -79,7 +79,10 @@ jobs:
         run: |
           # la clé (sans espaces) est transmise au service par modal_app.py (Secret.from_dict)
           export TTS_SERVICE_TOKEN="$(printf %s "$TTS_SERVICE_TOKEN" | tr -d '[:space:]')"
-          echo "Clé du service : ${#TTS_SERVICE_TOKEN} caractères"
+          export BUILD_ID="${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          echo "Clé du service : ${#TTS_SERVICE_TOKEN} caractères, empreinte $(printf %s "$TTS_SERVICE_TOKEN" | sha256sum | cut -c1-8)"
+          # arrête l'ancienne version (sinon des conteneurs encore allumés répondent avec l'ancienne clé)
+          modal app stop landpro-darija-tts 2>&1 | tail -2 || true
           set +e
           modal deploy modal_app.py 2>&1 | tee deploy.log
           status=${PIPESTATUS[0]}
@@ -101,7 +104,14 @@ jobs:
           TEXT: ${{ inputs.test_text }}
           VOICE: ${{ inputs.test_voice }}
         run: |
-          curl -fsS --max-time 300 "$TTS_URL/health" && echo
+          sent=$(printf %s "$TTS_SERVICE_TOKEN" | tr -d '[:space:]' | sha256sum | cut -c1-8)
+          echo "Empreinte de la clé envoyée : $sent"
+          for attempt in 1 2 3 4 5 6; do
+            health=$(curl -sS --max-time 300 "$TTS_URL/health" || true)
+            echo "health : $health"
+            echo "$health" | grep -q "\"build\":\"${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}\"" && break
+            sleep 20
+          done
           python - <<'PY' > body.json
           import json, os, re
           text = os.environ["TEXT"].strip()
@@ -120,7 +130,7 @@ jobs:
           done
           if [ "$code" != "200" ]; then
             msg="Le service répond HTTP $code."
-            [ "$code" = "401" ] && msg="$msg Clé refusée : le secret TTS_SERVICE_TOKEN contient peut-être un espace ou un retour à la ligne."
+            [ "$code" = "401" ] && msg="$msg Clé refusée (empreinte envoyée $sent ; service : $health)."
             echo "::error title=Test de voix::$msg $(head -c 200 voix-test.mp3 | tr -d '\n')"
             exit 1
           fi
