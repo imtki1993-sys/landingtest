@@ -1,5 +1,5 @@
 # Image générique (RunPod, Hugging Face Endpoint, serveur GPU…) : CUDA + Habibi-TTS + voix DODa.
-FROM pytorch/pytorch:2.5.1-cuda12.4-cudnn9-runtime
+FROM pytorch/pytorch:2.8.0-cuda12.8-cudnn9-runtime
 RUN apt-get update && apt-get install -y --no-install-recommends ffmpeg git && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
 COPY requirements.txt .
