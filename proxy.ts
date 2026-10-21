@@ -20,6 +20,7 @@ function isPublic(req: NextRequest) {
   // Tâches planifiées : protégées par CRON_SECRET dans la route elle-même
   if (
     p === "/api/cron/warm" ||
+    p === "/api/cron/sourcing-sync" ||
     p === "/api/cron/ozon-sync" ||
     p === "/api/cron/analytics-rollup" ||
     p === "/api/cron/subscriptions-expire"

@@ -12,6 +12,7 @@ const items = [
   ["/team", "☺", "Équipe"],
   ["/delivery", "🚚", "Livraison"],
   ["/products", "◇", "Mes produits"],
+  ["/sourcing", "⬡", "Sourcing Derb Omar"],
   ["/domains", "⌁", "Domaines"],
   ["/analytics", "↗", "Analytics"],
   ["/ads", "◎", "Analyse des pubs"],
