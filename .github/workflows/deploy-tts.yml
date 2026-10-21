@@ -98,6 +98,10 @@ jobs:
             exit 1
           fi
           echo "TTS_URL=$url" >> "$GITHUB_ENV"
+          # fin du journal en note (diagnostic sans télécharger les logs)
+          tail_lines=$(grep -v '^\s*$' deploy.log | tail -25 | sed 's/%/%25/g' | awk '{printf "%s%%0A", $0}')
+          echo "::notice title=Déploiement Modal (fin du journal)::${tail_lines}"
+          modal app list 2>&1 | tail -8 | sed 's/%/%25/g' | awk 'BEGIN{printf "::notice title=Apps Modal::"} {printf "%s%%0A", $0} END{print ""}'
 
       - name: Tester une voix
         env:
