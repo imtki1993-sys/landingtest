@@ -4,7 +4,7 @@ import { publicMessage } from "../../../../lib/public-error";
 import { reportError } from "../../../../lib/monitoring";
 import { authContext } from "../../../../lib/server-auth";
 import { channelUsername } from "../../../../lib/telegram-public";
-import { syncChannel } from "../../../../lib/sourcing-sync";
+import { backfillChannel, syncChannel } from "../../../../lib/sourcing-sync";
 
 export const maxDuration = 60;
 
@@ -21,11 +21,43 @@ const fail = (e: any) => {
   );
 };
 
-/** { link } : ajoute le canal et lit tout de suite ses derniers messages. { id, sync: true } : relit maintenant. */
+/**
+ * { link } : ajoute le canal et lit tout de suite ses derniers messages. { id, sync: true } : relit maintenant.
+ * { backfill: true, since: "AAAA-MM-JJ", id? } : importe les publications depuis cette date (tous les canaux actifs,
+ * ou un seul) ; à relancer tant que `done` est faux (≈ 50 s de lecture par appel).
+ */
 export async function POST(req: Request) {
   try {
     const s = await admin(req);
     const b = await req.json().catch(() => ({}));
+    if (b.backfill) {
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(String(b.since || "")))
+        return NextResponse.json({ error: "Date invalide" }, { status: 400 });
+      const since = new Date(`${b.since}T00:00:00+01:00`).toISOString();
+      let q = s.from("sourcing_channels").select("id,username,last_post_id").eq("active", true);
+      if (b.id) q = q.eq("id", b.id);
+      const { data: chans, error } = await q;
+      if (error) throw error;
+      const deadline = Date.now() + 48_000;
+      let added = 0;
+      let done = true;
+      const channels: Record<string, unknown> = {};
+      for (const ch of chans || []) {
+        if (Date.now() >= deadline) {
+          done = false;
+          break;
+        }
+        try {
+          const r = await backfillChannel(s, ch, since, deadline);
+          channels[ch.username] = r;
+          added += r.added;
+          if (!r.done) done = false;
+        } catch (e: any) {
+          channels[ch.username] = { error: e.message };
+        }
+      }
+      return NextResponse.json({ ok: true, added, done, channels });
+    }
     if (b.id && b.sync) {
       const { data: ch } = await s.from("sourcing_channels").select("id,username,last_post_id").eq("id", b.id).single();
       if (!ch) return NextResponse.json({ error: "Canal introuvable" }, { status: 404 });

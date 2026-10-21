@@ -51,20 +51,8 @@ export async function syncChannel(s: any, ch: ChannelRow, pages = 1) {
     if (ch.last_post_id && oldest <= ch.last_post_id) break; // on a rejoint ce qui est déjà connu
     before = oldest;
   }
+  const saved = await savePosts(s, ch, posts);
   const ids = posts.map((p) => p.postId);
-  const { data: known } = ids.length
-    ? await s.from("sourcing_posts").select("post_id,photos").eq("channel_id", ch.id).in("post_id", ids)
-    : { data: [] };
-  const knownSet = new Set((known || []).map((k: any) => Number(k.post_id)));
-  const stored = new Map<number, string[]>((known || []).map((k: any) => [Number(k.post_id), k.photos || []]));
-  const signature = boilerplateLines(posts.map((p) => p.text));
-  const fresh = posts.filter((p) => !knownSet.has(p.postId)).map((p) => rowOf(ch.id, p, signature));
-  if (fresh.length) {
-    const { error } = await s.from("sourcing_posts").upsert(fresh, { onConflict: "channel_id,post_id" });
-    if (error) throw error;
-  }
-  // photos : copiées chez nous pendant que les liens Telegram sont valides (les plus récentes d'abord)
-  const mirrored = await mirrorFromPage(s, ch.id, posts, stored).catch(() => 0);
   const last = ids.length ? Math.max(...ids, ch.last_post_id || 0) : ch.last_post_id;
   const photo = info?.photo ? (await mirrorChannelPhoto(s, ch.id, info.photo).catch(() => null)) || info.photo : null;
   await s
@@ -78,7 +66,71 @@ export async function syncChannel(s: any, ch: ChannelRow, pages = 1) {
       last_error: null,
     })
     .eq("id", ch.id);
-  return { added: fresh.length, seen: posts.length, mirrored };
+  return { added: saved.added, seen: posts.length, mirrored: saved.mirrored };
+}
+
+/** Enregistre les publications lues : nouvelles fiches insérées, photos copiées dans le stockage. */
+async function savePosts(s: any, ch: ChannelRow, posts: TgPost[]) {
+  const ids = posts.map((p) => p.postId);
+  const { data: known } = ids.length
+    ? await s.from("sourcing_posts").select("post_id,photos").eq("channel_id", ch.id).in("post_id", ids)
+    : { data: [] };
+  const knownSet = new Set((known || []).map((k: any) => Number(k.post_id)));
+  const stored = new Map<number, string[]>((known || []).map((k: any) => [Number(k.post_id), k.photos || []]));
+  const signature = boilerplateLines(posts.map((p) => p.text));
+  const fresh = posts.filter((p) => !knownSet.has(p.postId)).map((p) => rowOf(ch.id, p, signature));
+  if (fresh.length) {
+    const { error } = await s.from("sourcing_posts").upsert(fresh, { onConflict: "channel_id,post_id" });
+    if (error) throw error;
+  }
+  // photos : copiées chez nous pendant que les liens Telegram sont valides (les plus récentes d'abord)
+  const mirrored = await mirrorFromPage(s, ch.id, posts, stored, 60).catch(() => 0);
+  return { added: fresh.length, mirrored };
+}
+
+/**
+ * Import par date : remonte l'historique d'un canal (pages plus anciennes que la plus vieille publication connue)
+ * jusqu'à `since` (ISO), dans la limite de temps `deadline` (horodatage ms). À relancer tant que `done` est faux.
+ */
+export async function backfillChannel(s: any, ch: ChannelRow, since: string, deadline: number) {
+  const { data: first } = await s
+    .from("sourcing_posts")
+    .select("post_id,posted_at")
+    .eq("channel_id", ch.id)
+    .order("post_id", { ascending: true })
+    .limit(1);
+  const oldest = first?.[0];
+  if (oldest?.posted_at && oldest.posted_at < since) return { added: 0, reached: oldest.posted_at, done: true };
+  let before: number | undefined = oldest ? Number(oldest.post_id) : undefined;
+  let added = 0;
+  let reached: string | null = oldest?.posted_at || null;
+  let done = false;
+  while (Date.now() < deadline) {
+    if (before !== undefined && before <= 1) {
+      done = true; // début du canal
+      break;
+    }
+    const page = await fetchChannelPage(ch.username, before);
+    if (!page.posts.length) {
+      done = true;
+      break;
+    }
+    const next = Math.min(...page.posts.map((p) => p.postId));
+    if (before !== undefined && next >= before) {
+      done = true; // Telegram renvoie la même page : rien de plus ancien
+      break;
+    }
+    const r = await savePosts(s, ch, page.posts);
+    added += r.added;
+    before = next;
+    const dates = page.posts.map((p) => p.date).filter(Boolean) as string[];
+    if (dates.length) reached = dates.sort()[0];
+    if (reached && reached < since) {
+      done = true;
+      break;
+    }
+  }
+  return { added, reached, done };
 }
 
 /** Améliore par l'IA les fiches lues par règles (clé de la plateforme MODEL_API_KEY). */

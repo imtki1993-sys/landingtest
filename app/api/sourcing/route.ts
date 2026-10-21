@@ -24,6 +24,10 @@ export async function GET(req: Request) {
     const sort = q.get("sort") === "price" ? "price" : "recent";
     const cursor = q.get("cursor");
     const withPhotos = q.get("photos") !== "0";
+    // date de publication sur Telegram (jours du Maroc, UTC+1)
+    const day = (v: string | null) => (v && /^\d{4}-\d{2}-\d{2}$/.test(v) ? v : "");
+    const from = day(q.get("from"));
+    const to = day(q.get("to"));
 
     let query = s
       .from("sourcing_posts")
@@ -35,6 +39,8 @@ export async function GET(req: Request) {
     if (category) query = query.eq("category", category);
     if (UUID.test(channel)) query = query.eq("channel_id", channel);
     if (maxPrice > 0) query = query.lte("price", maxPrice);
+    if (from) query = query.gte("posted_at", new Date(`${from}T00:00:00+01:00`).toISOString());
+    if (to) query = query.lte("posted_at", new Date(`${to}T23:59:59.999+01:00`).toISOString());
     if (sort === "price") {
       query = query
         .not("price", "is", null)
@@ -45,13 +51,18 @@ export async function GET(req: Request) {
       query = query.order("posted_at", { ascending: false, nullsFirst: false });
       if (cursor) query = query.lt("posted_at", cursor);
     }
-    const [posts, channels] = await Promise.all([
+    // plus ancienne publication importée (pour proposer l'import d'une période plus ancienne)
+    let oldestQ = s.from("sourcing_posts").select("posted_at").not("posted_at", "is", null);
+    if (UUID.test(channel)) oldestQ = oldestQ.eq("channel_id", channel);
+    const [posts, channels, oldestRow] = await Promise.all([
       query,
       s
         .from("sourcing_channels")
         .select("id,username,title,photo_url,description,active,last_synced_at,last_error")
         .order("title", { ascending: true }),
+      from ? oldestQ.order("posted_at", { ascending: true }).limit(1) : Promise.resolve({ data: null }),
     ]);
+    const oldest: string | null = (oldestRow as any)?.data?.[0]?.posted_at ?? null;
     if (posts.error || channels.error) {
       const e = posts.error || channels.error;
       if (missing(e)) return NextResponse.json({ installed: false, isPlatformAdmin });
@@ -104,6 +115,7 @@ export async function GET(req: Request) {
       isPlatformAdmin,
       items,
       next,
+      oldest,
       // les clients ne voient pas l'état technique des canaux
       channels: (channels.data || [])
         .filter((c: any) => isPlatformAdmin || c.active)
