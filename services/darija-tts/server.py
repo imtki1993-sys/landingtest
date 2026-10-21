@@ -101,9 +101,23 @@ def _generate(sentence: str, voice: dict, speed: float):
     return wave, sr
 
 
+def _fingerprint(value: str) -> str:
+    """Empreinte courte de la clé (jamais la clé) : vérifier que LandPro et le service ont la même."""
+    import hashlib
+
+    return hashlib.sha256(value.encode()).hexdigest()[:8] if value else ""
+
+
 @app.get("/health")
 def health():
-    return {"ok": True, "loaded": bool(_state), "voices": sorted(_state.get("voices", {}))}
+    token = os.environ.get("TTS_SERVICE_TOKEN", "").strip().strip("\"'")
+    return {
+        "ok": True,
+        "loaded": bool(_state),
+        "voices": sorted(_state.get("voices", {})),
+        "key": _fingerprint(token),
+        "build": os.environ.get("BUILD_ID", ""),
+    }
 
 
 @app.get("/voices")

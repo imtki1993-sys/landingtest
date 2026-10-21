@@ -33,7 +33,12 @@ app = modal.App("landpro-darija-tts", image=image)
 # Clé du service : prise dans l'environnement du déploiement (secret GitHub TTS_SERVICE_TOKEN dans le workflow),
 # sinon dans le secret Modal « landpro-tts » (déploiement en ligne de commande).
 _token = "".join(os.environ.get("TTS_SERVICE_TOKEN", "").split())
-SECRETS = [modal.Secret.from_dict({"TTS_SERVICE_TOKEN": _token})] if _token else [modal.Secret.from_name("landpro-tts")]
+_build = os.environ.get("BUILD_ID", "")
+SECRETS = (
+    [modal.Secret.from_dict({"TTS_SERVICE_TOKEN": _token, "BUILD_ID": _build})]
+    if _token
+    else [modal.Secret.from_name("landpro-tts")]
+)
 
 
 @app.cls(
