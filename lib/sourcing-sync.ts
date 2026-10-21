@@ -3,6 +3,7 @@ import OpenAI from "openai";
 import { fetchChannelPage, type TgPost } from "./telegram-public";
 import { aiPrompt, boilerplateLines, parseAiAnswer, regexExtract, stripBoilerplate } from "./sourcing-extract";
 import { META_TEXT_MODEL } from "./store-templates/ai";
+import { mirrorChannelPhoto, mirrorFromPage } from "./sourcing-media";
 
 export interface ChannelRow {
   id: string;
@@ -34,7 +35,8 @@ const rowOf = (channelId: string, p: TgPost, signature: Set<string>) => {
 
 /**
  * Lit les derniers messages d'un canal (et `pages` pages plus anciennes au premier passage).
- * Les messages déjà connus gardent leur fiche (extraction IA) : seules les photos sont rafraîchies.
+ * Les messages déjà connus gardent leur fiche (extraction IA). Les photos sont copiées dans le stockage LandPro
+ * tant que les liens Telegram sont encore valides (ils expirent ensuite).
  */
 export async function syncChannel(s: any, ch: ChannelRow, pages = 1) {
   let before: number | undefined;
@@ -51,31 +53,32 @@ export async function syncChannel(s: any, ch: ChannelRow, pages = 1) {
   }
   const ids = posts.map((p) => p.postId);
   const { data: known } = ids.length
-    ? await s.from("sourcing_posts").select("post_id").eq("channel_id", ch.id).in("post_id", ids)
+    ? await s.from("sourcing_posts").select("post_id,photos").eq("channel_id", ch.id).in("post_id", ids)
     : { data: [] };
   const knownSet = new Set((known || []).map((k: any) => Number(k.post_id)));
+  const stored = new Map<number, string[]>((known || []).map((k: any) => [Number(k.post_id), k.photos || []]));
   const signature = boilerplateLines(posts.map((p) => p.text));
   const fresh = posts.filter((p) => !knownSet.has(p.postId)).map((p) => rowOf(ch.id, p, signature));
   if (fresh.length) {
     const { error } = await s.from("sourcing_posts").upsert(fresh, { onConflict: "channel_id,post_id" });
     if (error) throw error;
   }
-  // liens des photos Telegram : ils changent parfois, on garde les plus récents
-  for (const p of posts.filter((x) => knownSet.has(x.postId) && x.photos.length))
-    await s.from("sourcing_posts").update({ photos: p.photos }).eq("channel_id", ch.id).eq("post_id", p.postId);
+  // photos : copiées chez nous pendant que les liens Telegram sont valides (les plus récentes d'abord)
+  const mirrored = await mirrorFromPage(s, ch.id, posts, stored).catch(() => 0);
   const last = ids.length ? Math.max(...ids, ch.last_post_id || 0) : ch.last_post_id;
+  const photo = info?.photo ? (await mirrorChannelPhoto(s, ch.id, info.photo).catch(() => null)) || info.photo : null;
   await s
     .from("sourcing_channels")
     .update({
       ...(info?.title ? { title: info.title } : {}),
-      ...(info?.photo ? { photo_url: info.photo } : {}),
+      ...(photo ? { photo_url: photo } : {}),
       ...(info?.description ? { description: info.description } : {}),
       last_post_id: last,
       last_synced_at: new Date().toISOString(),
       last_error: null,
     })
     .eq("id", ch.id);
-  return { added: fresh.length, seen: posts.length };
+  return { added: fresh.length, seen: posts.length, mirrored };
 }
 
 /** Améliore par l'IA les fiches lues par règles (clé de la plateforme MODEL_API_KEY). */
