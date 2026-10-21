@@ -81,8 +81,6 @@ jobs:
           export TTS_SERVICE_TOKEN="$(printf %s "$TTS_SERVICE_TOKEN" | tr -d '[:space:]')"
           export BUILD_ID="${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
           echo "Clé du service : ${#TTS_SERVICE_TOKEN} caractères, empreinte $(printf %s "$TTS_SERVICE_TOKEN" | sha256sum | cut -c1-8)"
-          # arrête l'ancienne version (sinon des conteneurs encore allumés répondent avec l'ancienne clé)
-          modal app stop landpro-darija-tts 2>&1 | tail -2 || true
           set +e
           modal deploy modal_app.py 2>&1 | tee deploy.log
           status=${PIPESTATUS[0]}
@@ -98,6 +96,12 @@ jobs:
             exit 1
           fi
           echo "TTS_URL=$url" >> "$GITHUB_ENV"
+          # conteneurs de l'ancienne version encore allumés : arrêtés, la prochaine demande démarre la nouvelle
+          stopped=""
+          for id in $(modal container list 2>/dev/null | grep -oE 'ta-[A-Za-z0-9]+' | sort -u); do
+            modal container stop "$id" > /dev/null 2>&1 && stopped="$stopped $id"
+          done
+          echo "::notice title=Anciens conteneurs arrêtés::${stopped:- aucun}"
           # fin du journal en note (diagnostic sans télécharger les logs)
           tail_lines=$(grep -v '^\s*$' deploy.log | tail -25 | sed 's/%/%25/g' | awk '{printf "%s%%0A", $0}')
           echo "::notice title=Déploiement Modal (fin du journal)::${tail_lines}"
