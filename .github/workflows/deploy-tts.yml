@@ -77,7 +77,9 @@ jobs:
 
       - name: Enregistrer la clé du service dans Modal
         run: |
-          if ! modal secret create landpro-tts TTS_SERVICE_TOKEN="$TTS_SERVICE_TOKEN" --force 2>&1 | tee secret.log; then
+          clean=$(printf %s "$TTS_SERVICE_TOKEN" | tr -d '[:space:]')
+          echo "Clé du service : ${#clean} caractères"
+          if ! modal secret create landpro-tts TTS_SERVICE_TOKEN="$clean" --force 2>&1 | tee secret.log; then
             echo "::error::Impossible d'enregistrer la clé dans Modal : $(tail -3 secret.log | tr '\n' ' ')"
             exit 1
           fi
@@ -112,9 +114,22 @@ jobs:
           sentences = [s.strip() for s in re.split(r"(?<=[.!؟?])\s+", text) if s.strip()]
           print(json.dumps({"sentences": sentences, "voice": os.environ["VOICE"] or "doda-f1"}, ensure_ascii=False))
           PY
-          curl -fsS --max-time 600 -X POST "$TTS_URL/synthesize" \
-            -H "Authorization: Bearer $TTS_SERVICE_TOKEN" -H "Content-Type: application/json" \
-            --data-binary @body.json -D headers.txt -o voix-test.mp3
+          # nouvel essai : juste après un déploiement, l'ancienne version peut encore répondre quelques secondes
+          for attempt in 1 2 3 4; do
+            code=$(curl -sS --max-time 600 -X POST "$TTS_URL/synthesize" \
+              -H "Authorization: Bearer $(printf %s "$TTS_SERVICE_TOKEN" | tr -d '[:space:]')" -H "Content-Type: application/json" \
+              --data-binary @body.json -D headers.txt -o voix-test.mp3 -w '%{http_code}' || echo 000)
+            echo "Essai $attempt : HTTP $code"
+            [ "$code" = "200" ] && break
+            head -c 300 voix-test.mp3; echo
+            sleep 30
+          done
+          if [ "$code" != "200" ]; then
+            msg="Le service répond HTTP $code."
+            [ "$code" = "401" ] && msg="$msg Clé refusée : le secret TTS_SERVICE_TOKEN contient peut-être un espace ou un retour à la ligne."
+            echo "::error title=Test de voix::$msg $(head -c 200 voix-test.mp3 | tr -d '\n')"
+            exit 1
+          fi
           seconds=$(grep -i '^x-audio-seconds' headers.txt | tr -d '\r' | awk '{print $2}')
           echo "Voix de test : ${seconds:-?} s, $(stat -c %s voix-test.mp3) octets"
           echo "TEST_SECONDS=${seconds:-?}" >> "$GITHUB_ENV"
