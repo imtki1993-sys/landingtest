@@ -63,8 +63,8 @@ def load() -> None:
 
 
 def _check(authorization: str | None) -> None:
-    token = os.environ.get("TTS_SERVICE_TOKEN", "")
-    given = (authorization or "").removeprefix("Bearer ").strip()
+    token = os.environ.get("TTS_SERVICE_TOKEN", "").strip().strip("\"'")
+    given = (authorization or "").removeprefix("Bearer ").strip().strip("\"'")
     if not token or not hmac.compare_digest(given, token):
         raise HTTPException(status_code=401, detail="Clé du service invalide")
 

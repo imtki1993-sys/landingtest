@@ -19,7 +19,7 @@ describe("voix off : fournisseurs", () => {
   });
   it("Habibi : phrases, voix et vitesse envoyées au service avec la clé", async () => {
     process.env.TTS_SERVICE_URL = "https://tts.example.com/";
-    process.env.TTS_SERVICE_TOKEN = "secret";
+    process.env.TTS_SERVICE_TOKEN = " secret\n";
     const f = vi.fn(
       async () =>
         new Response(new Uint8Array([1, 2, 3]), {
