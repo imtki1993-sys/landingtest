@@ -3,8 +3,9 @@ import { NextResponse } from "next/server";
 import { adminDb } from "../../../../lib/server-auth";
 import { reportError } from "../../../../lib/monitoring";
 import { aiExtractPending, syncChannel } from "../../../../lib/sourcing-sync";
+import { repairPending } from "../../../../lib/sourcing-media";
 
-export const maxDuration = 60;
+export const maxDuration = 300;
 
 export async function GET(req: Request) {
   const secret = process.env.CRON_SECRET;
@@ -39,5 +40,12 @@ export async function GET(req: Request) {
   } catch (e) {
     reportError(e, "cron/sourcing-sync ai");
   }
-  return NextResponse.json({ ok: true, results, ai });
+  // anciennes publications aux liens Telegram expirés : photos relues et copiées
+  let repaired = 0;
+  try {
+    repaired = await repairPending(s, 60, 8);
+  } catch (e) {
+    reportError(e, "cron/sourcing-sync photos");
+  }
+  return NextResponse.json({ ok: true, results, ai, repaired });
 }

@@ -1,6 +1,6 @@
 "use client";
 // Sourcing Derb Omar : produits publiés par les grossistes dans des canaux Telegram publics.
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import SaaSSidebar from "../components/SaaSSidebar";
 import SaaSTopbar from "../components/SaaSTopbar";
@@ -66,7 +66,11 @@ function ChannelBadge({ c }: { c?: Channel }) {
   if (!c) return null;
   return (
     <span className="src-chan">
-      {c.photo_url ? <img src={c.photo_url} alt="" /> : <i>{(c.title || c.username)[0]?.toUpperCase()}</i>}
+      {c.photo_url ? (
+        <img src={c.photo_url} alt="" onError={(e) => (e.currentTarget.style.visibility = "hidden")} />
+      ) : (
+        <i>{(c.title || c.username)[0]?.toUpperCase()}</i>
+      )}
       <span>{c.title || "@" + c.username}</span>
     </span>
   );
@@ -147,7 +151,17 @@ function ImportForm({ item, onDone }: { item: Item; onDone: (id: string) => void
   );
 }
 
-function Detail({ item, channel, onClose }: { item: Item; channel?: Channel; onClose: () => void }) {
+function Detail({
+  item,
+  channel,
+  onClose,
+  onBroken,
+}: {
+  item: Item;
+  channel?: Channel;
+  onClose: () => void;
+  onBroken: (id: string) => void;
+}) {
   const [i, setI] = useState(0);
   const [done, setDone] = useState<string | null>(null);
   const [full, setFull] = useState(false);
@@ -167,7 +181,7 @@ function Detail({ item, channel, onClose }: { item: Item; channel?: Channel; onC
         </button>
         <div className="src-gallery">
           {item.photos[i] ? (
-            <img src={item.photos[i]} alt={item.name || ""} />
+            <img src={item.photos[i]} alt={item.name || ""} onError={() => onBroken(item.id)} />
           ) : (
             <div className="src-noimg">Pas de photo</div>
           )}
@@ -181,7 +195,7 @@ function Detail({ item, channel, onClose }: { item: Item; channel?: Channel; onC
                   onClick={() => setI(k)}
                   aria-label={`Photo ${k + 1}`}
                 >
-                  <img src={p} alt="" />
+                  <img src={p} alt="" onError={() => onBroken(item.id)} />
                 </button>
               ))}
             </div>
@@ -352,6 +366,46 @@ export default function SourcingPage() {
   const [maxPrice, setMaxPrice] = useState("");
   const [sort, setSort] = useState("recent");
   const [open, setOpen] = useState<Item | null>(null);
+  // photos dont le lien Telegram a expiré : réparées à la volée par le serveur, sinon « Photo indisponible »
+  const [dead, setDead] = useState<Set<string>>(new Set());
+  const tried = useRef(new Set<string>());
+  const queue = useRef(new Set<string>());
+  const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const flush = useCallback(async () => {
+    const ids = [...queue.current];
+    queue.current.clear();
+    if (!ids.length) return;
+    let fixed: Record<string, string[]> = {};
+    try {
+      const r = await fetch("/api/sourcing/photos", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ ids }),
+      });
+      fixed = (await r.json()).photos || {};
+    } catch {}
+    const ok = (id: string) => fixed[id]?.length;
+    setItems((v) => v.map((it) => (fixed[it.id] ? { ...it, photos: fixed[it.id] } : it)));
+    setOpen((o) => (o && fixed[o.id] ? { ...o, photos: fixed[o.id] } : o));
+    setDead((d) => {
+      const n = new Set(d);
+      for (const id of ids) if (!ok(id)) n.add(id);
+      return n;
+    });
+  }, []);
+  const onBroken = useCallback(
+    (id: string) => {
+      if (tried.current.has(id)) {
+        setDead((d) => (d.has(id) ? d : new Set(d).add(id)));
+        return;
+      }
+      tried.current.add(id);
+      queue.current.add(id);
+      if (timer.current) clearTimeout(timer.current);
+      timer.current = setTimeout(flush, 300);
+    },
+    [flush],
+  );
 
   useEffect(() => {
     const t = setTimeout(() => setQuery(q.trim()), 350);
@@ -494,7 +548,11 @@ export default function SourcingPage() {
                       onClick={() => setOpen(it)}
                       aria-label={it.name || "Voir le produit"}
                     >
-                      {it.photos[0] ? <img src={it.photos[0]} alt="" loading="lazy" /> : <span>Pas de photo</span>}
+                      {it.photos[0] && !dead.has(it.id) ? (
+                        <img src={it.photos[0]} alt="" loading="lazy" onError={() => onBroken(it.id)} />
+                      ) : (
+                        <span>{it.photos[0] ? "Photo indisponible" : "Pas de photo"}</span>
+                      )}
                       {it.photos.length > 1 ? <em>+{it.photos.length - 1}</em> : null}
                       {it.has_video ? <em className="src-vid">▶ vidéo</em> : null}
                     </button>
@@ -544,7 +602,14 @@ export default function SourcingPage() {
           <div className="orders-empty">Chargement…</div>
         ) : null}
 
-        {open ? <Detail item={open} channel={chanById.get(open.channel_id)} onClose={() => setOpen(null)} /> : null}
+        {open ? (
+          <Detail
+            item={open}
+            channel={chanById.get(open.channel_id)}
+            onClose={() => setOpen(null)}
+            onBroken={onBroken}
+          />
+        ) : null}
       </section>
     </main>
   );

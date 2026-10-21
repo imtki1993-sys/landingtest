@@ -105,19 +105,32 @@ function fakeDb(knownIds: number[] = []) {
     };
     return q;
   };
-  return { s: { from: builder }, writes };
+  const storage = {
+    createBucket: async () => ({ error: null }),
+    from: () => ({
+      upload: async () => ({ error: null }),
+      getPublicUrl: (path: string) => ({
+        data: { publicUrl: `https://x.supabase.co/storage/v1/object/public/sourcing-photos/${path}` },
+      }),
+    }),
+  };
+  return { s: { from: builder, storage }, writes };
 }
+// page Telegram pour t.me, image JPEG pour les photos
+const tgFetch = () =>
+  vi.fn(async (url: string) =>
+    String(url).startsWith("https://t.me/")
+      ? new Response(PAGE, { status: 200 })
+      : new Response(new Uint8Array([1, 2, 3]), { headers: { "content-type": "image/jpeg" } }),
+  );
 
 describe("synchronisation d'un canal", () => {
   afterEach(() => vi.unstubAllGlobals());
   it("enregistre les nouveaux produits avec leur fiche, met à jour le canal", async () => {
-    vi.stubGlobal(
-      "fetch",
-      vi.fn(async () => new Response(PAGE, { status: 200 })),
-    );
+    vi.stubGlobal("fetch", tgFetch());
     const { s, writes } = fakeDb();
     const r = await syncChannel(s, { id: "c1", username: "derbomargros", last_post_id: null }, 1);
-    expect(r).toEqual({ added: 2, seen: 2 });
+    expect(r).toEqual({ added: 2, seen: 2, mirrored: 2 });
     const up = writes.find((w) => w.op === "upsert")!;
     expect(up.table).toBe("sourcing_posts");
     expect(up.payload[0]).toMatchObject({
@@ -131,16 +144,15 @@ describe("synchronisation d'un canal", () => {
     const ch = writes.find((w) => w.table === "sourcing_channels")!;
     expect(ch.payload).toMatchObject({ title: "Derb Omar Gros & Détail", last_post_id: 122, last_error: null });
   });
-  it("messages déjà connus : pas réinsérés, photos rafraîchies", async () => {
-    vi.stubGlobal(
-      "fetch",
-      vi.fn(async () => new Response(PAGE, { status: 200 })),
-    );
+  it("messages déjà connus : pas réinsérés, photos copiées dans le stockage", async () => {
+    vi.stubGlobal("fetch", tgFetch());
     const { s, writes } = fakeDb([120, 122]);
     const r = await syncChannel(s, { id: "c1", username: "derbomargros", last_post_id: 122 }, 2);
     expect(r.added).toBe(0);
     expect(writes.filter((w) => w.op === "upsert")).toHaveLength(0);
-    expect(writes.filter((w) => w.table === "sourcing_posts" && w.op === "update")).toHaveLength(2);
+    const ups = writes.filter((w) => w.table === "sourcing_posts" && w.op === "update");
+    expect(ups).toHaveLength(2);
+    expect(ups[0].payload.photos[0]).toContain("/sourcing-photos/c1/");
   });
   it("canal privé ou aperçu désactivé : erreur claire", async () => {
     vi.stubGlobal(
