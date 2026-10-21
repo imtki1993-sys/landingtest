@@ -3,8 +3,8 @@ import { NextResponse } from "next/server";
 import { publicMessage } from "../../../lib/public-error";
 import { reportError } from "../../../lib/monitoring";
 import { authContext } from "../../../lib/server-auth";
-import { availableProviders, synthesize, VOICES } from "../../../lib/voiceover";
-import { estimateSeconds, normalizeDarija } from "../../../lib/darija-text";
+import { availableProviders, PAUSES, synthesize, VOICES, type PauseKind } from "../../../lib/voiceover";
+import { cleanLexicon, estimateSeconds, normalizeDarija, type Lexicon } from "../../../lib/darija-text";
 
 export const maxDuration = 300;
 const MAX_CHARS = 1500;
@@ -20,6 +20,17 @@ async function ensureBucket(s: any) {
   if (error) await s.storage.updateBucket(BUCKET, opts);
   bucketReady = true;
 }
+/** Dictionnaire de prononciation du compte ; null si la table n'est pas encore créée. */
+async function loadLexicon(s: any, workspaceId: string): Promise<Lexicon | null> {
+  const { data, error } = await s
+    .from("voiceover_lexicon")
+    .select("words")
+    .eq("workspace_id", workspaceId)
+    .maybeSingle();
+  if (error) return null;
+  return cleanLexicon(data?.words);
+}
+
 const missing = (e: any) =>
   ["42P01", "PGRST205"].includes(String(e?.code || "")) || /voiceovers/.test(String(e?.message || ""));
 
@@ -27,6 +38,7 @@ export async function GET(req: Request) {
   try {
     const { s, workspaceId } = await authContext(req);
     const providers = availableProviders();
+    const lexicon = await loadLexicon(s, workspaceId);
     const { data, error } = await s
       .from("voiceovers")
       .select("id,title,script,voice,provider,speed,audio_url,seconds,created_at,product_id")
@@ -35,14 +47,21 @@ export async function GET(req: Request) {
       .limit(30);
     if (error && missing(error)) return NextResponse.json({ installed: false, providers, voices: VOICES });
     if (error) throw error;
-    return NextResponse.json({ installed: true, providers, voices: VOICES, items: data || [] });
+    return NextResponse.json({
+      installed: true,
+      providers,
+      voices: VOICES,
+      items: data || [],
+      lexicon: lexicon || {},
+      lexiconInstalled: lexicon !== null,
+    });
   } catch (e: any) {
     reportError(e, "api/voiceover");
     return NextResponse.json({ error: publicMessage(e) }, { status: e?.message === "Non autorisé" ? 401 : 500 });
   }
 }
 
-/** { script, spoken?, voice, speed?, title?, product_id? } → voix off enregistrée. */
+/** { script, spoken?, voice, speed?, pause?, target_seconds?, title?, product_id? } → voix off enregistrée. */
 export async function POST(req: Request) {
   try {
     const { s, workspaceId } = await authContext(req);
@@ -50,7 +69,8 @@ export async function POST(req: Request) {
     const script = String(b.script || "").trim();
     if (!script) return NextResponse.json({ error: "Le script est vide." }, { status: 400 });
     // texte lu : celui corrigé par le vendeur, sinon préparé automatiquement à partir du script
-    const spoken = normalizeDarija(String(b.spoken || "").trim() || script);
+    const lexicon = (await loadLexicon(s, workspaceId)) || {};
+    const spoken = normalizeDarija(String(b.spoken || "").trim() || script, lexicon);
     if (!spoken.sentences.length) return NextResponse.json({ error: "Rien à lire dans ce texte." }, { status: 400 });
     if (spoken.text.length > MAX_CHARS)
       return NextResponse.json(
@@ -75,7 +95,11 @@ export async function POST(req: Request) {
 
     let out;
     try {
-      out = await synthesize(spoken.sentences, voice.id, speed);
+      out = await synthesize(spoken.sentences, voice.id, {
+        speed,
+        pause: (b.pause in PAUSES ? b.pause : "normales") as PauseKind,
+        targetSeconds: Number(b.target_seconds) || null,
+      });
     } catch (e: any) {
       return NextResponse.json({ error: e.message || "Génération de la voix impossible." }, { status: 502 });
     }
@@ -106,6 +130,28 @@ export async function POST(req: Request) {
       .single();
     if (error) throw error;
     return NextResponse.json({ item: data }, { status: 201 });
+  } catch (e: any) {
+    reportError(e, "api/voiceover");
+    return NextResponse.json({ error: publicMessage(e) }, { status: e?.message === "Non autorisé" ? 401 : 500 });
+  }
+}
+
+/** { lexicon: { mot: prononciation } } → dictionnaire de prononciation enregistré. */
+export async function PUT(req: Request) {
+  try {
+    const { s, workspaceId } = await authContext(req);
+    const b = await req.json().catch(() => ({}));
+    const words = cleanLexicon(b.lexicon);
+    const { error } = await s
+      .from("voiceover_lexicon")
+      .upsert({ workspace_id: workspaceId, words, updated_at: new Date().toISOString() });
+    if (error && ["42P01", "PGRST205"].includes(String(error.code || "")))
+      return NextResponse.json(
+        { error: "Dictionnaire pas encore installé : exécute la migration voiceover_lexicon dans Supabase." },
+        { status: 409 },
+      );
+    if (error) throw error;
+    return NextResponse.json({ lexicon: words });
   } catch (e: any) {
     reportError(e, "api/voiceover");
     return NextResponse.json({ error: publicMessage(e) }, { status: e?.message === "Non autorisé" ? 401 : 500 });
