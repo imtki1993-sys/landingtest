@@ -82,4 +82,19 @@ describe("analyse des pubs", () => {
     expect(utmFrom({ utm_term: "  Femmes  ", other: "x" })).toEqual({ utm_term: "Femmes" });
     expect(utmFrom("pas une url")).toEqual({});
   });
+  it("noms encodés décodés et fusionnés, noms donnés par le vendeur", () => {
+    const enc = encodeURIComponent(encodeURIComponent("حملة الشاحن"));
+    const r = buildAdsReport(
+      [
+        row({ campaign: enc, ad: "123456789012", visits: 4 }),
+        row({ campaign: "حملة الشاحن", ad: "123456789012", visits: 1, orders: 1 }),
+      ],
+      {},
+      { "حملة الشاحن": "Chargeur", "123456789012": "Vidéo 1" },
+    );
+    expect(r.campaigns).toHaveLength(1);
+    expect(r.campaigns[0]).toMatchObject({ campaign: "حملة الشاحن", label: "Chargeur", visits: 5, orders: 1 });
+    expect(r.campaigns[0].ads).toHaveLength(1);
+    expect(r.campaigns[0].ads[0].adLabel).toBe("Vidéo 1");
+  });
 });
