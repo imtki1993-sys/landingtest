@@ -3,7 +3,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import SaaSSidebar from "../components/SaaSSidebar";
 import SaaSTopbar from "../components/SaaSTopbar";
-import { normalizeDarija } from "../../lib/darija-text";
+import { normalizeDarija, type Lexicon } from "../../lib/darija-text";
 
 interface Voice {
   id: string;
@@ -51,6 +51,12 @@ const AUDIENCES: [string, string][] = [
   ["jeunes", "Jeunes (18-30 ans)"],
 ];
 
+const PAUSE_OPTIONS: [string, string][] = [
+  ["courtes", "Courtes"],
+  ["normales", "Normales"],
+  ["longues", "Longues"],
+];
+
 const fmtDate = (iso: string) =>
   new Date(iso).toLocaleString("fr-MA", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" });
 const fmtSec = (s: number | null) =>
@@ -64,7 +70,14 @@ async function api(url: string, init?: RequestInit) {
 }
 
 export default function VoiceoverPage() {
-  const [d, setD] = useState<{ installed: boolean; providers: string[]; voices: Voice[]; items?: Item[] } | null>(null);
+  const [d, setD] = useState<{
+    installed: boolean;
+    providers: string[];
+    voices: Voice[];
+    items?: Item[];
+    lexicon?: Lexicon;
+    lexiconInstalled?: boolean;
+  } | null>(null);
   const [error, setError] = useState("");
   const [products, setProducts] = useState<Product[]>([]);
   // 1. produit et consignes
@@ -87,6 +100,12 @@ export default function VoiceoverPage() {
   // 3. voix
   const [voice, setVoice] = useState("");
   const [speed, setSpeed] = useState(1);
+  const [pause, setPause] = useState("normales");
+  const [fit, setFit] = useState(true);
+  const [lexicon, setLexicon] = useState<Lexicon>({});
+  const [rows, setRows] = useState<[string, string][]>([]);
+  const [showLex, setShowLex] = useState(false);
+  const [lexState, setLexState] = useState<"" | "saving" | "saved">("");
   const [generating, setGenerating] = useState(false);
   const [result, setResult] = useState<Item | null>(null);
 
@@ -94,6 +113,8 @@ export default function VoiceoverPage() {
     api("/api/voiceover")
       .then((x) => {
         setD(x);
+        setLexicon(x.lexicon || {});
+        setRows(Object.entries(x.lexicon || {}));
         const first = (x.voices as Voice[]).find((v) => x.providers.includes(v.provider));
         if (first) setVoice(first.id);
       })
@@ -103,7 +124,7 @@ export default function VoiceoverPage() {
       .catch(() => {});
   }, []);
 
-  const spoken = useMemo(() => normalizeDarija(spokenEdit ?? script), [script, spokenEdit]);
+  const spoken = useMemo(() => normalizeDarija(spokenEdit ?? script, lexicon), [script, spokenEdit, lexicon]);
   const voices = d?.voices || [];
   const voiceById = new Map(voices.map((v) => [v.id, v]));
   const ready = (v: Voice) => !!d?.providers.includes(v.provider);
@@ -164,6 +185,8 @@ export default function VoiceoverPage() {
           spoken: spokenEdit ?? undefined,
           voice,
           speed,
+          pause,
+          target_seconds: fit ? seconds : undefined,
           title: title || name,
           product_id: productId || undefined,
         }),
@@ -174,6 +197,33 @@ export default function VoiceoverPage() {
       setError(err.message);
     } finally {
       setGenerating(false);
+    }
+  }
+
+  function addWord(word = "", say = "") {
+    setShowLex(true);
+    setLexState("");
+    setRows((r) => (word && r.some(([w]) => w === word) ? r : [...r, [word, say]]));
+  }
+
+  async function saveLexicon() {
+    setLexState("saving");
+    setError("");
+    const words = Object.fromEntries(
+      rows.filter(([w, v]) => w.trim() && v.trim()).map(([w, v]) => [w.trim(), v.trim()]),
+    );
+    try {
+      const x = await api("/api/voiceover", {
+        method: "PUT",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ lexicon: words }),
+      });
+      setLexicon(x.lexicon);
+      setRows(Object.entries(x.lexicon));
+      setLexState("saved");
+    } catch (err: any) {
+      setError(err.message);
+      setLexState("");
     }
   }
 
@@ -366,15 +416,98 @@ export default function VoiceoverPage() {
                     }}
                   />
                   {spoken.guessed.length ? (
-                    <p className="vo-warn">
-                      Mots en lettres latines réécrits approximativement : {spoken.guessed.join(" · ")}. Écris-les en
-                      arabe dans le script pour une prononciation exacte.
+                    <div className="vo-warn">
+                      Mots en lettres latines lus approximativement. Indique comment les dire :
+                      <span className="vo-chips">
+                        {spoken.guessed.map((g) => {
+                          const [w, ar] = g.split(" → ");
+                          return (
+                            <button type="button" key={g} onClick={() => addWord(w, ar)}>
+                              {w} <small dir="rtl">{ar}</small>
+                            </button>
+                          );
+                        })}
+                      </span>
+                    </div>
+                  ) : null}
+                  {spoken.adapted.length ? (
+                    <p className="vo-info">
+                      Arabe classique remplacé par la darija pour un accent marocain :{" "}
+                      <span dir="rtl">{spoken.adapted.map((x) => x.replace(" → ", " ← ")).join(" · ")}</span>
                     </p>
                   ) : null}
                   {tooLong ? <p className="vo-warn">Texte trop long pour une voix off (60 s au maximum).</p> : null}
                   <button type="button" className="vo-link" onClick={() => setShowSpoken((v) => !v)}>
                     {showSpoken ? "Masquer le texte lu par la voix" : "Voir le texte exact lu par la voix"}
                   </button>
+                  <button type="button" className="vo-link" onClick={() => setShowLex((v) => !v)}>
+                    Dictionnaire de prononciation ({Object.keys(lexicon).length} mot
+                    {Object.keys(lexicon).length > 1 ? "s" : ""})
+                  </button>
+                  {showLex ? (
+                    <div className="vo-spoken vo-lex">
+                      <p>
+                        Un mot mal prononcé ? Écris-le tel qu’il apparaît dans le script, puis comment le dire en
+                        darija. Il sera corrigé dans toutes tes voix off.
+                      </p>
+                      {d?.lexiconInstalled === false ? (
+                        <p className="vo-warn">
+                          Exécute d’abord la migration « voiceover_lexicon » dans Supabase pour enregistrer le
+                          dictionnaire.
+                        </p>
+                      ) : null}
+                      {rows.map(([w, v], i) => (
+                        <div className="vo-lex-row" key={i}>
+                          <input
+                            value={w}
+                            placeholder="Mot écrit (ex. MagSafe)"
+                            aria-label="Mot écrit"
+                            onChange={(e) => {
+                              setLexState("");
+                              setRows((r) => r.map((x, j) => (j === i ? [e.target.value, x[1]] : x)));
+                            }}
+                          />
+                          <input
+                            dir="rtl"
+                            value={v}
+                            placeholder="كيفاش يتقرا (ماك سيف)"
+                            aria-label="Prononciation"
+                            onChange={(e) => {
+                              setLexState("");
+                              setRows((r) => r.map((x, j) => (j === i ? [x[0], e.target.value] : x)));
+                            }}
+                          />
+                          <button
+                            type="button"
+                            aria-label="Retirer ce mot"
+                            onClick={() => {
+                              setLexState("");
+                              setRows((r) => r.filter((_, j) => j !== i));
+                            }}
+                          >
+                            ×
+                          </button>
+                        </div>
+                      ))}
+                      <div className="vo-lex-actions">
+                        <button type="button" className="vo-link" onClick={() => addWord()}>
+                          + Ajouter un mot
+                        </button>
+                        <button
+                          type="button"
+                          className="vo-small"
+                          disabled={lexState === "saving"}
+                          onClick={saveLexicon}
+                        >
+                          {lexState === "saving"
+                            ? "Enregistrement…"
+                            : lexState === "saved"
+                              ? "Enregistré"
+                              : "Enregistrer"}
+                        </button>
+                      </div>
+                    </div>
+                  ) : null}
                   {showSpoken ? (
                     <div className="vo-spoken">
                       <p>Chiffres, prix et mots latins sont écrits comme ils se prononcent. Tu peux corriger ici.</p>
@@ -429,6 +562,20 @@ export default function VoiceoverPage() {
                   </div>
                 </div>
               ))}
+              <fieldset>
+                <legend>Pauses entre les phrases</legend>
+                <div className="vo-seg vo-seg-3">
+                  {PAUSE_OPTIONS.map(([k, l]) => (
+                    <button type="button" key={k} className={pause === k ? "on" : ""} onClick={() => setPause(k)}>
+                      {l}
+                    </button>
+                  ))}
+                </div>
+              </fieldset>
+              <label className="vo-check">
+                <input type="checkbox" checked={fit} onChange={(e) => setFit(e.target.checked)} />
+                Tenir dans {seconds} s (accélère légèrement la voix si elle dépasse, sans changer le timbre)
+              </label>
               <label className="vo-speed">
                 Vitesse <b>{speed.toFixed(2).replace(/0$/, "")}×</b>
                 <input
@@ -451,6 +598,12 @@ export default function VoiceoverPage() {
               {result ? (
                 <div className="vo-result">
                   <audio controls autoPlay src={result.audio_url} />
+                  {result.seconds && result.seconds > seconds * 1.1 ? (
+                    <p className="vo-warn">
+                      La voix dure {fmtSec(result.seconds)} pour une pub de {seconds} s : raccourcis le script d’une
+                      phrase ou monte la vitesse.
+                    </p>
+                  ) : null}
                   <a href={result.audio_url} download className="vo-link">
                     Télécharger le MP3
                   </a>

@@ -27,11 +27,21 @@ describe("voix off : fournisseurs", () => {
         }),
     );
     vi.stubGlobal("fetch", f);
-    const out = await synthesize(["جملة لولى.", "جملة تانية."], "doda-m2", 2);
+    const out = await synthesize(["جملة لولى.", "جملة تانية."], "doda-m2", {
+      speed: 2,
+      pause: "longues",
+      targetSeconds: 30,
+    });
     const [url, init] = f.mock.calls[0] as any;
     expect(url).toBe("https://tts.example.com/synthesize");
     expect(init.headers.authorization).toBe("Bearer secret");
-    expect(JSON.parse(init.body)).toEqual({ sentences: ["جملة لولى.", "جملة تانية."], voice: "doda-m2", speed: 1.3 });
+    expect(JSON.parse(init.body)).toEqual({
+      sentences: ["جملة لولى.", "جملة تانية."],
+      voice: "doda-m2",
+      speed: 1.3,
+      pause: 1.5,
+      target_seconds: 30,
+    });
     expect(out).toMatchObject({ mime: "audio/mpeg", seconds: 12.5 });
     expect(out.audio.length).toBe(3);
   });
@@ -40,7 +50,7 @@ describe("voix off : fournisseurs", () => {
     process.env.AZURE_SPEECH_REGION = "westeurope";
     const f = vi.fn(async () => new Response(new Uint8Array([9])));
     vi.stubGlobal("fetch", f);
-    await synthesize(["واش <نتا> & هي؟", "يالاه."], "azure-mouna", 0.9);
+    await synthesize(["واش <نتا> & هي؟", "يالاه."], "azure-mouna", { speed: 0.9 });
     const [url, init] = f.mock.calls[0] as any;
     expect(url).toBe("https://westeurope.tts.speech.microsoft.com/cognitiveservices/v1");
     expect(init.body).toContain('voice name="ar-MA-MounaNeural"');

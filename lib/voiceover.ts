@@ -39,6 +39,17 @@ export function availableProviders(): VoiceProvider[] {
   return out;
 }
 
+/** Pauses entre les phrases. */
+export const PAUSES = { courtes: 0.6, normales: 1, longues: 1.5 } as const;
+export type PauseKind = keyof typeof PAUSES;
+
+export interface SynthesisOptions {
+  speed?: number;
+  pause?: PauseKind;
+  /** durée visée (s) : l'audio trop long est accéléré sans changer la voix (25 % au plus) */
+  targetSeconds?: number | null;
+}
+
 export interface Synthesis {
   audio: Buffer;
   mime: string;
@@ -46,7 +57,13 @@ export interface Synthesis {
 }
 
 /** Habibi-TTS sur le service GPU : une phrase à la fois, pauses et volume gérés par le service. */
-async function habibi(sentences: string[], voice: string, speed: number): Promise<Synthesis> {
+async function habibi(
+  sentences: string[],
+  voice: string,
+  speed: number,
+  pause: number,
+  target: number | null,
+): Promise<Synthesis> {
   const base = env("TTS_SERVICE_URL").replace(/\/+$/, "");
   const r = await fetch(base + "/synthesize", {
     method: "POST",
@@ -55,7 +72,7 @@ async function habibi(sentences: string[], voice: string, speed: number): Promis
       "content-type": "application/json",
       accept: "audio/mpeg",
     },
-    body: JSON.stringify({ sentences, voice, speed }),
+    body: JSON.stringify({ sentences, voice, speed, pause, target_seconds: target }),
     cache: "no-store",
     signal: AbortSignal.timeout(240_000),
   });
@@ -79,12 +96,12 @@ const esc = (s: string) =>
   s.replace(/[<>&'"]/g, (c) => ({ "<": "&lt;", ">": "&gt;", "&": "&amp;", "'": "&apos;", '"': "&quot;" })[c]!);
 
 /** Azure Speech, voix ar-MA ; une courte pause entre les phrases. */
-async function azure(sentences: string[], voice: string, speed: number): Promise<Synthesis> {
+async function azure(sentences: string[], voice: string, speed: number, pause: number): Promise<Synthesis> {
   const name = voice === "azure-mouna" ? "ar-MA-MounaNeural" : "ar-MA-JamalNeural";
   const rate = `${Math.round((speed - 1) * 100) >= 0 ? "+" : ""}${Math.round((speed - 1) * 100)}%`;
   const ssml = `<speak version="1.0" xml:lang="ar-MA"><voice name="${name}"><prosody rate="${rate}">${sentences
     .map((s) => esc(s))
-    .join('<break time="350ms"/>')}</prosody></voice></speak>`;
+    .join(`<break time="${Math.round(350 * pause)}ms"/>`)}</prosody></voice></speak>`;
   const r = await fetch(`https://${env("AZURE_SPEECH_REGION")}.tts.speech.microsoft.com/cognitiveservices/v1`, {
     method: "POST",
     headers: {
@@ -101,7 +118,7 @@ async function azure(sentences: string[], voice: string, speed: number): Promise
   return { audio: Buffer.from(await r.arrayBuffer()), mime: "audio/mpeg", seconds: null };
 }
 
-export async function synthesize(sentences: string[], voiceId: string, speed = 1): Promise<Synthesis> {
+export async function synthesize(sentences: string[], voiceId: string, o: SynthesisOptions = {}): Promise<Synthesis> {
   const voice = VOICES.find((v) => v.id === voiceId);
   if (!voice) throw new Error("Voix inconnue");
   if (!availableProviders().includes(voice.provider))
@@ -110,8 +127,12 @@ export async function synthesize(sentences: string[], voiceId: string, speed = 1
         ? "Le service de voix darija n'est pas encore branché (TTS_SERVICE_URL / TTS_SERVICE_TOKEN)."
         : "Azure Speech n'est pas configuré (AZURE_SPEECH_KEY / AZURE_SPEECH_REGION).",
     );
-  const s = Math.min(1.3, Math.max(0.7, Number(speed) || 1));
-  return voice.provider === "habibi" ? habibi(sentences, voice.id, s) : azure(sentences, voice.id, s);
+  const s = Math.min(1.3, Math.max(0.7, Number(o.speed) || 1));
+  const pause = PAUSES[o.pause as PauseKind] ?? 1;
+  const target = Number(o.targetSeconds) >= 5 ? Math.min(90, Number(o.targetSeconds)) : null;
+  return voice.provider === "habibi"
+    ? habibi(sentences, voice.id, s, pause, target)
+    : azure(sentences, voice.id, s, pause);
 }
 
 // ─── Script ───
@@ -155,10 +176,13 @@ ${p.notes ? "Consignes du vendeur : " + p.notes.slice(0, 400) : ""}
 
 Règles :
 - Durée lue : ${p.seconds} secondes, soit environ ${words} mots au total (pas plus).
-- Structure : une accroche forte dans la première phrase (question ou situation que le client vit), puis le produit, puis l'offre, puis l'appel à l'action « الدفع عند الاستلام » et « التوصيل لجميع المدن ».
-- Phrases courtes (5 à 12 mots), une idée par phrase, ponctuation qui marque les respirations.
-- Darija naturelle en alphabet arabe : PAS de mots en lettres latines, PAS d'emojis, PAS de hashtags.
-- Écris les prix et les nombres en lettres darija (ex. « مية و تسعة و تسعين درهم »).
+- Structure : une accroche forte dans la première phrase (question ou situation que le client vit), puis le produit, puis l'offre, puis l'appel à l'action « الخلاص عند الاستلام » et « التوصيل لجميع المدن ».
+- Phrases courtes (5 à 12 mots), une idée par phrase. Chaque phrase finit par « . », « ! » ou « ؟ ».
+- DARIJA PARLÉE, jamais d'arabe classique (fusha). Utilise : هاد، هادي، دابا، بزاف، غير، كاين، ماكاينش، ديال، واخا، علاش، فين، شنو، كيفاش، باش، ملي، بغيتي، تقدر، حاجة، زوين، واعر، فابور، خود، طلب.
+  N'utilise JAMAIS : هذا، هذه، الآن، جدا، فقط، أيضا، لماذا، ماذا، كيف، سوف، الذي، التي، يمكنك، تستطيع، شيء، رائع، مجانا.
+  Exemple du ton attendu : « واش عييتي من التليفون اللي كيطيح ليك فالطوموبيل؟ هاد الحامل كيشد مزيان. دابا غير ب 199 درهم! »
+- Alphabet arabe uniquement : PAS de mots en lettres latines, PAS d'emojis, PAS de hashtags.
+- Écris les prix et les nombres en CHIFFRES suivis de « درهم » (ex. « 199 درهم ») : ils seront lus correctement par la voix.
 - N'invente aucune caractéristique, certification, garantie ou résultat qui n'est pas dans la description. Aucune promesse médicale.
 Réponds UNIQUEMENT avec ce JSON : {"title":"titre court en français (4 à 6 mots)","lines":["phrase 1","phrase 2","…"]}`;
 }

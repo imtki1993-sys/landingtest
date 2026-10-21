@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { numberToDarija, normalizeDarija, estimateSeconds } from "../lib/darija-text";
+import { numberToDarija, normalizeDarija, cleanLexicon, estimateSeconds } from "../lib/darija-text";
 
 describe("nombres en darija", () => {
   it.each([
@@ -56,5 +56,29 @@ describe("texte prêt pour la voix", () => {
   });
   it("durée estimée", () => {
     expect(estimateSeconds(Array(48).fill("كلمة").join(" "))).toBe(20);
+  });
+});
+
+describe("darija parlée et dictionnaire", () => {
+  it("remplace l'arabe classique par la darija", () => {
+    const r = normalizeDarija("هذا المنتج رائع جدا. وهذا فقط ب 199 درهم! الدفع عند الاستلام");
+    expect(r.text).toContain("هاد المنتج واعر بزاف.");
+    expect(r.text).toContain("وهاد غير ب مية و تسعة و تسعين درهم!");
+    expect(r.text).toContain("الخلاص عند الاستلام");
+    expect(r.adapted).toContain("هذا → هاد");
+  });
+  it("ne touche pas aux mots plus longs", () => {
+    expect(normalizeDarija("كيفاش هذاك").text).toBe("كيفاش هذاك.");
+  });
+  it("applique le dictionnaire du vendeur (latin, arabe et texte préparé)", () => {
+    const lex = cleanLexicon({ MagSafe: "ماك سيف", "مية و تسعة و تسعين": "تسعة و تسعين و مية", " ": "x" });
+    expect(Object.keys(lex)).toHaveLength(2);
+    const r = normalizeDarija("Support MagSafe ب 199 درهم", lex);
+    expect(r.text).toContain("ماك سيف");
+    expect(r.text).toContain("تسعة و تسعين و مية درهم");
+    expect(r.guessed.join(" ")).not.toContain("MagSafe");
+  });
+  it("le dictionnaire a priorité sur les remplacements automatiques", () => {
+    expect(normalizeDarija("هذا", { هذا: "هادا" }).text).toBe("هادا.");
   });
 });

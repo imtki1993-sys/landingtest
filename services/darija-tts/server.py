@@ -19,7 +19,7 @@ from fastapi import FastAPI, Header, HTTPException
 from fastapi.responses import JSONResponse, Response
 from pydantic import BaseModel, Field
 
-from audio_utils import SAMPLE_RATE, assemble, expected_seconds, to_mp3
+from audio_utils import SAMPLE_RATE, assemble, expected_seconds, fit_tempo, to_mp3
 
 MAR_CKPT = "hf://SWivid/Habibi-TTS/Specialized/MAR/model_100000.safetensors"
 MAR_VOCAB = "hf://SWivid/Habibi-TTS/Specialized/MAR/vocab.txt"
@@ -73,6 +73,8 @@ class SynthesizeBody(BaseModel):
     sentences: list[str] = Field(min_length=1, max_length=MAX_SENTENCES)
     voice: str
     speed: float = Field(default=1.0, ge=0.7, le=1.3)
+    pause: float = Field(default=1.0, ge=0.3, le=2.0)
+    target_seconds: float | None = Field(default=None, ge=5, le=120)
 
 
 def _generate(sentence: str, voice: dict, speed: float):
@@ -94,9 +96,11 @@ def _generate(sentence: str, voice: dict, speed: float):
         )
         return wave, sr
 
-    wave, sr = run(32)
-    # phrase qui boucle (mots répétés) : beaucoup trop longue → nouvel essai plus précis
-    if len(wave) / sr > expected_seconds(sentence, speed) * 2.2 + 1.0:
+    wave, sr = run(48)
+    # phrase qui boucle (beaucoup trop longue) ou mots avalés (beaucoup trop courte) → nouvel essai plus précis
+    expected = expected_seconds(sentence, speed)
+    got = len(wave) / sr
+    if got > expected * 2.2 + 1.0 or got < expected * 0.4:
         wave, sr = run(64)
     return wave, sr
 
@@ -152,13 +156,16 @@ def synthesize(body: SynthesizeBody, authorization: str | None = Header(default=
             if sr != SAMPLE_RATE:
                 raise HTTPException(status_code=500, detail="Fréquence inattendue")
             segments.append((s, wave))
-    final = assemble(segments)
-    mp3 = to_mp3(final)
+    final = assemble(segments, pause=body.pause)
+    seconds = len(final) / SAMPLE_RATE
+    tempo = fit_tempo(seconds, body.target_seconds)
+    mp3 = to_mp3(final, tempo=tempo)
     return Response(
         content=mp3,
         media_type="audio/mpeg",
         headers={
-            "X-Audio-Seconds": f"{len(final) / SAMPLE_RATE:.1f}",
+            "X-Audio-Seconds": f"{seconds / tempo:.1f}",
+            "X-Tempo": f"{tempo:.3f}",
             "X-Voice-Used": voice_id,
             "Cache-Control": "no-store",
         },

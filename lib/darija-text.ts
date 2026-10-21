@@ -170,6 +170,106 @@ function transliterate(word: string): string {
   return w.replace(/[a-z]/g, (c) => LETTERS[c] || "").replace(/(.)\1+/g, "$1");
 }
 
+// Arabe classique (fréquent dans les textes écrits par l'IA) → darija parlée au Maroc.
+// Sans ce passage, la voix prend un accent « journal télévisé ».
+const DARIJA_SWAPS: [string, string][] = [
+  ["الدفع عند الاستلام", "الخلاص عند الاستلام"],
+  ["لا يوجد", "ماكاينش"],
+  ["لا تفوت", "ماتفوتش"],
+  ["لا تفوتي", "ماتفوتيش"],
+  ["لا تتردد", "ماتترددش"],
+  ["لا تترددي", "ماتتردديش"],
+  ["احصل على", "خود"],
+  ["احصلي على", "خودي"],
+  ["هذا", "هاد"],
+  ["هذه", "هادي"],
+  ["هذي", "هادي"],
+  ["هؤلاء", "هادو"],
+  ["ذلك", "داك"],
+  ["تلك", "ديك"],
+  ["الآن", "دابا"],
+  ["الان", "دابا"],
+  ["جدا", "بزاف"],
+  ["جداً", "بزاف"],
+  ["كثيرا", "بزاف"],
+  ["كثيراً", "بزاف"],
+  ["فقط", "غير"],
+  ["أيضا", "حتى"],
+  ["أيضاً", "حتى"],
+  ["ايضا", "حتى"],
+  ["لماذا", "علاش"],
+  ["ماذا", "شنو"],
+  ["كيف", "كيفاش"],
+  ["أين", "فين"],
+  ["اين", "فين"],
+  ["متى", "فوقاش"],
+  ["نعم", "إيه"],
+  ["يوجد", "كاين"],
+  ["توجد", "كاينة"],
+  ["سوف", "غادي"],
+  ["الذي", "اللي"],
+  ["التي", "اللي"],
+  ["الذين", "اللي"],
+  ["أريد", "بغيت"],
+  ["تريد", "بغيتي"],
+  ["تريدين", "بغيتي"],
+  ["يمكنك", "تقدر"],
+  ["تستطيع", "تقدر"],
+  ["شيء", "حاجة"],
+  ["أشياء", "حوايج"],
+  ["جميل", "زوين"],
+  ["جميلة", "زوينة"],
+  ["رائع", "واعر"],
+  ["رائعة", "واعرة"],
+  ["مجانا", "فابور"],
+  ["مجاناً", "فابور"],
+  ["مجاني", "فابور"],
+  ["مجانية", "فابور"],
+];
+
+const escRe = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+/** Remplace un mot entier (avec « و » collé devant éventuellement), sans toucher aux mots plus longs. */
+function replaceWord(t: string, word: string, by: string): { t: string; hit: boolean } {
+  const latin = /[A-Za-z]/.test(word);
+  const re = latin
+    ? new RegExp(`(?<![\\p{L}\\p{N}])${escRe(word)}(?![\\p{L}\\p{N}])`, "giu")
+    : new RegExp(`(?<![\\p{L}])(و?)${escRe(word)}(?![\\p{L}])`, "gu");
+  let hit = false;
+  const out = t.replace(re, (_m, w) => {
+    hit = true;
+    return latin ? by : (w || "") + by;
+  });
+  return { t: out, hit };
+}
+
+/** Dictionnaire de prononciation du vendeur : { mot écrit → comment le dire }. */
+export type Lexicon = Record<string, string>;
+
+/** Nettoie un dictionnaire reçu (clés et valeurs courtes, 200 mots au plus). */
+export function cleanLexicon(input: unknown): Lexicon {
+  const out: Lexicon = {};
+  if (!input || typeof input !== "object") return out;
+  for (const [k, v] of Object.entries(input as Record<string, unknown>)) {
+    const key = String(k).trim().replace(/\s+/g, " ").slice(0, 60);
+    const val = String(v ?? "")
+      .trim()
+      .replace(/\s+/g, " ")
+      .slice(0, 120);
+    if (key && val && key !== val) out[key] = val;
+    if (Object.keys(out).length >= 200) break;
+  }
+  return out;
+}
+
+function applyLexicon(t: string, lexicon: Lexicon, skipLooping = false): string {
+  // expressions longues d'abord (« livraison gratuite » avant « livraison »)
+  for (const [k, v] of Object.entries(lexicon).sort((a, b) => b[0].length - a[0].length)) {
+    if (skipLooping && v.includes(k)) continue;
+    t = replaceWord(t, k, v).t;
+  }
+  return t;
+}
+
 export interface NormalizeResult {
   /** texte prêt pour la voix */
   text: string;
@@ -177,6 +277,8 @@ export interface NormalizeResult {
   sentences: string[];
   /** mots latins inconnus transcrits approximativement : à relire */
   guessed: string[];
+  /** mots d'arabe classique remplacés par la darija */
+  adapted: string[];
   /** durée estimée en secondes */
   seconds: number;
 }
@@ -189,9 +291,10 @@ export function estimateSeconds(text: string, speed = 1): number {
   return Math.max(1, Math.round(words / WORDS_PER_SECOND / (speed || 1)));
 }
 
-export function normalizeDarija(input: string): NormalizeResult {
+export function normalizeDarija(input: string, lexicon: Lexicon = {}): NormalizeResult {
   const guessed = new Set<string>();
-  let t = String(input || "")
+  const adapted = new Set<string>();
+  let t = applyLexicon(String(input || ""), lexicon)
     .normalize("NFC")
     // emojis, pictogrammes, sélecteurs de variante
     .replace(/[\p{Extended_Pictographic}\u{FE0F}\u{200D}\u{20E3}]/gu, " ")
@@ -201,6 +304,16 @@ export function normalizeDarija(input: string): NormalizeResult {
     // chiffres arabes orientaux → latins (pour la conversion qui suit)
     .replace(/[٠-٩]/g, (d) => String("٠١٢٣٤٥٦٧٨٩".indexOf(d)))
     .replace(/[۰-۹]/g, (d) => String("۰۱۲۳۴۵۶۷۸۹".indexOf(d)));
+
+  // arabe classique → darija (les mots du dictionnaire du vendeur ne sont pas touchés)
+  for (const [k, v] of DARIJA_SWAPS) {
+    if (lexicon[k]) continue;
+    const r = replaceWord(t, k, v);
+    if (r.hit) {
+      t = r.t;
+      adapted.add(`${k} → ${v}`);
+    }
+  }
 
   // expressions latines de plusieurs mots d'abord
   for (const [k, v] of Object.entries(LATIN_WORDS))
@@ -240,6 +353,9 @@ export function normalizeDarija(input: string): NormalizeResult {
     return ar;
   });
 
+  // le dictionnaire s'applique aussi au texte préparé (ex. corriger la lecture d'un nombre)
+  t = applyLexicon(t, lexicon, true);
+
   t = t
     .replace(/[“”«»"(){}\[\]*_~|<>]/g, " ")
     .replace(/[:;]/g, "،")
@@ -271,7 +387,7 @@ export function normalizeDarija(input: string): NormalizeResult {
     }
   }
   const text = sentences.join(" ");
-  return { text, sentences, guessed: [...guessed], seconds: estimateSeconds(text) };
+  return { text, sentences, guessed: [...guessed], adapted: [...adapted], seconds: estimateSeconds(text) };
 }
 
 const endWithStop = (s: string) => (/[.!؟]$/.test(s) ? s : s.replace(/،$/, "") + ".");

@@ -2,7 +2,20 @@ import unittest
 
 import numpy as np
 
-from audio_utils import SAMPLE_RATE, assemble, expected_seconds, fade, normalize, pause_after, trim_silence
+import shutil
+
+from audio_utils import (
+    SAMPLE_RATE,
+    assemble,
+    audio_filters,
+    expected_seconds,
+    fade,
+    fit_tempo,
+    normalize,
+    pause_after,
+    to_mp3,
+    trim_silence,
+)
 
 
 class AudioUtilsTest(unittest.TestCase):
@@ -40,6 +53,26 @@ class AudioUtilsTest(unittest.TestCase):
 
     def test_expected_seconds(self):
         self.assertAlmostEqual(expected_seconds("a b c d e f g h i j k l"), 5.0)
+
+
+    def test_pause_scale(self):
+        self.assertAlmostEqual(len(pause_after("جملة.", scale=1.5)) / SAMPLE_RATE, 0.45, places=2)
+        self.assertAlmostEqual(len(pause_after("جملة.", scale=0.6)) / SAMPLE_RATE, 0.18, places=2)
+
+    def test_fit_tempo(self):
+        self.assertEqual(fit_tempo(29, 30), 1.0)
+        self.assertEqual(fit_tempo(30.5, 30), 1.0)
+        self.assertAlmostEqual(fit_tempo(33, 30), 1.1)
+        self.assertEqual(fit_tempo(50, 30), 1.25)
+        self.assertEqual(fit_tempo(50, None), 1.0)
+        self.assertIn("atempo=1.100", audio_filters(1.1))
+        self.assertNotIn("atempo", audio_filters(1.0))
+
+    @unittest.skipUnless(shutil.which("ffmpeg"), "ffmpeg absent")
+    def test_mp3_with_tempo(self):
+        t = np.linspace(0, 2, 2 * SAMPLE_RATE, dtype=np.float32)
+        wave = 0.3 * np.sin(2 * np.pi * 220 * t).astype(np.float32)
+        self.assertGreater(len(to_mp3(wave, tempo=1.2)), 1000)
 
 
 if __name__ == "__main__":
