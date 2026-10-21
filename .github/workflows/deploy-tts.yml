@@ -36,6 +36,8 @@ jobs:
         run: |
           missing=""
           [ -n "$MODAL_TOKEN_ID" ] || missing="$missing MODAL_TOKEN_ID"
+          case "$MODAL_TOKEN_ID" in ak-*|"") ;; *) echo "::warning::MODAL_TOKEN_ID devrait commencer par ak- (vérifie que les deux valeurs ne sont pas inversées)";; esac
+          case "$MODAL_TOKEN_SECRET" in as-*|"") ;; *) echo "::warning::MODAL_TOKEN_SECRET devrait commencer par as- (vérifie que les deux valeurs ne sont pas inversées)";; esac
           [ -n "$MODAL_TOKEN_SECRET" ] || missing="$missing MODAL_TOKEN_SECRET"
           [ -n "$TTS_SERVICE_TOKEN" ] || missing="$missing TTS_SERVICE_TOKEN"
           if [ -n "$missing" ]; then
@@ -57,8 +59,21 @@ jobs:
       - name: Installer Modal
         run: pip install --quiet "modal>=1.0,<2"
 
+      - name: Vérifier la connexion à Modal
+        run: |
+          if ! modal app list > modal-check.log 2>&1; then
+            cat modal-check.log
+            echo "::error::Modal refuse la connexion. Vérifie MODAL_TOKEN_ID (commence par ak-) et MODAL_TOKEN_SECRET (commence par as-) : modal.com → Settings → API Tokens → New Token, puis recopie-les dans les secrets GitHub, sans espace ni guillemet."
+            exit 1
+          fi
+          echo "Connexion à Modal : OK"
+
       - name: Enregistrer la clé du service dans Modal
-        run: modal secret create landpro-tts TTS_SERVICE_TOKEN="$TTS_SERVICE_TOKEN" --force
+        run: |
+          if ! modal secret create landpro-tts TTS_SERVICE_TOKEN="$TTS_SERVICE_TOKEN" --force 2>&1 | tee secret.log; then
+            echo "::error::Impossible d'enregistrer la clé dans Modal : $(tail -3 secret.log | tr '\n' ' ')"
+            exit 1
+          fi
 
       - name: "Déployer (1re fois ≈ 15-25 min, modèle marocain + 7 voix DODa)"
         run: |
