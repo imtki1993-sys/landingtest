@@ -95,6 +95,9 @@ function fakeDb(knownIds: number[] = []) {
       select: () => q,
       eq: () => q,
       in: () => q,
+      order: () => q,
+      limit: () => q,
+      not: () => q,
       upsert: (p: any) => ((op = "upsert"), (payload = p), q),
       update: (p: any) => ((op = "update"), (payload = p), q),
       then: (res: any) => {
@@ -188,5 +191,26 @@ describe("WhatsApp et signature du canal", () => {
     const desc =
       "مرحبا بكم 😍\nبيع ملابس بالجملة بثمن المصنع الجودة الجيدة و الثمن المناسب\nواتساب 👇\nhttps://wa.me/212643837289\n\nالهاتف 👇\n\n0643837289\n\nرابط تيليكرام 👇\nhttps://t.me/bi3bjemla";
     expect(extractPhones(desc)).toEqual(["212643837289"]);
+  });
+});
+
+describe("import par date", () => {
+  afterEach(() => vi.unstubAllGlobals());
+  it("remonte les pages jusqu'à la date demandée, sans boucler", async () => {
+    const { backfillChannel } = await import("../lib/sourcing-sync");
+    const f = tgFetch();
+    vi.stubGlobal("fetch", f);
+    const { s } = fakeDb([500]);
+    const r = await backfillChannel(
+      s,
+      { id: "c1", username: "derbomargros", last_post_id: 500 },
+      "2020-01-01T00:00:00.000Z",
+      Date.now() + 5000,
+    );
+    const pages = f.mock.calls.filter(([u]) => String(u).startsWith("https://t.me/s/"));
+    expect(String(pages[0][0])).toContain("before=500");
+    expect(pages.length).toBeLessThanOrEqual(2);
+    expect(r.done).toBe(true);
+    expect(r.added).toBe(2); // la page lue une seule fois
   });
 });

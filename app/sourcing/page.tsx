@@ -353,6 +353,48 @@ function ChannelsAdmin({ channels, reload }: { channels: Channel[]; reload: () =
   );
 }
 
+/** Date du jour au Maroc (AAAA-MM-JJ), décalée de `days` jours. */
+function dayStr(days = 0) {
+  const d = new Date(Date.now() + 3600_000 - days * 86400_000); // UTC+1
+  return d.toISOString().slice(0, 10);
+}
+const PERIODS: [string, string][] = [
+  ["", "Toutes les dates"],
+  ["today", "Aujourd’hui"],
+  ["yesterday", "Hier"],
+  ["7", "7 derniers jours"],
+  ["30", "30 derniers jours"],
+  ["90", "3 derniers mois"],
+  ["custom", "Choisir les dates…"],
+];
+function periodRange(period: string, from: string, to: string): [string, string] {
+  if (period === "today") return [dayStr(0), dayStr(0)];
+  if (period === "yesterday") return [dayStr(1), dayStr(1)];
+  if (/^\d+$/.test(period)) return [dayStr(Number(period) - 1), ""];
+  if (period === "custom") return [from, to];
+  return ["", ""];
+}
+/** « Aujourd’hui », « Hier », « lundi 19 octobre » : en-têtes de jour dans la grille. */
+function dayLabel(iso: string | null) {
+  if (!iso) return "Date inconnue";
+  const d = new Date(new Date(iso).getTime() + 3600_000).toISOString().slice(0, 10);
+  if (d === dayStr(0)) return "Aujourd’hui";
+  if (d === dayStr(1)) return "Hier";
+  return new Date(d + "T12:00:00Z").toLocaleDateString("fr-MA", {
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+    timeZone: "UTC",
+  });
+}
+const fmtDay = (d: string) =>
+  new Date(d.slice(0, 10) + "T12:00:00Z").toLocaleDateString("fr-MA", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+    timeZone: "UTC",
+  });
+
 export default function SourcingPage() {
   const [d, setD] = useState<any>(null);
   const [items, setItems] = useState<Item[]>([]);
@@ -365,6 +407,11 @@ export default function SourcingPage() {
   const [channel, setChannel] = useState("");
   const [maxPrice, setMaxPrice] = useState("");
   const [sort, setSort] = useState("recent");
+  const [period, setPeriod] = useState("");
+  const [fromDay, setFromDay] = useState("");
+  const [toDay, setToDay] = useState("");
+  const [range0, range1] = periodRange(period, fromDay, toDay);
+  const [importing, setImporting] = useState("");
   const [open, setOpen] = useState<Item | null>(null);
   // photos dont le lien Telegram a expiré : réparées à la volée par le serveur, sinon « Photo indisponible »
   const [dead, setDead] = useState<Set<string>>(new Set());
@@ -419,6 +466,8 @@ export default function SourcingPage() {
       if (category) p.set("category", category);
       if (channel) p.set("channel", channel);
       if (maxPrice) p.set("max_price", maxPrice);
+      if (range0) p.set("from", range0);
+      if (range1) p.set("to", range1);
       if (cursor) p.set("cursor", cursor);
       setLoading(true);
       try {
@@ -435,7 +484,7 @@ export default function SourcingPage() {
         setLoading(false);
       }
     },
-    [query, category, channel, maxPrice, sort],
+    [query, category, channel, maxPrice, sort, range0, range1],
   );
   useEffect(() => {
     load();
@@ -443,7 +492,34 @@ export default function SourcingPage() {
 
   const channels: Channel[] = d?.channels || [];
   const chanById = new Map(channels.map((c) => [c.id, c]));
-  const filtered = !!(query || category || channel || maxPrice);
+  const filtered = !!(query || category || channel || maxPrice || range0 || range1);
+  // période plus ancienne que les produits importés : import possible (administrateur)
+  const notImported = !!(range0 && d?.oldest && range0 < String(d.oldest).slice(0, 10));
+
+  async function importPeriod() {
+    if (!range0) return;
+    let total = 0;
+    setImporting("Lecture des canaux Telegram…");
+    try {
+      for (let round = 0; round < 30; round++) {
+        const r = await fetch("/api/sourcing/channels", {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({ backfill: true, since: range0, id: channel || undefined }),
+        });
+        const x = await r.json();
+        if (!r.ok) throw new Error(x.error || "Import impossible");
+        total += x.added || 0;
+        setImporting(`${total} produit${total > 1 ? "s" : ""} importé${total > 1 ? "s" : ""}…`);
+        if (x.done) break;
+      }
+      setImporting(`Import terminé : ${total} produit${total > 1 ? "s" : ""} ajouté${total > 1 ? "s" : ""}.`);
+      load();
+    } catch (e: any) {
+      setImporting("");
+      setError(e.message);
+    }
+  }
 
   return (
     <main className="dash-shell has-shared-topbar">
@@ -499,11 +575,58 @@ export default function SourcingPage() {
                   </option>
                 ))}
               </select>
+              <select value={period} onChange={(e) => setPeriod(e.target.value)} aria-label="Date de publication">
+                {PERIODS.map(([k, l]) => (
+                  <option key={k} value={k}>
+                    {l}
+                  </option>
+                ))}
+              </select>
               <select value={sort} onChange={(e) => setSort(e.target.value)} aria-label="Trier">
                 <option value="recent">Plus récents</option>
                 <option value="price">Prix croissant</option>
               </select>
             </div>
+            {period === "custom" ? (
+              <div className="src-dates">
+                <label>
+                  Du
+                  <input
+                    type="date"
+                    value={fromDay}
+                    max={toDay || dayStr(0)}
+                    onChange={(e) => setFromDay(e.target.value)}
+                  />
+                </label>
+                <label>
+                  au
+                  <input
+                    type="date"
+                    value={toDay}
+                    min={fromDay || undefined}
+                    max={dayStr(0)}
+                    onChange={(e) => setToDay(e.target.value)}
+                  />
+                </label>
+              </div>
+            ) : null}
+            {notImported || importing ? (
+              <div className="src-import">
+                {importing ? (
+                  <span>{importing}</span>
+                ) : (
+                  <span>
+                    Les produits importés commencent le {fmtDay(String(d.oldest))}. Ceux d’avant ne sont pas encore dans
+                    le catalogue.
+                  </span>
+                )}
+                {d.isPlatformAdmin && notImported && !/…$/.test(importing) ? (
+                  <button type="button" onClick={importPeriod}>
+                    Importer depuis le {fmtDay(range0)}
+                  </button>
+                ) : null}
+              </div>
+            ) : null}
             <div className="src-cats" role="tablist" aria-label="Catégories">
               {["", ...SOURCING_CATEGORIES].map((c) => (
                 <button
@@ -540,53 +663,58 @@ export default function SourcingPage() {
               </section>
             ) : (
               <div className={"src-grid" + (loading && !next ? " is-loading" : "")}>
-                {items.map((it) => (
-                  <article key={it.id} className="src-item">
-                    <button
-                      type="button"
-                      className="src-thumb"
-                      onClick={() => setOpen(it)}
-                      aria-label={it.name || "Voir le produit"}
-                    >
-                      {it.photos[0] && !dead.has(it.id) ? (
-                        <img src={it.photos[0]} alt="" loading="lazy" onError={() => onBroken(it.id)} />
-                      ) : (
-                        <span>{it.photos[0] ? "Photo indisponible" : "Pas de photo"}</span>
-                      )}
-                      {it.photos.length > 1 ? <em>+{it.photos.length - 1}</em> : null}
-                      {it.has_video ? <em className="src-vid">▶ vidéo</em> : null}
-                    </button>
-                    <div className="src-body">
-                      <div className="src-price">
-                        <b className={it.price == null ? "is-empty" : ""}>{dh(it.price) || "Prix sur demande"}</b>
-                        {it.min_qty ? <span>min. {it.min_qty}</span> : null}
+                {items.map((it, k) => (
+                  <React.Fragment key={it.id}>
+                    {sort === "recent" && (k === 0 || dayLabel(items[k - 1].posted_at) !== dayLabel(it.posted_at)) ? (
+                      <h2 className="src-day">{dayLabel(it.posted_at)}</h2>
+                    ) : null}
+                    <article className="src-item">
+                      <button
+                        type="button"
+                        className="src-thumb"
+                        onClick={() => setOpen(it)}
+                        aria-label={it.name || "Voir le produit"}
+                      >
+                        {it.photos[0] && !dead.has(it.id) ? (
+                          <img src={it.photos[0]} alt="" loading="lazy" onError={() => onBroken(it.id)} />
+                        ) : (
+                          <span>{it.photos[0] ? "Photo indisponible" : "Pas de photo"}</span>
+                        )}
+                        {it.photos.length > 1 ? <em>+{it.photos.length - 1}</em> : null}
+                        {it.has_video ? <em className="src-vid">▶ vidéo</em> : null}
+                      </button>
+                      <div className="src-body">
+                        <div className="src-price">
+                          <b className={it.price == null ? "is-empty" : ""}>{dh(it.price) || "Prix sur demande"}</b>
+                          {it.min_qty ? <span>min. {it.min_qty}</span> : null}
+                        </div>
+                        <h3 dir="auto" title={it.name || ""} className={it.name ? "" : "is-empty"}>
+                          {it.name || "Voir la photo"}
+                        </h3>
+                        <div className="src-meta">
+                          <ChannelBadge c={chanById.get(it.channel_id)} />
+                          <time>{ago(it.posted_at)}</time>
+                        </div>
+                        <div className="src-actions">
+                          <button type="button" className="src-primary" onClick={() => setOpen(it)}>
+                            Voir
+                          </button>
+                          {it.phones?.length ? (
+                            <a
+                              className="src-wa src-wa-icon"
+                              href={waLink(it.phones[0], it)}
+                              target="_blank"
+                              rel="noreferrer"
+                              title={"WhatsApp " + formatPhone(it.phones[0])}
+                              aria-label={"Contacter le fournisseur sur WhatsApp " + formatPhone(it.phones[0])}
+                            >
+                              <WaIcon />
+                            </a>
+                          ) : null}
+                        </div>
                       </div>
-                      <h3 dir="auto" title={it.name || ""} className={it.name ? "" : "is-empty"}>
-                        {it.name || "Voir la photo"}
-                      </h3>
-                      <div className="src-meta">
-                        <ChannelBadge c={chanById.get(it.channel_id)} />
-                        <time>{ago(it.posted_at)}</time>
-                      </div>
-                      <div className="src-actions">
-                        <button type="button" className="src-primary" onClick={() => setOpen(it)}>
-                          Voir
-                        </button>
-                        {it.phones?.length ? (
-                          <a
-                            className="src-wa src-wa-icon"
-                            href={waLink(it.phones[0], it)}
-                            target="_blank"
-                            rel="noreferrer"
-                            title={"WhatsApp " + formatPhone(it.phones[0])}
-                            aria-label={"Contacter le fournisseur sur WhatsApp " + formatPhone(it.phones[0])}
-                          >
-                            <WaIcon />
-                          </a>
-                        ) : null}
-                      </div>
-                    </div>
-                  </article>
+                    </article>
+                  </React.Fragment>
                 ))}
               </div>
             )}
