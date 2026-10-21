@@ -97,11 +97,14 @@ jobs:
           fi
           echo "TTS_URL=$url" >> "$GITHUB_ENV"
           # conteneurs de l'ancienne version encore allumés : arrêtés, la prochaine demande démarre la nouvelle
+          modal container list --json > containers.json 2> containers.err || modal container list > containers.json 2>> containers.err
+          ids=$(grep -oE '"?(ta|co)-[A-Za-z0-9]+"?' containers.json | tr -d '"' | sort -u)
           stopped=""
-          for id in $(modal container list 2>/dev/null | grep -oE 'ta-[A-Za-z0-9]+' | sort -u); do
-            modal container stop "$id" > /dev/null 2>&1 && stopped="$stopped $id"
+          for id in $ids; do
+            if modal container stop "$id" >> stop.log 2>&1; then stopped="$stopped $id"; fi
           done
-          echo "::notice title=Anciens conteneurs arrêtés::${stopped:- aucun}"
+          note=$( { echo "conteneurs : ${ids:-aucun}"; echo "arrêtés : ${stopped:-aucun}"; head -c 1500 containers.json; head -c 300 containers.err; tail -c 400 stop.log 2>/dev/null; } | sed 's/%/%25/g' | awk '{printf "%s%%0A", $0}')
+          echo "::notice title=Conteneurs Modal::${note}"
           # fin du journal en note (diagnostic sans télécharger les logs)
           tail_lines=$(grep -v '^\s*$' deploy.log | tail -25 | sed 's/%/%25/g' | awk '{printf "%s%%0A", $0}')
           echo "::notice title=Déploiement Modal (fin du journal)::${tail_lines}"
