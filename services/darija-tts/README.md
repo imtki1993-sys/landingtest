@@ -4,9 +4,11 @@ Synthèse vocale en darija marocaine pour la page **Voix off** de LandPro.
 
 - **Modèle** : [Habibi-TTS](https://github.com/SWivid/Habibi-TTS), version spécialisée marocaine
   (`Specialized/MAR/model_100000.safetensors`, licence Apache 2.0, usage commercial autorisé).
-- **Voix** : 7 comédiens marocains du corpus [DODa](https://huggingface.co/datasets/atlasia/DODa-audio-dataset)
-  (4 femmes, 3 hommes, enregistrements studio). `prepare_voices.py` choisit pour chacun un extrait
-  de 5 à 9 secondes qui sert de voix de référence.
+- **Voix** : 7 comédiens marocains du corpus DODa (4 femmes, 3 hommes, enregistrements studio), téléchargés
+  depuis la copie libre d'accès [Jip7e/doda-darija-cosyvoice2](https://huggingface.co/datasets/Jip7e/doda-darija-cosyvoice2)
+  (CC-BY-4.0 ; l'original `atlasia/DODa-audio-dataset` demande un compte Hugging Face).
+  `prepare_voices.py` choisit pour chacun un extrait de 5 à 9 secondes qui sert de voix de référence.
+  Un comédien sans extrait valable est remplacé par une autre voix du même genre (en-tête `X-Voice-Used`).
 - **Montage** : chaque phrase est générée séparément (moins de répétitions), puis assemblée avec des pauses,
   des fondus, un volume homogène (≈ -18 dBFS) et exportée en MP3 128 kb/s.
 
@@ -80,5 +82,5 @@ curl -X POST "$TTS_SERVICE_URL/synthesize" \
 ## Licences et mentions
 
 - Habibi-TTS : code MIT ; modèle MAR Apache 2.0.
-- DODa audio : Darija Open Dataset (AtlasIA). Citer la source si les voix sont présentées publiquement.
+- DODa audio : Darija Open Dataset (AtlasIA), CC-BY-4.0. Citer la source si les voix sont présentées publiquement.
 - Ne pas utiliser `assets/MAR.mp3` fourni par Habibi : cette voix vient de la bibliothèque ElevenLabs.

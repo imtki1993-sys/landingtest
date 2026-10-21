@@ -1,6 +1,10 @@
-"""Prépare les 7 voix de référence à partir du corpus DODa (atlasia/DODa-audio-dataset).
+"""Prépare les 7 voix de référence à partir du corpus DODa (Darija Open Dataset, AtlasIA).
 
 DODa : 12 743 phrases en darija enregistrées en studio par 7 comédiens marocains (4 femmes, 3 hommes).
+Source utilisée : la copie libre d'accès « Jip7e/doda-darija-cosyvoice2 » (mêmes enregistrements, 24 kHz,
+licence CC-BY-4.0, transcriptions en alphabet arabe, comédien de chaque phrase dans utt2spk).
+L'original « atlasia/DODa-audio-dataset » est protégé (compte Hugging Face requis).
+
 Pour chaque comédien, on garde l'extrait le plus adapté au clonage de voix : 5 à 9 secondes, phrase complète
 en alphabet arabe, volume régulier. Sortie : voices/<id>.wav (24 kHz mono) + voices/voices.json.
 
@@ -10,7 +14,6 @@ Usage : python prepare_voices.py --out voices
 from __future__ import annotations
 
 import argparse
-import io
 import json
 import re
 from pathlib import Path
@@ -18,24 +21,11 @@ from pathlib import Path
 import numpy as np
 import soundfile as sf
 
-DATASET = "atlasia/DODa-audio-dataset"
-# Répartition des enregistrements par comédien (fiche du dataset)
-RANGES = [
-    (0, 999, "F1"), (1000, 1999, "M3"), (2000, 2730, "F2"), (2731, 2800, "M1"), (2801, 2999, "M2"),
-    (3000, 3999, "M2"), (4000, 4999, "M1"), (5000, 5999, "F3"), (6000, 6999, "M1"), (7000, 7999, "F4"),
-    (8000, 8999, "F1"), (9000, 9999, "M2"), (10000, 10999, "M1"), (11000, 11999, "M1"), (12000, 12350, "M2"),
-    (12351, 12742, "M1"),
-]
+REPO = "Jip7e/doda-darija-cosyvoice2"
+SOURCE = "DODa (Darija Open Dataset, AtlasIA) via " + REPO
 LABELS = {"F1": "Salma", "F2": "Nadia", "F3": "Imane", "F4": "Kenza", "M1": "Youssef", "M2": "Hamza", "M3": "Karim"}
 TARGET_SR = 24_000
-CANDIDATES = 60  # extraits examinés par comédien
-
-
-def speaker_of(i: int) -> str | None:
-    for a, b, spk in RANGES:
-        if a <= i <= b:
-            return spk
-    return None
+CANDIDATES = 40  # extraits téléchargés et évalués par comédien
 
 
 def resample(wave: np.ndarray, sr: int, target: int = TARGET_SR) -> np.ndarray:
@@ -63,8 +53,23 @@ def score(wave: np.ndarray, sr: int, text: str) -> float | None:
     return float(np.std(20 * np.log10(voiced))) + abs(seconds - 7.0)
 
 
+def read_kaldi(path: str) -> dict[str, str]:
+    """Fichier « <id> <valeur> » par ligne → dictionnaire."""
+    out = {}
+    for line in Path(path).read_text(encoding="utf-8").splitlines():
+        parts = line.strip().split(maxsplit=1)
+        if len(parts) == 2:
+            out[parts[0]] = parts[1].strip()
+    return out
+
+
+def text_ok(text: str) -> bool:
+    words = len(text.split())
+    return 8 <= words <= 24 and not re.search(r"[A-Za-z0-9]", text) and bool(re.search(r"[\u0600-\u06FF]", text))
+
+
 def main() -> None:
-    from datasets import Audio, load_dataset
+    from huggingface_hub import hf_hub_download
 
     ap = argparse.ArgumentParser()
     ap.add_argument("--out", default="voices")
@@ -72,37 +77,52 @@ def main() -> None:
     out = Path(args.out)
     out.mkdir(parents=True, exist_ok=True)
 
-    ds = load_dataset(DATASET, split="train", streaming=True).cast_column("audio", Audio(decode=False))
-    seen: dict[str, int] = {}
-    best: dict[str, tuple[float, np.ndarray, int, str]] = {}
-    for i, row in enumerate(ds):
-        spk = speaker_of(i)
-        if not spk or seen.get(spk, 0) >= CANDIDATES:
-            if all(seen.get(s, 0) >= CANDIDATES for s in LABELS):
-                break
-            continue
-        text = (row.get("darija_Arab_new") or row.get("darija_Arab_old") or "").strip()
-        audio = row["audio"]
-        try:
-            wave, sr = sf.read(io.BytesIO(audio["bytes"]) if audio.get("bytes") else audio["path"], dtype="float32")
-        except Exception:
-            continue
-        if wave.ndim > 1:
-            wave = wave.mean(axis=1)
-        seen[spk] = seen.get(spk, 0) + 1
-        sc = score(wave, sr, text)
-        if sc is not None and (spk not in best or sc < best[spk][0]):
-            best[spk] = (sc, wave, sr, text)
+    def get(name: str) -> str:
+        return hf_hub_download(REPO, name, repo_type="dataset")
+
+    texts: dict[str, str] = {}
+    speakers: dict[str, str] = {}
+    for split in ("train", "dev"):
+        texts.update(read_kaldi(get(f"{split}/text")))
+        speakers.update(read_kaldi(get(f"{split}/utt2spk")))
+
+    by_spk: dict[str, list[str]] = {}
+    for utt, spk in speakers.items():
+        if spk in LABELS and text_ok(texts.get(utt, "")):
+            by_spk.setdefault(spk, []).append(utt)
 
     meta = {}
-    for spk, (sc, wave, sr, text) in sorted(best.items()):
+    for spk in sorted(LABELS):
+        utts = by_spk.get(spk, [])
+        # phrases moyennes (≈ 6-8 s) en premier, réparties dans tout l'enregistrement
+        utts.sort(key=lambda u: abs(len(texts[u].split()) - 15))
+        best = None
+        for utt in utts[:CANDIDATES]:
+            num = utt.split("_")[-1]
+            try:
+                wave, sr = sf.read(get(f"wavs/{num}.wav"), dtype="float32")
+            except Exception as e:  # fichier absent : on passe au suivant
+                print(f"{utt}: ignoré ({e.__class__.__name__})")
+                continue
+            if wave.ndim > 1:
+                wave = wave.mean(axis=1)
+            sc = score(wave, sr, texts[utt])
+            if sc is not None and (best is None or sc < best[0]):
+                best = (sc, wave, sr, texts[utt])
+        if best is None:
+            print(f"{spk}: aucun extrait valable")
+            continue
+        _, wave, sr, text = best
         vid = "doda-" + spk.lower()
         sf.write(out / f"{vid}.wav", resample(wave, sr), TARGET_SR)
-        meta[vid] = {"file": f"{vid}.wav", "ref_text": text, "label": LABELS[spk], "speaker": spk, "source": DATASET}
+        meta[vid] = {"file": f"{vid}.wav", "ref_text": text, "label": LABELS[spk], "speaker": spk, "source": SOURCE}
         print(f"{vid}: {LABELS[spk]} · {len(wave) / sr:.1f}s · {text}")
-    missing = sorted(set(LABELS) - set(best))
+
+    if len(meta) < 2:
+        raise SystemExit(f"Trop peu de voix préparées ({len(meta)}) : vérifier l'accès à {REPO}")
+    missing = sorted(set(LABELS) - {m["speaker"] for m in meta.values()})
     if missing:
-        raise SystemExit(f"Aucun extrait valable pour : {missing}")
+        print("Comédiens sans extrait (voix non proposées) :", ", ".join(missing))
     (out / "voices.json").write_text(json.dumps(meta, ensure_ascii=False, indent=2), encoding="utf-8")
 
 
