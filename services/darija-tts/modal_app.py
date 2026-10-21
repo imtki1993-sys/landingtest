@@ -26,7 +26,20 @@ image = (
         "cd /app && python -c 'import server; server.download_models()'",
     )
     .env({"VOICES_DIR": "/app/voices", "PYTHONPATH": "/app"})
+    # code du service monté à chaque déploiement (jamais figé dans le cache de l'image)
+    .add_local_file("audio_utils.py", "/srv/audio_utils.py")
+    .add_local_file("server.py", "/srv/server.py")
 )
+
+
+def _server():
+    import sys
+
+    if sys.path[0] != "/srv":
+        sys.path.insert(0, "/srv")
+    import server
+
+    return server
 
 app = modal.App("landpro-darija-tts", image=image)
 
@@ -51,12 +64,8 @@ SECRETS = (
 class DarijaTTS:
     @modal.enter()
     def start(self):
-        import server
-
-        server.load()
+        _server().load()
 
     @modal.asgi_app()
     def web(self):
-        import server
-
-        return server.app
+        return _server().app

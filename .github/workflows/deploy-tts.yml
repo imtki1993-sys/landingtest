@@ -82,6 +82,9 @@ jobs:
           export BUILD_ID="${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
           echo "Clé du service : ${#TTS_SERVICE_TOKEN} caractères, empreinte $(printf %s "$TTS_SERVICE_TOKEN" | sha256sum | cut -c1-8)"
           set +e
+          # arrête l'ancienne version (et ses conteneurs) pour que la nouvelle soit la seule servie
+          modal app stop landpro-darija-tts --yes > stop-app.log 2>&1 || modal app stop landpro-darija-tts > stop-app.log 2>&1 < /dev/null
+          echo "::notice title=Ancienne version arrêtée::$(tail -c 300 stop-app.log | tr '\n' ' ')"
           modal deploy modal_app.py 2>&1 | tee deploy.log
           status=${PIPESTATUS[0]}
           set -e
@@ -101,7 +104,7 @@ jobs:
           ids=$(grep -oE '"?(ta|co)-[A-Za-z0-9]+"?' containers.json | tr -d '"' | sort -u)
           stopped=""
           for id in $ids; do
-            if modal container stop "$id" >> stop.log 2>&1; then stopped="$stopped $id"; fi
+            if modal container stop --yes "$id" >> stop.log 2>&1; then stopped="$stopped $id"; fi
           done
           note=$( { echo "conteneurs : ${ids:-aucun}"; echo "arrêtés : ${stopped:-aucun}"; head -c 1500 containers.json; head -c 300 containers.err; tail -c 400 stop.log 2>/dev/null; } | sed 's/%/%25/g' | awk '{printf "%s%%0A", $0}')
           echo "::notice title=Conteneurs Modal::${note}"
