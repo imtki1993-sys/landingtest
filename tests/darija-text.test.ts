@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { numberToDarija, normalizeDarija, cleanLexicon, estimateSeconds } from "../lib/darija-text";
+import { numberToDarija, normalizeDarija, cleanLexicon, estimateSeconds, GAP } from "../lib/darija-text";
 
 describe("nombres en darija", () => {
   it.each([
@@ -80,5 +80,30 @@ describe("darija parlée et dictionnaire", () => {
   });
   it("le dictionnaire a priorité sur les remplacements automatiques", () => {
     expect(normalizeDarija("هذا", { هذا: "هادا" }).text).toBe("هادا.");
+  });
+});
+
+describe("ponctuation expressive", () => {
+  it("pauses selon la ponctuation et les retours à la ligne", () => {
+    const r = normalizeDarija("واش عييتي؟ هاد الحامل واعر!\nالثمن غير 199 درهم. طلب دابا");
+    expect(r.sentences).toEqual(["واش عييتي؟", "هاد الحامل واعر!", "الثمن غير مية و تسعة و تسعين درهم.", "طلب دابا."]);
+    expect(r.gaps).toEqual([GAP.question, GAP.exclaim + GAP.newline, GAP.stop, 0]);
+  });
+  it("hésitation « ... » : la voix reste en suspens, silence plus long", () => {
+    const r = normalizeDarija("وكاين واحد الحاجة... الثمن!");
+    expect(r.sentences).toEqual(["وكاين واحد الحاجة،", "الثمن!"]);
+    expect(r.gaps[0]).toBe(GAP.hesitation);
+  });
+  it("?! et !!! simplifiés", () => {
+    expect(normalizeDarija("بصح؟! واو!!!").sentences).toEqual(["بصح؟", "واو!"]);
+  });
+  it("phrase longue coupée aux virgules, intonation qui continue", () => {
+    const long = Array.from({ length: 6 }, (_, i) => `هادي جملة طويلة شوية رقم ${i + 1} ديال الوصف`).join("، ") + ".";
+    const r = normalizeDarija(long);
+    expect(r.sentences.length).toBeGreaterThan(1);
+    expect(r.sentences[0].endsWith("،")).toBe(true);
+    expect(r.gaps[0]).toBe(GAP.comma);
+    expect(r.sentences.at(-1)!.endsWith(".")).toBe(true);
+    expect(r.gaps.length).toBe(r.sentences.length);
   });
 });

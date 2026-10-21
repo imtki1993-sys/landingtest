@@ -80,3 +80,5 @@ div.vo-warn { display: block; }
 @media (max-width: 560px) { .vo-lex-row { grid-template-columns: 1fr 34px; } .vo-lex-row input:nth-child(2) { grid-column: 1; } .vo-lex-row button { grid-row: 1 / span 2; grid-column: 2; } }
 html[data-theme="dark"] .vo-info { background: #0f1b33; color: #bfdbfe; }
 html[data-theme="dark"] .vo-chips button { background: #111827; border-color: #4a3f12; color: #fcd34d; }
+.vo-hint { margin: -4px 0 0; font-size: 12px; color: var(--vo-muted); line-height: 1.6; }
+.vo-hint b { color: var(--vo-ink); font-size: 14px; padding: 0 2px; }

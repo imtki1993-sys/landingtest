@@ -275,6 +275,8 @@ export interface NormalizeResult {
   text: string;
   /** phrases, lues une par une (moins de répétitions, pauses naturelles) */
   sentences: string[];
+  /** silence après chaque phrase (s), selon la ponctuation : « ؟ » > « ! » > « . » > « ، », + retour à la ligne */
+  gaps: number[];
   /** mots latins inconnus transcrits approximativement : à relire */
   guessed: string[];
   /** mots d'arabe classique remplacés par la darija */
@@ -361,33 +363,59 @@ export function normalizeDarija(input: string, lexicon: Lexicon = {}): Normalize
     .replace(/[:;]/g, "،")
     .replace(/,/g, "،")
     .replace(/\?/g, "؟")
-    .replace(/\.{2,}|…/g, "، ")
+    // ponctuation expressive : « ?! » → « ؟ », « !!! » → « ! », « ... » → hésitation (pause marquée)
+    .replace(/[?؟]+\s*!+|!+\s*[?؟]+/g, "؟")
+    .replace(/!{2,}/g, "!")
+    .replace(/\.{2,}|…/g, "…")
     .replace(/[-–—/\\+=]/g, " ")
     .replace(/[ \t]+/g, " ")
-    .replace(/ ?([،.!؟])/g, "$1")
-    .replace(/([،.!؟])(?=\S)/g, "$1 ");
+    .replace(/ ?([،.!؟…])/g, "$1")
+    .replace(/([،.!؟…])(?=[^\s،.!؟…])/g, "$1 ");
 
   const sentences: string[] = [];
+  const gaps: number[] = [];
+  const push = (s: string, gap: number) => {
+    sentences.push(s);
+    gaps.push(gap);
+  };
   for (const line of t.split(/\n+/)) {
-    for (const raw of line.split(/(?<=[.!؟])\s+/)) {
-      const s = raw.trim().replace(/^[،.\s]+/, "");
+    const before = sentences.length;
+    for (const raw of line.split(/(?<=[.!؟…])\s+/)) {
+      let s = raw.trim().replace(/^[،.…\s]+/, "");
       if (!s || !/\p{L}/u.test(s)) continue;
-      // phrase trop longue : coupée aux virgules (≈ 120 caractères)
-      if (s.length <= 140) sentences.push(endWithStop(s));
+      // hésitation / suspense « … » : la voix reste en suspens (virgule), puis un silence plus long
+      const hesitation = /…$/.test(s);
+      if (hesitation) s = s.replace(/[…،.\s]+$/, "") + "،";
+      // phrase trop longue : coupée aux virgules (≈ 120 caractères) ; les morceaux finissent sur « ، » (intonation qui continue)
+      const chunks: string[] = [];
+      if (s.length <= 140) chunks.push(s);
       else {
         let cur = "";
         for (const part of s.split(/(?<=،)\s*/)) {
           if ((cur + " " + part).trim().length > 120 && cur) {
-            sentences.push(endWithStop(cur.trim().replace(/،$/, "")));
+            chunks.push(cur.trim());
             cur = part;
           } else cur = (cur + " " + part).trim();
         }
-        if (cur) sentences.push(endWithStop(cur.trim()));
+        if (cur) chunks.push(cur.trim());
       }
+      chunks.forEach((c, i) => {
+        const last = i === chunks.length - 1;
+        if (!last) return push(/،$/.test(c) ? c : c + "،", GAP.comma);
+        if (hesitation) return push(c, GAP.hesitation);
+        const end = endWithStop(c);
+        push(end, end.endsWith("؟") ? GAP.question : end.endsWith("!") ? GAP.exclaim : GAP.stop);
+      });
     }
+    // retour à la ligne : une respiration de plus
+    if (sentences.length > before) gaps[gaps.length - 1] += GAP.newline;
   }
+  if (gaps.length) gaps[gaps.length - 1] = 0;
   const text = sentences.join(" ");
-  return { text, sentences, guessed: [...guessed], adapted: [...adapted], seconds: estimateSeconds(text) };
+  return { text, sentences, gaps, guessed: [...guessed], adapted: [...adapted], seconds: estimateSeconds(text) };
 }
+
+/** Silences (s) après une phrase selon sa ponctuation. */
+export const GAP = { comma: 0.18, stop: 0.32, exclaim: 0.38, question: 0.5, hesitation: 0.6, newline: 0.15 };
 
 const endWithStop = (s: string) => (/[.!؟]$/.test(s) ? s : s.replace(/،$/, "") + ".");

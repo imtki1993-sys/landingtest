@@ -41,6 +41,8 @@ describe("voix off : fournisseurs", () => {
       speed: 1.3,
       pause: 1.5,
       target_seconds: 30,
+      gaps: null,
+      expressive: true,
     });
     expect(out).toMatchObject({ mime: "audio/mpeg", seconds: 12.5 });
     expect(out.audio.length).toBe(3);
@@ -78,5 +80,17 @@ describe("prompt du script", () => {
     expect(p).toContain("Support magnétique");
     expect(p).toContain("199 درهم");
     expect(p).toContain("PAS de mots en lettres latines");
+  });
+});
+
+describe("pauses selon la ponctuation", () => {
+  it("Azure : un silence par phrase d'après les gaps", async () => {
+    process.env.AZURE_SPEECH_KEY = "k";
+    process.env.AZURE_SPEECH_REGION = "westeurope";
+    const f = vi.fn(async () => new Response(new Uint8Array([9])));
+    vi.stubGlobal("fetch", f);
+    await synthesize(["واش؟", "واو!", "طلب."], "azure-jamal", { gaps: [0.5, 0.38, 0], pause: "longues" });
+    const body = (f.mock.calls[0] as any)[1].body as string;
+    expect(body).toContain('واش؟<break time="750ms"/>واو!<break time="570ms"/>طلب.');
   });
 });

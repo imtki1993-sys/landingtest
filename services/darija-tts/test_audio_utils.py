@@ -8,11 +8,15 @@ from audio_utils import (
     SAMPLE_RATE,
     assemble,
     audio_filters,
+    expressiveness,
     expected_seconds,
     fade,
     fit_tempo,
     normalize,
     pause_after,
+    pitch_track,
+    sentence_speed,
+    style_of,
     to_mp3,
     trim_silence,
 )
@@ -73,6 +77,31 @@ class AudioUtilsTest(unittest.TestCase):
         t = np.linspace(0, 2, 2 * SAMPLE_RATE, dtype=np.float32)
         wave = 0.3 * np.sin(2 * np.pi * 220 * t).astype(np.float32)
         self.assertGreater(len(to_mp3(wave, tempo=1.2)), 1000)
+
+    def test_style_of(self):
+        self.assertEqual(style_of("واش عييتي؟"), "question")
+        self.assertEqual(style_of("واو!"), "exclaim")
+        self.assertEqual(style_of("وكاين واحد الحاجة،"), "continue")
+        self.assertEqual(style_of("طلب دابا."), "neutral")
+        self.assertEqual(sentence_speed("واو!", 1.0), 1.04)
+        self.assertEqual(sentence_speed("واش؟", 1.0), 0.97)
+
+    def test_assemble_with_gaps(self):
+        segs = [("واش؟", self.tone(1.0)), ("واو!", self.tone(1.0))]
+        short = assemble(segs, gaps=[0.1, 0])
+        long_ = assemble(segs, gaps=[0.6, 0])
+        self.assertAlmostEqual((len(long_) - len(short)) / SAMPLE_RATE, 0.5, places=2)
+
+    def test_pitch_and_rise(self):
+        t = np.arange(int(1.5 * SAMPLE_RATE)) / SAMPLE_RATE
+        flat = 0.3 * np.sin(2 * np.pi * 200 * t)
+        f0 = pitch_track(flat)
+        self.assertAlmostEqual(float(np.median(f0[f0 > 0])), 200, delta=6)
+        # mélodie qui monte à la fin (question)
+        freq = np.where(t < 1.1, 180.0, 180.0 + (t - 1.1) * 300)
+        rising = 0.3 * np.sin(2 * np.pi * np.cumsum(freq) / SAMPLE_RATE)
+        self.assertGreater(expressiveness(rising)["rise"], 2)
+        self.assertLess(abs(expressiveness(flat)["rise"]), 0.5)
 
 
 if __name__ == "__main__":

@@ -62,13 +62,43 @@ def normalize(wave: np.ndarray, target_rms_db: float = -18.0, peak_db: float = -
     return out.astype(np.float32)
 
 
-def assemble(segments: list[tuple[str, np.ndarray]], sr: int = SAMPLE_RATE, pause: float = 1.0) -> np.ndarray:
+def style_of(sentence: str) -> str:
+    """Intonation voulue d'après la ponctuation finale : question, exclamation, suspens (virgule) ou neutre."""
+    s = sentence.strip()
+    if s.endswith(("؟", "?")):
+        return "question"
+    if s.endswith("!"):
+        return "exclaim"
+    if s.endswith(("،", ",")):
+        return "continue"
+    return "neutral"
+
+
+# légère variation de débit : l'enthousiasme va un peu plus vite, la question se pose
+STYLE_SPEED = {"exclaim": 1.04, "question": 0.97, "continue": 1.0, "neutral": 1.0}
+
+
+def sentence_speed(sentence: str, speed: float) -> float:
+    return round(min(1.35, max(0.65, speed * STYLE_SPEED[style_of(sentence)])), 3)
+
+
+def assemble(
+    segments: list[tuple[str, np.ndarray]],
+    sr: int = SAMPLE_RATE,
+    pause: float = 1.0,
+    gaps: list[float] | None = None,
+) -> np.ndarray:
     """Phrases générées → une seule piste : silence retiré, fondus, pauses, volume final."""
     parts: list[np.ndarray] = [np.zeros(int(0.15 * sr), dtype=np.float32)]
     for i, (sentence, wave) in enumerate(segments):
         parts.append(fade(trim_silence(np.asarray(wave, dtype=np.float32), sr), sr))
         if i < len(segments) - 1:
-            parts.append(pause_after(sentence, sr, pause))
+            if gaps is not None and len(gaps) == len(segments):
+                # silence calculé par LandPro d'après la ponctuation (؟ ! . ، … et retours à la ligne)
+                seconds = max(0.0, min(1.5, float(gaps[i]))) * min(2.0, max(0.3, pause))
+                parts.append(np.zeros(int(seconds * sr), dtype=np.float32))
+            else:
+                parts.append(pause_after(sentence, sr, pause))
     parts.append(np.zeros(int(0.25 * sr), dtype=np.float32))
     return normalize(np.concatenate(parts))
 
@@ -77,6 +107,38 @@ def expected_seconds(sentence: str, speed: float = 1.0) -> float:
     """Durée attendue d'une phrase darija (~2,4 mots/s) : sert à repérer une génération qui boucle."""
     words = max(1, len(sentence.split()))
     return words / 2.4 / max(0.5, speed)
+
+
+def pitch_track(wave: np.ndarray, sr: int = SAMPLE_RATE, fmin: float = 70.0, fmax: float = 400.0) -> np.ndarray:
+    """Hauteur de la voix (Hz) toutes les 20 ms, 0 quand la trame n'est pas voisée (autocorrélation)."""
+    wave = np.asarray(wave, dtype=np.float32)
+    n, hop = int(sr * 0.04), int(sr * 0.02)
+    if len(wave) < n:
+        return np.zeros(0, dtype=np.float32)
+    frames = np.lib.stride_tricks.sliding_window_view(wave, n)[::hop]
+    rms = np.sqrt(np.mean(frames**2, axis=1) + 1e-12)
+    lo, hi = int(sr / fmax), min(n - 1, int(sr / fmin))
+    out = np.zeros(len(frames), dtype=np.float32)
+    loud = rms > rms.max() * 0.1
+    spec = np.fft.rfft(frames[loud] - frames[loud].mean(axis=1, keepdims=True), 2 * n)
+    ac = np.fft.irfft(np.abs(spec) ** 2)[:, :n]
+    ac /= ac[:, :1] + 1e-12
+    lags = lo + np.argmax(ac[:, lo:hi], axis=1)
+    peak = ac[np.arange(len(lags)), lags]
+    f0 = np.where(peak > 0.35, sr / lags, 0.0)
+    out[loud] = f0
+    return out
+
+
+def expressiveness(wave: np.ndarray, sr: int = SAMPLE_RATE) -> dict:
+    """Mélodie d'un extrait : variation de hauteur (demi-tons) et montée finale (demi-tons, > 0 = intonation de question)."""
+    f0 = pitch_track(wave, sr)
+    voiced = f0[f0 > 0]
+    if voiced.size < 10:
+        return {"range": 0.0, "rise": 0.0}
+    st = 12 * np.log2(voiced / np.median(voiced))
+    tail = st[-max(3, len(st) // 6):]
+    return {"range": float(np.std(st)), "rise": float(np.median(tail) - np.median(st))}
 
 
 MAX_TEMPO = 1.25
