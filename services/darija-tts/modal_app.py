@@ -1,8 +1,7 @@
 """Déploiement sur Modal (GPU à la demande, facturé à la seconde).
 
     pip install modal && modal setup
-    modal secret create landpro-tts TTS_SERVICE_TOKEN=<une longue clé secrète>
-    cd services/darija-tts && modal deploy modal_app.py
+    cd services/darija-tts && TTS_SERVICE_TOKEN=<une longue clé secrète> modal deploy modal_app.py
 
 L'adresse affichée (https://…modal.run) va dans TTS_SERVICE_URL sur Vercel, la même clé dans TTS_SERVICE_TOKEN.
 """
@@ -31,10 +30,15 @@ image = (
 
 app = modal.App("landpro-darija-tts", image=image)
 
+# Clé du service : prise dans l'environnement du déploiement (secret GitHub TTS_SERVICE_TOKEN dans le workflow),
+# sinon dans le secret Modal « landpro-tts » (déploiement en ligne de commande).
+_token = "".join(os.environ.get("TTS_SERVICE_TOKEN", "").split())
+SECRETS = [modal.Secret.from_dict({"TTS_SERVICE_TOKEN": _token})] if _token else [modal.Secret.from_name("landpro-tts")]
+
 
 @app.cls(
     gpu=GPU,
-    secrets=[modal.Secret.from_name("landpro-tts")],
+    secrets=SECRETS,
     scaledown_window=300,  # le GPU s'éteint après 5 min sans demande
     timeout=600,
     max_containers=3,
