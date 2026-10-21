@@ -124,3 +124,14 @@ html[data-theme="dark"] .src-page { --src-ink: #e6eef8; --src-muted: #93a4bb; --
 .src-tg { font-size: 13px; font-weight: 700; color: var(--src-accent); text-decoration: none; }
 .src-toggle { justify-self: start; border: 0; background: none; padding: 0; color: var(--src-accent); font-size: 12px; font-weight: 700; cursor: pointer; }
 .src-page .src-toggle { align-self: flex-start; text-align: start; }
+
+/* Cartes de taille unique : photo carrée recadrée, quel que soit le format de l'image
+   (les boutons du tableau de bord ont une hauteur automatique : l'image est placée en absolu) */
+.src-page .src-item { height: 100%; }
+.src-page .src-thumb { position: relative !important; display: block !important; width: 100% !important; height: auto !important; aspect-ratio: 1 / 1 !important; padding: 0 !important; margin: 0 !important; overflow: hidden !important; border-radius: 0 !important; flex: none !important; }
+.src-page .src-thumb img { position: absolute !important; inset: 0 !important; width: 100% !important; height: 100% !important; max-width: none !important; object-fit: cover !important; }
+.src-page .src-thumb > span { position: absolute; inset: 0; }
+.src-page .src-thumb em { z-index: 1; }
+/* nom et prix absents : discrets, sans casser l'alignement */
+.src-page .src-price b.is-empty { font-size: 13px; color: var(--src-muted); font-weight: 700; }
+.src-page .src-body h3.is-empty { color: var(--src-muted); font-weight: 500; font-style: italic; }

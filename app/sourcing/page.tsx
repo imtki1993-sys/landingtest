@@ -97,7 +97,13 @@ function ImportForm({ item, onDone }: { item: Item; onDone: (id: string) => void
     <form className="src-import" onSubmit={submit}>
       <label>
         Nom du produit
-        <input value={name} onChange={(e) => setName(e.target.value)} required maxLength={120} />
+        <input
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          required
+          maxLength={120}
+          placeholder="Écris le nom du produit (ex. Égouttoir de cuisine pliable)"
+        />
       </label>
       <div className="src-import-row">
         <label>
@@ -489,11 +495,11 @@ export default function SourcingPage() {
                     </button>
                     <div className="src-body">
                       <div className="src-price">
-                        <b>{dh(it.price) || "Prix sur demande"}</b>
+                        <b className={it.price == null ? "is-empty" : ""}>{dh(it.price) || "Prix sur demande"}</b>
                         {it.min_qty ? <span>min. {it.min_qty}</span> : null}
                       </div>
-                      <h3 dir="auto" title={it.name || ""}>
-                        {it.name || "Produit sans nom"}
+                      <h3 dir="auto" title={it.name || ""} className={it.name ? "" : "is-empty"}>
+                        {it.name || "Voir la photo"}
                       </h3>
                       <div className="src-meta">
                         <ChannelBadge c={chanById.get(it.channel_id)} />
