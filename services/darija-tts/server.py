@@ -122,9 +122,15 @@ def synthesize(body: SynthesizeBody, authorization: str | None = Header(default=
     if sum(len(s) for s in sentences) > MAX_CHARS:
         raise HTTPException(status_code=400, detail="Texte trop long")
     load()
-    voice = _state["voices"].get(body.voice)
-    if not voice:
-        raise HTTPException(status_code=400, detail="Voix inconnue")
+    voices_ = _state["voices"]
+    voice_id = body.voice
+    if voice_id not in voices_:
+        # voix non préparée (pas d'extrait valable pour ce comédien) : une autre voix du même genre
+        same = sorted(v for v in voices_ if v[:6] == voice_id[:6]) or sorted(voices_)
+        if not same:
+            raise HTTPException(status_code=400, detail="Aucune voix disponible")
+        voice_id = same[0]
+    voice = voices_[voice_id]
     segments = []
     with _lock:
         for s in sentences:
@@ -137,7 +143,11 @@ def synthesize(body: SynthesizeBody, authorization: str | None = Header(default=
     return Response(
         content=mp3,
         media_type="audio/mpeg",
-        headers={"X-Audio-Seconds": f"{len(final) / SAMPLE_RATE:.1f}", "Cache-Control": "no-store"},
+        headers={
+            "X-Audio-Seconds": f"{len(final) / SAMPLE_RATE:.1f}",
+            "X-Voice-Used": voice_id,
+            "Cache-Control": "no-store",
+        },
     )
 
 
