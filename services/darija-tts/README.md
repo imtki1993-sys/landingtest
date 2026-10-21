@@ -22,7 +22,16 @@ LandPro envoie un texte déjà préparé (chiffres en lettres, mots latins réé
 
 Toutes les routes sauf `/health` demandent `Authorization: Bearer <TTS_SERVICE_TOKEN>`.
 
-## Déployer sur Modal (recommandé)
+## Déployer depuis GitHub (sans terminal)
+
+1. Compte sur [modal.com](https://modal.com) → **Settings → API Tokens → New Token**.
+2. Dépôt GitHub → **Settings → Secrets and variables → Actions** → ajouter
+   `MODAL_TOKEN_ID`, `MODAL_TOKEN_SECRET` (le jeton Modal) et `TTS_SERVICE_TOKEN` (une longue clé inventée).
+3. Onglet **Actions** → **Déployer la voix off darija** → **Run workflow**.
+4. Le résumé du déploiement donne l'adresse à mettre dans Vercel (`TTS_SERVICE_URL`) et une voix de test
+   à écouter (Artifacts → `voix-test`).
+
+## Déployer sur Modal en ligne de commande
 
 GPU à la demande, facturé à la seconde ; il s'éteint après 5 minutes sans demande.
 

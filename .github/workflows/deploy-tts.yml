@@ -1,0 +1,112 @@
+# Déploie le service de voix off darija (services/darija-tts) sur Modal, puis génère une voix de test.
+# Lancement : onglet Actions → « Déployer la voix off darija » → Run workflow.
+# Secrets du dépôt nécessaires : MODAL_TOKEN_ID, MODAL_TOKEN_SECRET, TTS_SERVICE_TOKEN.
+name: Déployer la voix off darija
+
+on:
+  workflow_dispatch:
+    inputs:
+      test_text:
+        description: "Phrase de test (darija, alphabet arabe)"
+        required: false
+        default: "واش عييتي من التيليفون اللي كيطيح ليك فالطوموبيل؟ هاد الحامل المغناطيسي كيشد التيليفون مزيان."
+      test_voice:
+        description: "Voix de test (doda-f1 … doda-f4, doda-m1 … doda-m3)"
+        required: false
+        default: "doda-f1"
+
+concurrency:
+  group: deploy-tts
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 75
+    defaults:
+      run:
+        working-directory: services/darija-tts
+    env:
+      MODAL_TOKEN_ID: ${{ secrets.MODAL_TOKEN_ID }}
+      MODAL_TOKEN_SECRET: ${{ secrets.MODAL_TOKEN_SECRET }}
+      TTS_SERVICE_TOKEN: ${{ secrets.TTS_SERVICE_TOKEN }}
+    steps:
+      - name: Vérifier les secrets
+        working-directory: .
+        run: |
+          missing=""
+          [ -n "$MODAL_TOKEN_ID" ] || missing="$missing MODAL_TOKEN_ID"
+          [ -n "$MODAL_TOKEN_SECRET" ] || missing="$missing MODAL_TOKEN_SECRET"
+          [ -n "$TTS_SERVICE_TOKEN" ] || missing="$missing TTS_SERVICE_TOKEN"
+          if [ -n "$missing" ]; then
+            echo "::error::Secrets manquants dans GitHub (Settings → Secrets and variables → Actions) :$missing"
+            exit 1
+          fi
+
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Tests du montage audio
+        run: |
+          pip install --quiet numpy
+          python -m unittest test_audio_utils
+
+      - name: Installer Modal
+        run: pip install --quiet "modal>=1.0,<2"
+
+      - name: Enregistrer la clé du service dans Modal
+        run: modal secret create landpro-tts TTS_SERVICE_TOKEN="$TTS_SERVICE_TOKEN" --force
+
+      - name: Déployer (1re fois ≈ 15-25 min : modèle marocain + 7 voix DODa)
+        run: |
+          modal deploy modal_app.py 2>&1 | tee deploy.log
+          url=$(grep -oE 'https://[A-Za-z0-9.-]+\.modal\.run' deploy.log | head -1)
+          if [ -z "$url" ]; then echo "::error::Adresse du service introuvable dans la sortie de Modal"; exit 1; fi
+          echo "TTS_URL=$url" >> "$GITHUB_ENV"
+
+      - name: Tester une voix
+        env:
+          TEXT: ${{ inputs.test_text }}
+          VOICE: ${{ inputs.test_voice }}
+        run: |
+          curl -fsS --max-time 300 "$TTS_URL/health" && echo
+          python - <<'PY' > body.json
+          import json, os, re
+          text = os.environ["TEXT"].strip()
+          sentences = [s.strip() for s in re.split(r"(?<=[.!؟?])\s+", text) if s.strip()]
+          print(json.dumps({"sentences": sentences, "voice": os.environ["VOICE"] or "doda-f1"}, ensure_ascii=False))
+          PY
+          curl -fsS --max-time 600 -X POST "$TTS_URL/synthesize" \
+            -H "Authorization: Bearer $TTS_SERVICE_TOKEN" -H "Content-Type: application/json" \
+            --data-binary @body.json -D headers.txt -o voix-test.mp3
+          seconds=$(grep -i '^x-audio-seconds' headers.txt | tr -d '\r' | awk '{print $2}')
+          echo "Voix de test : ${seconds:-?} s, $(stat -c %s voix-test.mp3) octets"
+          echo "TEST_SECONDS=${seconds:-?}" >> "$GITHUB_ENV"
+
+      - name: Voix de test à écouter
+        uses: actions/upload-artifact@v4
+        with:
+          name: voix-test
+          path: services/darija-tts/voix-test.mp3
+
+      - name: Résumé
+        if: always()
+        run: |
+          {
+            echo "## Voix off darija"
+            if [ -n "$TTS_URL" ]; then
+              echo "Service en ligne : \`$TTS_URL\`"
+              echo
+              echo "Dans **Vercel → Settings → Environment Variables** :"
+              echo "- \`TTS_SERVICE_URL\` = \`$TTS_URL\`"
+              echo "- \`TTS_SERVICE_TOKEN\` = la même clé que le secret GitHub \`TTS_SERVICE_TOKEN\`"
+              echo
+              echo "puis redéployer LandPro."
+              [ -n "$TEST_SECONDS" ] && echo && echo "Voix de test : ${TEST_SECONDS} s (fichier **voix-test** ci-dessous, dans Artifacts)."
+            else
+              echo "Le déploiement n'a pas abouti : voir les étapes ci-dessus."
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
