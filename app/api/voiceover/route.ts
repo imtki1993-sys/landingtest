@@ -81,13 +81,15 @@ export async function POST(req: Request) {
     if (!voice) return NextResponse.json({ error: "Choisis une voix." }, { status: 400 });
     const speed = Math.min(1.3, Math.max(0.7, Number(b.speed) || 1));
 
-    const { data: allowed, error: le } = await s.rpc("check_public_order_rate_limit", {
-      p_key: "tts|" + workspaceId,
-      p_limit: DAILY_LIMIT,
-      p_window_seconds: 24 * 3600,
-    });
+    // limite : seules les voix off réellement produites comptent (pas les essais en erreur)
+    const since = new Date(Date.now() - 24 * 3600 * 1000).toISOString();
+    const { count, error: le } = await s
+      .from("voiceovers")
+      .select("id", { count: "exact", head: true })
+      .eq("workspace_id", workspaceId)
+      .gte("created_at", since);
     if (le) throw le;
-    if (!allowed)
+    if ((count || 0) >= DAILY_LIMIT)
       return NextResponse.json(
         { error: `Limite de ${DAILY_LIMIT} voix off par 24 h atteinte. Réessaie demain.` },
         { status: 429 },
