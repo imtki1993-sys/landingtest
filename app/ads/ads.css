@@ -1,0 +1,57 @@
+/* Analyse des pubs : complète les styles du tableau de bord (globals.css, analytics) */
+.ads-dashboard .ads-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 14px; padding: 18px 20px; margin: 0 0 16px; }
+.ads-dashboard .ads-card b { display: block; font-size: 15px; color: #0f172a; margin-bottom: 6px; }
+.ads-dashboard .ads-card p { margin: 0 0 12px; color: #475569; font-size: 13px; line-height: 1.55; }
+.ads-dashboard .ads-help { margin-top: 16px; }
+.ads-dashboard .ads-help p b { display: inline; font-size: inherit; margin: 0; }
+.ads-params { display: flex; gap: 8px; align-items: stretch; min-width: 0; }
+.ads-params code { flex: 1; min-width: 0; overflow-x: auto; white-space: nowrap; padding: 10px 12px; border-radius: 9px; background: #f1f5f9; color: #0f172a; font-size: 12px; }
+.ads-params button { flex: none; padding: 0 16px; border-radius: 9px; border: 0; background: #2563eb; color: #fff; font-weight: 800; cursor: pointer; }
+.ads-kpis article.is-good b { color: #15803d; }
+.ads-kpis article.is-bad b { color: #dc2626; }
+.ads-table .ads-campaign { cursor: pointer; }
+.ads-table .ads-campaign:hover td { background: #f8fafc; }
+.ads-table td small { display: block; color: #64748b; font-size: 11px; margin-top: 2px; }
+.ads-table .ads-name { display: inline-flex; align-items: center; gap: 6px; max-width: 280px; }
+.ads-table .ads-name b { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ads-table .ads-name i { font-style: normal; color: #64748b; width: 12px; }
+.ads-table .ads-ad td { background: #f8fafc; font-size: 12px; }
+.ads-table .ads-ad td:first-child { padding-inline-start: 34px; }
+.ads-table .ads-muted { color: #94a3b8; font-size: 11px; font-style: italic; }
+.ads-good { color: #15803d; font-weight: 800; }
+.ads-bad { color: #dc2626; font-weight: 800; }
+.ads-spend { display: inline-flex; align-items: center; gap: 4px; border: 1px solid #cbd5e1; border-radius: 8px; padding: 0 8px; background: #fff; }
+.ads-spend input { width: 84px; border: 0 !important; outline: 0; padding: 7px 0 !important; background: transparent !important; font-weight: 700; color: #0f172a; box-shadow: none !important; }
+.ads-spend span { font-size: 11px; color: #64748b; font-weight: 700; }
+.ads-spend:focus-within { border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37, 99, 235, .15); }
+.ads-spend.is-ok { border-color: #16a34a; }
+.ads-spend.is-ok span { color: #16a34a; }
+.ads-spend.is-err { border-color: #dc2626; }
+.ads-spend.is-err span { color: #dc2626; }
+
+html[data-theme="dark"] .ads-dashboard .ads-card { background: #111827; border-color: #1f2a3d; }
+html[data-theme="dark"] .ads-dashboard .ads-card b { color: #e6eef8; }
+html[data-theme="dark"] .ads-dashboard .ads-card p { color: #a7b4c6; }
+html[data-theme="dark"] .ads-params code { background: #0b1120; color: #e6eef8; }
+html[data-theme="dark"] .ads-table .ads-campaign:hover td,
+html[data-theme="dark"] .ads-table .ads-ad td { background: #0f1a2b; }
+html[data-theme="dark"] .ads-spend { background: #0b1120; border-color: #29415f; }
+html[data-theme="dark"] .ads-spend input { color: #e6eef8; }
+
+@media (max-width: 700px) {
+  .ads-params { flex-direction: column; }
+  .ads-params button { padding: 10px; }
+}
+
+/* Mise en page : 6 indicateurs sur 3 colonnes, tableau large qui défile horizontalement */
+.ads-dashboard .ads-kpis { grid-template-columns: repeat(3, minmax(0, 1fr)) !important; }
+@media (max-width: 900px) { .ads-dashboard .ads-kpis { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; } }
+.ads-dashboard .pages-toolbar { flex-wrap: wrap; }
+.ads-dashboard .pages-toolbar > div { display: grid !important; gap: 4px; }
+.ads-dashboard .pages-toolbar > div span { background: none !important; padding: 0 !important; border: 0 !important; color: #64748b !important; font-size: 12px !important; white-space: normal !important; border-radius: 0 !important; }
+.ads-dashboard .ads-table-wrap { overflow-x: auto !important; }
+.ads-dashboard .ads-table { min-width: 1080px; table-layout: auto !important; }
+.ads-dashboard .ads-table th, .ads-dashboard .ads-table td { white-space: nowrap; }
+.ads-dashboard .ads-table th:first-child, .ads-dashboard .ads-table td:first-child { min-width: 230px; max-width: 300px; white-space: normal; text-align: start; }
+.ads-table .ads-name { max-width: none; align-items: flex-start; }
+.ads-table .ads-name b { white-space: normal; overflow-wrap: anywhere; }

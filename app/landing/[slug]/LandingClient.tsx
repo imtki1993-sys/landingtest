@@ -16,6 +16,15 @@ const readCookie = (k: string) =>
     .split("; ")
     .find((c) => c.startsWith(k + "="))
     ?.slice(k.length + 1);
+/** Provenance pub enregistrée à l'arrivée sur la landing (paramètres UTM). */
+function savedUtm(): Record<string, string> | undefined {
+  try {
+    return JSON.parse(sessionStorage.getItem("lm_utm") || "null") || undefined;
+  } catch {
+    return undefined;
+  }
+}
+
 /** Identifiants navigateur Meta pour l'API Conversions (_fbp, _fbc ou fbclid de la visite). */
 function metaBrowserIds() {
   let fbc = readCookie("_fbc");
@@ -81,6 +90,15 @@ export default function LandingClient({
     sessionStorage.setItem("lm_sid", sid);
     localStorage.setItem("lm_vid", vid);
     if (q.get("fbclid")) sessionStorage.setItem("lm_fbclid", JSON.stringify({ id: q.get("fbclid"), t: Date.now() }));
+    // Provenance pub (dernier clic) : gardée pour la commande, même si l'URL change entre-temps
+    if (q.get("utm_campaign") || q.get("utm_source")) {
+      const utm: Record<string, string> = {};
+      for (const k of ["utm_source", "utm_medium", "utm_campaign", "utm_term", "utm_content"]) {
+        const v = q.get(k);
+        if (v) utm[k] = v;
+      }
+      sessionStorage.setItem("lm_utm", JSON.stringify(utm));
+    }
     const track = (event: string) =>
       fetch("/api/track", {
         method: "POST",
@@ -211,6 +229,7 @@ export default function LandingClient({
           // pour l'API Conversions Meta (même visiteur que le Pixel)
           page_url: location.href,
           visitor_id: localStorage.getItem("lm_vid") || undefined,
+          utm: savedUtm(),
           ...metaBrowserIds(),
         }),
       });

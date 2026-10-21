@@ -9,6 +9,7 @@ import { customerRisk } from "../../../lib/order-risk";
 import { blacklistedPhones } from "../../../lib/blacklist";
 import { afterPublicOrder, AGENT_ROLE } from "../../../lib/team";
 import { isMissingColumn } from "../../../lib/db-errors";
+import { hasUtm, utmFrom } from "../../../lib/utm";
 function db() {
   const u = process.env.NEXT_PUBLIC_SUPABASE_URL,
     k = process.env.SUPABASE_SECRET_KEY;
@@ -236,6 +237,13 @@ export async function POST(req: Request) {
     if (data?.order_id) {
       const orderId = String(data.order_id);
       after(() => afterPublicOrder(s, orderId).catch(() => undefined));
+      // Provenance pub (Analyse des pubs) : envoyée par la landing, sinon lue dans l'URL de la page.
+      // Sans les colonnes utm_* (migration pas encore faite), la commande reste enregistrée.
+      const utm = { ...utmFrom(b.page_url), ...utmFrom(b.utm) };
+      if (hasUtm(utm))
+        after(async () => {
+          await s.from("orders").update(utm).eq("id", orderId);
+        });
       // URL exacte de la page (envoyée par la landing), sinon le Referer ; jamais une autre origine
       const referer = req.headers.get("referer") || "",
         pageUrl = typeof b.page_url === "string" ? b.page_url.slice(0, 1000) : "";
