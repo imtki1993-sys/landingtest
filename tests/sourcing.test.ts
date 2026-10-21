@@ -171,4 +171,10 @@ describe("WhatsApp et signature du canal", () => {
     expect(guessName(stripBoilerplate(texts[2], lines))).toBe("قنينة ماء 2 لتر");
     expect(boilerplateLines(texts.slice(0, 2)).size).toBe(0); // trop peu de messages pour décider
   });
+  it("numéro de la description du canal (capture du vendeur)", async () => {
+    const { extractPhones } = await import("../lib/sourcing-extract");
+    const desc =
+      "مرحبا بكم 😍\nبيع ملابس بالجملة بثمن المصنع الجودة الجيدة و الثمن المناسب\nواتساب 👇\nhttps://wa.me/212643837289\n\nالهاتف 👇\n\n0643837289\n\nرابط تيليكرام 👇\nhttps://t.me/bi3bjemla";
+    expect(extractPhones(desc)).toEqual(["212643837289"]);
+  });
 });

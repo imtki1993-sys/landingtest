@@ -23,6 +23,8 @@ interface Item {
   body?: string;
   /** numéros WhatsApp cités dans le message (212XXXXXXXXX) */
   phones?: string[];
+  /** numéro pris dans la description du canal (le message n'en contient pas) */
+  phones_from_channel?: boolean;
 }
 interface Channel {
   id: string;
@@ -207,7 +209,10 @@ function Detail({ item, channel, onClose }: { item: Item; channel?: Channel; onC
           <div className="src-contact">
             {phones.length ? (
               <>
-                <span>Contacter le fournisseur</span>
+                <span>
+                  Contacter le fournisseur
+                  {item.phones_from_channel ? <small> · numéro général du canal</small> : null}
+                </span>
                 <div className="src-wa-list">
                   {phones.map((n) => (
                     <a key={n} className="src-wa" href={waLink(n, item)} target="_blank" rel="noreferrer">

@@ -135,3 +135,4 @@ html[data-theme="dark"] .src-page { --src-ink: #e6eef8; --src-muted: #93a4bb; --
 /* nom et prix absents : discrets, sans casser l'alignement */
 .src-page .src-price b.is-empty { font-size: 13px; color: var(--src-muted); font-weight: 700; }
 .src-page .src-body h3.is-empty { color: var(--src-muted); font-weight: 500; font-style: italic; }
+.src-contact > span small { font-weight: 600; }
