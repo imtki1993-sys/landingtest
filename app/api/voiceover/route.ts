@@ -9,6 +9,17 @@ import { estimateSeconds, normalizeDarija } from "../../../lib/darija-text";
 export const maxDuration = 300;
 const MAX_CHARS = 1500;
 const DAILY_LIMIT = 40;
+// stockage dédié à l'audio (le bucket des images refuse audio/mpeg) ; créé au premier usage
+const BUCKET = "voiceovers";
+let bucketReady = false;
+async function ensureBucket(s: any) {
+  if (bucketReady) return;
+  const opts = { public: true, allowedMimeTypes: ["audio/mpeg", "audio/wav", "audio/x-wav"], fileSizeLimit: "20MB" };
+  const { error } = await s.storage.createBucket(BUCKET, opts);
+  if (error && !/exist|duplicate/i.test(String(error.message || ""))) throw error;
+  if (error) await s.storage.updateBucket(BUCKET, opts);
+  bucketReady = true;
+}
 const missing = (e: any) =>
   ["42P01", "PGRST205"].includes(String(e?.code || "")) || /voiceovers/.test(String(e?.message || ""));
 
@@ -70,11 +81,12 @@ export async function POST(req: Request) {
     }
     const ext = out.mime.includes("wav") ? "wav" : "mp3";
     const path = `${workspaceId}/voiceover-${Date.now()}-${crypto.randomUUID()}.${ext}`;
+    await ensureBucket(s);
     const up = await s.storage
-      .from("landing-images")
+      .from(BUCKET)
       .upload(path, out.audio, { contentType: out.mime, cacheControl: "31536000", upsert: false });
     if (up.error) throw up.error;
-    const audio_url = s.storage.from("landing-images").getPublicUrl(path).data.publicUrl;
+    const audio_url = s.storage.from(BUCKET).getPublicUrl(path).data.publicUrl;
     const row = {
       workspace_id: workspaceId,
       product_id: typeof b.product_id === "string" && b.product_id ? b.product_id : null,
@@ -114,8 +126,8 @@ export async function DELETE(req: Request) {
     const { error } = await s.from("voiceovers").delete().eq("workspace_id", workspaceId).eq("id", id);
     if (error) throw error;
     // fichier audio : supprimé du stockage s'il est bien dans le dossier du compte
-    const m = String(data?.audio_url || "").match(/\/landing-images\/(.+)$/);
-    if (m && m[1].startsWith(workspaceId + "/")) await s.storage.from("landing-images").remove([m[1]]);
+    const m = String(data?.audio_url || "").match(/\/(voiceovers|landing-images)\/(.+)$/);
+    if (m && m[2].startsWith(workspaceId + "/")) await s.storage.from(m[1]).remove([m[2]]);
     return NextResponse.json({ ok: true });
   } catch (e: any) {
     reportError(e, "api/voiceover");
