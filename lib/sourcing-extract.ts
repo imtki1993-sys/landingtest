@@ -54,10 +54,79 @@ export function extractMinQty(text: string): number | null {
   return Number.isFinite(n) && n > 0 && n < 100000 ? n : null;
 }
 
+/**
+ * Numéros WhatsApp / téléphone cités dans le message (liens wa.me, +212…, 06…), au format
+ * international sans « + » (212XXXXXXXXX), sans doublon, dans l'ordre du message.
+ */
+export function extractPhones(text: string): string[] {
+  const t = latin(text || "");
+  const found: { at: number; n: string }[] = [];
+  let m: RegExpExecArray | null;
+  const links = /(?:wa\.me\/|whatsapp\.com\/send\/?\?phone=|whatsapp\.com\/send\?phone=)\+?(\d{9,15})/gi;
+  while ((m = links.exec(t))) {
+    const d = m[1].replace(/^00/, "");
+    found.push({ at: m.index, n: d.startsWith("0") ? "212" + d.slice(1) : d });
+  }
+  const plain = /(?:\+|00)?212[\s.-]?\(?0?\)?[\s.-]?([5-7](?:[\s.-]?\d){8})|(?<![\d])0([5-7](?:[\s.-]?\d){8})(?![\d])/g;
+  while ((m = plain.exec(t))) found.push({ at: m.index, n: "212" + (m[1] || m[2]).replace(/\D/g, "") });
+  const out: string[] = [];
+  for (const f of found.sort((a, b) => a.at - b.at))
+    if (/^212[5-7]\d{8}$/.test(f.n) ? !out.includes(f.n) : /^\d{9,15}$/.test(f.n) && !out.includes(f.n)) out.push(f.n);
+  return out.slice(0, 5);
+}
+
+/** Premier numéro au format marocain (06…). */
 export function extractPhone(text: string): string | null {
-  const t = latin(text).replace(/[\s.-]/g, "");
-  const m = t.match(/(?:\+212|00212|0)([5-7]\d{8})/);
-  return m ? "0" + m[1] : null;
+  const n = extractPhones(text).find((x) => x.startsWith("212"));
+  return n ? "0" + n.slice(3) : null;
+}
+
+/** 212661234567 → « 06 61 23 45 67 » (autres pays : +indicatif). */
+export function formatPhone(n: string): string {
+  if (/^212\d{9}$/.test(n))
+    return ("0" + n.slice(3)).replace(/^(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})$/, "$1 $2 $3 $4 $5");
+  return "+" + n;
+}
+
+// ─── Signature répétée du canal (nom, slogan, numéros…) ───
+const lineKey = (l: string) =>
+  latin(l)
+    .replace(/[\p{Extended_Pictographic}\u{FE0F}\u{200D}]/gu, "")
+    .replace(/\s+/g, " ")
+    .trim()
+    .toLowerCase();
+
+/**
+ * Lignes présentes dans au moins la moitié des messages d'un canal (3 messages minimum) :
+ * c'est la signature du fournisseur, pas la description du produit.
+ */
+export function boilerplateLines(texts: (string | null | undefined)[]): Set<string> {
+  const list = texts.filter((t): t is string => !!t && t.trim().length > 0);
+  const out = new Set<string>();
+  if (list.length < 3) return out;
+  const count = new Map<string, number>();
+  for (const t of list)
+    for (const k of new Set(
+      t
+        .split("\n")
+        .map(lineKey)
+        .filter((k) => k.length >= 3),
+    ))
+      count.set(k, (count.get(k) || 0) + 1);
+  const min = Math.max(3, Math.ceil(list.length * 0.5));
+  for (const [k, n] of count) if (n >= min) out.add(k);
+  return out;
+}
+
+/** Texte du message sans la signature du canal. */
+export function stripBoilerplate(text: string, lines: Set<string>): string {
+  if (!lines.size) return text;
+  return text
+    .split("\n")
+    .filter((l) => !lines.has(lineKey(l)))
+    .join("\n")
+    .replace(/\n{3,}/g, "\n\n")
+    .trim();
 }
 
 const KEYWORDS: [SourcingCategory, RegExp][] = [
@@ -94,6 +163,7 @@ export function guessName(text: string): string | null {
       .replace(/(?:\+212|0)[5-7][\d\s.-]{8,}/g, " ")
       .replace(/\s+/g, " ")
       .trim();
+    if (/https?:\/\/|wa\.me|t\.me\//i.test(raw)) continue;
     if (line.length >= 3 && /\p{L}/u.test(line)) return line.slice(0, 80);
   }
   return null;

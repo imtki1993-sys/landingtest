@@ -4,7 +4,7 @@ import React, { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import SaaSSidebar from "../components/SaaSSidebar";
 import SaaSTopbar from "../components/SaaSTopbar";
-import { SOURCING_CATEGORIES } from "../../lib/sourcing-extract";
+import { formatPhone, SOURCING_CATEGORIES } from "../../lib/sourcing-extract";
 
 interface Item {
   id: string;
@@ -19,6 +19,10 @@ interface Item {
   min_qty: number | null;
   phone: string | null;
   channel_id: string;
+  /** texte sans la signature répétée du canal */
+  body?: string;
+  /** numéros WhatsApp cités dans le message (212XXXXXXXXX) */
+  phones?: string[];
 }
 interface Channel {
   id: string;
@@ -44,7 +48,17 @@ function ago(iso: string | null | undefined) {
 }
 /** Prix de vente proposé : environ 2,5 × le prix de gros, arrondi à …9 DH. */
 const suggestPrice = (w: number | null) => (w ? Math.max(49, Math.round((w * 2.5) / 10) * 10 - 1) : "");
-const waLink = (phone: string) => "https://wa.me/212" + phone.replace(/^0/, "");
+/** Lien WhatsApp avec un message prêt à envoyer (lien du produit inclus). */
+const waLink = (phone: string, item: Item) =>
+  `https://wa.me/${phone}?text=${encodeURIComponent(
+    `السلام عليكم، بغيت نسول على هاد المنتج${item.name ? " : " + item.name : ""}\n${item.url}`,
+  )}`;
+
+const WaIcon = () => (
+  <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" fill="currentColor">
+    <path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.3-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.7 11.8 11.8 0 0 0 4.5 4c1.7.7 2.3.8 3.2.6.5-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.1-1.2l-.4-.2z" />
+  </svg>
+);
 
 function ChannelBadge({ c }: { c?: Channel }) {
   if (!c) return null;
@@ -128,6 +142,10 @@ function ImportForm({ item, onDone }: { item: Item; onDone: (id: string) => void
 function Detail({ item, channel, onClose }: { item: Item; channel?: Channel; onClose: () => void }) {
   const [i, setI] = useState(0);
   const [done, setDone] = useState<string | null>(null);
+  const [full, setFull] = useState(false);
+  const body = (item.body ?? item.text ?? "").trim();
+  const shown = full || !body ? item.text || "" : body;
+  const phones = item.phones || [];
   useEffect(() => {
     const k = (e: KeyboardEvent) => e.key === "Escape" && onClose();
     window.addEventListener("keydown", k);
@@ -170,20 +188,34 @@ function Detail({ item, channel, onClose }: { item: Item; channel?: Channel; onC
               prix de gros{item.min_qty ? ` · minimum ${item.min_qty} pièces` : ""} · {ago(item.posted_at)}
             </span>
           </div>
-          {item.text ? (
+          {shown ? (
             <p className="src-text" dir="auto">
-              {item.text}
+              {shown}
             </p>
           ) : null}
-          <div className="src-links">
-            <a href={item.url} target="_blank" rel="noreferrer">
-              Ouvrir sur Telegram ↗
+          {body && body !== (item.text || "").trim() ? (
+            <button type="button" className="src-toggle" onClick={() => setFull((f) => !f)}>
+              {full ? "Masquer la signature du fournisseur" : "Voir le message complet"}
+            </button>
+          ) : null}
+          <div className="src-contact">
+            {phones.length ? (
+              <>
+                <span>Contacter le fournisseur</span>
+                <div className="src-wa-list">
+                  {phones.map((n) => (
+                    <a key={n} className="src-wa" href={waLink(n, item)} target="_blank" rel="noreferrer">
+                      <WaIcon /> {formatPhone(n)}
+                    </a>
+                  ))}
+                </div>
+              </>
+            ) : (
+              <span>Pas de numéro dans ce message : contacte le fournisseur sur Telegram.</span>
+            )}
+            <a className="src-tg" href={item.url} target="_blank" rel="noreferrer">
+              Ouvrir le message sur Telegram ↗
             </a>
-            {item.phone ? (
-              <a href={waLink(item.phone)} target="_blank" rel="noreferrer">
-                WhatsApp {item.phone} ↗
-              </a>
-            ) : null}
           </div>
           {done !== null ? (
             <div className="src-success">
@@ -467,9 +499,23 @@ export default function SourcingPage() {
                         <ChannelBadge c={chanById.get(it.channel_id)} />
                         <time>{ago(it.posted_at)}</time>
                       </div>
-                      <button type="button" className="src-primary" onClick={() => setOpen(it)}>
-                        Voir et importer
-                      </button>
+                      <div className="src-actions">
+                        <button type="button" className="src-primary" onClick={() => setOpen(it)}>
+                          Voir
+                        </button>
+                        {it.phones?.length ? (
+                          <a
+                            className="src-wa src-wa-icon"
+                            href={waLink(it.phones[0], it)}
+                            target="_blank"
+                            rel="noreferrer"
+                            title={"WhatsApp " + formatPhone(it.phones[0])}
+                            aria-label={"Contacter le fournisseur sur WhatsApp " + formatPhone(it.phones[0])}
+                          >
+                            <WaIcon />
+                          </a>
+                        ) : null}
+                      </div>
                     </div>
                   </article>
                 ))}
