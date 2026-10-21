@@ -75,17 +75,11 @@ jobs:
           fi
           echo "Connexion à Modal : OK"
 
-      - name: Enregistrer la clé du service dans Modal
-        run: |
-          clean=$(printf %s "$TTS_SERVICE_TOKEN" | tr -d '[:space:]')
-          echo "Clé du service : ${#clean} caractères"
-          if ! modal secret create landpro-tts TTS_SERVICE_TOKEN="$clean" --force 2>&1 | tee secret.log; then
-            echo "::error::Impossible d'enregistrer la clé dans Modal : $(tail -3 secret.log | tr '\n' ' ')"
-            exit 1
-          fi
-
       - name: "Déployer (1re fois ≈ 15-25 min, modèle marocain + 7 voix DODa)"
         run: |
+          # la clé (sans espaces) est transmise au service par modal_app.py (Secret.from_dict)
+          export TTS_SERVICE_TOKEN="$(printf %s "$TTS_SERVICE_TOKEN" | tr -d '[:space:]')"
+          echo "Clé du service : ${#TTS_SERVICE_TOKEN} caractères"
           set +e
           modal deploy modal_app.py 2>&1 | tee deploy.log
           status=${PIPESTATUS[0]}

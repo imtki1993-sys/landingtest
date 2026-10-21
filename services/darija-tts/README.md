@@ -40,9 +40,8 @@ GPU à la demande, facturé à la seconde ; il s'éteint après 5 minutes sans d
 ```bash
 pip install modal
 modal setup                                   # connexion au compte Modal
-modal secret create landpro-tts TTS_SERVICE_TOKEN=$(openssl rand -hex 32)
 cd services/darija-tts
-modal deploy modal_app.py
+TTS_SERVICE_TOKEN=<la même clé que dans Vercel> modal deploy modal_app.py
 ```
 
 La première construction télécharge le modèle (~1,4 Go) et prépare les 7 voix : compter 10 à 20 minutes.
@@ -51,7 +50,7 @@ Modal affiche ensuite l'adresse du service (`https://…--landpro-darija-tts-dar
 Dans **Vercel → Settings → Environment Variables** :
 
 - `TTS_SERVICE_URL` = l'adresse affichée par Modal
-- `TTS_SERVICE_TOKEN` = la même clé que dans le secret `landpro-tts`
+- `TTS_SERVICE_TOKEN` = la même clé que celle utilisée au déploiement
 
 puis redéployer LandPro. Les voix Salma, Nadia, Imane, Kenza, Youssef, Hamza et Karim deviennent actives.
 
