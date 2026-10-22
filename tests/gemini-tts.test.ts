@@ -77,3 +77,26 @@ describe("Gemini TTS", () => {
     await expect(synthesize(["طلب."], "gemini-orus")).rejects.toThrow("GEMINI_API_KEY");
   });
 });
+
+describe("quota voix Gemini", () => {
+  it("429 → modèle de voix suivant ; 429 partout → message clair", async () => {
+    process.env.GEMINI_API_KEY = "k";
+    const wav = wavFromPcm(tone(1));
+    const f = vi.fn(async (_u: string, init: any) =>
+      JSON.parse(init.body).model === "gemini-3.8-flash-tts"
+        ? new Response(JSON.stringify({ error: { message: "quota" } }), { status: 429 })
+        : new Response(
+            JSON.stringify({ steps: [{ content: [{ mime_type: "audio/wav", data: wav.toString("base64") }] }] }),
+          ),
+    );
+    vi.stubGlobal("fetch", f);
+    const out = await synthesize(["طلب."], "gemini-orus");
+    expect(out.seconds).toBe(1);
+    expect(JSON.parse((f.mock.calls[1] as any)[1].body).model).toBe("gemini-3.8-flash-lite-tts");
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async () => new Response("{}", { status: 429 })),
+    );
+    await expect(synthesize(["طلب."], "gemini-orus")).rejects.toThrow("Autres voix");
+  });
+});

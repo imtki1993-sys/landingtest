@@ -3,6 +3,8 @@
 import { Mp3Encoder } from "@breezystack/lamejs";
 
 export const GEMINI_TTS_MODEL = "gemini-3.8-flash-tts";
+/** Modèles de voix de secours (quota séparé par modèle) : même catalogue de voix. */
+export const GEMINI_TTS_MODELS = [GEMINI_TTS_MODEL, "gemini-3.8-flash-lite-tts", "gemini-3.1-flash-tts-preview"];
 const SAMPLE_RATE = 24_000;
 
 /** Direction de base : darija marocaine de pub (Casablanca), jamais d'arabe classique ni d'autres dialectes. */
@@ -78,22 +80,33 @@ export function pcmToMp3(pcm: Buffer, sampleRate = SAMPLE_RATE, kbps = 128): Buf
 }
 
 export async function geminiTts(text: string, voice: string, style: string, key: string) {
-  // surcharge passagère chez Google (503…) : 2 nouveaux essais espacés
+  // par modèle : surcharge passagère (503…) → 2 nouveaux essais ; quota atteint (429) ou modèle absent (404) →
+  // modèle de voix suivant (les quotas de Google sont comptés par modèle)
   let r!: Response;
-  for (const wait of [0, 1500, 4000]) {
-    if (wait) await new Promise((ok) => setTimeout(ok, wait));
-    r = await post(text, voice, style, key);
-    if (![500, 502, 503, 504].includes(r.status)) break;
+  let quota = false;
+  for (const model of GEMINI_TTS_MODELS) {
+    for (const wait of [0, 1500, 4000]) {
+      if (wait) await new Promise((ok) => setTimeout(ok, wait));
+      r = await post(text, voice, style, key, model);
+      if (![500, 502, 503, 504].includes(r.status)) break;
+    }
+    if (r.status === 429) quota = true;
+    if (![429, 404, 500, 502, 503, 504].includes(r.status)) break;
   }
+  if (!r.ok && quota)
+    throw new Error(
+      "Quota Gemini atteint pour la voix (offre gratuite de Google : peu de voix par jour). Active la facturation dans " +
+        "Google AI Studio (≈ 0,007 $ par voix de 30 s) ou choisis une voix LandPro dans « Autres voix ».",
+    );
   return readAudio(r);
 }
 
-function post(text: string, voice: string, style: string, key: string) {
+function post(text: string, voice: string, style: string, key: string, model = GEMINI_TTS_MODEL) {
   return fetch("https://generativelanguage.googleapis.com/v1beta/interactions", {
     method: "POST",
     headers: { "x-goog-api-key": key, "content-type": "application/json" },
     body: JSON.stringify({
-      model: GEMINI_TTS_MODEL,
+      model,
       input: [
         {
           type: "user_input",
