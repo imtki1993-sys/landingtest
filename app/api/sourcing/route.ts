@@ -116,6 +116,13 @@ export async function GET(req: Request) {
       items,
       next,
       oldest,
+      // dernière lecture des canaux (le plus récent) : affichée sous les filtres
+      lastSync:
+        ((channels.data || []) as any[])
+          .map((c) => c.last_synced_at)
+          .filter(Boolean)
+          .sort()
+          .at(-1) ?? null,
       // les clients ne voient pas l'état technique des canaux
       channels: (channels.data || [])
         .filter((c: any) => isPlatformAdmin || c.active)

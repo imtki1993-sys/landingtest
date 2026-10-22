@@ -151,3 +151,35 @@ export async function repairPending(s: any, limit = 40, maxPages = 6): Promise<n
   const rows = ((data || []) as PostRow[]).filter((r) => needsMirror(r.photos)).slice(0, limit);
   return (await repairPosts(s, rows, maxPages)).size;
 }
+
+/**
+ * Photos des publications récentes (< 3 jours) encore sur Telegram : copiées depuis le lien enregistré, encore valide
+ * à ce stade. Sans dépasser `deadline`. Les liens expirés sont ensuite réparés par `repairPending`.
+ */
+export async function mirrorRecent(s: any, deadline: number, limit = 80): Promise<number> {
+  const since = new Date(Date.now() - 3 * 86400_000).toISOString();
+  const { data } = await s
+    .from("sourcing_posts")
+    .select("id,channel_id,post_id,photos")
+    .neq("photos", "{}")
+    .gte("posted_at", since)
+    .order("posted_at", { ascending: false })
+    .limit(400);
+  const rows = ((data || []) as PostRow[]).filter((r) => needsMirror(r.photos)).slice(0, limit);
+  let n = 0;
+  let i = 0;
+  await Promise.all(
+    Array.from({ length: Math.min(4, rows.length) }, async () => {
+      while (i < rows.length && Date.now() < deadline) {
+        const r = rows[i++];
+        const photos = await mirrorPhotos(s, r.channel_id, r.post_id, r.photos).catch(() => []);
+        // tout copié : liens permanents ; sinon on garde les liens Telegram (réparés plus tard)
+        if (photos.length === r.photos.length) {
+          await s.from("sourcing_posts").update({ photos }).eq("id", r.id);
+          n++;
+        }
+      }
+    }),
+  );
+  return n;
+}

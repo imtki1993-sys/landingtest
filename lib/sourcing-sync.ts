@@ -38,7 +38,7 @@ const rowOf = (channelId: string, p: TgPost, signature: Set<string>) => {
  * Les messages déjà connus gardent leur fiche (extraction IA). Les photos sont copiées dans le stockage LandPro
  * tant que les liens Telegram sont encore valides (ils expirent ensuite).
  */
-export async function syncChannel(s: any, ch: ChannelRow, pages = 1) {
+export async function syncChannel(s: any, ch: ChannelRow, pages = 1, opts: { mirror?: boolean } = {}) {
   let before: number | undefined;
   let info: Awaited<ReturnType<typeof fetchChannelPage>>["channel"] | null = null;
   const posts: TgPost[] = [];
@@ -51,7 +51,7 @@ export async function syncChannel(s: any, ch: ChannelRow, pages = 1) {
     if (ch.last_post_id && oldest <= ch.last_post_id) break; // on a rejoint ce qui est déjà connu
     before = oldest;
   }
-  const saved = await savePosts(s, ch, posts);
+  const saved = await savePosts(s, ch, posts, opts.mirror !== false);
   const ids = posts.map((p) => p.postId);
   const last = ids.length ? Math.max(...ids, ch.last_post_id || 0) : ch.last_post_id;
   const photo = info?.photo ? (await mirrorChannelPhoto(s, ch.id, info.photo).catch(() => null)) || info.photo : null;
@@ -70,7 +70,7 @@ export async function syncChannel(s: any, ch: ChannelRow, pages = 1) {
 }
 
 /** Enregistre les publications lues : nouvelles fiches insérées, photos copiées dans le stockage. */
-async function savePosts(s: any, ch: ChannelRow, posts: TgPost[]) {
+async function savePosts(s: any, ch: ChannelRow, posts: TgPost[], mirror = true) {
   const ids = posts.map((p) => p.postId);
   const { data: known } = ids.length
     ? await s.from("sourcing_posts").select("post_id,photos").eq("channel_id", ch.id).in("post_id", ids)
@@ -84,7 +84,8 @@ async function savePosts(s: any, ch: ChannelRow, posts: TgPost[]) {
     if (error) throw error;
   }
   // photos : copiées chez nous pendant que les liens Telegram sont valides (les plus récentes d'abord)
-  const mirrored = await mirrorFromPage(s, ch.id, posts, stored, 60).catch(() => 0);
+  // copie des photos : peut être faite plus tard (cron : d'abord les nouveaux produits de tous les canaux)
+  const mirrored = mirror ? await mirrorFromPage(s, ch.id, posts, stored, 60).catch(() => 0) : 0;
   return { added: fresh.length, mirrored };
 }
 
@@ -170,4 +171,15 @@ export async function aiExtractPending(s: any, limit = 20) {
     await s.from("sourcing_posts").update(patch).eq("id", r.id);
   }
   return n;
+}
+
+/** Exécute `fn` sur chaque élément, au plus `n` à la fois, sans dépasser `deadline` (horodatage ms). */
+export async function eachLimited<T>(items: T[], n: number, deadline: number, fn: (x: T) => Promise<void>) {
+  let i = 0;
+  await Promise.all(
+    Array.from({ length: Math.min(n, items.length) }, async () => {
+      while (i < items.length && Date.now() < deadline) await fn(items[i++]);
+    }),
+  );
+  return i;
 }
