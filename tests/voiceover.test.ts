@@ -183,3 +183,35 @@ describe("voix pub personnalisée", () => {
     expect(body.ref_text).toBe("واش باغي حاجة زوينة؟");
   });
 });
+
+describe("conversion de voix", () => {
+  it("enregistrement + voix cible envoyés au service, MP3 / WAV / décalage renvoyés", async () => {
+    const { convertVoice } = await import("../lib/voiceover");
+    process.env.TTS_SERVICE_URL = "https://tts.example.com";
+    process.env.TTS_SERVICE_TOKEN = "k";
+    const f = vi.fn(
+      async () =>
+        new Response(
+          JSON.stringify({ mp3: "AQI=", wav: "UklGRg==", seconds: 21.4, pitch_shift: 7.2, quality: { clipped: 0 } }),
+          { headers: { "content-type": "application/json" } },
+        ),
+    );
+    vi.stubGlobal("fetch", f);
+    const out = await convertVoice(Buffer.from("rec"), { voice: "doda-f2", ref: null });
+    expect((f.mock.calls[0] as any)[0]).toBe("https://tts.example.com/convert");
+    expect(JSON.parse((f.mock.calls[0] as any)[1].body)).toEqual({ audio: "cmVj", voice: "doda-f2", ref_audio: null });
+    expect(out.seconds).toBe(21.4);
+    expect(out.pitchShift).toBe(7.2);
+    expect(out.wav?.toString()).toBe("RIFF");
+  });
+  it("service pas encore à jour : message clair", async () => {
+    const { convertVoice } = await import("../lib/voiceover");
+    process.env.TTS_SERVICE_URL = "https://tts.example.com";
+    process.env.TTS_SERVICE_TOKEN = "k";
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async () => new Response("{}", { status: 404 })),
+    );
+    await expect(convertVoice(Buffer.from("rec"), { voice: "doda-f2", ref: null })).rejects.toThrow("mis à jour");
+  });
+});

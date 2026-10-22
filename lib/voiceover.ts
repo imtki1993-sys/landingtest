@@ -478,3 +478,38 @@ export async function checkReference(
     wav: j.wav ? Buffer.from(j.wav, "base64") : null,
   };
 }
+
+// ─── Conversion de voix ───
+
+/** Script enregistré par le vendeur → redit avec le timbre de la voix choisie (ton, accent et rythme gardés). */
+export async function convertVoice(
+  audio: Buffer,
+  target: { voice: string; ref: string | null },
+): Promise<Synthesis & { pitchShift: number }> {
+  if (!availableProviders().includes("habibi"))
+    throw new Error("Le service de voix darija n'est pas encore branché (TTS_SERVICE_URL / TTS_SERVICE_TOKEN).");
+  const r = await fetch(env("TTS_SERVICE_URL").replace(/\/+$/, "") + "/convert", {
+    method: "POST",
+    headers: { authorization: "Bearer " + env("TTS_SERVICE_TOKEN"), "content-type": "application/json" },
+    body: JSON.stringify({ audio: audio.toString("base64"), voice: target.voice, ref_audio: target.ref }),
+    cache: "no-store",
+    signal: AbortSignal.timeout(240_000),
+  });
+  const j: any = await r.json().catch(() => ({}));
+  if (!r.ok)
+    throw new Error(
+      r.status === 404
+        ? "Le service de voix doit être mis à jour pour la conversion."
+        : j?.detail
+          ? String(j.detail)
+          : `Le service de voix a répondu ${r.status}`,
+    );
+  return {
+    audio: Buffer.from(j.mp3, "base64"),
+    mime: "audio/mpeg",
+    wav: j.wav ? Buffer.from(j.wav, "base64") : undefined,
+    seconds: Number(j.seconds) || null,
+    quality: j.quality || undefined,
+    pitchShift: Number(j.pitch_shift) || 0,
+  };
+}

@@ -5,6 +5,7 @@ import SaaSSidebar from "../components/SaaSSidebar";
 import SaaSTopbar from "../components/SaaSTopbar";
 import { hasHarakat, normalizeDarija, stripHarakat, type Lexicon } from "../../lib/darija-text";
 import VoiceRecorder, { type CustomVoice } from "./VoiceRecorder";
+import { toBase64, useRecorder } from "./useRecorder";
 
 interface Voice {
   id: string;
@@ -143,6 +144,9 @@ export default function VoiceoverPage() {
   const [custom, setCustom] = useState<CustomVoice[]>([]);
   const [customInstalled, setCustomInstalled] = useState(true);
   const [recording, setRecording] = useState(false);
+  // « Dire au micro » : le vendeur enregistre son script, la voix choisie le redit (conversion de voix)
+  const [mode, setMode] = useState<"text" | "voice">("text");
+  const mic = useRecorder(90);
 
   useEffect(() => {
     api("/api/voiceover")
@@ -184,7 +188,7 @@ export default function VoiceoverPage() {
   }
   const voices = d?.voices || [];
   const voiceById = new Map(voices.map((v) => [v.id, v]));
-  const ready = (v: Voice) => !!d?.providers.includes(v.provider);
+  const ready = (v: Voice) => !!d?.providers.includes(v.provider) && (mode === "text" || v.provider === "habibi");
   const noProvider = !!d && !d.providers.length;
   const tooLong = spoken.text.length > 1500;
 
@@ -248,6 +252,33 @@ export default function VoiceoverPage() {
           exact,
           preset: preset || undefined,
           title: title || name,
+          product_id: productId || undefined,
+        }),
+      });
+      setResult(x.item);
+      setD((v) => (v ? { ...v, items: [x.item, ...(v.items || [])] } : v));
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setGenerating(false);
+    }
+  }
+
+  async function convertRecording() {
+    if (!mic.blob) return;
+    setGenerating(true);
+    setError("");
+    setResult(null);
+    try {
+      const x = await api("/api/voiceover", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          action: "convert",
+          audio: await toBase64(mic.blob),
+          voice,
+          title: title || name || "Mon enregistrement",
+          script: script || undefined,
           product_id: productId || undefined,
         }),
       });
@@ -534,13 +565,79 @@ export default function VoiceoverPage() {
             <div className="vo-card">
               <h2>
                 <i>2</i> Le script
-                {script ? (
+                {script && mode === "text" ? (
                   <span className="vo-meta">
                     ≈ {spoken.seconds} s · {spoken.sentences.length} phrase{spoken.sentences.length > 1 ? "s" : ""}
                   </span>
                 ) : null}
               </h2>
-              {script ? (
+              <div className="vo-seg vo-seg-2 vo-mode" role="tablist" aria-label="Comment créer la voix off">
+                <button
+                  type="button"
+                  role="tab"
+                  aria-selected={mode === "text"}
+                  className={mode === "text" ? "on" : ""}
+                  onClick={() => setMode("text")}
+                >
+                  Écrire le script
+                </button>
+                <button
+                  type="button"
+                  role="tab"
+                  aria-selected={mode === "voice"}
+                  className={mode === "voice" ? "on" : ""}
+                  onClick={() => {
+                    setMode("voice");
+                    if (voice.startsWith("azure")) setVoice("");
+                  }}
+                >
+                  Dire au micro
+                </button>
+              </div>
+              {mode === "voice" ? (
+                <div className="vo-rec vo-say">
+                  <p>
+                    Lis ton script <strong>exactement comme tu veux l’entendre</strong> : ton de pub, accent, pauses,
+                    énergie. Ensuite, choisis une voix à l’étape 3 : elle redira ton enregistrement avec son timbre, en
+                    gardant ton jeu. 90 s maximum.
+                  </p>
+                  {script ? (
+                    <div className="vo-say-script" dir="rtl">
+                      {script}
+                    </div>
+                  ) : null}
+                  <div className="vo-rec-actions">
+                    {mic.recording ? (
+                      <button type="button" className="vo-small vo-rec-on" onClick={mic.stop}>
+                        ■ Arrêter ({Math.floor(mic.seconds)} / 90 s)
+                      </button>
+                    ) : (
+                      <button type="button" className="vo-small" onClick={mic.start}>
+                        ● {mic.blob ? "Recommencer" : "Enregistrer mon script"}
+                      </button>
+                    )}
+                    <label className="vo-link vo-file">
+                      ou importer un fichier (vocal WhatsApp, MP3…)
+                      <input
+                        type="file"
+                        accept="audio/*"
+                        onChange={(e) => {
+                          const f = e.target.files?.[0];
+                          if (f) mic.take(f);
+                        }}
+                      />
+                    </label>
+                  </div>
+                  {mic.error ? <p className="vo-warn">{mic.error}</p> : null}
+                  {mic.url ? <audio controls src={mic.url} /> : null}
+                  <input
+                    className="vo-title"
+                    value={title}
+                    onChange={(e) => setTitle(e.target.value)}
+                    placeholder="Titre de la voix off (facultatif)"
+                  />
+                </div>
+              ) : script ? (
                 <>
                   <input
                     className="vo-title"
@@ -793,39 +890,54 @@ export default function VoiceoverPage() {
                   </div>
                 </div>
               ))}
-              <fieldset>
-                <legend>Pauses entre les phrases</legend>
-                <div className="vo-seg vo-seg-3">
-                  {PAUSE_OPTIONS.map(([k, l]) => (
-                    <button type="button" key={k} className={pause === k ? "on" : ""} onClick={() => setPause(k)}>
-                      {l}
-                    </button>
-                  ))}
-                </div>
-              </fieldset>
-              <label className="vo-check">
-                <input type="checkbox" checked={fit} onChange={(e) => setFit(e.target.checked)} />
-                Tenir dans {seconds} s (accélère légèrement la voix si elle dépasse, sans changer le timbre)
-              </label>
-              <label className="vo-speed">
-                Vitesse <b>{speed.toFixed(2).replace(/0$/, "")}×</b>
-                <input
-                  type="range"
-                  min={0.8}
-                  max={1.2}
-                  step={0.05}
-                  value={speed}
-                  onChange={(e) => setSpeed(Number(e.target.value))}
-                />
-              </label>
-              <button
-                type="button"
-                className="vo-primary"
-                disabled={generating || !script.trim() || !voice || noProvider || tooLong}
-                onClick={generate}
-              >
-                {generating ? "Génération de la voix… (20 à 60 s)" : "Générer la voix off"}
-              </button>
+              {mode === "text" ? (
+                <>
+                  <fieldset>
+                    <legend>Pauses entre les phrases</legend>
+                    <div className="vo-seg vo-seg-3">
+                      {PAUSE_OPTIONS.map(([k, l]) => (
+                        <button type="button" key={k} className={pause === k ? "on" : ""} onClick={() => setPause(k)}>
+                          {l}
+                        </button>
+                      ))}
+                    </div>
+                  </fieldset>
+                  <label className="vo-check">
+                    <input type="checkbox" checked={fit} onChange={(e) => setFit(e.target.checked)} />
+                    Tenir dans {seconds} s (accélère légèrement la voix si elle dépasse, sans changer le timbre)
+                  </label>
+                  <label className="vo-speed">
+                    Vitesse <b>{speed.toFixed(2).replace(/0$/, "")}×</b>
+                    <input
+                      type="range"
+                      min={0.8}
+                      max={1.2}
+                      step={0.05}
+                      value={speed}
+                      onChange={(e) => setSpeed(Number(e.target.value))}
+                    />
+                  </label>
+                  <button
+                    type="button"
+                    className="vo-primary"
+                    disabled={generating || !script.trim() || !voice || noProvider || tooLong}
+                    onClick={generate}
+                  >
+                    {generating ? "Génération de la voix… (20 à 60 s)" : "Générer la voix off"}
+                  </button>
+                </>
+              ) : (
+                <button
+                  type="button"
+                  className="vo-primary"
+                  disabled={generating || !mic.blob || mic.recording || !voice || noProvider}
+                  onClick={convertRecording}
+                >
+                  {generating
+                    ? "Transformation de ta voix… (20 à 60 s)"
+                    : `Redire mon enregistrement avec ${voice ? voiceLabel(voice) : "la voix choisie"}`}
+                </button>
+              )}
               {result ? (
                 <div className="vo-result">
                   {result.parent_id && itemById.get(result.parent_id) ? (

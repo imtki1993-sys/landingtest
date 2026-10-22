@@ -36,7 +36,7 @@ image = (
         "cn2an==0.5.22",
         "langid==1.1.6",
     )
-    .run_commands("pip install --no-deps git+https://github.com/myshell-ai/OpenVoice.git")
+    .run_commands("pip install --no-deps git+https://github.com/myshell-ai/OpenVoice.git@74a1d147b17a8c3092dd5430504bd83ef6c7eb23")
     .add_local_file("vc.py", "/app/vc.py", copy=True)
     .run_commands(
         "cd /app && OPENVOICE_DIR=/app/openvoice python -c 'import vc; vc.download()'",

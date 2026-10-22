@@ -34,11 +34,17 @@ def download() -> None:
 def converter():
     if "c" not in _vc:
         import torch
-        from openvoice.api import ToneColorConverter
+        from openvoice.api import OpenVoiceBaseClass, ToneColorConverter
 
         device = "cuda" if torch.cuda.is_available() else "cpu"
-        c = ToneColorConverter(str(OV_DIR / "converter/config.json"), device=device, enable_watermark=False)
-        c.load_ckpt(str(OV_DIR / "converter/checkpoint.pth"))
+        # le constructeur d'OpenVoice transmet enable_watermark à sa classe de base (erreur) : construit à la main,
+        # sans filigrane audio
+        c = ToneColorConverter.__new__(ToneColorConverter)
+        OpenVoiceBaseClass.__init__(c, str(OV_DIR / "converter/config.json"), device=device)
+        c.watermark_model = None
+        c.version = getattr(c.hps, "_version_", "v1")
+        ckpt = torch.load(str(OV_DIR / "converter/checkpoint.pth"), map_location=device, weights_only=False)
+        c.model.load_state_dict(ckpt["model"], strict=False)
         _vc["c"] = c
         _vc["se"] = {}
     return _vc["c"]

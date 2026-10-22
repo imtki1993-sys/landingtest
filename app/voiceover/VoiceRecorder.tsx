@@ -1,6 +1,7 @@
 "use client";
 // Enregistrer une voix pub personnalisée : 4 à 12 s lues avec le ton d'une pub, depuis le micro ou un fichier.
-import React, { useEffect, useRef, useState } from "react";
+import React, { useState } from "react";
+import { toBase64, useRecorder } from "./useRecorder";
 
 const SAMPLE =
   "واش باغي حاجة زوينة وبثمن مناسب؟ هاد المنتوج غادي يعجبك بزاف! الجودة عالية، والتوصيل لجميع المدن. طلب دابا!";
@@ -14,14 +15,6 @@ export interface CustomVoice {
   seconds: number | null;
 }
 
-const toBase64 = (blob: Blob) =>
-  new Promise<string>((ok, ko) => {
-    const r = new FileReader();
-    r.onload = () => ok(String(r.result).split(",")[1] || "");
-    r.onerror = () => ko(r.error);
-    r.readAsDataURL(blob);
-  });
-
 export default function VoiceRecorder({
   onSaved,
   onClose,
@@ -33,61 +26,14 @@ export default function VoiceRecorder({
   const [name, setName] = useState("");
   const [gender, setGender] = useState<"m" | "f">("m");
   const [consent, setConsent] = useState(false);
-  const [blob, setBlob] = useState<Blob | null>(null);
-  const [url, setUrl] = useState("");
-  const [rec, setRec] = useState(0); // secondes écoulées pendant l'enregistrement, 0 = arrêté
+  const r = useRecorder(MAX_S);
+  const { blob, url } = r;
+  const rec = r.seconds;
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState<string[]>([]);
-  const media = useRef<MediaRecorder | null>(null);
-  const timer = useRef<ReturnType<typeof setInterval> | null>(null);
-
-  useEffect(
-    () => () => {
-      if (timer.current) clearInterval(timer.current);
-      media.current?.stream.getTracks().forEach((t) => t.stop());
-    },
-    [],
-  );
-  useEffect(() => () => (url ? URL.revokeObjectURL(url) : undefined), [url]);
-
-  function take(b: Blob) {
-    setBlob(b);
-    setUrl(URL.createObjectURL(b));
-    setMsg([]);
-  }
-
-  async function start() {
-    setMsg([]);
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({
-        audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true },
-      });
-      const chunks: Blob[] = [];
-      const m = new MediaRecorder(stream);
-      m.ondataavailable = (e) => e.data.size && chunks.push(e.data);
-      m.onstop = () => {
-        stream.getTracks().forEach((t) => t.stop());
-        take(new Blob(chunks, { type: m.mimeType || "audio/webm" }));
-      };
-      media.current = m;
-      m.start();
-      const t0 = Date.now();
-      setRec(0.1);
-      timer.current = setInterval(() => {
-        const s = (Date.now() - t0) / 1000;
-        setRec(s);
-        if (s >= MAX_S) stop();
-      }, 200);
-    } catch {
-      setMsg(["Micro inaccessible : autorise le micro dans ton navigateur, ou importe un fichier audio."]);
-    }
-  }
-  function stop() {
-    if (timer.current) clearInterval(timer.current);
-    timer.current = null;
-    setRec(0);
-    if (media.current?.state === "recording") media.current.stop();
-  }
+  const take = r.take;
+  const start = r.start;
+  const stop = r.stop;
 
   async function save() {
     if (!blob) return;
@@ -170,6 +116,7 @@ export default function VoiceRecorder({
         <input type="checkbox" checked={consent} onChange={(e) => setConsent(e.target.checked)} />
         C’est ma voix, ou la personne enregistrée m’a donné son accord pour l’utiliser dans mes pubs.
       </label>
+      {r.error ? <p className="vo-warn">{r.error}</p> : null}
       {msg.length ? (
         <ul className="vo-warn vo-rec-msg">
           {msg.map((m) => (
