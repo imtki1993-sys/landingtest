@@ -13,6 +13,7 @@ const items = [
   ["/delivery", "🚚", "Livraison"],
   ["/products", "◇", "Mes produits"],
   ["/sourcing", "⬡", "Sourcing Derb Omar"],
+  ["/landing-gemini", "✦", "Landing Gemini"],
   ["/voiceover", "♪", "Voix off darija"],
   ["/domains", "⌁", "Domaines"],
   ["/analytics", "↗", "Analytics"],
