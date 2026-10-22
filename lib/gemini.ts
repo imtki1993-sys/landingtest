@@ -1,0 +1,103 @@
+// Appels Gemini (Google) côté serveur : texte / analyse d'images (JSON) et génération d'images (Nano Banana).
+// Clé : GEMINI_API_KEY (Vercel). Modèles réglables : GEMINI_TEXT_MODEL, GEMINI_IMAGE_MODEL.
+const BASE = "https://generativelanguage.googleapis.com/v1beta/models";
+const env = (k: string) =>
+  String(process.env[k] || "")
+    .trim()
+    .replace(/^["']|["']$/g, "");
+
+export const geminiKey = () => env("GEMINI_API_KEY");
+export const GEMINI_TEXT_MODEL = () => env("GEMINI_TEXT_MODEL") || "gemini-3.6-flash";
+export const GEMINI_IMAGE_MODEL = () => env("GEMINI_IMAGE_MODEL") || "gemini-nano-banana-2.1";
+
+export class GeminiError extends Error {
+  constructor(
+    message: string,
+    public status = 502,
+  ) {
+    super(message);
+  }
+}
+
+type Part = { text: string } | { inline_data: { mime_type: string; data: string } };
+
+/** Photo (lien) → partie image pour Gemini (4 Mo au plus). */
+export async function imagePart(url: string): Promise<Part | null> {
+  const r = await fetch(url, { signal: AbortSignal.timeout(15_000), cache: "no-store" }).catch(() => null);
+  if (!r?.ok) return null;
+  const type = (r.headers.get("content-type") || "image/jpeg").split(";")[0].trim();
+  if (!/^image\/(jpeg|png|webp)$/.test(type)) return null;
+  const buf = Buffer.from(await r.arrayBuffer());
+  if (!buf.length || buf.length > 4 * 1024 * 1024) return null;
+  return { inline_data: { mime_type: type, data: buf.toString("base64") } };
+}
+
+async function call(model: string, body: unknown, timeout = 120_000): Promise<any> {
+  const key = geminiKey();
+  if (!key) throw new GeminiError("Gemini n'est pas configuré : ajoute GEMINI_API_KEY dans Vercel.", 503);
+  const r = await fetch(`${BASE}/${encodeURIComponent(model)}:generateContent`, {
+    method: "POST",
+    headers: { "x-goog-api-key": key, "content-type": "application/json" },
+    body: JSON.stringify(body),
+    cache: "no-store",
+    signal: AbortSignal.timeout(timeout),
+  });
+  const j: any = await r.json().catch(() => ({}));
+  if (!r.ok) {
+    const msg = String(j?.error?.message || "").slice(0, 220);
+    throw new GeminiError(
+      r.status === 429
+        ? "Quota Gemini atteint : réessaie dans une minute ou active la facturation dans Google AI Studio."
+        : /api key/i.test(msg)
+          ? "Clé Gemini refusée : vérifie GEMINI_API_KEY dans Vercel."
+          : `Gemini (${model}) a répondu ${r.status}${msg ? " : " + msg : ""}`,
+      r.status === 429 ? 429 : 502,
+    );
+  }
+  return j;
+}
+
+const partsOf = (j: any): any[] => (j?.candidates || []).flatMap((c: any) => c?.content?.parts || []);
+
+/** Réponse JSON (texte + images éventuelles en entrée). */
+export async function geminiJson<T = any>(prompt: string, images: Part[] = []): Promise<T> {
+  const j = await call(GEMINI_TEXT_MODEL(), {
+    contents: [{ role: "user", parts: [...images, { text: prompt }] }],
+    generationConfig: { responseMimeType: "application/json", temperature: 0.7 },
+  });
+  const text = partsOf(j)
+    .map((p) => p.text || "")
+    .join("")
+    .trim();
+  const clean = text.replace(/```json|```/gi, "").trim();
+  const a = clean.indexOf("{"),
+    b = clean.lastIndexOf("}");
+  if (a < 0 || b <= a) throw new GeminiError("Gemini n'a pas renvoyé de JSON valide. Réessaie.");
+  try {
+    return JSON.parse(clean.slice(a, b + 1)) as T;
+  } catch {
+    throw new GeminiError("Gemini n'a pas renvoyé de JSON valide. Réessaie.");
+  }
+}
+
+/** Image générée à partir d'une consigne et de photos de référence (le produit doit rester identique). */
+export async function geminiImage(
+  prompt: string,
+  refs: Part[],
+  aspectRatio = "1:1",
+): Promise<{ data: Buffer; mime: string }> {
+  const j = await call(
+    GEMINI_IMAGE_MODEL(),
+    {
+      contents: [{ role: "user", parts: [...refs, { text: prompt }] }],
+      generationConfig: { responseModalities: ["IMAGE"], imageConfig: { aspectRatio } },
+    },
+    150_000,
+  );
+  for (const p of partsOf(j)) {
+    const d = p.inline_data || p.inlineData;
+    if (d?.data && String(d.mime_type || d.mimeType || "image/png").startsWith("image/"))
+      return { data: Buffer.from(d.data, "base64"), mime: String(d.mime_type || d.mimeType || "image/png") };
+  }
+  throw new GeminiError("Gemini n'a pas renvoyé d'image (consigne refusée ou réponse vide).");
+}

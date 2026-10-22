@@ -284,6 +284,14 @@ export default function Pages() {
     const id = window.setTimeout(loadAiUsage, 300);
     return () => window.clearTimeout(id);
   }, []);
+  // ouverture directe dans l'éditeur (/pages?edit=<id>), par exemple après « Landing Gemini »
+  useEffect(() => {
+    const id = new URLSearchParams(window.location.search).get("edit");
+    if (id && /^[0-9a-f-]{36}$/i.test(id)) {
+      openEditor({ id });
+      window.history.replaceState(null, "", "/pages");
+    }
+  }, []);
   async function uploadCreateImages(files: FileList | null) {
     if (!files?.length) return;
     setUploading(true);
