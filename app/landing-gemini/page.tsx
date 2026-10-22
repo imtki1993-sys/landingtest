@@ -7,6 +7,7 @@ import SaaSTopbar from "../components/SaaSTopbar";
 import { uploadImages } from "../../lib/builder-images";
 import { LANDING_TEMPLATE_PRESETS } from "../../lib/landing-template-presets";
 import type { ProductAnalysis } from "../../lib/gemini-landing";
+import GeminiLanding from "../../components/public/GeminiLanding";
 
 const LANGS: [string, string][] = [
   ["ar-MA", "Darija"],
@@ -45,6 +46,10 @@ export default function LandingGeminiPage() {
   const [busy, setBusy] = useState("");
   const [error, setError] = useState("");
   const [result, setResult] = useState<any>(null);
+  // design complet par Gemini (HTML/CSS) : aperçu, publication
+  const [design, setDesign] = useState<any>(null);
+  const [view, setView] = useState<"mobile" | "desktop">("mobile");
+  const [published, setPublished] = useState("");
 
   async function addPhotos(files: FileList | null) {
     if (!files?.length) return;
@@ -93,6 +98,48 @@ export default function LandingGeminiPage() {
       });
       setResult(x);
       setStep(3);
+      await makeDesign(x.page.id);
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setBusy("");
+    }
+  }
+
+  /** Gemini dessine toute la page (mise en page, couleurs, typo, sections). */
+  async function makeDesign(pageId: string) {
+    setBusy("design");
+    setError("");
+    setPublished("");
+    try {
+      setDesign(await post("/api/landing-gemini/design", { pageId }));
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setBusy("");
+    }
+  }
+
+  async function publish() {
+    if (!design || !result) return;
+    setBusy("publish");
+    setError("");
+    try {
+      const r = await fetch("/api/pages/" + result.page.id, {
+        method: "PATCH",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          status: "PUBLISHED",
+          name,
+          content: design.content,
+          images: design.images,
+          price: design.price,
+          oldPrice: design.oldPrice,
+        }),
+      });
+      const x = await r.json().catch(() => ({}));
+      if (!r.ok) throw new Error(x.error || "Publication impossible");
+      setPublished("/landing/" + (x.slug || design.slug));
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -121,7 +168,10 @@ export default function LandingGeminiPage() {
           <div>
             <span className="eyebrow">LANDING GEMINI</span>
             <h1>Landing page avec Gemini</h1>
-            <p>Gemini analyse tes photos, écrit la page en darija et crée des photos de mise en scène du produit.</p>
+            <p>
+              Gemini analyse tes photos, écrit la page en darija, crée les photos de mise en scène et dessine toute la
+              page, de A à Z.
+            </p>
           </div>
         </header>
 
@@ -276,16 +326,12 @@ export default function LandingGeminiPage() {
 
         {step === 3 && result ? (
           <section className="lg-card">
-            <h2>Ta landing est prête</h2>
-            {result.generated?.length ? (
-              <div className="lg-shots">
-                {result.generated.map((g: any) => (
-                  <figure key={g.url}>
-                    <img src={g.url} alt={`Photo ${g.kind}`} />
-                    <figcaption>{g.kind}</figcaption>
-                  </figure>
-                ))}
-              </div>
+            <h2>{design ? "Ta landing dessinée par Gemini" : "Gemini dessine ta page…"}</h2>
+            {busy === "design" ? (
+              <p className="lg-hint">
+                Gemini crée la mise en page, les couleurs, la typo et toutes les sections (1 à 3 min). Ne ferme pas la
+                page.
+              </p>
             ) : null}
             {result.imageErrors?.length || result.imagesSkipped ? (
               <p className="lg-warn">
@@ -294,27 +340,50 @@ export default function LandingGeminiPage() {
                   : `${result.imageErrors.length} photo(s) n’ont pas pu être créées : ${result.imageErrors[0]}`}
               </p>
             ) : null}
-            {result.headlines?.length > 1 ? (
-              <div className="lg-ab">
-                <span>Deux accroches : la A est sur la page, la B est enregistrée pour un test A/B</span>
-                {result.headlines.map((h: string, i: number) => (
-                  <p key={i} dir="auto">
-                    <b>{i ? "B" : "A"}</b> {h}
+            {design ? (
+              <>
+                <div className="lg-seg lg-view" role="tablist" aria-label="Aperçu">
+                  {(["mobile", "desktop"] as const).map((v) => (
+                    <button
+                      type="button"
+                      key={v}
+                      role="tab"
+                      aria-selected={view === v}
+                      className={view === v ? "on" : ""}
+                      onClick={() => setView(v)}
+                    >
+                      {v === "mobile" ? "Téléphone" : "Ordinateur"}
+                    </button>
+                  ))}
+                </div>
+                <div className={"lg-preview lg-preview-" + view}>
+                  <GeminiLanding html={design.html} title="Aperçu" />
+                </div>
+                <p className="lg-hint">
+                  Le formulaire de l’aperçu n’envoie rien. Une fois publiée, chaque commande arrive dans Commandes
+                  (Pixel et API Conversions compris). Vérifie les photos : le produit doit être identique au vrai.
+                </p>
+                {published ? (
+                  <p className="lg-ok">
+                    Page publiée :{" "}
+                    <a href={published} target="_blank" rel="noreferrer">
+                      {typeof window !== "undefined" ? window.location.origin : ""}
+                      {published}
+                    </a>
                   </p>
-                ))}
-              </div>
+                ) : null}
+              </>
             ) : null}
-            <p className="lg-hint">
-              Vérifie les photos générées : le produit doit être identique au vrai. Supprime celles qui ne le sont pas
-              dans l’éditeur. Ajoute de vrais avis clients si tu en as.
-            </p>
             <div className="lg-actions">
               <button
                 type="button"
                 className="lg-ghost"
+                disabled={!!busy}
                 onClick={() => {
                   setStep(1);
                   setResult(null);
+                  setDesign(null);
+                  setPublished("");
                   setAnalysis(null);
                   setName("");
                   setImages([]);
@@ -324,9 +393,17 @@ export default function LandingGeminiPage() {
               >
                 Créer une autre landing
               </button>
-              <a className="lg-primary" href={`/pages?edit=${result.page.id}`}>
-                Ouvrir dans l’éditeur
-              </a>
+              <div className="lg-actions-right">
+                <button type="button" className="lg-ghost" disabled={!!busy} onClick={() => makeDesign(result.page.id)}>
+                  {busy === "design" ? "Dessin en cours…" : design ? "Redessiner" : "Relancer le dessin"}
+                </button>
+                <a className="lg-ghost" href={`/pages?edit=${result.page.id}`} title="Version modèle LandPro">
+                  Éditeur classique
+                </a>
+                <button type="button" className="lg-primary" disabled={!!busy || !design} onClick={publish}>
+                  {busy === "publish" ? "Publication…" : published ? "Republier" : "Publier la page"}
+                </button>
+              </div>
             </div>
           </section>
         ) : null}
