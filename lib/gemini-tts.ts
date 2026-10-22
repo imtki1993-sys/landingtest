@@ -78,7 +78,18 @@ export function pcmToMp3(pcm: Buffer, sampleRate = SAMPLE_RATE, kbps = 128): Buf
 }
 
 export async function geminiTts(text: string, voice: string, style: string, key: string) {
-  const r = await fetch("https://generativelanguage.googleapis.com/v1beta/interactions", {
+  // surcharge passagère chez Google (503…) : 2 nouveaux essais espacés
+  let r!: Response;
+  for (const wait of [0, 1500, 4000]) {
+    if (wait) await new Promise((ok) => setTimeout(ok, wait));
+    r = await post(text, voice, style, key);
+    if (![500, 502, 503, 504].includes(r.status)) break;
+  }
+  return readAudio(r);
+}
+
+function post(text: string, voice: string, style: string, key: string) {
+  return fetch("https://generativelanguage.googleapis.com/v1beta/interactions", {
     method: "POST",
     headers: { "x-goog-api-key": key, "content-type": "application/json" },
     body: JSON.stringify({
@@ -95,6 +106,9 @@ export async function geminiTts(text: string, voice: string, style: string, key:
     cache: "no-store",
     signal: AbortSignal.timeout(180_000),
   });
+}
+
+async function readAudio(r: Response) {
   const j: any = await r.json().catch(() => ({}));
   if (!r.ok) {
     const msg = String(j?.error?.message || "").slice(0, 200);
@@ -103,7 +117,9 @@ export async function geminiTts(text: string, voice: string, style: string, key:
         ? "Clé Gemini refusée : vérifie GEMINI_API_KEY dans Vercel."
         : r.status === 429
           ? "Quota Gemini atteint : réessaie dans une minute ou active la facturation dans Google AI Studio."
-          : `Gemini a répondu ${r.status}${msg ? " : " + msg : ""}`,
+          : r.status === 503
+            ? "Gemini est surchargé en ce moment (forte demande chez Google). Réessaie dans une minute."
+            : `Gemini a répondu ${r.status}${msg ? " : " + msg : ""}`,
     );
   }
   const audio = findAudio(j);
