@@ -91,3 +91,41 @@ describe("landing Gemini (prompts, nettoyage)", () => {
     expect(p).toContain("any text");
   });
 });
+
+describe("Gemini surchargé", () => {
+  it("503 : nouveaux essais puis modèle de secours", async () => {
+    vi.useFakeTimers();
+    process.env.GEMINI_API_KEY = "k";
+    const f = vi.fn(async (url: string) =>
+      url.includes("gemini-3.6-flash")
+        ? new Response(JSON.stringify({ error: { message: "high demand" } }), { status: 503 })
+        : reply([{ text: '{"ok":true}' }]),
+    );
+    vi.stubGlobal("fetch", f);
+    const p = geminiJson("x");
+    await vi.runAllTimersAsync();
+    expect(await p).toEqual({ ok: true });
+    const urls = f.mock.calls.map(([u]) => String(u));
+    expect(urls.filter((u) => u.includes("gemini-3.6-flash"))).toHaveLength(3);
+    expect(urls.at(-1)).toContain("gemini-3-flash-preview");
+    vi.useRealTimers();
+  });
+  it("tous surchargés : message clair ; clé refusée : pas de reprise", async () => {
+    vi.useFakeTimers();
+    process.env.GEMINI_API_KEY = "k";
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async () => new Response("{}", { status: 503 })),
+    );
+    const p = geminiJson("x").catch((e) => e);
+    await vi.runAllTimersAsync();
+    expect(String((await p).message)).toContain("surchargé");
+    const f = vi.fn(
+      async () => new Response(JSON.stringify({ error: { message: "API key not valid" } }), { status: 400 }),
+    );
+    vi.stubGlobal("fetch", f);
+    await expect(geminiJson("x")).rejects.toThrow("GEMINI_API_KEY");
+    expect(f).toHaveBeenCalledTimes(1);
+    vi.useRealTimers();
+  });
+});

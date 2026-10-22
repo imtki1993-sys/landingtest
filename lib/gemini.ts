@@ -9,6 +9,13 @@ const env = (k: string) =>
 export const geminiKey = () => env("GEMINI_API_KEY");
 export const GEMINI_TEXT_MODEL = () => env("GEMINI_TEXT_MODEL") || "gemini-3.6-flash";
 export const GEMINI_IMAGE_MODEL = () => env("GEMINI_IMAGE_MODEL") || "gemini-nano-banana-2.1";
+/** Modèles de secours quand le modèle principal est saturé (503) ou indisponible (404). */
+const TEXT_FALLBACKS = ["gemini-3-flash-preview", "gemini-3.5-flash-lite"];
+const IMAGE_FALLBACKS = ["gemini-2.5-flash-image"];
+const chain = (main: string, fallbacks: string[]) => [main, ...fallbacks.filter((m) => m !== main)];
+const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+/** Erreurs passagères côté Google (surcharge, panne) : on réessaie puis on passe au modèle suivant. */
+const TRANSIENT = new Set([500, 502, 503, 504]);
 
 export class GeminiError extends Error {
   constructor(
@@ -32,9 +39,8 @@ export async function imagePart(url: string): Promise<Part | null> {
   return { inline_data: { mime_type: type, data: buf.toString("base64") } };
 }
 
-async function call(model: string, body: unknown, timeout = 120_000): Promise<any> {
+async function callOnce(model: string, body: unknown, timeout: number): Promise<any> {
   const key = geminiKey();
-  if (!key) throw new GeminiError("Gemini n'est pas configuré : ajoute GEMINI_API_KEY dans Vercel.", 503);
   const r = await fetch(`${BASE}/${encodeURIComponent(model)}:generateContent`, {
     method: "POST",
     headers: { "x-goog-api-key": key, "content-type": "application/json" },
@@ -51,17 +57,45 @@ async function call(model: string, body: unknown, timeout = 120_000): Promise<an
         : /api key/i.test(msg)
           ? "Clé Gemini refusée : vérifie GEMINI_API_KEY dans Vercel."
           : `Gemini (${model}) a répondu ${r.status}${msg ? " : " + msg : ""}`,
-      r.status === 429 ? 429 : 502,
+      r.status,
     );
   }
   return j;
+}
+
+/**
+ * Appel avec reprise : surcharge passagère (503…) → 2 nouveaux essais espacés, puis modèle de secours ;
+ * modèle inconnu (404) → modèle de secours. Les autres erreurs (clé, quota, consigne refusée) remontent tout de suite.
+ */
+async function call(models: string[], body: unknown, timeout = 120_000): Promise<any> {
+  if (!geminiKey()) throw new GeminiError("Gemini n'est pas configuré : ajoute GEMINI_API_KEY dans Vercel.", 503);
+  let last: GeminiError | null = null;
+  for (const model of models) {
+    for (const wait of [0, 1500, 4000]) {
+      if (wait) await sleep(wait);
+      try {
+        return await callOnce(model, body, timeout);
+      } catch (e: any) {
+        if (!(e instanceof GeminiError)) throw e;
+        last = e;
+        if (e.status === 404) break; // modèle indisponible pour cette clé : suivant
+        if (!TRANSIENT.has(e.status)) throw new GeminiError(e.message, e.status === 429 ? 429 : 502);
+      }
+    }
+  }
+  throw new GeminiError(
+    last?.status === 404
+      ? `Aucun modèle Gemini disponible pour cette clé (${models.join(", ")}).`
+      : "Gemini est surchargé en ce moment (forte demande chez Google). Réessaie dans une minute.",
+    503,
+  );
 }
 
 const partsOf = (j: any): any[] => (j?.candidates || []).flatMap((c: any) => c?.content?.parts || []);
 
 /** Réponse JSON (texte + images éventuelles en entrée). */
 export async function geminiJson<T = any>(prompt: string, images: Part[] = []): Promise<T> {
-  const j = await call(GEMINI_TEXT_MODEL(), {
+  const j = await call(chain(GEMINI_TEXT_MODEL(), TEXT_FALLBACKS), {
     contents: [{ role: "user", parts: [...images, { text: prompt }] }],
     generationConfig: { responseMimeType: "application/json", temperature: 0.7 },
   });
@@ -87,7 +121,7 @@ export async function geminiImage(
   aspectRatio = "1:1",
 ): Promise<{ data: Buffer; mime: string }> {
   const j = await call(
-    GEMINI_IMAGE_MODEL(),
+    chain(GEMINI_IMAGE_MODEL(), IMAGE_FALLBACKS),
     {
       contents: [{ role: "user", parts: [...refs, { text: prompt }] }],
       generationConfig: { responseModalities: ["IMAGE"], imageConfig: { aspectRatio } },
