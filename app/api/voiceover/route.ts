@@ -6,6 +6,7 @@ import { reportError } from "../../../lib/monitoring";
 import { authContext } from "../../../lib/server-auth";
 import {
   availableProviders,
+  convertVoice,
   PAUSES,
   PRESETS,
   newSeed,
@@ -193,6 +194,7 @@ export async function POST(req: Request) {
     const b = await req.json().catch(() => ({}));
     const lexicon = (await loadLexicon(s, workspaceId)) || {};
     if (b.action === "redo") return redo(s, workspaceId, b, lexicon);
+    if (b.action === "convert") return convert(s, workspaceId, b);
 
     const script = String(b.script || "").trim();
     if (!script) return NextResponse.json({ error: "Le script est vide." }, { status: 400 });
@@ -261,6 +263,60 @@ export async function POST(req: Request) {
     reportError(e, "api/voiceover");
     return NextResponse.json({ error: publicMessage(e) }, { status: e?.message === "Non autorisé" ? 401 : 500 });
   }
+}
+
+/**
+ * Conversion de voix : { action: "convert", audio (base64), voice, title?, script? } → voix off enregistrée.
+ * Le vendeur dit le script lui-même ; la voix choisie le redit avec son timbre.
+ */
+async function convert(s: any, workspaceId: string, b: any) {
+  const audio = Buffer.from(String(b.audio || ""), "base64");
+  if (audio.length < 2000) return NextResponse.json({ error: "Enregistrement vide." }, { status: 400 });
+  if (audio.length > 4 * 1024 * 1024)
+    return NextResponse.json(
+      { error: "Enregistrement trop lourd (4 Mo maximum) : utilise un fichier MP3 ou M4A, ou enregistre ici." },
+      { status: 400 },
+    );
+  const voice = await resolveVoice(s, workspaceId, String(b.voice || ""));
+  if (!voice) return NextResponse.json({ error: "Choisis une voix." }, { status: 400 });
+  if (voice.provider !== "habibi")
+    return NextResponse.json(
+      { error: "Cette voix ne peut pas redire un enregistrement : choisis-en une autre." },
+      { status: 400 },
+    );
+  if (!(await underLimit(s, workspaceId))) return limitReached();
+  let out: Synthesis & { pitchShift: number };
+  try {
+    out = await convertVoice(audio, { voice: voice.synthId, ref: voice.ref?.audio ?? null });
+  } catch (e: any) {
+    return NextResponse.json({ error: e.message || "Conversion impossible." }, { status: 502 });
+  }
+  const files = await storeAudio(s, workspaceId, out);
+  const script =
+    String(b.script || "")
+      .trim()
+      .slice(0, 4000) || "(script enregistré au micro)";
+  const item = await insertRow(
+    s,
+    {
+      workspace_id: workspaceId,
+      product_id: typeof b.product_id === "string" && b.product_id ? b.product_id : null,
+      title: String(b.title || "").slice(0, 80) || "Mon enregistrement",
+      script,
+      tts_text: "",
+      voice: voice.id,
+      provider: "vc",
+      speed: 1,
+      audio_url: files.audio,
+      seconds: out.seconds,
+    },
+    {
+      settings: { mode: "vc", pitch_shift: out.pitchShift },
+      wav_path: files.wav,
+      quality: out.quality ?? null,
+    },
+  );
+  return NextResponse.json({ item }, { status: 201 });
 }
 
 /** Régénère une seule phrase : les autres phrases sont reprises telles quelles (même prise). */

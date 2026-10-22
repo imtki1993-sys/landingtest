@@ -25,10 +25,28 @@ image = (
         "cd /app && python prepare_voices.py --out /app/voices",
         "cd /app && python -c 'import server; server.download_models()'",
     )
-    .env({"VOICES_DIR": "/app/voices", "PYTHONPATH": "/app"})
+    # conversion de voix : OpenVoice V2 (MIT) ; installé sans ses dépendances lourdes (TTS de base, whisper)
+    .pip_install(
+        "librosa==0.10.2.post1",
+        "inflect==7.4.0",
+        "unidecode==1.3.8",
+        "eng_to_ipa==0.0.2",
+        "pypinyin==0.53.0",
+        "jieba==0.42.1",
+        "cn2an==0.5.22",
+        "langid==1.1.6",
+    )
+    .run_commands("pip install --no-deps git+https://github.com/myshell-ai/OpenVoice.git@74a1d147b17a8c3092dd5430504bd83ef6c7eb23")
+    .add_local_file("vc.py", "/app/vc.py", copy=True)
+    .run_commands(
+        "cd /app && OPENVOICE_DIR=/app/openvoice python -c 'import vc; vc.download()'",
+        "cd /app && OPENVOICE_DIR=/app/openvoice python -c 'import vc; vc.smoke_test(\"/app/voices\")'",
+    )
+    .env({"VOICES_DIR": "/app/voices", "PYTHONPATH": "/app", "OPENVOICE_DIR": "/app/openvoice"})
     # code du service monté à chaque déploiement (jamais figé dans le cache de l'image)
     .add_local_file("audio_utils.py", "/srv/audio_utils.py")
     .add_local_file("server.py", "/srv/server.py")
+    .add_local_file("vc.py", "/srv/vc.py")
 )
 
 
