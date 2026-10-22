@@ -19,7 +19,21 @@ from fastapi import FastAPI, Header, HTTPException
 from fastapi.responses import JSONResponse, Response
 from pydantic import BaseModel, Field
 
-from audio_utils import SAMPLE_RATE, assemble, expected_seconds, fit_tempo, sentence_speed, style_of, to_mp3
+import base64
+
+from audio_utils import (
+    SAMPLE_RATE,
+    assemble,
+    expected_seconds,
+    fit_tempo,
+    from_pcm16,
+    quality_report,
+    sentence_speed,
+    style_of,
+    to_mp3,
+    to_pcm16,
+    to_wav,
+)
 
 MAR_CKPT = "hf://SWivid/Habibi-TTS/Specialized/MAR/model_100000.safetensors"
 MAR_VOCAB = "hf://SWivid/Habibi-TTS/Specialized/MAR/vocab.txt"
@@ -85,6 +99,10 @@ class SynthesizeBody(BaseModel):
     gaps: list[float] | None = None
     # intonation selon la ponctuation (référence « question » / « exclamation » du comédien)
     expressive: bool = True
+    # phrases déjà générées à réutiliser (PCM 16 bits 24 kHz en base64), null = à générer : régénérer une seule phrase
+    segments: list[str | None] | None = None
+    # « json » : MP3 + WAV + phrases brutes (pour régénérer une phrase plus tard) ; « mp3 » : audio seul
+    format: str = "mp3"
 
 
 def _reference(sentence: str, voice: dict, expressive: bool) -> dict:
@@ -158,8 +176,8 @@ def voices(authorization: str | None = Header(default=None)):
 @app.post("/synthesize")
 def synthesize(body: SynthesizeBody, authorization: str | None = Header(default=None)):
     _check(authorization)
-    sentences = [s.strip() for s in body.sentences if s and s.strip()]
-    if not sentences:
+    sentences = [s.strip() for s in body.sentences]
+    if not sentences or any(not s for s in sentences):
         raise HTTPException(status_code=400, detail="Aucune phrase")
     if sum(len(s) for s in sentences) > MAX_CHARS:
         raise HTTPException(status_code=400, detail="Texte trop long")
@@ -173,18 +191,48 @@ def synthesize(body: SynthesizeBody, authorization: str | None = Header(default=
             raise HTTPException(status_code=400, detail="Aucune voix disponible")
         voice_id = same[0]
     voice = voices_[voice_id]
+    reuse = body.segments if body.segments and len(body.segments) == len(sentences) else [None] * len(sentences)
     segments = []
+    generated = 0
     with _lock:
-        for s in sentences:
+        for s, old in zip(sentences, reuse):
+            if old:
+                try:
+                    segments.append((s, from_pcm16(base64.b64decode(old))))
+                    continue
+                except Exception:
+                    pass  # segment illisible : régénéré
             wave, sr = _generate(s, voice, body.speed, body.expressive)
             if sr != SAMPLE_RATE:
                 raise HTTPException(status_code=500, detail="Fréquence inattendue")
             segments.append((s, wave))
+            generated += 1
     gaps = body.gaps if body.gaps and len(body.gaps) == len(sentences) else None
     final = assemble(segments, pause=body.pause, gaps=gaps)
     seconds = len(final) / SAMPLE_RATE
     tempo = fit_tempo(seconds, body.target_seconds)
     mp3 = to_mp3(final, tempo=tempo)
+    if body.format == "json":
+        raws = [to_pcm16(w) for _, w in segments]
+        bounds, total = [], 0
+        for r in raws:
+            total += len(r) // 2
+            bounds.append(total)
+        b64 = lambda b: base64.b64encode(b).decode()  # noqa: E731
+        return JSONResponse(
+            {
+                "mp3": b64(mp3),
+                "wav": b64(to_wav(final, tempo=tempo)),
+                "segments": b64(b"".join(raws)),
+                "bounds": bounds,
+                "seconds": round(seconds / tempo, 1),
+                "tempo": tempo,
+                "voice_used": voice_id,
+                "generated": generated,
+                "quality": quality_report(final),
+            },
+            headers={"Cache-Control": "no-store"},
+        )
     return Response(
         content=mp3,
         media_type="audio/mpeg",
