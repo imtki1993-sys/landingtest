@@ -201,7 +201,11 @@ export async function POST(req: Request) {
     if (!script) return NextResponse.json({ error: "Le script est vide." }, { status: 400 });
     const exact = !!b.exact;
     // texte lu : celui corrigé par le vendeur, sinon préparé automatiquement à partir du script
-    const spoken = normalizeDarija(String(b.spoken || "").trim() || script, lexicon, { exact });
+    const spoken = normalizeDarija(String(b.spoken || "").trim() || script, lexicon, {
+      exact,
+      // expressions <laugh>, <short pause>… : comprises seulement par les voix Google
+      tags: String(b.voice || "").startsWith("gemini-"),
+    });
     if (!spoken.sentences.length) return NextResponse.json({ error: "Rien à lire dans ce texte." }, { status: 400 });
     if (spoken.text.length > MAX_CHARS)
       return NextResponse.json(

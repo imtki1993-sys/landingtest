@@ -1,6 +1,6 @@
 "use client";
 // Voix off darija : script écrit par Meta AI, texte préparé pour la voix, voix marocaine (Habibi-TTS / Azure).
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import SaaSSidebar from "../components/SaaSSidebar";
 import SaaSTopbar from "../components/SaaSTopbar";
 import { hasHarakat, normalizeDarija, stripHarakat, type Lexicon } from "../../lib/darija-text";
@@ -13,6 +13,7 @@ interface Voice {
   gender: "f" | "m";
   provider: "habibi" | "azure" | "gemini";
   hint: string;
+  top?: boolean;
 }
 interface Item {
   id: string;
@@ -73,6 +74,23 @@ const AUDIENCES: [string, string][] = [
   ["hommes", "Hommes"],
   ["parents", "Parents"],
   ["jeunes", "Jeunes (18-30 ans)"],
+];
+
+/** Expressions comprises par les voix Google, insérées dans le script entre chevrons. */
+const EXPRESSIONS: [string, string][] = [
+  ["<short pause>", "Pause courte"],
+  ["<long pause>", "Pause longue"],
+  ["<laugh>", "Rire"],
+  ["<chuckle>", "Petit rire"],
+  ["<giggle>", "Rire étouffé"],
+  ["<sigh>", "Soupir"],
+  ["<breath>", "Respiration"],
+  ["<phew>", "Ouf (soulagement)"],
+  ["<gasp>", "Étonnement"],
+  ["<cheer>", "Joie, hourra"],
+  ["<whispers>", "Chuchoter (la suite)"],
+  ["<tsk>", "Tss (désapprobation)"],
+  ["<throat-clearing>", "Se racler la gorge"],
 ];
 
 const PAUSE_OPTIONS: [string, string][] = [
@@ -145,6 +163,9 @@ export default function VoiceoverPage() {
   const [custom, setCustom] = useState<CustomVoice[]>([]);
   const [customInstalled, setCustomInstalled] = useState(true);
   const [recording, setRecording] = useState(false);
+  const [allGoogle, setAllGoogle] = useState(false);
+  const [showOld, setShowOld] = useState(false);
+  const scriptRef = useRef<HTMLTextAreaElement | null>(null);
   // « Dire au micro » : le vendeur enregistre son script, la voix choisie le redit (conversion de voix)
   const [mode, setMode] = useState<"text" | "voice">("text");
   const mic = useRecorder(90);
@@ -171,8 +192,8 @@ export default function VoiceoverPage() {
   }, []);
 
   const spoken = useMemo(
-    () => normalizeDarija(spokenEdit ?? script, lexicon, { exact }),
-    [script, spokenEdit, lexicon, exact],
+    () => normalizeDarija(spokenEdit ?? script, lexicon, { exact, tags: voice.startsWith("gemini-") }),
+    [script, spokenEdit, lexicon, exact, voice],
   );
   const items = d?.items || [];
   const itemById = new Map(items.map((i) => [i.id, i]));
@@ -336,6 +357,22 @@ export default function VoiceoverPage() {
       setVocalizing("");
       setError(err.message);
     }
+  }
+
+  /** Insère une expression à l'endroit du curseur dans le script. */
+  function insertExpression(tag: string) {
+    const el = scriptRef.current;
+    const at = el ? el.selectionStart : script.length;
+    const end = el ? el.selectionEnd : script.length;
+    const next = script.slice(0, at) + ` ${tag} ` + script.slice(end);
+    setScript(next.replace(/ {2,}/g, " "));
+    setSpokenEdit(null);
+    requestAnimationFrame(() => {
+      if (!el) return;
+      const pos = at + tag.length + 2;
+      el.focus();
+      el.setSelectionRange(pos, pos);
+    });
   }
 
   async function removeCustom(v: CustomVoice) {
@@ -654,6 +691,7 @@ export default function VoiceoverPage() {
                     placeholder="Titre de la voix off"
                   />
                   <textarea
+                    ref={scriptRef}
                     className="vo-script"
                     dir="rtl"
                     rows={9}
@@ -663,6 +701,25 @@ export default function VoiceoverPage() {
                       setSpokenEdit(null);
                     }}
                   />
+                  {voice.startsWith("gemini-") ? (
+                    <div className="vo-expr">
+                      <select
+                        value=""
+                        aria-label="Ajouter une expression"
+                        onChange={(e) => e.target.value && insertExpression(e.target.value)}
+                      >
+                        <option value="">+ Expression (rire, soupir, pause…)</option>
+                        {EXPRESSIONS.map(([tag, label]) => (
+                          <option key={tag} value={tag}>
+                            {label} {tag}
+                          </option>
+                        ))}
+                      </select>
+                      <span>
+                        Place le curseur dans le script, puis choisis : la voix Google la jouera à cet endroit.
+                      </span>
+                    </div>
+                  ) : null}
                   <div className="vo-tashkeel">
                     <button
                       type="button"
@@ -881,7 +938,7 @@ export default function VoiceoverPage() {
                   <span>Voix Google (Gemini) · darija la plus naturelle</span>
                   <div>
                     {voices
-                      .filter((v) => v.provider === "gemini")
+                      .filter((v) => v.provider === "gemini" && (allGoogle || v.top || voice === v.id))
                       .map((v) => (
                         <button
                           type="button"
@@ -891,34 +948,53 @@ export default function VoiceoverPage() {
                           title={v.hint}
                         >
                           <b>{v.label}</b>
-                          <small>{v.hint.split(" · ")[1]?.replace(" (Google)", "") || v.hint}</small>
+                          <small>
+                            {v.gender === "f" ? "Femme" : "Homme"} ·{" "}
+                            {v.hint.split(" · ")[1]?.replace(" (Google)", "") || v.hint}
+                          </small>
                         </button>
                       ))}
                   </div>
+                  <button type="button" className="vo-link" onClick={() => setAllGoogle((x) => !x)}>
+                    {allGoogle
+                      ? "Moins de voix Google"
+                      : `Voir les ${voices.filter((v) => v.provider === "gemini").length} voix Google`}
+                  </button>
                 </div>
               ) : null}
-              {(["f", "m"] as const).map((g) => (
-                <div key={g} className="vo-voices">
-                  <span>{g === "f" ? "Voix de femme" : "Voix d’homme"}</span>
-                  <div>
-                    {voices
-                      .filter((v) => v.gender === g && v.provider !== "gemini")
-                      .map((v) => (
-                        <button
-                          type="button"
-                          key={v.id}
-                          className={"vo-voice" + (voice === v.id ? " on" : "") + (ready(v) ? "" : " off")}
-                          onClick={() => ready(v) && setVoice(v.id)}
-                          disabled={!ready(v)}
-                          title={ready(v) ? v.hint : "Pas encore disponible"}
-                        >
-                          <b>{v.label}</b>
-                          <small>{ready(v) ? v.hint.split(" · ")[1] || v.hint : "bientôt"}</small>
-                        </button>
-                      ))}
+              {mode === "text" && voices.some((v) => v.provider === "gemini" && ready(v)) ? (
+                <button type="button" className="vo-link" onClick={() => setShowOld((x) => !x)}>
+                  {showOld ? "Masquer les autres voix" : "Autres voix (LandPro, Azure)"}
+                </button>
+              ) : null}
+              {(["f", "m"] as const).map((g) =>
+                // voix Google disponibles : les autres voix sont repliées (sauf « Dire au micro », qui en a besoin)
+                mode === "text" &&
+                !showOld &&
+                !voices.find((v) => v.id === voice && v.provider !== "gemini") &&
+                voices.some((v) => v.provider === "gemini" && ready(v)) ? null : (
+                  <div key={g} className="vo-voices">
+                    <span>{g === "f" ? "Voix de femme" : "Voix d’homme"}</span>
+                    <div>
+                      {voices
+                        .filter((v) => v.gender === g && v.provider !== "gemini")
+                        .map((v) => (
+                          <button
+                            type="button"
+                            key={v.id}
+                            className={"vo-voice" + (voice === v.id ? " on" : "") + (ready(v) ? "" : " off")}
+                            onClick={() => ready(v) && setVoice(v.id)}
+                            disabled={!ready(v)}
+                            title={ready(v) ? v.hint : "Pas encore disponible"}
+                          >
+                            <b>{v.label}</b>
+                            <small>{ready(v) ? v.hint.split(" · ")[1] || v.hint : "bientôt"}</small>
+                          </button>
+                        ))}
+                    </div>
                   </div>
-                </div>
-              ))}
+                ),
+              )}
               {mode === "text" ? (
                 <>
                   <fieldset>
@@ -931,10 +1007,12 @@ export default function VoiceoverPage() {
                       ))}
                     </div>
                   </fieldset>
-                  <label className="vo-check">
-                    <input type="checkbox" checked={fit} onChange={(e) => setFit(e.target.checked)} />
-                    Tenir dans {seconds} s (accélère légèrement la voix si elle dépasse, sans changer le timbre)
-                  </label>
+                  {!voice.startsWith("gemini-") ? (
+                    <label className="vo-check">
+                      <input type="checkbox" checked={fit} onChange={(e) => setFit(e.target.checked)} />
+                      Tenir dans {seconds} s (accélère légèrement la voix si elle dépasse, sans changer le timbre)
+                    </label>
+                  ) : null}
                   <label className="vo-speed">
                     Vitesse <b>{speed.toFixed(2).replace(/0$/, "")}×</b>
                     <input

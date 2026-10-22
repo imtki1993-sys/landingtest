@@ -217,3 +217,23 @@ describe("scripts vocalisés (harakat)", () => {
     expect(hasHarakat("دابا")).toBe(false);
   });
 });
+
+describe("expressions Gemini", () => {
+  const t = "واش عييتي؟ <sigh>\nدابا الحل وصل! <laugh> الثمن غير 199 درهم <short pause> طلب دابا.\n<Long Pause>";
+  it("gardées pour les voix Google, à leur place, sans être lues comme des mots latins", () => {
+    const r = normalizeDarija(t, {}, { tags: true });
+    expect(r.sentences).toEqual([
+      "واش عييتي؟",
+      "<sigh>",
+      "دابا الحل وصل!",
+      "<laugh> الثمن غير مية و تسعة و تسعين درهم <short pause> طلب دابا.",
+      "<long pause>",
+    ]);
+    expect(r.guessed).toEqual([]);
+  });
+  it("retirées pour les autres voix", () => {
+    const r = normalizeDarija(t);
+    expect(r.text).not.toMatch(/[<>]|laugh|pause/);
+    expect(r.guessed).toEqual([]);
+  });
+});
