@@ -8,6 +8,7 @@ import {
   availableProviders,
   PAUSES,
   PRESETS,
+  newSeed,
   splitSegments,
   synthesize,
   VOICES,
@@ -15,7 +16,7 @@ import {
   type PauseKind,
   type Synthesis,
 } from "../../../lib/voiceover";
-import { cleanLexicon, estimateSeconds, normalizeDarija, type Lexicon } from "../../../lib/darija-text";
+import { cleanLexicon, estimateSeconds, groupPassages, normalizeDarija, type Lexicon } from "../../../lib/darija-text";
 import { VOICE_BUCKET, ensureVoiceBucket, voicePath } from "../../../lib/voiceover-storage";
 
 export const maxDuration = 300;
@@ -184,9 +185,12 @@ export async function POST(req: Request) {
     const target = Number(b.target_seconds) || null;
     if (!(await underLimit(s, workspaceId))) return limitReached();
 
+    // passages de 2-3 phrases lus d'une traite, même tirage pour toute la voix : pas de changement de voix entre les lignes
+    const { passages, gaps } = groupPassages(spoken.sentences, spoken.gaps);
+    const seed = newSeed();
     let out: Synthesis;
     try {
-      out = await synthesize(spoken.sentences, voice.id, { speed, pause, targetSeconds: target, gaps: spoken.gaps });
+      out = await synthesize(passages, voice.id, { speed, pause, targetSeconds: target, gaps, seed });
     } catch (e: any) {
       return NextResponse.json({ error: e.message || "Génération de la voix impossible." }, { status: 502 });
     }
@@ -208,9 +212,9 @@ export async function POST(req: Request) {
       {
         preset: PRESETS.some((p) => p.id === b.preset) ? b.preset : null,
         exact,
-        settings: { pause, target_seconds: target },
-        sentences: spoken.sentences,
-        gaps: spoken.gaps,
+        settings: { pause, target_seconds: target, seed },
+        sentences: passages,
+        gaps,
         bounds: out.bounds ?? null,
         wav_path: files.wav,
         segments_path: files.segments,
@@ -267,6 +271,7 @@ async function redo(s: any, workspaceId: string, b: any, lexicon: Lexicon) {
       targetSeconds: settings.target_seconds,
       gaps: Array.isArray(row.gaps) ? row.gaps : undefined,
       segments,
+      seed: newSeed(), // nouvelle prise pour le passage refait
     });
   } catch (e: any) {
     return NextResponse.json({ error: e.message || "Génération de la voix impossible." }, { status: 502 });

@@ -709,7 +709,7 @@ export default function VoiceoverPage() {
                       </div>
                       <div>
                         <span>
-                          Après{result.settings.redone != null ? ` (phrase ${result.settings.redone + 1} refaite)` : ""}
+                          Après{result.settings.redone != null ? ` (passage ${result.settings.redone + 1} refait)` : ""}
                         </span>
                         <audio controls autoPlay src={result.audio} />
                       </div>
@@ -738,7 +738,7 @@ export default function VoiceoverPage() {
                   </div>
                   {result.can_redo && result.sentences ? (
                     <div className="vo-lines">
-                      <p>Une phrase sonne mal ? Refais seulement celle-là (les autres restent identiques).</p>
+                      <p>Un passage sonne mal ? Refais seulement celui-là (le reste ne change pas).</p>
                       <ol>
                         {result.sentences.map((line, i) => (
                           <li key={i}>
@@ -747,7 +747,7 @@ export default function VoiceoverPage() {
                                 dir="rtl"
                                 value={editText}
                                 onChange={(e) => setEditText(e.target.value)}
-                                aria-label={`Texte de la phrase ${i + 1}`}
+                                aria-label={`Texte du passage ${i + 1}`}
                               />
                             ) : (
                               <span dir="rtl">{line}</span>
@@ -841,7 +841,7 @@ export default function VoiceoverPage() {
                     <b>{it.title || "Voix off"}</b>
                     <small>
                       {voiceById.get(it.voice)?.label || it.voice} · {fmtSec(it.seconds)} · {fmtDate(it.created_at)}
-                      {it.parent_id && it.settings.redone != null ? ` · phrase ${it.settings.redone + 1} refaite` : ""}
+                      {it.parent_id && it.settings.redone != null ? ` · passage ${it.settings.redone + 1} refait` : ""}
                     </small>
                   </div>
                   <audio controls preload="none" src={it.audio} />

@@ -52,6 +52,8 @@ export interface SynthesisOptions {
   gaps?: number[];
   /** phrases déjà générées à réutiliser (PCM 16 bits base64), null = à générer (régénérer une phrase) */
   segments?: (string | null)[];
+  /** tirage commun à tous les passages (même voix du début à la fin) ; nouveau tirage = nouvelle prise */
+  seed?: number;
 }
 
 export interface Synthesis {
@@ -75,6 +77,7 @@ async function habibi(
   target: number | null,
   gaps: number[] | null,
   segments: (string | null)[] | null,
+  seed: number | null,
 ): Promise<Synthesis> {
   const base = env("TTS_SERVICE_URL").replace(/\/+$/, "");
   const r = await fetch(base + "/synthesize", {
@@ -91,7 +94,8 @@ async function habibi(
       pause,
       target_seconds: target,
       gaps,
-      expressive: true,
+      expressive: false,
+      seed,
       segments,
       format: "json",
     }),
@@ -188,6 +192,7 @@ export async function synthesize(sentences: string[], voiceId: string, o: Synthe
         target,
         gaps,
         Array.isArray(o.segments) && o.segments.length === sentences.length ? o.segments : null,
+        Number.isInteger(o.seed) ? (o.seed as number) : null,
       )
     : azure(sentences, voice.id, s, pause, gaps);
 }
@@ -386,3 +391,6 @@ export function splitSegments(wav: Buffer, bounds: number[]): string[] {
   }
   return out;
 }
+
+/** Tirage aléatoire pour une prise de voix. */
+export const newSeed = () => Math.floor(Math.random() * 2_000_000_000);

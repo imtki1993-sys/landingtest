@@ -515,3 +515,33 @@ export function normalizeDarija(input: string, lexicon: Lexicon = {}, opts: Norm
 export const GAP = { comma: 0.18, stop: 0.32, exclaim: 0.38, question: 0.5, hesitation: 0.6, newline: 0.15 };
 
 const endWithStop = (s: string) => (/[.!؟]$/.test(s) ? s : s.replace(/،$/, "") + ".");
+
+/**
+ * Phrases → passages de 2-3 phrases (≈ 200 caractères au plus) lus d'une traite : la voix garde son élan et son
+ * timbre au lieu de repartir à zéro à chaque ligne. Le silence après un passage est celui de sa dernière phrase.
+ */
+export function groupPassages(
+  sentences: string[],
+  gaps: number[],
+  maxChars = 200,
+  maxSentences = 3,
+): { passages: string[]; gaps: number[] } {
+  const passages: string[] = [];
+  const out: number[] = [];
+  let cur: string[] = [];
+  let gap = 0;
+  const flush = () => {
+    if (!cur.length) return;
+    passages.push(cur.join(" "));
+    out.push(gap);
+    cur = [];
+  };
+  sentences.forEach((s, i) => {
+    const len = cur.join(" ").length;
+    if (cur.length && (cur.length >= maxSentences || len + 1 + s.length > maxChars)) flush();
+    cur.push(s);
+    gap = gaps[i] ?? 0;
+  });
+  flush();
+  return { passages, gaps: out };
+}

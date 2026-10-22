@@ -167,3 +167,22 @@ describe("script S11 (test de référence)", () => {
     expect(normalizeDarija("هذا رائع", {}, { exact: true }).text).toBe("هذا رائع.");
   });
 });
+
+describe("passages lus d'une traite", () => {
+  it("regroupe 2-3 phrases (≤ 200 caractères), garde le silence de la dernière", async () => {
+    const { groupPassages } = await import("../lib/darija-text");
+    const r = normalizeDarija(S11, {}, { exact: true });
+    const g = groupPassages(r.sentences, r.gaps);
+    expect(g.passages.length).toBeGreaterThanOrEqual(5);
+    expect(g.passages.length).toBeLessThan(r.sentences.length);
+    expect(g.passages.every((p) => p.length <= 200 || !p.includes(" ؟ "))).toBe(true);
+    expect(g.passages.join(" ")).toBe(r.sentences.join(" "));
+    expect(g.gaps.at(-1)).toBe(0);
+    expect(g.gaps.length).toBe(g.passages.length);
+  });
+  it("une phrase très longue reste seule", async () => {
+    const { groupPassages } = await import("../lib/darija-text");
+    const long = "ا".repeat(196) + ".";
+    expect(groupPassages(["قصيرة.", long, "تانية."], [0.3, 0.3, 0]).passages).toEqual(["قصيرة.", long, "تانية."]);
+  });
+});
