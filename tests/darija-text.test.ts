@@ -180,9 +180,14 @@ describe("passages lus d'une traite", () => {
     expect(g.gaps.at(-1)).toBe(0);
     expect(g.gaps.length).toBe(g.passages.length);
     // fin de la question dans le 1er passage : ~31 % du texte, pause de question
-    expect(g.inner[0][0][0]).toBeCloseTo(0.31, 1);
-    expect(g.inner[0][0][1]).toBeGreaterThan(g.inner[0][1][1]);
-    expect(g.inner.at(-1)).toHaveLength(1);
+    const ends = g.inner[0].filter(([, gap]) => gap > GAP.breath);
+    expect(ends[0][0]).toBeCloseTo(0.31, 1);
+    expect(ends[0][1]).toBeGreaterThan(ends[1][1]);
+    // virgules du 1er passage : « التيليفون، » et « خيط، » → respirations courtes, dans l'ordre
+    expect(g.inner[0].filter(([, gap]) => gap === GAP.breath)).toHaveLength(2);
+    expect(g.inner[0].map(([p]) => p)).toEqual([...g.inner[0].map(([p]) => p)].sort((a, b) => a - b));
+    // dernier passage : fin de « آش كتسنى؟ » + virgule de « دابا، »
+    expect(g.inner.at(-1)).toHaveLength(2);
   });
   it("une phrase très longue reste seule", async () => {
     const { groupPassages } = await import("../lib/darija-text");

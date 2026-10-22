@@ -528,7 +528,15 @@ export function normalizeDarija(input: string, lexicon: Lexicon = {}, opts: Norm
 }
 
 /** Silences (s) après une phrase selon sa ponctuation. */
-export const GAP = { comma: 0.18, stop: 0.32, exclaim: 0.38, question: 0.5, hesitation: 0.6, newline: 0.15 };
+export const GAP = {
+  breath: 0.16,
+  comma: 0.18,
+  stop: 0.32,
+  exclaim: 0.38,
+  question: 0.5,
+  hesitation: 0.6,
+  newline: 0.15,
+};
 
 const endWithStop = (s: string) => (/[.!؟]$/.test(s) ? s : s.replace(/،$/, "") + ".");
 
@@ -554,11 +562,15 @@ export function groupPassages(
     out.push(curGaps[curGaps.length - 1] ?? 0);
     // fin de chaque phrase du passage (position 0-1, d'après le nombre de lettres) et son silence (un peu réduit
     // pour garder l'élan du passage) : le service place la pause dans le creux de voix le plus proche
+    // + une respiration courte à chaque virgule (comme un vrai témoignage : petites pauses toutes les 1-2 s)
     const splits: [number, number][] = [];
+    const at = (i: number) => Math.round((i / text.length) * 1000) / 1000;
     let pos = 0;
-    cur.slice(0, -1).forEach((s, k) => {
+    cur.forEach((s, k) => {
+      for (let i = s.indexOf("،"); i >= 0 && i < s.length - 1; i = s.indexOf("،", i + 1))
+        splits.push([at(pos + i + 1), GAP.breath]);
       pos += s.length + 1;
-      splits.push([Math.round((pos / text.length) * 1000) / 1000, Math.round(curGaps[k] * 0.85 * 100) / 100]);
+      if (k < cur.length - 1) splits.push([at(pos), Math.round(curGaps[k] * 0.85 * 100) / 100]);
     });
     inner.push(splits);
     cur = [];
