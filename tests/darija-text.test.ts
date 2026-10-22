@@ -186,3 +186,25 @@ describe("passages lus d'une traite", () => {
     expect(groupPassages(["قصيرة.", long, "تانية."], [0.3, 0.3, 0]).passages).toEqual(["قصيرة.", long, "تانية."]);
   });
 });
+
+describe("scripts vocalisés (harakat)", () => {
+  it("les harakat sont gardées telles quelles, chiffres toujours convertis", async () => {
+    const t = "وَاشْ التِّيلِيفُونْ دْيَالَكْ كَيْطِيحْ؟\nدَابَا الحَلّْ وْصَلْ ب 199 درهم!";
+    const r = normalizeDarija(t);
+    expect(r.sentences[0]).toBe("وَاشْ التِّيلِيفُونْ دْيَالَكْ كَيْطِيحْ؟");
+    expect(r.text).toContain("دَابَا الحَلّْ وْصَلْ ب مية و تسعة و تسعين درهم!");
+  });
+  it("un mot vocalisé volontairement n'est pas « adapté » en darija", () => {
+    expect(normalizeDarija("هَذَا").text).toBe("هَذَا.");
+    expect(normalizeDarija("هَذَا").adapted).toEqual([]);
+  });
+  it("le dictionnaire s'applique aussi au mot écrit avec harakat", () => {
+    expect(normalizeDarija("السّْبُورْ زوين", { السبور: "السّبور" }).text).toBe("السّبور زوين.");
+  });
+  it("outils harakat", async () => {
+    const { stripHarakat, hasHarakat } = await import("../lib/darija-text");
+    expect(stripHarakat("دَابَا الحَلّْ")).toBe("دابا الحل");
+    expect(hasHarakat("دَابَا الحَلّْ")).toBe(true);
+    expect(hasHarakat("دابا")).toBe(false);
+  });
+});

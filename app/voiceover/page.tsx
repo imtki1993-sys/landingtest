@@ -3,7 +3,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import SaaSSidebar from "../components/SaaSSidebar";
 import SaaSTopbar from "../components/SaaSTopbar";
-import { normalizeDarija, type Lexicon } from "../../lib/darija-text";
+import { hasHarakat, normalizeDarija, stripHarakat, type Lexicon } from "../../lib/darija-text";
 
 interface Voice {
   id: string;
@@ -138,6 +138,7 @@ export default function VoiceoverPage() {
   const [editIdx, setEditIdx] = useState<number | null>(null);
   const [editText, setEditText] = useState("");
   const [compare, setCompare] = useState<string[]>([]);
+  const [vocalizing, setVocalizing] = useState("");
 
   useEffect(() => {
     api("/api/voiceover")
@@ -265,6 +266,28 @@ export default function VoiceoverPage() {
       setError(err.message);
     } finally {
       setRedoing(null);
+    }
+  }
+
+  async function vocalize() {
+    setVocalizing("…");
+    setError("");
+    try {
+      const x = await api("/api/voiceover/vocalize", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ text: script }),
+      });
+      setScript(x.text);
+      setSpokenEdit(null);
+      setVocalizing(
+        x.lines
+          ? `Harakat ajoutées sur ${x.lines} ligne${x.lines > 1 ? "s" : ""}${x.rejected ? ` (${x.rejected} laissée${x.rejected > 1 ? "s" : ""} telle${x.rejected > 1 ? "s" : ""} : l’IA voulait changer un mot)` : ""}. Relis avant de générer.`
+          : "Aucune harakat ajoutée : réessaie ou ajoute-les toi-même.",
+      );
+    } catch (err: any) {
+      setVocalizing("");
+      setError(err.message);
     }
   }
 
@@ -510,6 +533,34 @@ export default function VoiceoverPage() {
                       setSpokenEdit(null);
                     }}
                   />
+                  <div className="vo-tashkeel">
+                    <button
+                      type="button"
+                      className="vo-small vo-ghost"
+                      disabled={vocalizing === "…"}
+                      onClick={vocalize}
+                    >
+                      {vocalizing === "…" ? "Ajout des harakat…" : "Ajouter les harakat (IA)"}
+                    </button>
+                    {hasHarakat(script) ? (
+                      <button
+                        type="button"
+                        className="vo-link"
+                        onClick={() => {
+                          setScript(stripHarakat(script));
+                          setSpokenEdit(null);
+                          setVocalizing("");
+                        }}
+                      >
+                        Retirer les harakat
+                      </button>
+                    ) : null}
+                    <span>
+                      Les harakat (َ ُ ِ ْ ّ) guident la prononciation : mets surtout le soukoun (دْيَالْ) et la chadda,
+                      pas toutes les voyelles.
+                    </span>
+                  </div>
+                  {vocalizing && vocalizing !== "…" ? <p className="vo-info">{vocalizing}</p> : null}
                   <p className="vo-hint">
                     La voix suit ta ponctuation : <b>؟</b> question (la voix monte), <b>!</b> enthousiasme, <b>،</b>{" "}
                     respiration, <b>…</b> suspense avant le prix, retour à la ligne = petite pause.
