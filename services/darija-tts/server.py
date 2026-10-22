@@ -226,6 +226,62 @@ def voices(authorization: str | None = Header(default=None)):
     return {vid: v["label"] for vid, v in _state["voices"].items()}
 
 
+class ConvertBody(BaseModel):
+    audio: str  # script enregistré par le vendeur (webm, m4a, mp3, wav…) en base64
+    voice: str = "doda-m1"
+    # voix pub personnalisée comme cible (WAV en base64), à la place d'une voix du catalogue
+    ref_audio: str | None = None
+    auto_pitch: bool = True
+
+
+@app.post("/convert")
+def convert_voice(body: ConvertBody, authorization: str | None = Header(default=None)):
+    """Conversion de voix : l'enregistrement du vendeur (ton, accent, rythme) redit avec le timbre de la voix choisie."""
+    import hashlib
+    import tempfile
+
+    import vc
+
+    _check(authorization)
+    try:
+        source = base64.b64decode(body.audio)
+    except Exception:
+        raise HTTPException(status_code=400, detail="Fichier audio illisible")
+    if not 2000 < len(source) <= 12 * 1024 * 1024:
+        raise HTTPException(status_code=400, detail="Fichier audio vide ou trop lourd (12 Mo maximum)")
+    tmp_ref = None
+    if body.ref_audio:
+        ref = base64.b64decode(body.ref_audio)
+        tmp_ref = tempfile.NamedTemporaryFile(suffix=".wav", delete=False)
+        tmp_ref.write(ref)
+        tmp_ref.close()
+        target, key = tmp_ref.name, "custom-" + hashlib.sha1(ref).hexdigest()
+    else:
+        meta = json.loads((VOICES_DIR / "voices.json").read_text(encoding="utf-8"))
+        vid = body.voice if body.voice in meta else next((v for v in sorted(meta) if v[:6] == body.voice[:6]), None)
+        if not vid:
+            raise HTTPException(status_code=400, detail="Voix inconnue")
+        target, key = str(VOICES_DIR / meta[vid]["file"]), vid
+    try:
+        with _lock:
+            wave, info = vc.convert(source, target, key, body.auto_pitch)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    finally:
+        if tmp_ref:
+            os.unlink(tmp_ref.name)
+    return JSONResponse(
+        {
+            "mp3": base64.b64encode(to_mp3(wave)).decode(),
+            "wav": base64.b64encode(to_wav(wave)).decode(),
+            "seconds": round(len(wave) / SAMPLE_RATE, 1),
+            "quality": quality_report(wave),
+            **info,
+        },
+        headers={"Cache-Control": "no-store"},
+    )
+
+
 @app.post("/reference")
 def reference(body: ReferenceBody, authorization: str | None = Header(default=None)):
     """Vérifie et prépare un extrait de voix pub : durée 4-12 s, volume, saturation → WAV 24 kHz à enregistrer."""
