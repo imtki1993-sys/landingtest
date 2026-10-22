@@ -395,12 +395,26 @@ export function estimateSeconds(text: string, speed = 1): number {
 export interface NormalizeOptions {
   /** texte exact : aucun mot d'arabe classique remplacé (seuls chiffres, sigles et lettres latines sont rendus lisibles) */
   exact?: boolean;
+  /** garder les expressions <laugh>, <short pause>… (voix Google) ; sinon elles sont retirées du texte lu */
+  tags?: boolean;
 }
+
+/** Expressions vocales comprises par Gemini TTS, écrites entre chevrons : <laugh>, <short pause>… */
+const TAG_RE = /<\s*([a-z][a-z -]{1,24}?)\s*>/gi;
+const TAG_MARK = "\uE000";
+const tagCode = (i: number) => String.fromCharCode(0xe100 + i);
 
 export function normalizeDarija(input: string, lexicon: Lexicon = {}, opts: NormalizeOptions = {}): NormalizeResult {
   const guessed = new Set<string>();
   const adapted = new Set<string>();
-  let t = applyLexicon(String(input || ""), lexicon)
+  // expressions mises de côté (caractères réservés) pour que la préparation du texte ne les touche pas
+  const tags: string[] = [];
+  const raw = String(input || "").replace(TAG_RE, (_, name: string) => {
+    if (!opts.tags || tags.length > 60) return " ";
+    tags.push(`<${name.trim().toLowerCase().replace(/\s+/g, " ")}>`);
+    return ` ${TAG_MARK}${tagCode(tags.length - 1)} `;
+  });
+  let t = applyLexicon(raw, lexicon)
     .normalize("NFC")
     // emojis, pictogrammes, sélecteurs de variante
     .replace(/[\p{Extended_Pictographic}\u{FE0F}\u{200D}\u{20E3}]/gu, " ")
@@ -494,7 +508,7 @@ export function normalizeDarija(input: string, lexicon: Lexicon = {}, opts: Norm
     const before = sentences.length;
     for (const raw of line.split(/(?<=[.!؟…])\s+/)) {
       let s = raw.trim().replace(/^[،.…\s]+/, "");
-      if (!s || !/\p{L}/u.test(s)) continue;
+      if (!s || !/[\p{L}\uE000]/u.test(s)) continue;
       // hésitation / suspense « … » : la voix reste en suspens (virgule), puis un silence plus long
       const hesitation = /…$/.test(s);
       if (hesitation) s = s.replace(/[…،.\s]+$/, "") + "،";
@@ -523,6 +537,9 @@ export function normalizeDarija(input: string, lexicon: Lexicon = {}, opts: Norm
     if (sentences.length > before) gaps[gaps.length - 1] += GAP.newline;
   }
   if (gaps.length) gaps[gaps.length - 1] = 0;
+  // expressions remises à leur place
+  const restore = (x: string) => x.replace(/\uE000(.)/g, (_, c: string) => tags[c.charCodeAt(0) - 0xe100] || "");
+  for (let i = 0; i < sentences.length; i++) sentences[i] = restore(sentences[i]);
   const text = sentences.join(" ");
   return { text, sentences, gaps, guessed: [...guessed], adapted: [...adapted], seconds: estimateSeconds(text) };
 }
@@ -538,7 +555,7 @@ export const GAP = {
   newline: 0.15,
 };
 
-const endWithStop = (s: string) => (/[.!؟]$/.test(s) ? s : s.replace(/،$/, "") + ".");
+const endWithStop = (s: string) => (/[.!؟]$|\uE000.$/u.test(s) ? s : s.replace(/،$/, "") + ".");
 
 /**
  * Phrases → passages de 2-3 phrases (≈ 200 caractères au plus) lus d'une traite : la voix garde son élan et son

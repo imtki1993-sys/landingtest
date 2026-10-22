@@ -13,18 +13,82 @@ export interface Voice {
   provider: VoiceProvider;
   /** description courte affichée dans le choix */
   hint: string;
+  /** voix mise en avant (les autres voix Google sont repliées) */
+  top?: boolean;
 }
 
 export const VOICES: Voice[] = [
-  // Gemini TTS (Google) : meilleur rendu darija constaté (voix Orus), ton réglé en langage naturel
-  { id: "gemini-orus", label: "Orus", gender: "m", provider: "gemini", hint: "Homme · ferme, pub (Google)" },
-  { id: "gemini-fenrir", label: "Fenrir", gender: "m", provider: "gemini", hint: "Homme · énergique (Google)" },
-  { id: "gemini-puck", label: "Puck", gender: "m", provider: "gemini", hint: "Homme · enjoué (Google)" },
-  { id: "gemini-charon", label: "Charon", gender: "m", provider: "gemini", hint: "Homme · posé (Google)" },
-  { id: "gemini-kore", label: "Kore", gender: "f", provider: "gemini", hint: "Femme · ferme (Google)" },
-  { id: "gemini-leda", label: "Leda", gender: "f", provider: "gemini", hint: "Femme · jeune (Google)" },
-  { id: "gemini-aoede", label: "Aoede", gender: "f", provider: "gemini", hint: "Femme · légère (Google)" },
-  { id: "gemini-sulafat", label: "Sulafat", gender: "f", provider: "gemini", hint: "Femme · chaleureuse (Google)" },
+  // Gemini TTS (Google) : meilleur rendu darija constaté (voix Orus), ton réglé en langage naturel.
+  // « top » : voix mises en avant ; les autres s'affichent avec « Voir les 30 voix Google ».
+  { id: "gemini-orus", label: "Orus", gender: "m", provider: "gemini", hint: "Homme · ferme, pub (Google)", top: true },
+  {
+    id: "gemini-fenrir",
+    label: "Fenrir",
+    gender: "m",
+    provider: "gemini",
+    hint: "Homme · énergique (Google)",
+    top: true,
+  },
+  { id: "gemini-puck", label: "Puck", gender: "m", provider: "gemini", hint: "Homme · enjoué (Google)", top: true },
+  {
+    id: "gemini-charon",
+    label: "Charon",
+    gender: "m",
+    provider: "gemini",
+    hint: "Homme · posé, informatif (Google)",
+    top: true,
+  },
+  { id: "gemini-kore", label: "Kore", gender: "f", provider: "gemini", hint: "Femme · ferme (Google)", top: true },
+  { id: "gemini-leda", label: "Leda", gender: "f", provider: "gemini", hint: "Femme · jeune (Google)", top: true },
+  { id: "gemini-aoede", label: "Aoede", gender: "f", provider: "gemini", hint: "Femme · légère (Google)", top: true },
+  {
+    id: "gemini-sulafat",
+    label: "Sulafat",
+    gender: "f",
+    provider: "gemini",
+    hint: "Femme · chaleureuse (Google)",
+    top: true,
+  },
+  { id: "gemini-achird", label: "Achird", gender: "m", provider: "gemini", hint: "Homme · amical (Google)" },
+  { id: "gemini-sadachbia", label: "Sadachbia", gender: "m", provider: "gemini", hint: "Homme · vif (Google)" },
+  {
+    id: "gemini-zubenelgenubi",
+    label: "Zubenelgenubi",
+    gender: "m",
+    provider: "gemini",
+    hint: "Homme · décontracté (Google)",
+  },
+  { id: "gemini-algenib", label: "Algenib", gender: "m", provider: "gemini", hint: "Homme · voix rauque (Google)" },
+  { id: "gemini-alnilam", label: "Alnilam", gender: "m", provider: "gemini", hint: "Homme · ferme (Google)" },
+  { id: "gemini-iapetus", label: "Iapetus", gender: "m", provider: "gemini", hint: "Homme · clair (Google)" },
+  { id: "gemini-umbriel", label: "Umbriel", gender: "m", provider: "gemini", hint: "Homme · détendu (Google)" },
+  { id: "gemini-algieba", label: "Algieba", gender: "m", provider: "gemini", hint: "Homme · doux (Google)" },
+  { id: "gemini-enceladus", label: "Enceladus", gender: "m", provider: "gemini", hint: "Homme · soufflé (Google)" },
+  {
+    id: "gemini-rasalgethi",
+    label: "Rasalgethi",
+    gender: "m",
+    provider: "gemini",
+    hint: "Homme · informatif (Google)",
+  },
+  { id: "gemini-schedar", label: "Schedar", gender: "m", provider: "gemini", hint: "Homme · égal (Google)" },
+  { id: "gemini-sadaltager", label: "Sadaltager", gender: "m", provider: "gemini", hint: "Homme · savant (Google)" },
+  { id: "gemini-zephyr", label: "Zephyr", gender: "f", provider: "gemini", hint: "Femme · lumineuse (Google)" },
+  { id: "gemini-autonoe", label: "Autonoe", gender: "f", provider: "gemini", hint: "Femme · lumineuse (Google)" },
+  { id: "gemini-laomedeia", label: "Laomedeia", gender: "f", provider: "gemini", hint: "Femme · enjouée (Google)" },
+  { id: "gemini-callirrhoe", label: "Callirrhoe", gender: "f", provider: "gemini", hint: "Femme · détendue (Google)" },
+  { id: "gemini-despina", label: "Despina", gender: "f", provider: "gemini", hint: "Femme · douce (Google)" },
+  { id: "gemini-erinome", label: "Erinome", gender: "f", provider: "gemini", hint: "Femme · claire (Google)" },
+  { id: "gemini-achernar", label: "Achernar", gender: "f", provider: "gemini", hint: "Femme · tendre (Google)" },
+  { id: "gemini-gacrux", label: "Gacrux", gender: "f", provider: "gemini", hint: "Femme · mûre (Google)" },
+  { id: "gemini-pulcherrima", label: "Pulcherrima", gender: "f", provider: "gemini", hint: "Femme · directe (Google)" },
+  {
+    id: "gemini-vindemiatrix",
+    label: "Vindemiatrix",
+    gender: "f",
+    provider: "gemini",
+    hint: "Femme · douce, posée (Google)",
+  },
   { id: "doda-f1", label: "Salma", gender: "f", provider: "habibi", hint: "Femme · claire, posée" },
   { id: "doda-f2", label: "Nadia", gender: "f", provider: "habibi", hint: "Femme · chaleureuse" },
   { id: "doda-f3", label: "Imane", gender: "f", provider: "habibi", hint: "Femme · jeune, dynamique" },

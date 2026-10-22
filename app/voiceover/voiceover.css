@@ -147,3 +147,7 @@ html[data-theme="dark"] .vo-chips button { background: #111827; border-color: #4
 .vo-say { margin-top: 0; }
 .vo-say-script { max-height: 180px; overflow: auto; background: var(--vo-card); border: 1px solid var(--vo-line); border-radius: 10px; padding: 10px 12px; font-size: 16px; line-height: 1.9; white-space: pre-wrap; color: var(--vo-ink); }
 .vo-google > span { color: var(--vo-accent) !important; }
+.vo-expr { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.vo-page .vo-expr select { width: auto !important; flex: 0 0 auto; font-weight: 700; color: var(--vo-accent); border-color: color-mix(in srgb, var(--vo-accent) 40%, var(--vo-line)); }
+.vo-expr span { flex: 1 1 220px; font-size: 12px; color: var(--vo-muted); }
+.vo-google .vo-link { margin-top: 2px; }
