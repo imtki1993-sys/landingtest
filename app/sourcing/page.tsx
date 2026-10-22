@@ -284,12 +284,32 @@ function ChannelsAdmin({ channels, reload }: { channels: Channel[]; reload: () =
       reload();
     } else setMsg(x?.error || "Ajout impossible.");
   }
+  async function syncAll() {
+    setBusy("all");
+    setMsg("Lecture de tous les canaux…");
+    const { ok, x } = await call("POST", { syncAll: true });
+    setBusy("");
+    if (ok) {
+      setMsg(
+        `${x.synced}/${x.channels} canaux lus : ${x.added} nouveau${x.added > 1 ? "x" : ""} produit${x.added > 1 ? "s" : ""}` +
+          (x.failed ? `, ${x.failed} en erreur` : "") +
+          (x.synced < x.channels ? " (relance pour lire les autres)" : "") +
+          ".",
+      );
+      reload();
+    } else setMsg(x?.error || "Lecture impossible.");
+  }
   return (
     <details className="src-admin" open={!channels.length}>
       <summary>
         Canaux suivis <span>{channels.length}</span>
         <small>visible seulement par l’administrateur</small>
       </summary>
+      <div className="src-admin-sync">
+        <button type="button" disabled={!!busy || !channels.length} onClick={syncAll}>
+          {busy === "all" ? "Lecture en cours…" : "Actualiser tous les canaux maintenant"}
+        </button>
+      </div>
       <form onSubmit={add} className="src-admin-add">
         <input
           value={link}
@@ -587,6 +607,7 @@ export default function SourcingPage() {
                 <option value="price">Prix croissant</option>
               </select>
             </div>
+            {d.lastSync ? <p className="src-sync">Canaux lus {ago(d.lastSync)}.</p> : null}
             {period === "custom" ? (
               <div className="src-dates">
                 <label>

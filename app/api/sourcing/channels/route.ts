@@ -4,7 +4,8 @@ import { publicMessage } from "../../../../lib/public-error";
 import { reportError } from "../../../../lib/monitoring";
 import { authContext } from "../../../../lib/server-auth";
 import { channelUsername } from "../../../../lib/telegram-public";
-import { backfillChannel, syncChannel } from "../../../../lib/sourcing-sync";
+import { backfillChannel, eachLimited, syncChannel } from "../../../../lib/sourcing-sync";
+import { mirrorRecent } from "../../../../lib/sourcing-media";
 
 export const maxDuration = 60;
 
@@ -57,6 +58,31 @@ export async function POST(req: Request) {
         }
       }
       return NextResponse.json({ ok: true, added, done, channels });
+    }
+    // { syncAll: true } : relit maintenant tous les canaux actifs (nouveaux produits d'abord, photos ensuite)
+    if (b.syncAll) {
+      const t0 = Date.now();
+      const { data: chans, error } = await s
+        .from("sourcing_channels")
+        .select("id,username,last_post_id")
+        .eq("active", true)
+        .order("last_synced_at", { ascending: true, nullsFirst: true });
+      if (error) throw error;
+      let added = 0,
+        failed = 0;
+      const done = await eachLimited(chans || [], 4, t0 + 40_000, async (ch: any) => {
+        try {
+          added += (await syncChannel(s, ch, 2, { mirror: false })).added;
+        } catch (e: any) {
+          failed++;
+          await s
+            .from("sourcing_channels")
+            .update({ last_error: String(e.message).slice(0, 300), last_synced_at: new Date().toISOString() })
+            .eq("id", ch.id);
+        }
+      });
+      await mirrorRecent(s, t0 + 52_000, 40).catch(() => 0);
+      return NextResponse.json({ ok: true, channels: (chans || []).length, synced: done, added, failed });
     }
     if (b.id && b.sync) {
       const { data: ch } = await s.from("sourcing_channels").select("id,username,last_post_id").eq("id", b.id).single();
