@@ -42,7 +42,8 @@ describe("voix off : fournisseurs", () => {
       pause: 1.5,
       target_seconds: 30,
       gaps: null,
-      expressive: true,
+      expressive: false,
+      seed: null,
       segments: null,
       format: "json",
     });

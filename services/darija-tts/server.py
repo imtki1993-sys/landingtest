@@ -98,7 +98,10 @@ class SynthesizeBody(BaseModel):
     # silence après chaque phrase, calculé par LandPro d'après la ponctuation
     gaps: list[float] | None = None
     # intonation selon la ponctuation (référence « question » / « exclamation » du comédien)
-    expressive: bool = True
+    # intonation par extrait « question / exclamation » : désactivée par défaut (le timbre changeait d'une ligne à l'autre)
+    expressive: bool = False
+    # tirage commun à tous les passages : même voix, même élan du début à la fin
+    seed: int | None = Field(default=None, ge=0, le=2**31 - 1)
     # phrases déjà générées à réutiliser (PCM 16 bits 24 kHz en base64), null = à générer : régénérer une seule phrase
     segments: list[str | None] | None = None
     # « json » : MP3 + WAV + phrases brutes (pour régénérer une phrase plus tard) ; « mp3 » : audio seul
@@ -114,7 +117,8 @@ def _reference(sentence: str, voice: dict, expressive: bool) -> dict:
     return voice
 
 
-def _generate(sentence: str, voice: dict, speed: float, expressive: bool = True):
+def _generate(sentence: str, voice: dict, speed: float, expressive: bool = False, seed: int | None = None):
+    import torch
     from habibi_tts.infer.utils_infer import infer_process
 
     ref = _reference(sentence, voice, expressive)
@@ -122,6 +126,8 @@ def _generate(sentence: str, voice: dict, speed: float, expressive: bool = True)
         speed = sentence_speed(sentence, speed)
 
     def run(nfe: int):
+        if seed is not None:
+            torch.manual_seed(seed)
         wave, sr, _ = infer_process(
             ref["ref_audio"],
             ref["ref_text"],
@@ -202,7 +208,7 @@ def synthesize(body: SynthesizeBody, authorization: str | None = Header(default=
                     continue
                 except Exception:
                     pass  # segment illisible : régénéré
-            wave, sr = _generate(s, voice, body.speed, body.expressive)
+            wave, sr = _generate(s, voice, body.speed, body.expressive, body.seed)
             if sr != SAMPLE_RATE:
                 raise HTTPException(status_code=500, detail="Fréquence inattendue")
             segments.append((s, wave))
@@ -229,6 +235,7 @@ def synthesize(body: SynthesizeBody, authorization: str | None = Header(default=
                 "tempo": tempo,
                 "voice_used": voice_id,
                 "generated": generated,
+                "seed": body.seed,
                 "quality": quality_report(final),
             },
             headers={"Cache-Control": "no-store"},
