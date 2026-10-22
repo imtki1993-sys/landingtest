@@ -186,11 +186,11 @@ export async function POST(req: Request) {
     if (!(await underLimit(s, workspaceId))) return limitReached();
 
     // passages de 2-3 phrases lus d'une traite, même tirage pour toute la voix : pas de changement de voix entre les lignes
-    const { passages, gaps } = groupPassages(spoken.sentences, spoken.gaps);
+    const { passages, gaps, inner } = groupPassages(spoken.sentences, spoken.gaps);
     const seed = newSeed();
     let out: Synthesis;
     try {
-      out = await synthesize(passages, voice.id, { speed, pause, targetSeconds: target, gaps, seed });
+      out = await synthesize(passages, voice.id, { speed, pause, targetSeconds: target, gaps, seed, inner });
     } catch (e: any) {
       return NextResponse.json({ error: e.message || "Génération de la voix impossible." }, { status: 502 });
     }
@@ -212,7 +212,7 @@ export async function POST(req: Request) {
       {
         preset: PRESETS.some((p) => p.id === b.preset) ? b.preset : null,
         exact,
-        settings: { pause, target_seconds: target, seed },
+        settings: { pause, target_seconds: target, seed, inner },
         sentences: passages,
         gaps,
         bounds: out.bounds ?? null,
@@ -272,6 +272,7 @@ async function redo(s: any, workspaceId: string, b: any, lexicon: Lexicon) {
       gaps: Array.isArray(row.gaps) ? row.gaps : undefined,
       segments,
       seed: newSeed(), // nouvelle prise pour le passage refait
+      inner: Array.isArray(settings.inner) ? settings.inner : undefined,
     });
   } catch (e: any) {
     return NextResponse.json({ error: e.message || "Génération de la voix impossible." }, { status: 502 });

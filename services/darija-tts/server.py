@@ -97,6 +97,8 @@ class SynthesizeBody(BaseModel):
     target_seconds: float | None = Field(default=None, ge=5, le=120)
     # silence après chaque phrase, calculé par LandPro d'après la ponctuation
     gaps: list[float] | None = None
+    # pauses entre les phrases d'un même passage : [[position 0-1, silence en s], …] par passage
+    inner_gaps: list[list[list[float]]] | None = None
     # intonation selon la ponctuation (référence « question » / « exclamation » du comédien)
     # intonation par extrait « question / exclamation » : désactivée par défaut (le timbre changeait d'une ligne à l'autre)
     expressive: bool = False
@@ -214,7 +216,10 @@ def synthesize(body: SynthesizeBody, authorization: str | None = Header(default=
             segments.append((s, wave))
             generated += 1
     gaps = body.gaps if body.gaps and len(body.gaps) == len(sentences) else None
-    final = assemble(segments, pause=body.pause, gaps=gaps)
+    inner = None
+    if body.inner_gaps and len(body.inner_gaps) == len(sentences):
+        inner = [[(float(p[0]), float(p[1])) for p in row if len(p) == 2] for row in body.inner_gaps]
+    final = assemble(segments, pause=body.pause, gaps=gaps, inner=inner)
     seconds = len(final) / SAMPLE_RATE
     tempo = fit_tempo(seconds, body.target_seconds)
     mp3 = to_mp3(final, tempo=tempo)

@@ -541,23 +541,35 @@ export function groupPassages(
   gaps: number[],
   maxChars = 200,
   maxSentences = 3,
-): { passages: string[]; gaps: number[] } {
+): { passages: string[]; gaps: number[]; inner: [number, number][][] } {
   const passages: string[] = [];
   const out: number[] = [];
+  const inner: [number, number][][] = [];
   let cur: string[] = [];
-  let gap = 0;
+  let curGaps: number[] = [];
   const flush = () => {
     if (!cur.length) return;
-    passages.push(cur.join(" "));
-    out.push(gap);
+    const text = cur.join(" ");
+    passages.push(text);
+    out.push(curGaps[curGaps.length - 1] ?? 0);
+    // fin de chaque phrase du passage (position 0-1, d'après le nombre de lettres) et son silence (un peu réduit
+    // pour garder l'élan du passage) : le service place la pause dans le creux de voix le plus proche
+    const splits: [number, number][] = [];
+    let pos = 0;
+    cur.slice(0, -1).forEach((s, k) => {
+      pos += s.length + 1;
+      splits.push([Math.round((pos / text.length) * 1000) / 1000, Math.round(curGaps[k] * 0.85 * 100) / 100]);
+    });
+    inner.push(splits);
     cur = [];
+    curGaps = [];
   };
   sentences.forEach((s, i) => {
     const len = cur.join(" ").length;
     if (cur.length && (cur.length >= maxSentences || len + 1 + s.length > maxChars)) flush();
     cur.push(s);
-    gap = gaps[i] ?? 0;
+    curGaps.push(gaps[i] ?? 0);
   });
   flush();
-  return { passages, gaps: out };
+  return { passages, gaps: out, inner };
 }

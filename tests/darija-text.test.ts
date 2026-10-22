@@ -179,6 +179,10 @@ describe("passages lus d'une traite", () => {
     expect(g.passages.join(" ")).toBe(r.sentences.join(" "));
     expect(g.gaps.at(-1)).toBe(0);
     expect(g.gaps.length).toBe(g.passages.length);
+    // fin de la question dans le 1er passage : ~31 % du texte, pause de question
+    expect(g.inner[0][0][0]).toBeCloseTo(0.31, 1);
+    expect(g.inner[0][0][1]).toBeGreaterThan(g.inner[0][1][1]);
+    expect(g.inner.at(-1)).toHaveLength(1);
   });
   it("une phrase très longue reste seule", async () => {
     const { groupPassages } = await import("../lib/darija-text");
