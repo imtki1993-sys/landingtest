@@ -133,6 +133,10 @@ async function handler(req: Request) {
       characteristics: analysis.features.join("\n"),
       headline_variants: [copy.headline, headline_b].filter(Boolean),
       generator: "gemini",
+      gemini_images: [
+        ...generated.map((g) => ({ url: g.url, role: g.kind + " (photo de mise en scène)" })),
+        ...productImages.map((u, i) => ({ url: u, role: i ? "photo produit " + (i + 1) : "photo produit principale" })),
+      ],
       gemini_analysis: analysis,
       builder_template: tpl.id,
       builder_pattern: tpl.pattern,

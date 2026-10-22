@@ -7,6 +7,7 @@
 import { useParams } from "next/navigation";
 import React, { useEffect, useRef, useState } from "react";
 import LandingTemplateV4 from "../../../components/LandingTemplateV4";
+import GeminiLanding, { type GeminiOrder } from "../../../components/public/GeminiLanding";
 import { toTemplateData } from "../../../components/landpro/legacy";
 import { fbcFromClickId, metaCurrency, metaValue, purchaseEventId } from "../../../lib/meta-events";
 
@@ -213,9 +214,15 @@ export default function LandingClient({
   }
 
   async function sendOrder(formEl: HTMLFormElement, qty: number) {
+    const f = new FormData(formEl);
+    await sendOrderData((k) => f.get(k), qty);
+  }
+
+  /** Enregistre la commande (formulaire du template ou landing Gemini) ; renvoie le résultat pour l'afficher. */
+  async function sendOrderData(get: (k: string) => unknown, qty: number): Promise<{ ok: boolean; message: string }> {
     setError("");
     (window as any).lmTrack?.("FORM_SUBMIT");
-    const f = new FormData(formEl),
+    const f = { get },
       r = await fetch("/api/orders", {
         method: "POST",
         headers: { "content-type": "application/json" },
@@ -235,8 +242,9 @@ export default function LandingClient({
       });
     if (!r.ok) {
       const x = await r.json().catch(() => ({}));
-      setError(x?.error || "تعذر تسجيل الطلب. حاول مرة أخرى.");
-      return;
+      const message = x?.error || "تعذر تسجيل الطلب. حاول مرة أخرى.";
+      setError(message);
+      return { ok: false, message };
     }
     const result = await r.json().catch(() => ({}));
     setSent(true);
@@ -278,10 +286,39 @@ export default function LandingClient({
       );
       window.open("https://wa.me/" + data.whatsappPhone + "?text=" + msg, "_blank");
     }
+    return { ok: true, message: "✅ تم تسجيل طلبك بنجاح" };
+  }
+
+  // Landing dessinée par Gemini (cadre isolé) : mêmes commandes, statistiques et événements Meta
+  async function geminiOrder(o: GeminiOrder) {
+    if (sending.current) return { ok: false, message: "…" };
+    sending.current = true;
+    try {
+      return await sendOrderData((k) => (o.fields as any)[k] ?? "", o.qty);
+    } finally {
+      sending.current = false;
+    }
   }
 
   if (!data) return <div className="lp-loading">{error ? "Page introuvable" : "Chargement..."}</div>;
   if (data.error) return <div className="lp-loading">Page introuvable</div>;
+
+  if (!builderMode && data.content?.render === "gemini" && data.content?.gemini_html)
+    return (
+      <div className="landing-gemini-runtime">
+        {sent ? <div className="v4-runtime-success">✅ تم تسجيل طلبك بنجاح</div> : null}
+        <GeminiLanding
+          html={String(data.content.gemini_html)}
+          title={String(data.name || "")}
+          onOrder={geminiOrder}
+          onCheckout={() => onFocusCapture({ target: { closest: () => true } } as unknown as React.FocusEvent)}
+          onWhatsapp={() => {
+            (window as any).lmTrack?.("WHATSAPP_CLICK");
+            fbq("track", "Contact", { content_name: String(data?.name || "") });
+          }}
+        />
+      </div>
+    );
 
   const { data: templateData } = toTemplateData(data);
   return (

@@ -135,3 +135,22 @@ export async function geminiImage(
   }
   throw new GeminiError("Gemini n'a pas renvoyé d'image (consigne refusée ou réponse vide).");
 }
+
+/** Modèle du design complet (HTML/CSS) : le plus capable, avec secours. Réglable : GEMINI_DESIGN_MODEL. */
+export const GEMINI_DESIGN_MODEL = () => env("GEMINI_DESIGN_MODEL") || "gemini-4-argon";
+
+/** Réponse texte libre (ex. une page HTML complète), photos de référence en entrée possibles. */
+export async function geminiText(prompt: string, images: Part[] = [], model = GEMINI_DESIGN_MODEL()): Promise<string> {
+  const j = await call(
+    chain(model, ["gemini-3.6-flash", ...TEXT_FALLBACKS]),
+    {
+      contents: [{ role: "user", parts: [...images, { text: prompt }] }],
+      generationConfig: { temperature: 0.9, maxOutputTokens: 32768 },
+    },
+    240_000,
+  );
+  return partsOf(j)
+    .map((p) => p.text || "")
+    .join("")
+    .trim();
+}
