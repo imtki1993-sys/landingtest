@@ -82,3 +82,40 @@ html[data-theme="dark"] .vo-info { background: #0f1b33; color: #bfdbfe; }
 html[data-theme="dark"] .vo-chips button { background: #111827; border-color: #4a3f12; color: #fcd34d; }
 .vo-hint { margin: -4px 0 0; font-size: 12px; color: var(--vo-muted); line-height: 1.6; }
 .vo-hint b { color: var(--vo-ink); font-size: 14px; padding: 0 2px; }
+
+.vo-presets { display: grid; gap: 8px; margin-bottom: 16px; }
+.vo-presets > span { font-size: 12px; font-weight: 800; color: var(--vo-muted); }
+.vo-presets > div { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 8px; }
+.vo-preset { display: grid; gap: 3px; text-align: start; border: 1.5px solid var(--vo-line); background: var(--vo-card); color: var(--vo-ink); border-radius: 12px; padding: 10px 12px; cursor: pointer; }
+.vo-preset b { font-size: 14px; }
+.vo-preset small { font-size: 12px; color: var(--vo-muted); }
+.vo-preset em { font-style: normal; font-size: 11px; font-weight: 700; color: var(--vo-accent); }
+.vo-preset.on { border-color: var(--vo-accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--vo-accent) 18%, transparent); }
+.vo-preset:focus-visible, .vo-lines button:focus-visible { outline: 2px solid var(--vo-accent); outline-offset: 2px; }
+.vo-ab { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.vo-ab > div { display: grid; gap: 4px; min-width: 0; }
+.vo-ab span { font-size: 12px; font-weight: 800; color: var(--vo-muted); }
+.vo-ab audio { width: 100%; }
+.vo-compare { background: var(--vo-soft); border-radius: 12px; padding: 12px; margin-bottom: 10px; }
+.vo-compare .vo-link { grid-column: 1 / -1; }
+.vo-downloads { display: flex; gap: 8px; flex-wrap: wrap; }
+.vo-downloads a { text-decoration: none; }
+.vo-ghost { background: var(--vo-card) !important; color: var(--vo-ink) !important; border: 1px solid var(--vo-line) !important; }
+.vo-lines { display: grid; gap: 6px; }
+.vo-lines p { margin: 0; font-size: 12px; color: var(--vo-muted); }
+.vo-lines ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.vo-lines li { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px; align-items: center; background: var(--vo-card); border: 1px solid var(--vo-line); border-radius: 10px; padding: 7px 10px; }
+.vo-lines li > span { font-size: 15px; line-height: 1.6; color: var(--vo-ink); }
+.vo-lines li > div { display: flex; gap: 6px; }
+.vo-lines button { border: 0; border-radius: 8px; background: var(--vo-ink); color: var(--vo-card); font-weight: 800; font-size: 12px; padding: 6px 10px; cursor: pointer; white-space: nowrap; }
+.vo-lines button:disabled { opacity: .5; cursor: default; }
+@media (min-width: 981px) { .vo-history li { grid-template-columns: auto minmax(0, 1.2fr) minmax(220px, 1.4fr) auto; } }
+.vo-page label.vo-pick { display: flex; }
+.vo-pick input { width: 18px !important; height: 18px; padding: 0; accent-color: var(--vo-accent); }
+@media (max-width: 720px) {
+  .vo-ab { grid-template-columns: 1fr; }
+  .vo-lines li { grid-template-columns: 1fr; }
+  .vo-lines li > div { justify-content: flex-end; }
+}
+@media (max-width: 980px) { .vo-history li { position: relative; padding-inline-start: 30px; } .vo-page label.vo-pick { position: absolute; inset-inline-start: 0; top: 12px; } }
+.vo-h-actions { flex-wrap: wrap; }

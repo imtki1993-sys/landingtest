@@ -5,7 +5,7 @@ import { reportError } from "../../../../lib/monitoring";
 import { authContext } from "../../../../lib/server-auth";
 import { metaAsk, MetaModelError } from "../../../../lib/meta-model";
 import { parseJsonReply } from "../../../../lib/store-templates/ai";
-import { DURATIONS, scriptPrompt } from "../../../../lib/voiceover";
+import { DURATIONS, PRESETS, scriptPrompt } from "../../../../lib/voiceover";
 import { normalizeDarija } from "../../../../lib/darija-text";
 
 export const maxDuration = 60;
@@ -51,6 +51,7 @@ export async function POST(req: Request) {
             angle: String(b.angle || "probleme"),
             audience: String(b.audience || "").slice(0, 80),
             notes: String(b.notes || ""),
+            brief: PRESETS.find((x) => x.id === b.preset)?.brief,
           }),
         ),
       );

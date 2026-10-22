@@ -12,12 +12,16 @@ from audio_utils import (
     expected_seconds,
     fade,
     fit_tempo,
+    from_pcm16,
+    quality_report,
     normalize,
     pause_after,
     pitch_track,
     sentence_speed,
     style_of,
     to_mp3,
+    to_pcm16,
+    to_wav,
     trim_silence,
 )
 
@@ -102,6 +106,24 @@ class AudioUtilsTest(unittest.TestCase):
         rising = 0.3 * np.sin(2 * np.pi * np.cumsum(freq) / SAMPLE_RATE)
         self.assertGreater(expressiveness(rising)["rise"], 2)
         self.assertLess(abs(expressiveness(flat)["rise"]), 0.5)
+
+    def test_pcm16_roundtrip(self):
+        w = self.tone(0.5)
+        back = from_pcm16(to_pcm16(w))
+        self.assertEqual(len(back), len(w))
+        self.assertLess(float(np.max(np.abs(back - w))), 1e-3)
+
+    def test_quality_report(self):
+        w = np.concatenate([self.tone(1.0), np.zeros(SAMPLE_RATE), self.tone(0.5)])
+        q = quality_report(w)
+        self.assertAlmostEqual(q["longest_silence"], 1.0, delta=0.1)
+        self.assertEqual(q["clipped"], 0.0)
+        self.assertGreater(quality_report(np.ones(100, dtype=np.float32))["clipped"], 0.9)
+
+    @unittest.skipUnless(shutil.which("ffmpeg"), "ffmpeg absent")
+    def test_wav(self):
+        data = to_wav(self.tone(1.0), tempo=1.1)
+        self.assertEqual(data[:4], b"RIFF")
 
 
 if __name__ == "__main__":

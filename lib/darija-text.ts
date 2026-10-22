@@ -121,7 +121,90 @@ const LATIN_WORDS: Record<string, string> = {
   new: "جديد",
   sale: "تخفيضات",
   landpro: "لاندبرو",
+  // mots français courants dans la darija des pubs (écrits comme on les dit au Maroc)
+  support: "سبور",
+  chargeur: "شارجور",
+  charge: "شارج",
+  rapide: "رابيد",
+  "charge rapide": "شارج رابيد",
+  "sans fil": "بلا خيط",
+  câble: "كابل",
+  cable: "كابل",
+  clim: "كليم",
+  climatisation: "كليماتيزاسيون",
+  "pare-brise": "باربريز",
+  parebrise: "باربريز",
+  capteur: "كابتور",
+  sensor: "سانسور",
+  design: "ديزاين",
+  téléphone: "تيليفون",
+  telephone: "تيليفون",
+  portable: "بورطابل",
+  voiture: "طوموبيل",
+  tomobil: "طوموبيل",
+  commande: "كوموند",
+  commander: "كوموندي",
+  batterie: "باطري",
+  écran: "ايكران",
+  ecran: "ايكران",
+  moteur: "موطور",
+  magnétique: "مانيتيك",
+  magnetique: "مانيتيك",
+  aimant: "إيمان",
+  silicone: "سيليكون",
+  plastique: "بلاستيك",
+  inox: "إينوكس",
+  machine: "ماشينة",
+  modèle: "موديل",
+  modele: "موديل",
+  couleur: "كولور",
+  taille: "طاي",
+  prix: "الثمن",
+  solde: "صولد",
+  soldes: "صولد",
+  cadeau: "كادو",
+  service: "سيرفيس",
+  client: "كليان",
+  confort: "كونفور",
+  pratique: "براتيك",
+  gps: "جي بي إس",
 };
+
+// Sigles et références (GPS, LCD, S11…) : épelés à la française, comme on les dit au Maroc
+const LETTER_NAMES: Record<string, string> = {
+  A: "آ",
+  B: "بي",
+  C: "سي",
+  D: "دي",
+  E: "أو",
+  F: "إف",
+  G: "جي",
+  H: "آش",
+  I: "إي",
+  J: "جي",
+  K: "كا",
+  L: "إل",
+  M: "إم",
+  N: "إن",
+  O: "أو",
+  P: "بي",
+  Q: "كي",
+  R: "إر",
+  S: "إس",
+  T: "تي",
+  U: "يو",
+  V: "في",
+  W: "دوبل في",
+  X: "إكس",
+  Y: "إيغريك",
+  Z: "زيد",
+};
+const spell = (letters: string) =>
+  letters
+    .toUpperCase()
+    .split("")
+    .map((c) => LETTER_NAMES[c] || "")
+    .join(" ");
 
 // Lettres latines → arabe (dernier recours pour un mot inconnu ; à vérifier par le vendeur)
 const DIGRAPHS: [RegExp, string][] = [
@@ -293,7 +376,12 @@ export function estimateSeconds(text: string, speed = 1): number {
   return Math.max(1, Math.round(words / WORDS_PER_SECOND / (speed || 1)));
 }
 
-export function normalizeDarija(input: string, lexicon: Lexicon = {}): NormalizeResult {
+export interface NormalizeOptions {
+  /** texte exact : aucun mot d'arabe classique remplacé (seuls chiffres, sigles et lettres latines sont rendus lisibles) */
+  exact?: boolean;
+}
+
+export function normalizeDarija(input: string, lexicon: Lexicon = {}, opts: NormalizeOptions = {}): NormalizeResult {
   const guessed = new Set<string>();
   const adapted = new Set<string>();
   let t = applyLexicon(String(input || ""), lexicon)
@@ -308,7 +396,7 @@ export function normalizeDarija(input: string, lexicon: Lexicon = {}): Normalize
     .replace(/[۰-۹]/g, (d) => String("۰۱۲۳۴۵۶۷۸۹".indexOf(d)));
 
   // arabe classique → darija (les mots du dictionnaire du vendeur ne sont pas touchés)
-  for (const [k, v] of DARIJA_SWAPS) {
+  for (const [k, v] of opts.exact ? [] : DARIJA_SWAPS) {
     if (lexicon[k]) continue;
     const r = replaceWord(t, k, v);
     if (r.hit) {
@@ -319,7 +407,15 @@ export function normalizeDarija(input: string, lexicon: Lexicon = {}): Normalize
 
   // expressions latines de plusieurs mots d'abord
   for (const [k, v] of Object.entries(LATIN_WORDS))
-    if (k.includes(" ")) t = t.replace(new RegExp(k.replace(/\s+/g, "\\s+"), "gi"), v);
+    if (/[\s-]/.test(k)) t = t.replace(new RegExp(k.replace(/\s+/g, "\\s+"), "gi"), v);
+
+  // références produit (S11, A54, X3 Pro) : lettres épelées + nombre ; sigles (GPS, LCD) : lettres épelées
+  t = t
+    .replace(
+      /(?<![\p{L}\p{N}])([A-Z]{1,3})[- ]?(\d{1,4})(?![\p{L}\p{N}])/gu,
+      (_, l, n) => `${spell(l)} ${numberToDarija(+n)}`,
+    )
+    .replace(/(?<![\p{L}\p{N}])([A-Z]{2,5})(?![\p{L}\p{N}])/gu, (m) => LATIN_WORDS[m.toLowerCase()] || spell(m));
 
   t = t
     // 1 000 / 1.000 = mille (avant les prix et pourcentages)

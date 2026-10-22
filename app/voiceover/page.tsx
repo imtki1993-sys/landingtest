@@ -19,9 +19,29 @@ interface Item {
   voice: string;
   provider: string;
   speed: number;
-  audio_url: string;
   seconds: number | null;
   created_at: string;
+  parent_id: string | null;
+  preset: string | null;
+  exact: boolean;
+  settings: { pause?: string; target_seconds?: number | null; redone?: number };
+  sentences: string[] | null;
+  has_wav: boolean;
+  can_redo: boolean;
+  quality: { clipped?: number; longest_silence?: number } | null;
+  /** lecture (lien signé après vérification du compte) */
+  audio: string;
+}
+interface Preset {
+  id: string;
+  label: string;
+  hint: string;
+  voice: string;
+  speed: number;
+  pause: string;
+  tone: string;
+  angle: string;
+  seconds: number;
 }
 interface Product {
   id: string;
@@ -36,6 +56,7 @@ const TONES: [string, string][] = [
   ["premium", "Haut de gamme"],
   ["drole", "Drôle"],
   ["temoignage", "Témoignage client"],
+  ["ugc", "Créateur TikTok (UGC)"],
 ];
 const ANGLES: [string, string][] = [
   ["probleme", "Problème → solution"],
@@ -75,6 +96,8 @@ export default function VoiceoverPage() {
     providers: string[];
     voices: Voice[];
     items?: Item[];
+    presets?: Preset[];
+    studio?: boolean;
     lexicon?: Lexicon;
     lexiconInstalled?: boolean;
   } | null>(null);
@@ -108,6 +131,13 @@ export default function VoiceoverPage() {
   const [lexState, setLexState] = useState<"" | "saving" | "saved">("");
   const [generating, setGenerating] = useState(false);
   const [result, setResult] = useState<Item | null>(null);
+  // studio : style de pub, texte exact, phrase régénérée, comparaison
+  const [preset, setPreset] = useState("");
+  const [exact, setExact] = useState(false);
+  const [redoing, setRedoing] = useState<number | null>(null);
+  const [editIdx, setEditIdx] = useState<number | null>(null);
+  const [editText, setEditText] = useState("");
+  const [compare, setCompare] = useState<string[]>([]);
 
   useEffect(() => {
     api("/api/voiceover")
@@ -124,7 +154,23 @@ export default function VoiceoverPage() {
       .catch(() => {});
   }, []);
 
-  const spoken = useMemo(() => normalizeDarija(spokenEdit ?? script, lexicon), [script, spokenEdit, lexicon]);
+  const spoken = useMemo(
+    () => normalizeDarija(spokenEdit ?? script, lexicon, { exact }),
+    [script, spokenEdit, lexicon, exact],
+  );
+  const items = d?.items || [];
+  const itemById = new Map(items.map((i) => [i.id, i]));
+  const presetById = new Map((d?.presets || []).map((p) => [p.id, p]));
+
+  function applyPreset(p: Preset) {
+    setPreset(p.id);
+    setTone(p.tone);
+    setAngle(p.angle);
+    setSeconds(p.seconds);
+    setSpeed(p.speed);
+    setPause(p.pause);
+    if (d?.voices.some((v) => v.id === p.voice && d.providers.includes(v.provider))) setVoice(p.voice);
+  }
   const voices = d?.voices || [];
   const voiceById = new Map(voices.map((v) => [v.id, v]));
   const ready = (v: Voice) => !!d?.providers.includes(v.provider);
@@ -159,6 +205,7 @@ export default function VoiceoverPage() {
           angle,
           audience: AUDIENCES.find(([k]) => k === audience)?.[1] || "",
           notes,
+          preset: preset || undefined,
         }),
       });
       setTitle(x.title || name);
@@ -187,6 +234,8 @@ export default function VoiceoverPage() {
           speed,
           pause,
           target_seconds: fit ? seconds : undefined,
+          exact,
+          preset: preset || undefined,
           title: title || name,
           product_id: productId || undefined,
         }),
@@ -198,6 +247,29 @@ export default function VoiceoverPage() {
     } finally {
       setGenerating(false);
     }
+  }
+
+  async function redo(item: Item, index: number, text?: string) {
+    setRedoing(index);
+    setError("");
+    try {
+      const x = await api("/api/voiceover", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ action: "redo", id: item.id, index, text }),
+      });
+      setResult(x.item);
+      setEditIdx(null);
+      setD((v) => (v ? { ...v, items: [x.item, ...(v.items || [])] } : v));
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setRedoing(null);
+    }
+  }
+
+  function toggleCompare(id: string) {
+    setCompare((c) => (c.includes(id) ? c.filter((x) => x !== id) : [...c.slice(-1), id]));
   }
 
   function addWord(word = "", say = "") {
@@ -266,6 +338,29 @@ export default function VoiceoverPage() {
               voix darija sera en ligne.
             </span>
           </div>
+        ) : null}
+
+        {d?.presets?.length ? (
+          <section className="vo-presets" aria-label="Style de pub">
+            <span>Style de pub</span>
+            <div>
+              {d.presets.map((p) => (
+                <button
+                  type="button"
+                  key={p.id}
+                  className={"vo-preset" + (preset === p.id ? " on" : "")}
+                  aria-pressed={preset === p.id}
+                  onClick={() => applyPreset(p)}
+                >
+                  <b>{p.label}</b>
+                  <small>{p.hint}</small>
+                  <em>
+                    {voiceById.get(p.voice)?.label || p.voice} · {p.speed.toFixed(2).replace(/0$/, "")}× · {p.seconds} s
+                  </em>
+                </button>
+              ))}
+            </div>
+          </section>
         ) : null}
 
         <div className="vo-grid">
@@ -441,6 +536,11 @@ export default function VoiceoverPage() {
                     </p>
                   ) : null}
                   {tooLong ? <p className="vo-warn">Texte trop long pour une voix off (60 s au maximum).</p> : null}
+                  <label className="vo-check">
+                    <input type="checkbox" checked={exact} onChange={(e) => setExact(e.target.checked)} />
+                    Texte exact : lire mon script tel quel, sans remplacer de mots (seuls chiffres, prix et sigles sont
+                    écrits comme ils se disent)
+                  </label>
                   <button type="button" className="vo-link" onClick={() => setShowSpoken((v) => !v)}>
                     {showSpoken ? "Masquer le texte lu par la voix" : "Voir le texte exact lu par la voix"}
                   </button>
@@ -601,44 +701,170 @@ export default function VoiceoverPage() {
               </button>
               {result ? (
                 <div className="vo-result">
-                  <audio controls autoPlay src={result.audio_url} />
+                  {result.parent_id && itemById.get(result.parent_id) ? (
+                    <div className="vo-ab">
+                      <div>
+                        <span>Avant</span>
+                        <audio controls preload="none" src={itemById.get(result.parent_id)!.audio} />
+                      </div>
+                      <div>
+                        <span>
+                          Après{result.settings.redone != null ? ` (phrase ${result.settings.redone + 1} refaite)` : ""}
+                        </span>
+                        <audio controls autoPlay src={result.audio} />
+                      </div>
+                    </div>
+                  ) : (
+                    <audio controls autoPlay src={result.audio} />
+                  )}
                   {result.seconds && result.seconds > seconds * 1.1 ? (
                     <p className="vo-warn">
                       La voix dure {fmtSec(result.seconds)} pour une pub de {seconds} s : raccourcis le script d’une
                       phrase ou monte la vitesse.
                     </p>
                   ) : null}
-                  <a href={result.audio_url} download className="vo-link">
-                    Télécharger le MP3
-                  </a>
+                  {result.quality?.clipped ? (
+                    <p className="vo-warn">Son saturé par endroits : régénère la phrase concernée.</p>
+                  ) : null}
+                  <div className="vo-downloads">
+                    <a href={`${result.audio}&dl=1`} className="vo-small">
+                      Télécharger MP3
+                    </a>
+                    {result.has_wav ? (
+                      <a href={`${result.audio}&format=wav&dl=1`} className="vo-small vo-ghost">
+                        WAV (montage vidéo)
+                      </a>
+                    ) : null}
+                  </div>
+                  {result.can_redo && result.sentences ? (
+                    <div className="vo-lines">
+                      <p>Une phrase sonne mal ? Refais seulement celle-là (les autres restent identiques).</p>
+                      <ol>
+                        {result.sentences.map((line, i) => (
+                          <li key={i}>
+                            {editIdx === i ? (
+                              <input
+                                dir="rtl"
+                                value={editText}
+                                onChange={(e) => setEditText(e.target.value)}
+                                aria-label={`Texte de la phrase ${i + 1}`}
+                              />
+                            ) : (
+                              <span dir="rtl">{line}</span>
+                            )}
+                            <div>
+                              {editIdx === i ? (
+                                <>
+                                  <button
+                                    type="button"
+                                    disabled={redoing !== null || !editText.trim()}
+                                    onClick={() => redo(result, i, editText)}
+                                  >
+                                    {redoing === i ? "…" : "Refaire avec ce texte"}
+                                  </button>
+                                  <button type="button" className="vo-ghost" onClick={() => setEditIdx(null)}>
+                                    Annuler
+                                  </button>
+                                </>
+                              ) : (
+                                <>
+                                  <button type="button" disabled={redoing !== null} onClick={() => redo(result, i)}>
+                                    {redoing === i ? "Nouvelle prise…" : "↻ Refaire"}
+                                  </button>
+                                  <button
+                                    type="button"
+                                    className="vo-ghost"
+                                    disabled={redoing !== null}
+                                    onClick={() => {
+                                      setEditIdx(i);
+                                      setEditText(line);
+                                    }}
+                                  >
+                                    Modifier
+                                  </button>
+                                </>
+                              )}
+                            </div>
+                          </li>
+                        ))}
+                      </ol>
+                    </div>
+                  ) : d?.studio === false ? (
+                    <p className="vo-info">
+                      Pour refaire une seule phrase et télécharger en WAV, exécute la migration « voiceover_studio »
+                      dans Supabase.
+                    </p>
+                  ) : null}
                 </div>
               ) : null}
             </div>
           </div>
         </div>
 
-        {d?.items?.length ? (
+        {items.length ? (
           <section className="vo-card vo-history">
-            <h2>Mes voix off</h2>
+            <h2>
+              Mes voix off
+              <span className="vo-meta">Coche 2 versions pour les comparer</span>
+            </h2>
+            {compare.length === 2 ? (
+              <div className="vo-ab vo-compare">
+                {compare.map((id, k) => {
+                  const it = itemById.get(id);
+                  return it ? (
+                    <div key={id}>
+                      <span>
+                        {k ? "B" : "A"} · {it.title || "Voix off"} · {voiceById.get(it.voice)?.label || it.voice}
+                        {it.preset ? ` · ${presetById.get(it.preset)?.label || it.preset}` : ""} · {it.speed}×
+                      </span>
+                      <audio controls preload="none" src={it.audio} />
+                    </div>
+                  ) : null;
+                })}
+                <button type="button" className="vo-link" onClick={() => setCompare([])}>
+                  Fermer la comparaison
+                </button>
+              </div>
+            ) : null}
             <ul>
-              {d.items.map((it) => (
+              {items.map((it) => (
                 <li key={it.id}>
+                  <label className="vo-pick" title="Comparer">
+                    <input
+                      type="checkbox"
+                      checked={compare.includes(it.id)}
+                      onChange={() => toggleCompare(it.id)}
+                      aria-label={`Comparer ${it.title || "cette voix off"}`}
+                    />
+                  </label>
                   <div className="vo-h-info">
                     <b>{it.title || "Voix off"}</b>
                     <small>
                       {voiceById.get(it.voice)?.label || it.voice} · {fmtSec(it.seconds)} · {fmtDate(it.created_at)}
+                      {it.parent_id && it.settings.redone != null ? ` · phrase ${it.settings.redone + 1} refaite` : ""}
                     </small>
                   </div>
-                  <audio controls preload="none" src={it.audio_url} />
+                  <audio controls preload="none" src={it.audio} />
                   <div className="vo-h-actions">
-                    <a href={it.audio_url} download>
-                      MP3
-                    </a>
+                    <a href={`${it.audio}&dl=1`}>MP3</a>
+                    {it.has_wav ? <a href={`${it.audio}&format=wav&dl=1`}>WAV</a> : null}
+                    {it.can_redo ? (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setResult(it);
+                          window.scrollTo({ top: 0, behavior: "smooth" });
+                        }}
+                      >
+                        Phrases
+                      </button>
+                    ) : null}
                     <button
                       type="button"
                       onClick={() => {
                         setScript(it.script);
                         setTitle(it.title || "");
+                        setExact(it.exact);
                         setSpokenEdit(null);
                         window.scrollTo({ top: 0, behavior: "smooth" });
                       }}

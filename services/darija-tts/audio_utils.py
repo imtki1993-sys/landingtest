@@ -160,13 +160,52 @@ def audio_filters(tempo: float = 1.0) -> str:
     return ",".join(chain)
 
 
-def to_mp3(wave: np.ndarray, sr: int = SAMPLE_RATE, bitrate: str = "128k", tempo: float = 1.0) -> bytes:
-    """Encode en MP3 mono avec ffmpeg (finition et éventuelle accélération comprises)."""
+def _encode(wave: np.ndarray, sr: int, tempo: float, out_args: list[str]) -> bytes:
     proc = subprocess.run(
         ["ffmpeg", "-hide_banner", "-loglevel", "error", "-f", "f32le", "-ar", str(sr), "-ac", "1", "-i", "pipe:0",
-         "-af", audio_filters(tempo), "-codec:a", "libmp3lame", "-b:a", bitrate, "-f", "mp3", "pipe:1"],
+         "-af", audio_filters(tempo), *out_args, "pipe:1"],
         input=np.asarray(wave, dtype=np.float32).tobytes(),
         capture_output=True,
         check=True,
     )
     return proc.stdout
+
+
+def to_mp3(wave: np.ndarray, sr: int = SAMPLE_RATE, bitrate: str = "128k", tempo: float = 1.0) -> bytes:
+    """Encode en MP3 mono avec ffmpeg (finition et éventuelle accélération comprises)."""
+    return _encode(wave, sr, tempo, ["-codec:a", "libmp3lame", "-b:a", bitrate, "-f", "mp3"])
+
+
+def to_wav(wave: np.ndarray, sr: int = SAMPLE_RATE, tempo: float = 1.0) -> bytes:
+    """Même rendu que le MP3, en WAV 16 bits (montage vidéo sans perte)."""
+    return _encode(wave, sr, tempo, ["-codec:a", "pcm_s16le", "-f", "wav"])
+
+
+def to_pcm16(wave: np.ndarray) -> bytes:
+    """Phrase brute (avant montage) → PCM 16 bits, pour la réutiliser quand on régénère une autre phrase."""
+    return (np.clip(np.asarray(wave, dtype=np.float32), -1, 1) * 32767).astype("<i2").tobytes()
+
+
+def from_pcm16(data: bytes) -> np.ndarray:
+    return np.frombuffer(data, dtype="<i2").astype(np.float32) / 32767
+
+
+def quality_report(wave: np.ndarray, sr: int = SAMPLE_RATE) -> dict:
+    """Contrôles après génération : saturation, plus long silence, durée."""
+    w = np.asarray(wave, dtype=np.float32)
+    if not w.size:
+        return {"seconds": 0.0, "peak": 0.0, "clipped": 0.0, "longest_silence": 0.0}
+    win = max(1, int(sr * 0.02))
+    frames = w[: len(w) // win * win].reshape(-1, win)
+    rms = np.sqrt(np.mean(frames**2, axis=1) + 1e-12)
+    quiet = rms < 10 ** (-45 / 20)
+    longest = run = 0
+    for q in quiet:
+        run = run + 1 if q else 0
+        longest = max(longest, run)
+    return {
+        "seconds": round(len(w) / sr, 2),
+        "peak": round(float(np.max(np.abs(w))), 3),
+        "clipped": round(float(np.mean(np.abs(w) >= 0.999)), 5),
+        "longest_silence": round(longest * win / sr, 2),
+    }

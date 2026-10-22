@@ -107,3 +107,63 @@ describe("ponctuation expressive", () => {
     expect(r.gaps.length).toBe(r.sentences.length);
   });
 });
+
+const S11 = `واش التيليفون ديالك ديما كيطيح ليك فالطوموبيل؟
+
+دابا الحل وصل!
+
+مع السبور الذكي ديال التيليفون، اللي فيه شارجور بلا خيط، غادي تسوق مرتاح وبلا صداع الراس!
+
+غير كتقرب ليه التيليفون، السانسور الذكي كيحل ليك الدراعات، وكيسدهم بوحدو!
+
+وزيد عليها، شارج رابيد بلا خيط، بلا كابلات وبلا تعقيدات!
+
+وتقدر تثبتو بجوج طرق، يا إما فالكليم، يا إما فالباربريز!
+
+والجي بي إس ديما قدام عينيك، باش تبقى مركز فالطريق!
+
+كيشد التيليفون مزيان، حتى فالطريق اللي فيها الهزات!
+
+والديزاين ديالو أنيق وعصري، وكيزيد لمسة زوينة لطوموبيلتك!
+
+والأحسن من هادشي كامل؟
+
+التوصيل لجميع أنحاء المغرب!
+
+والخلاص حتى توصلك السلعة!
+
+آش كتسنى؟
+
+طلب السبور الذكي ديالك دابا، وسوق مرتاح وبلا صداع الراس!`;
+
+describe("script S11 (test de référence)", () => {
+  it("texte exact : chaque phrase lue telle qu'écrite, ponctuation respectée", () => {
+    const r = normalizeDarija(S11, {}, { exact: true });
+    expect(r.sentences).toHaveLength(14);
+    expect(r.sentences[0]).toBe("واش التيليفون ديالك ديما كيطيح ليك فالطوموبيل؟");
+    expect(r.sentences[9]).toBe("والأحسن من هادشي كامل؟");
+    expect(r.sentences.at(-1)).toBe("طلب السبور الذكي ديالك دابا، وسوق مرتاح وبلا صداع الراس!");
+    expect(r.adapted).toEqual([]);
+    expect(r.guessed).toEqual([]);
+    // mots d'origine française gardés tels quels
+    for (const w of ["شارجور", "السانسور", "الكليم", "الباربريز", "الديزاين", "شارج رابيد", "الجي بي إس"])
+      expect(r.text).toContain(w);
+    expect(r.gaps[0]).toBe(GAP.question + GAP.newline);
+  });
+  it("même script en lettres latines mélangées : rendu lisible en arabe", () => {
+    const r = normalizeDarija("Support S11 m3a chargeur sans fil, GPS w clim. Prix 199 DH!");
+    expect(r.text).toContain("سبور إس حداش");
+    expect(r.text).toContain("شارجور بلا خيط");
+    expect(r.text).toContain("جي بي إس");
+    expect(r.text).toContain("كليم");
+    expect(r.text).toContain("مية و تسعة و تسعين درهم!");
+  });
+  it("sigles inconnus épelés, références produit lues", () => {
+    expect(normalizeDarija("écran LCD").text).toBe("ايكران إل سي دي.");
+    expect(normalizeDarija("A54").text).toBe("آ ربعة و خمسين.");
+  });
+  it("sans « texte exact », l'arabe classique est adapté", () => {
+    expect(normalizeDarija("هذا رائع").adapted.length).toBe(2);
+    expect(normalizeDarija("هذا رائع", {}, { exact: true }).text).toBe("هذا رائع.");
+  });
+});

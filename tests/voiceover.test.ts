@@ -43,6 +43,8 @@ describe("voix off : fournisseurs", () => {
       target_seconds: 30,
       gaps: null,
       expressive: true,
+      segments: null,
+      format: "json",
     });
     expect(out).toMatchObject({ mime: "audio/mpeg", seconds: 12.5 });
     expect(out.audio.length).toBe(3);
@@ -92,5 +94,44 @@ describe("pauses selon la ponctuation", () => {
     await synthesize(["واش؟", "واو!", "طلب."], "azure-jamal", { gaps: [0.5, 0.38, 0], pause: "longues" });
     const body = (f.mock.calls[0] as any)[1].body as string;
     expect(body).toContain('واش؟<break time="750ms"/>واو!<break time="570ms"/>طلب.');
+  });
+});
+
+describe("régénérer une phrase", () => {
+  it("phrases brutes : WAV puis découpage d'après les fins de phrase", async () => {
+    const { wavFromPcm, splitSegments } = await import("../lib/voiceover");
+    const pcm = Buffer.alloc(20);
+    for (let i = 0; i < 10; i++) pcm.writeInt16LE(i, i * 2);
+    const wav = wavFromPcm(pcm);
+    expect(wav.subarray(0, 4).toString()).toBe("RIFF");
+    expect(wav.readUInt32LE(40)).toBe(20);
+    const parts = splitSegments(wav, [3, 10]).map((b) => Buffer.from(b, "base64"));
+    expect(parts[0].readInt16LE(4)).toBe(2);
+    expect(parts[1].length).toBe(14);
+  });
+  it("Habibi : réponse JSON (MP3 + WAV + phrases brutes) et phrases réutilisées envoyées", async () => {
+    process.env.TTS_SERVICE_URL = "https://tts.example.com";
+    process.env.TTS_SERVICE_TOKEN = "k";
+    const f = vi.fn(
+      async () =>
+        new Response(
+          JSON.stringify({
+            mp3: Buffer.from([1, 2]).toString("base64"),
+            wav: Buffer.from("RIFF").toString("base64"),
+            segments: Buffer.from([0, 0, 1, 0]).toString("base64"),
+            bounds: [1, 2],
+            seconds: 3.2,
+            quality: { clipped: 0 },
+          }),
+          { headers: { "content-type": "application/json" } },
+        ),
+    );
+    vi.stubGlobal("fetch", f);
+    const out = await synthesize(["أ.", "ب."], "doda-m1", { segments: ["AAA=", null] });
+    expect(JSON.parse((f.mock.calls[0] as any)[1].body).segments).toEqual(["AAA=", null]);
+    expect(out.audio.length).toBe(2);
+    expect(out.wav?.toString()).toBe("RIFF");
+    expect(out.bounds).toEqual([1, 2]);
+    expect(out.seconds).toBe(3.2);
   });
 });
