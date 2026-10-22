@@ -70,6 +70,7 @@ async function callOnce(model: string, body: unknown, timeout: number): Promise<
 async function call(models: string[], body: unknown, timeout = 120_000): Promise<any> {
   if (!geminiKey()) throw new GeminiError("Gemini n'est pas configuré : ajoute GEMINI_API_KEY dans Vercel.", 503);
   let last: GeminiError | null = null;
+  let quota = false;
   for (const model of models) {
     for (const wait of [0, 1500, 4000]) {
       if (wait) await sleep(wait);
@@ -79,10 +80,21 @@ async function call(models: string[], body: unknown, timeout = 120_000): Promise
         if (!(e instanceof GeminiError)) throw e;
         last = e;
         if (e.status === 404) break; // modèle indisponible pour cette clé : suivant
-        if (!TRANSIENT.has(e.status)) throw new GeminiError(e.message, e.status === 429 ? 429 : 502);
+        // quota épuisé pour CE modèle (les quotas sont par modèle, très bas en offre gratuite) : modèle suivant
+        if (e.status === 429) {
+          quota = true;
+          break;
+        }
+        if (!TRANSIENT.has(e.status)) throw new GeminiError(e.message, 502);
       }
     }
   }
+  if (quota)
+    throw new GeminiError(
+      "Quota Gemini atteint pour tous les modèles (offre gratuite de Google très limitée, surtout pour les photos). " +
+        "Active la facturation dans Google AI Studio (Paramètres → Facturation) ou réessaie dans une minute.",
+      429,
+    );
   throw new GeminiError(
     last?.status === 404
       ? `Aucun modèle Gemini disponible pour cette clé (${models.join(", ")}).`

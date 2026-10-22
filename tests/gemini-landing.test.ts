@@ -129,3 +129,22 @@ describe("Gemini surchargé", () => {
     vi.useRealTimers();
   });
 });
+
+describe("quota Gemini", () => {
+  it("429 sur un modèle : modèle suivant ; 429 partout : message facturation", async () => {
+    process.env.GEMINI_API_KEY = "k";
+    const f = vi.fn(async (url: string) =>
+      url.includes("gemini-3.6-flash")
+        ? new Response(JSON.stringify({ error: { message: "quota" } }), { status: 429 })
+        : reply([{ text: '{"ok":1}' }]),
+    );
+    vi.stubGlobal("fetch", f);
+    expect(await geminiJson("x")).toEqual({ ok: 1 });
+    expect(f).toHaveBeenCalledTimes(2);
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async () => new Response("{}", { status: 429 })),
+    );
+    await expect(geminiJson("x")).rejects.toThrow("facturation");
+  });
+});
