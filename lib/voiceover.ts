@@ -56,6 +56,8 @@ export interface SynthesisOptions {
   seed?: number;
   /** pauses entre les phrases d'un même passage : [[position 0-1, silence s], …] par passage */
   inner?: [number, number][][];
+  /** voix pub personnalisée : extrait WAV (base64) et texte exact lu dedans */
+  ref?: { audio: string; text: string } | null;
 }
 
 export interface Synthesis {
@@ -81,6 +83,7 @@ async function habibi(
   segments: (string | null)[] | null,
   seed: number | null,
   inner: [number, number][][] | null,
+  ref: { audio: string; text: string } | null,
 ): Promise<Synthesis> {
   const base = env("TTS_SERVICE_URL").replace(/\/+$/, "");
   const r = await fetch(base + "/synthesize", {
@@ -100,6 +103,8 @@ async function habibi(
       expressive: false,
       seed,
       inner_gaps: inner,
+      ref_audio: ref?.audio ?? null,
+      ref_text: ref?.text ?? null,
       segments,
       format: "json",
     }),
@@ -198,6 +203,7 @@ export async function synthesize(sentences: string[], voiceId: string, o: Synthe
         Array.isArray(o.segments) && o.segments.length === sentences.length ? o.segments : null,
         Number.isInteger(o.seed) ? (o.seed as number) : null,
         Array.isArray(o.inner) && o.inner.length === sentences.length ? o.inner : null,
+        o.ref?.audio && o.ref.text ? o.ref : null,
       )
     : azure(sentences, voice.id, s, pause, gaps);
 }
@@ -445,4 +451,30 @@ export function mergeVocalized(original: string, vocalized: string): { text: str
     return line;
   });
   return { text: merged.join("\n"), lines, rejected };
+}
+
+// ─── Voix pub personnalisée ───
+
+/** Vérifie et prépare un extrait de voix (4-12 s, volume, saturation) sur le service GPU → WAV à enregistrer. */
+export async function checkReference(
+  audio: Buffer,
+  text: string,
+): Promise<{ ok: boolean; problems: string[]; seconds: number; wav: Buffer | null }> {
+  if (!availableProviders().includes("habibi"))
+    throw new Error("Le service de voix darija n'est pas encore branché (TTS_SERVICE_URL / TTS_SERVICE_TOKEN).");
+  const r = await fetch(env("TTS_SERVICE_URL").replace(/\/+$/, "") + "/reference", {
+    method: "POST",
+    headers: { authorization: "Bearer " + env("TTS_SERVICE_TOKEN"), "content-type": "application/json" },
+    body: JSON.stringify({ audio: audio.toString("base64"), text }),
+    cache: "no-store",
+    signal: AbortSignal.timeout(120_000),
+  });
+  const j: any = await r.json().catch(() => ({}));
+  if (!r.ok) throw new Error(j?.detail ? String(j.detail) : `Le service de voix a répondu ${r.status}`);
+  return {
+    ok: !!j.ok,
+    problems: Array.isArray(j.problems) ? j.problems.map(String) : [],
+    seconds: Number(j.seconds) || 0,
+    wav: j.wav ? Buffer.from(j.wav, "base64") : null,
+  };
 }

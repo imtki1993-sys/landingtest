@@ -45,6 +45,8 @@ describe("voix off : fournisseurs", () => {
       expressive: false,
       seed: null,
       inner_gaps: null,
+      ref_audio: null,
+      ref_text: null,
       segments: null,
       format: "json",
     });
@@ -147,5 +149,37 @@ describe("vocalisation par l'IA", () => {
     expect(r.lines).toBe(1);
     expect(r.rejected).toBe(1);
     expect(mergeVocalized(src, "une seule ligne").text).toBe(src);
+  });
+});
+
+describe("voix pub personnalisée", () => {
+  it("vérification de l'extrait par le service, problèmes renvoyés", async () => {
+    const { checkReference } = await import("../lib/voiceover");
+    process.env.TTS_SERVICE_URL = "https://tts.example.com";
+    process.env.TTS_SERVICE_TOKEN = "k";
+    const f = vi.fn(
+      async () =>
+        new Response(
+          JSON.stringify({ ok: false, problems: ["Enregistrement trop court (2.0 s)"], seconds: 2, wav: null }),
+          {
+            headers: { "content-type": "application/json" },
+          },
+        ),
+    );
+    vi.stubGlobal("fetch", f);
+    const r = await checkReference(Buffer.from("abc"), "واش باغي");
+    expect((f.mock.calls[0] as any)[0]).toBe("https://tts.example.com/reference");
+    expect(JSON.parse((f.mock.calls[0] as any)[1].body)).toEqual({ audio: "YWJj", text: "واش باغي" });
+    expect(r).toEqual({ ok: false, problems: ["Enregistrement trop court (2.0 s)"], seconds: 2, wav: null });
+  });
+  it("synthèse : extrait et texte de la voix perso envoyés au service", async () => {
+    process.env.TTS_SERVICE_URL = "https://tts.example.com";
+    process.env.TTS_SERVICE_TOKEN = "k";
+    const f = vi.fn(async () => new Response(new Uint8Array([1]), { headers: { "content-type": "audio/mpeg" } }));
+    vi.stubGlobal("fetch", f);
+    await synthesize(["طلب دابا!"], "doda-m1", { ref: { audio: "UklGRg==", text: "واش باغي حاجة زوينة؟" } });
+    const body = JSON.parse((f.mock.calls[0] as any)[1].body);
+    expect(body.ref_audio).toBe("UklGRg==");
+    expect(body.ref_text).toBe("واش باغي حاجة زوينة؟");
   });
 });
