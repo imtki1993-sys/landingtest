@@ -12,6 +12,7 @@ from audio_utils import (
     expected_seconds,
     fade,
     fit_tempo,
+    insert_pauses,
     from_pcm16,
     quality_report,
     normalize,
@@ -124,6 +125,18 @@ class AudioUtilsTest(unittest.TestCase):
     def test_wav(self):
         data = to_wav(self.tone(1.0), tempo=1.1)
         self.assertEqual(data[:4], b"RIFF")
+
+    def test_insert_pauses_at_word_gap(self):
+        # « phrase » 1 s, petit creux de 60 ms, « phrase » 1 s : la pause va dans le creux
+        a, gap, b = self.tone(1.0), np.zeros(int(0.06 * SAMPLE_RATE), dtype=np.float32), self.tone(1.0)
+        w = np.concatenate([a, gap, b])
+        out = insert_pauses(w, [(0.45, 0.5)])
+        self.assertAlmostEqual((len(out) - len(w)) / SAMPLE_RATE, 0.44, delta=0.01)
+        # le silence ajouté est dans le creux (autour de 1,0-1,06 s), pas au milieu d'un son
+        quiet = np.abs(out) < 1e-4
+        start = int(0.98 * SAMPLE_RATE)
+        self.assertTrue(quiet[start + int(0.05 * SAMPLE_RATE): start + int(0.45 * SAMPLE_RATE)].all())
+        self.assertEqual(len(insert_pauses(w, None)), len(w))
 
 
 if __name__ == "__main__":

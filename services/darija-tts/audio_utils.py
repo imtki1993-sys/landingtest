@@ -82,16 +82,104 @@ def sentence_speed(sentence: str, speed: float) -> float:
     return round(min(1.35, max(0.65, speed * STYLE_SPEED[style_of(sentence)])), 3)
 
 
+def _valleys(rms: np.ndarray, min_frames: int = 3) -> list[int]:
+    """Centres des creux de voix (≥ 60 ms sous le seuil) : les frontières possibles entre deux phrases."""
+    thr = max(float(np.percentile(rms, 95)) * 0.08, 1e-4)
+    out, run = [], 0
+    for k, q in enumerate(np.append(rms < thr, False)):
+        if q:
+            run += 1
+        else:
+            if run >= min_frames:
+                out.append(k - run // 2 - 1)
+            run = 0
+    return out
+
+
+def _match(estimates: list[int], valleys: list[int], limit: int) -> list[int | None]:
+    """Associe chaque fin de phrase estimée à un creux, dans l'ordre, au plus près (programmation dynamique)."""
+    n, m = len(estimates), len(valleys)
+    inf = float("inf")
+    cost = [[inf] * (m + 1) for _ in range(n + 1)]
+    back: list[list[tuple[int, int, bool] | None]] = [[None] * (m + 1) for _ in range(n + 1)]
+    for j in range(m + 1):
+        cost[0][j] = 0.0
+    for i in range(1, n + 1):
+        cost[i][0] = cost[i - 1][0] + limit
+        back[i][0] = (i - 1, 0, False)
+        for j in range(1, m + 1):
+            best, arg = cost[i][j - 1], (i, j - 1, False)  # creux j inutilisé
+            if cost[i - 1][j] + limit < best:  # fin de phrase i sans creux assez proche
+                best, arg = cost[i - 1][j] + limit, (i - 1, j, False)
+            d = abs(estimates[i - 1] - valleys[j - 1])
+            if d < limit and cost[i - 1][j - 1] + d < best:
+                best, arg = cost[i - 1][j - 1] + d, (i - 1, j - 1, True)
+            cost[i][j], back[i][j] = best, arg
+    res: list[int | None] = [None] * n
+    i, j = n, m
+    while i > 0:
+        pi, pj, matched = back[i][j]  # type: ignore[misc]
+        if matched:
+            res[i - 1] = valleys[j - 1]
+        i, j = pi, pj
+    return res
+
+
+def insert_pauses(
+    wave: np.ndarray, splits: list[tuple[float, float]] | None, sr: int = SAMPLE_RATE, pause: float = 1.0
+) -> np.ndarray:
+    """Passage lu d'une traite : ajoute le silence voulu entre ses phrases (après « ؟ », « ! », « . »).
+
+    `splits` : [(position estimée de la fin de phrase entre 0 et 1, silence en s)]. Chaque fin de phrase est associée,
+    dans l'ordre, au creux de voix le plus proche (frontière de mot) ; le silence y est inséré avec un fondu court.
+    Sans creux assez proche, aucune pause n'est ajoutée (jamais au milieu d'un mot).
+    """
+    w = np.asarray(wave, dtype=np.float32)
+    if not splits or len(w) < sr // 2:
+        return w
+    win = int(sr * 0.02)
+    n = len(w) // win
+    if n < 5:
+        return w
+    rms = np.sqrt(np.mean(w[: n * win].reshape(n, win) ** 2, axis=1) + 1e-12)
+    valleys = _valleys(rms)
+    todo = [(f, g) for f, g in splits if 0.02 < f < 0.98]
+    limit = max(int(0.9 * sr / win), int(0.2 * n))
+    picked = _match([int(f * n) for f, _ in todo], valleys, limit)
+    cuts: list[tuple[int, int]] = []
+    for (f, gap), k in zip(todo, picked):
+        if k is None:
+            continue
+        # le creux existant compte déjà un peu comme pause
+        extra = max(0.0, min(1.5, gap) * min(2.0, max(0.3, pause)) - 0.06)
+        if extra > 0.02:
+            cuts.append((k * win + win // 2, int(extra * sr)))
+    out = w
+    for pos, length in sorted(cuts, reverse=True):
+        f = min(int(sr * 0.006), pos, len(out) - pos)
+        a, b = out[:pos].copy(), out[pos:].copy()
+        if f > 0:
+            ramp = np.linspace(1.0, 0.0, f, dtype=np.float32)
+            a[-f:] *= ramp
+            b[:f] *= ramp[::-1]
+        out = np.concatenate([a, np.zeros(length, dtype=np.float32), b])
+    return out
+
+
 def assemble(
     segments: list[tuple[str, np.ndarray]],
     sr: int = SAMPLE_RATE,
     pause: float = 1.0,
     gaps: list[float] | None = None,
+    inner: list[list[tuple[float, float]]] | None = None,
 ) -> np.ndarray:
-    """Phrases générées → une seule piste : silence retiré, fondus, pauses, volume final."""
+    """Passages générés → une seule piste : silence retiré, pauses entre phrases d'un passage, fondus, pauses, volume."""
     parts: list[np.ndarray] = [np.zeros(int(0.15 * sr), dtype=np.float32)]
     for i, (sentence, wave) in enumerate(segments):
-        parts.append(fade(trim_silence(np.asarray(wave, dtype=np.float32), sr), sr))
+        w = trim_silence(np.asarray(wave, dtype=np.float32), sr)
+        if inner is not None and len(inner) == len(segments):
+            w = insert_pauses(w, inner[i], sr, pause)
+        parts.append(fade(w, sr))
         if i < len(segments) - 1:
             if gaps is not None and len(gaps) == len(segments):
                 # silence calculé par LandPro d'après la ponctuation (؟ ! . ، … et retours à la ligne)
@@ -152,9 +240,9 @@ def fit_tempo(seconds: float, target: float | None) -> float:
 
 
 def audio_filters(tempo: float = 1.0) -> str:
-    """Finition « pub » : graves parasites coupés, compression douce (voix présente), crêtes limitées.
-    atempo accélère sans changer la hauteur de la voix."""
-    chain = ["highpass=f=70", "acompressor=threshold=0.125:ratio=2.5:attack=5:release=90:makeup=1.4", "alimiter=limit=0.9"]
+    """Finition « pub » : graves parasites coupés, volume réseaux sociaux (-16 LUFS, crêtes à -1,5 dB) sans écraser
+    la dynamique de la voix. atempo accélère sans changer la hauteur de la voix."""
+    chain = ["highpass=f=70", "loudnorm=I=-16:TP=-1.5:LRA=9", "aresample=24000"]
     if abs(tempo - 1.0) > 0.005:
         chain.insert(0, f"atempo={tempo:.3f}")
     return ",".join(chain)

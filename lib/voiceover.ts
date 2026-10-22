@@ -54,6 +54,8 @@ export interface SynthesisOptions {
   segments?: (string | null)[];
   /** tirage commun à tous les passages (même voix du début à la fin) ; nouveau tirage = nouvelle prise */
   seed?: number;
+  /** pauses entre les phrases d'un même passage : [[position 0-1, silence s], …] par passage */
+  inner?: [number, number][][];
 }
 
 export interface Synthesis {
@@ -78,6 +80,7 @@ async function habibi(
   gaps: number[] | null,
   segments: (string | null)[] | null,
   seed: number | null,
+  inner: [number, number][][] | null,
 ): Promise<Synthesis> {
   const base = env("TTS_SERVICE_URL").replace(/\/+$/, "");
   const r = await fetch(base + "/synthesize", {
@@ -96,6 +99,7 @@ async function habibi(
       gaps,
       expressive: false,
       seed,
+      inner_gaps: inner,
       segments,
       format: "json",
     }),
@@ -193,6 +197,7 @@ export async function synthesize(sentences: string[], voiceId: string, o: Synthe
         gaps,
         Array.isArray(o.segments) && o.segments.length === sentences.length ? o.segments : null,
         Number.isInteger(o.seed) ? (o.seed as number) : null,
+        Array.isArray(o.inner) && o.inner.length === sentences.length ? o.inner : null,
       )
     : azure(sentences, voice.id, s, pause, gaps);
 }
