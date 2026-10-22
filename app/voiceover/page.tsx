@@ -11,7 +11,7 @@ interface Voice {
   id: string;
   label: string;
   gender: "f" | "m";
-  provider: "habibi" | "azure";
+  provider: "habibi" | "azure" | "gemini";
   hint: string;
 }
 interface Item {
@@ -39,6 +39,7 @@ interface Preset {
   label: string;
   hint: string;
   voice: string;
+  geminiVoice?: string;
   speed: number;
   pause: string;
   tone: string;
@@ -184,7 +185,11 @@ export default function VoiceoverPage() {
     setSeconds(p.seconds);
     setSpeed(p.speed);
     setPause(p.pause);
-    if (d?.voices.some((v) => v.id === p.voice && d.providers.includes(v.provider))) setVoice(p.voice);
+    // voix Google quand Gemini est configuré (meilleur rendu darija), sinon la voix du catalogue
+    const pick = [p.geminiVoice, p.voice].find((id) =>
+      d?.voices.some((v) => v.id === id && d.providers.includes(v.provider)),
+    );
+    if (pick) setVoice(pick);
   }
   const voices = d?.voices || [];
   const voiceById = new Map(voices.map((v) => [v.id, v]));
@@ -250,6 +255,7 @@ export default function VoiceoverPage() {
           pause,
           target_seconds: fit ? seconds : undefined,
           exact,
+          tone,
           preset: preset || undefined,
           title: title || name,
           product_id: productId || undefined,
@@ -434,7 +440,9 @@ export default function VoiceoverPage() {
                   <b>{p.label}</b>
                   <small>{p.hint}</small>
                   <em>
-                    {voiceById.get(p.voice)?.label || p.voice} · {p.speed.toFixed(2).replace(/0$/, "")}× · {p.seconds} s
+                    {voiceById.get(d.providers.includes("gemini") && p.geminiVoice ? p.geminiVoice : p.voice)?.label ||
+                      p.voice}{" "}
+                    · {p.speed.toFixed(2).replace(/0$/, "")}× · {p.seconds} s
                   </em>
                 </button>
               ))}
@@ -868,12 +876,33 @@ export default function VoiceoverPage() {
                   />
                 ) : null}
               </div>
+              {mode === "text" && voices.some((v) => v.provider === "gemini" && ready(v)) ? (
+                <div className="vo-voices vo-google">
+                  <span>Voix Google (Gemini) · darija la plus naturelle</span>
+                  <div>
+                    {voices
+                      .filter((v) => v.provider === "gemini")
+                      .map((v) => (
+                        <button
+                          type="button"
+                          key={v.id}
+                          className={"vo-voice" + (voice === v.id ? " on" : "")}
+                          onClick={() => setVoice(v.id)}
+                          title={v.hint}
+                        >
+                          <b>{v.label}</b>
+                          <small>{v.hint.split(" · ")[1]?.replace(" (Google)", "") || v.hint}</small>
+                        </button>
+                      ))}
+                  </div>
+                </div>
+              ) : null}
               {(["f", "m"] as const).map((g) => (
                 <div key={g} className="vo-voices">
                   <span>{g === "f" ? "Voix de femme" : "Voix d’homme"}</span>
                   <div>
                     {voices
-                      .filter((v) => v.gender === g)
+                      .filter((v) => v.gender === g && v.provider !== "gemini")
                       .map((v) => (
                         <button
                           type="button"

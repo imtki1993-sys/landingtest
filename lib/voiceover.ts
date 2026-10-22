@@ -1,9 +1,11 @@
 // Voix off darija : catalogue des voix et fournisseurs de synthèse.
+// 0. Gemini TTS (Google, clé GEMINI_API_KEY) : tout le script en une requête, ton réglé en langage naturel.
 // 1. Habibi-TTS (modèle marocain, Apache 2.0) sur le service GPU de LandPro (services/darija-tts),
 //    voix de référence tirées du corpus DODa (7 comédiens marocains, enregistrés en studio).
 // 2. Azure Speech (voix « arabe du Maroc » Jamal / Mouna) en secours, sans GPU.
+import { geminiStyle, geminiTts, pcmToMp3 } from "./gemini-tts";
 
-export type VoiceProvider = "habibi" | "azure";
+export type VoiceProvider = "habibi" | "azure" | "gemini";
 export interface Voice {
   id: string;
   label: string;
@@ -14,6 +16,15 @@ export interface Voice {
 }
 
 export const VOICES: Voice[] = [
+  // Gemini TTS (Google) : meilleur rendu darija constaté (voix Orus), ton réglé en langage naturel
+  { id: "gemini-orus", label: "Orus", gender: "m", provider: "gemini", hint: "Homme · ferme, pub (Google)" },
+  { id: "gemini-fenrir", label: "Fenrir", gender: "m", provider: "gemini", hint: "Homme · énergique (Google)" },
+  { id: "gemini-puck", label: "Puck", gender: "m", provider: "gemini", hint: "Homme · enjoué (Google)" },
+  { id: "gemini-charon", label: "Charon", gender: "m", provider: "gemini", hint: "Homme · posé (Google)" },
+  { id: "gemini-kore", label: "Kore", gender: "f", provider: "gemini", hint: "Femme · ferme (Google)" },
+  { id: "gemini-leda", label: "Leda", gender: "f", provider: "gemini", hint: "Femme · jeune (Google)" },
+  { id: "gemini-aoede", label: "Aoede", gender: "f", provider: "gemini", hint: "Femme · légère (Google)" },
+  { id: "gemini-sulafat", label: "Sulafat", gender: "f", provider: "gemini", hint: "Femme · chaleureuse (Google)" },
   { id: "doda-f1", label: "Salma", gender: "f", provider: "habibi", hint: "Femme · claire, posée" },
   { id: "doda-f2", label: "Nadia", gender: "f", provider: "habibi", hint: "Femme · chaleureuse" },
   { id: "doda-f3", label: "Imane", gender: "f", provider: "habibi", hint: "Femme · jeune, dynamique" },
@@ -36,6 +47,7 @@ export function availableProviders(): VoiceProvider[] {
   const out: VoiceProvider[] = [];
   if (env("TTS_SERVICE_URL") && env("TTS_SERVICE_TOKEN")) out.push("habibi");
   if (env("AZURE_SPEECH_KEY") && env("AZURE_SPEECH_REGION")) out.push("azure");
+  if (env("GEMINI_API_KEY")) out.push("gemini");
   return out;
 }
 
@@ -56,6 +68,8 @@ export interface SynthesisOptions {
   seed?: number;
   /** pauses entre les phrases d'un même passage : [[position 0-1, silence s], …] par passage */
   inner?: [number, number][][];
+  /** consigne de ton (Gemini) */
+  style?: string;
   /** voix pub personnalisée : extrait WAV (base64) et texte exact lu dedans */
   ref?: { audio: string; text: string } | null;
 }
@@ -183,7 +197,9 @@ export async function synthesize(sentences: string[], voiceId: string, o: Synthe
     throw new Error(
       voice.provider === "habibi"
         ? "Le service de voix darija n'est pas encore branché (TTS_SERVICE_URL / TTS_SERVICE_TOKEN)."
-        : "Azure Speech n'est pas configuré (AZURE_SPEECH_KEY / AZURE_SPEECH_REGION).",
+        : voice.provider === "gemini"
+          ? "Gemini n'est pas configuré : ajoute GEMINI_API_KEY dans Vercel."
+          : "Azure Speech n'est pas configuré (AZURE_SPEECH_KEY / AZURE_SPEECH_REGION).",
     );
   const s = Math.min(1.3, Math.max(0.7, Number(o.speed) || 1));
   const pause = PAUSES[o.pause as PauseKind] ?? 1;
@@ -192,6 +208,21 @@ export async function synthesize(sentences: string[], voiceId: string, o: Synthe
     Array.isArray(o.gaps) && o.gaps.length === sentences.length
       ? o.gaps.map((g) => Math.min(1.5, Math.max(0, Number(g) || 0)))
       : null;
+  if (voice.provider === "gemini") {
+    // tout le script d'un coup (meilleure continuité), une ligne par phrase
+    const pcm = await geminiTts(
+      sentences.join("\n"),
+      voice.label,
+      o.style || geminiStyle({ pause: o.pause, speed: s }),
+      env("GEMINI_API_KEY"),
+    );
+    return {
+      audio: pcmToMp3(pcm),
+      mime: "audio/mpeg",
+      wav: wavFromPcm(pcm),
+      seconds: Math.round((pcm.length / 2 / 24_000) * 10) / 10,
+    };
+  }
   return voice.provider === "habibi"
     ? habibi(
         sentences,
@@ -225,6 +256,8 @@ export interface VoicePreset {
   label: string;
   hint: string;
   voice: string;
+  /** voix Google équivalente (utilisée quand Gemini est configuré) */
+  geminiVoice: string;
   speed: number;
   pause: PauseKind;
   tone: string;
@@ -240,6 +273,7 @@ export const PRESETS: VoicePreset[] = [
     label: "Pub Facebook",
     hint: "Homme, énergique, accroche forte",
     voice: "doda-m2",
+    geminiVoice: "gemini-orus",
     speed: 1.08,
     pause: "courtes",
     tone: "energique",
@@ -252,6 +286,7 @@ export const PRESETS: VoicePreset[] = [
     label: "TikTok UGC",
     hint: "Jeune créateur, spontané",
     voice: "doda-m3",
+    geminiVoice: "gemini-puck",
     speed: 1.05,
     pause: "courtes",
     tone: "ugc",
@@ -265,6 +300,7 @@ export const PRESETS: VoicePreset[] = [
     label: "Recommandation femme",
     hint: "Femme, chaleureuse, de confiance",
     voice: "doda-f2",
+    geminiVoice: "gemini-sulafat",
     speed: 1.0,
     pause: "normales",
     tone: "chaleureux",
@@ -277,6 +313,7 @@ export const PRESETS: VoicePreset[] = [
     label: "Premium",
     hint: "Voix grave, posée, élégante",
     voice: "doda-m1",
+    geminiVoice: "gemini-charon",
     speed: 0.95,
     pause: "longues",
     tone: "premium",
@@ -289,6 +326,7 @@ export const PRESETS: VoicePreset[] = [
     label: "Offre COD",
     hint: "Offre, livraison, paiement à la livraison",
     voice: "doda-m2",
+    geminiVoice: "gemini-orus",
     speed: 1.1,
     pause: "courtes",
     tone: "energique",
@@ -301,6 +339,7 @@ export const PRESETS: VoicePreset[] = [
     label: "Pub 15 s",
     hint: "Rapide : accroche + offre",
     voice: "doda-m2",
+    geminiVoice: "gemini-fenrir",
     speed: 1.12,
     pause: "courtes",
     tone: "energique",
@@ -313,6 +352,7 @@ export const PRESETS: VoicePreset[] = [
     label: "Témoignage",
     hint: "Client satisfait, naturel",
     voice: "doda-f1",
+    geminiVoice: "gemini-leda",
     speed: 1.0,
     pause: "normales",
     tone: "temoignage",

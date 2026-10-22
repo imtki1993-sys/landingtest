@@ -17,6 +17,7 @@ import {
   type PauseKind,
   type Synthesis,
 } from "../../../lib/voiceover";
+import { geminiStyle } from "../../../lib/gemini-tts";
 import { cleanLexicon, estimateSeconds, groupPassages, normalizeDarija, type Lexicon } from "../../../lib/darija-text";
 import { VOICE_BUCKET, ensureVoiceBucket, voicePath } from "../../../lib/voiceover-storage";
 
@@ -227,6 +228,12 @@ export async function POST(req: Request) {
         seed,
         inner,
         ref: voice.ref,
+        // Gemini : ton du style de pub choisi, en langage naturel
+        style: geminiStyle({
+          tone: String(b.tone || PRESETS.find((p) => p.id === b.preset)?.tone || "energique"),
+          pause,
+          speed,
+        }),
       });
     } catch (e: any) {
       return NextResponse.json({ error: e.message || "Génération de la voix impossible." }, { status: 502 });
