@@ -44,6 +44,33 @@ const missing = (e: any) =>
 const noColumn = (e: any) =>
   ["42703", "PGRST204"].includes(String(e?.code || "")) || /column .* does not exist/.test(String(e?.message || ""));
 
+/**
+ * Voix choisie → ce qu'il faut envoyer au service. « custom:<id> » = voix pub personnalisée du compte
+ * (extrait privé téléchargé du stockage), sinon une voix du catalogue.
+ */
+async function resolveVoice(s: any, workspaceId: string, voiceId: string) {
+  if (voiceId.startsWith("custom:")) {
+    const { data: p } = await s
+      .from("voice_profiles")
+      .select("id,gender,ref_path,ref_text")
+      .eq("workspace_id", workspaceId)
+      .eq("id", voiceId.slice(7))
+      .maybeSingle();
+    if (!p) return null;
+    const dl = await s.storage.from(VOICE_BUCKET).download(p.ref_path);
+    if (dl.error) throw dl.error;
+    const audio = Buffer.from(await dl.data.arrayBuffer()).toString("base64");
+    return {
+      id: voiceId,
+      provider: "habibi" as const,
+      synthId: p.gender === "f" ? "doda-f1" : "doda-m1",
+      ref: { audio, text: p.ref_text as string },
+    };
+  }
+  const v = VOICES.find((x) => x.id === voiceId);
+  return v ? { id: v.id, provider: v.provider, synthId: v.id, ref: null } : null;
+}
+
 /** Ligne → élément envoyé à la page (sans chemins de stockage). */
 function toItem(r: any) {
   return {
@@ -178,7 +205,7 @@ export async function POST(req: Request) {
         { error: `Texte trop long (${spoken.text.length} caractères, ${MAX_CHARS} au maximum, soit ~60 s).` },
         { status: 400 },
       );
-    const voice = VOICES.find((v) => v.id === b.voice);
+    const voice = await resolveVoice(s, workspaceId, String(b.voice || ""));
     if (!voice) return NextResponse.json({ error: "Choisis une voix." }, { status: 400 });
     const speed = Math.min(1.3, Math.max(0.7, Number(b.speed) || 1));
     const pause = (b.pause in PAUSES ? b.pause : "normales") as PauseKind;
@@ -190,7 +217,15 @@ export async function POST(req: Request) {
     const seed = newSeed();
     let out: Synthesis;
     try {
-      out = await synthesize(passages, voice.id, { speed, pause, targetSeconds: target, gaps, seed, inner });
+      out = await synthesize(passages, voice.synthId, {
+        speed,
+        pause,
+        targetSeconds: target,
+        gaps,
+        seed,
+        inner,
+        ref: voice.ref,
+      });
     } catch (e: any) {
       return NextResponse.json({ error: e.message || "Génération de la voix impossible." }, { status: 502 });
     }
@@ -265,7 +300,10 @@ async function redo(s: any, workspaceId: string, b: any, lexicon: Lexicon) {
   const settings = row.settings || {};
   let out: Synthesis;
   try {
-    out = await synthesize(sentences, row.voice, {
+    const voice = await resolveVoice(s, workspaceId, String(row.voice || ""));
+    if (!voice) return NextResponse.json({ error: "Cette voix a été supprimée." }, { status: 400 });
+    out = await synthesize(sentences, voice.synthId, {
+      ref: voice.ref,
       speed: Number(row.speed) || 1,
       pause: settings.pause,
       targetSeconds: settings.target_seconds,

@@ -4,6 +4,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import SaaSSidebar from "../components/SaaSSidebar";
 import SaaSTopbar from "../components/SaaSTopbar";
 import { hasHarakat, normalizeDarija, stripHarakat, type Lexicon } from "../../lib/darija-text";
+import VoiceRecorder, { type CustomVoice } from "./VoiceRecorder";
 
 interface Voice {
   id: string;
@@ -139,6 +140,9 @@ export default function VoiceoverPage() {
   const [editText, setEditText] = useState("");
   const [compare, setCompare] = useState<string[]>([]);
   const [vocalizing, setVocalizing] = useState("");
+  const [custom, setCustom] = useState<CustomVoice[]>([]);
+  const [customInstalled, setCustomInstalled] = useState(true);
+  const [recording, setRecording] = useState(false);
 
   useEffect(() => {
     api("/api/voiceover")
@@ -150,6 +154,12 @@ export default function VoiceoverPage() {
         if (first) setVoice(first.id);
       })
       .catch((e) => setError(e.message));
+    api("/api/voiceover/voices")
+      .then((x) => {
+        setCustom(x.voices || []);
+        setCustomInstalled(x.installed !== false);
+      })
+      .catch(() => {});
     api("/api/products?limit=100")
       .then((x) => setProducts(x.products || []))
       .catch(() => {});
@@ -290,6 +300,21 @@ export default function VoiceoverPage() {
       setError(err.message);
     }
   }
+
+  async function removeCustom(v: CustomVoice) {
+    if (!confirm(`Supprimer la voix « ${v.name} » et son enregistrement ?`)) return;
+    try {
+      await api("/api/voiceover/voices?id=" + v.id, { method: "DELETE" });
+      setCustom((c) => c.filter((x) => x.id !== v.id));
+      if (voice === "custom:" + v.id) setVoice("");
+    } catch (err: any) {
+      setError(err.message);
+    }
+  }
+  const voiceLabel = (id: string) =>
+    id.startsWith("custom:")
+      ? custom.find((c) => "custom:" + c.id === id)?.name || "Ma voix pub"
+      : voiceById.get(id)?.label || id;
 
   function toggleCompare(id: string) {
     setCompare((c) => (c.includes(id) ? c.filter((x) => x !== id) : [...c.slice(-1), id]));
@@ -695,6 +720,57 @@ export default function VoiceoverPage() {
               <h2>
                 <i>3</i> La voix
               </h2>
+              <div className="vo-voices vo-custom">
+                <span>Ma voix pub (ton vendeur, recommandé)</span>
+                <div>
+                  {custom.map((c) => (
+                    <div key={c.id} className="vo-custom-card">
+                      <button
+                        type="button"
+                        className={"vo-voice" + (voice === "custom:" + c.id ? " on" : "")}
+                        onClick={() => setVoice("custom:" + c.id)}
+                      >
+                        <b>{c.name}</b>
+                        <small>
+                          {c.gender === "f" ? "Femme" : "Homme"} · ton pub{c.seconds ? ` · ${c.seconds} s` : ""}
+                        </small>
+                      </button>
+                      <button
+                        type="button"
+                        className="vo-x"
+                        aria-label={`Supprimer ${c.name}`}
+                        onClick={() => removeCustom(c)}
+                      >
+                        ×
+                      </button>
+                    </div>
+                  ))}
+                  {!recording && custom.length < 10 ? (
+                    <button
+                      type="button"
+                      className="vo-voice vo-add"
+                      disabled={noProvider || !d?.providers.includes("habibi")}
+                      onClick={() => setRecording(true)}
+                    >
+                      <b>+ Enregistrer</b>
+                      <small>10 s lues comme une pub</small>
+                    </button>
+                  ) : null}
+                </div>
+                {!customInstalled ? (
+                  <p className="vo-warn">Exécute d’abord la migration « voice_profiles » dans Supabase.</p>
+                ) : null}
+                {recording ? (
+                  <VoiceRecorder
+                    onClose={() => setRecording(false)}
+                    onSaved={(v) => {
+                      setCustom((c) => [v, ...c]);
+                      setVoice("custom:" + v.id);
+                      setRecording(false);
+                    }}
+                  />
+                ) : null}
+              </div>
               {(["f", "m"] as const).map((g) => (
                 <div key={g} className="vo-voices">
                   <span>{g === "f" ? "Voix de femme" : "Voix d’homme"}</span>
@@ -865,7 +941,7 @@ export default function VoiceoverPage() {
                   return it ? (
                     <div key={id}>
                       <span>
-                        {k ? "B" : "A"} · {it.title || "Voix off"} · {voiceById.get(it.voice)?.label || it.voice}
+                        {k ? "B" : "A"} · {it.title || "Voix off"} · {voiceLabel(it.voice)}
                         {it.preset ? ` · ${presetById.get(it.preset)?.label || it.preset}` : ""} · {it.speed}×
                       </span>
                       <audio controls preload="none" src={it.audio} />
@@ -891,7 +967,7 @@ export default function VoiceoverPage() {
                   <div className="vo-h-info">
                     <b>{it.title || "Voix off"}</b>
                     <small>
-                      {voiceById.get(it.voice)?.label || it.voice} · {fmtSec(it.seconds)} · {fmtDate(it.created_at)}
+                      {voiceLabel(it.voice)} · {fmtSec(it.seconds)} · {fmtDate(it.created_at)}
                       {it.parent_id && it.settings.redone != null ? ` · passage ${it.settings.redone + 1} refait` : ""}
                     </small>
                   </div>

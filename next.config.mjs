@@ -16,6 +16,11 @@ const nextConfig = {
       { source: "/((?!connect/).*)", headers: [...base, { key: "X-Frame-Options", value: "SAMEORIGIN" }] },
       // Script de commande embarqué chez les marchands : pas de restriction d'iframe.
       { source: "/connect/:path*", headers: base },
+      // Voix off : le micro du site lui-même est permis (enregistrer sa voix pub) ; écrase la règle générale.
+      {
+        source: "/voiceover",
+        headers: [{ key: "Permissions-Policy", value: "camera=(), microphone=(self), geolocation=(), payment=()" }],
+      },
     ];
   },
 };

@@ -123,3 +123,23 @@ html[data-theme="dark"] .vo-chips button { background: #111827; border-color: #4
 .vo-tashkeel span { flex: 1 1 260px; font-size: 12px; color: var(--vo-muted); line-height: 1.5; }
 .vo-tashkeel .vo-small { border: 1px solid var(--vo-line); }
 .vo-script { font-family: "Noto Naskh Arabic", "Segoe UI", Tahoma, sans-serif; }
+.vo-custom > span { color: var(--vo-accent) !important; }
+.vo-custom-card { position: relative; display: grid; }
+.vo-x { position: absolute; top: 4px; inset-inline-end: 4px; border: 0; background: transparent; color: var(--vo-muted); font-size: 16px; line-height: 1; cursor: pointer; padding: 2px 5px; border-radius: 6px; }
+.vo-x:hover { color: #dc2626; }
+.vo-add { border-style: dashed !important; color: var(--vo-accent) !important; }
+.vo-add small { color: var(--vo-muted); }
+.vo-rec { display: grid; gap: 10px; background: var(--vo-soft); border-radius: 12px; padding: 14px; margin-top: 4px; }
+.vo-rec-head { display: flex; justify-content: space-between; align-items: center; }
+.vo-rec-head b { color: var(--vo-ink); }
+.vo-rec p { margin: 0; font-size: 13px; color: var(--vo-muted); line-height: 1.6; }
+.vo-rec p strong { color: var(--vo-ink); }
+.vo-rec textarea { font-size: 16px !important; line-height: 1.8; }
+.vo-rec-actions { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.vo-rec-on { background: #dc2626 !important; }
+.vo-rec audio { width: 100%; }
+.vo-page label.vo-file { display: inline-flex; position: relative; cursor: pointer; font-size: 13px; }
+.vo-file input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+.vo-seg-2 { grid-template-columns: repeat(2, 1fr); }
+.vo-rec-msg { list-style: none; display: grid; gap: 4px; }
+.vo-voices > div.vo-rec { grid-template-columns: minmax(0, 1fr); }

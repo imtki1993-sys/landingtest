@@ -27,6 +27,7 @@ from audio_utils import (
     expected_seconds,
     fit_tempo,
     from_pcm16,
+    trim_silence,
     quality_report,
     sentence_speed,
     style_of,
@@ -99,7 +100,6 @@ class SynthesizeBody(BaseModel):
     gaps: list[float] | None = None
     # pauses entre les phrases d'un même passage : [[position 0-1, silence en s], …] par passage
     inner_gaps: list[list[list[float]]] | None = None
-    # intonation selon la ponctuation (référence « question » / « exclamation » du comédien)
     # intonation par extrait « question / exclamation » : désactivée par défaut (le timbre changeait d'une ligne à l'autre)
     expressive: bool = False
     # tirage commun à tous les passages : même voix, même élan du début à la fin
@@ -108,6 +108,51 @@ class SynthesizeBody(BaseModel):
     segments: list[str | None] | None = None
     # « json » : MP3 + WAV + phrases brutes (pour régénérer une phrase plus tard) ; « mp3 » : audio seul
     format: str = "mp3"
+    # voix pub personnalisée : extrait de référence (WAV 24 kHz en base64, préparé par /reference) et son texte exact
+    ref_audio: str | None = None
+    ref_text: str | None = Field(default=None, max_length=400)
+
+
+class ReferenceBody(BaseModel):
+    audio: str  # fichier enregistré ou importé (webm, m4a, mp3, wav…) en base64
+    text: str = Field(min_length=3, max_length=400)
+
+
+REF_MIN, REF_MAX = 4.0, 12.0  # le modèle n'utilise que 12 s de référence : au-delà le texte ne correspondrait plus
+_custom: dict[str, dict] = {}  # voix personnalisées déjà préparées dans ce conteneur (clé : empreinte de l'audio)
+
+
+def _to_wav24(data: bytes) -> bytes:
+    """N'importe quel fichier audio → WAV mono 24 kHz 16 bits (ffmpeg)."""
+    import subprocess
+
+    proc = subprocess.run(
+        ["ffmpeg", "-hide_banner", "-loglevel", "error", "-i", "pipe:0", "-ac", "1", "-ar", "24000",
+         "-af", "highpass=f=70,loudnorm=I=-18:TP=-2", "-c:a", "pcm_s16le", "-f", "wav", "pipe:1"],
+        input=data,
+        capture_output=True,
+        timeout=60,
+    )
+    if proc.returncode != 0 or len(proc.stdout) < 1000:
+        raise HTTPException(status_code=400, detail="Fichier audio illisible")
+    return proc.stdout
+
+
+def _custom_voice(audio_b64: str, text: str) -> dict:
+    """Voix personnalisée prête pour le modèle (préparée une fois par conteneur)."""
+    import hashlib
+    import tempfile
+
+    from f5_tts.infer.utils_infer import preprocess_ref_audio_text
+
+    raw = base64.b64decode(audio_b64)
+    key = hashlib.sha1(raw + text.encode()).hexdigest()
+    if key not in _custom:
+        with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as f:
+            f.write(raw)
+        a, t = preprocess_ref_audio_text(f.name, text, show_info=lambda *_: None)
+        _custom[key] = {"ref_audio": a, "ref_text": t, "label": "custom", "styles": {}}
+    return _custom[key]
 
 
 def _reference(sentence: str, voice: dict, expressive: bool) -> dict:
@@ -181,6 +226,43 @@ def voices(authorization: str | None = Header(default=None)):
     return {vid: v["label"] for vid, v in _state["voices"].items()}
 
 
+@app.post("/reference")
+def reference(body: ReferenceBody, authorization: str | None = Header(default=None)):
+    """Vérifie et prépare un extrait de voix pub : durée 4-12 s, volume, saturation → WAV 24 kHz à enregistrer."""
+    _check(authorization)
+    try:
+        raw = base64.b64decode(body.audio, validate=False)
+    except Exception:
+        raise HTTPException(status_code=400, detail="Fichier audio illisible")
+    if len(raw) > 6 * 1024 * 1024:
+        raise HTTPException(status_code=400, detail="Fichier trop lourd (6 Mo maximum)")
+    import io
+
+    import soundfile as sf
+
+    wave, _ = sf.read(io.BytesIO(_to_wav24(raw)), dtype="float32")
+    trimmed = trim_silence(wave)
+    seconds = len(trimmed) / SAMPLE_RATE
+    q = quality_report(wave)
+    problems = []
+    if seconds < REF_MIN:
+        problems.append(f"Enregistrement trop court ({seconds:.1f} s) : lis tout le texte, 4 à 12 s.")
+    if seconds > REF_MAX:
+        problems.append(f"Enregistrement trop long ({seconds:.1f} s) : 12 s au maximum, lis un texte plus court.")
+    if q["clipped"] > 0.002:
+        problems.append("Son saturé : éloigne un peu le téléphone de la bouche.")
+    if q["peak"] < 0.05:
+        problems.append("Son trop faible : rapproche-toi du micro.")
+    return JSONResponse(
+        {
+            "ok": not problems,
+            "problems": problems,
+            "seconds": round(seconds, 1),
+            "wav": base64.b64encode(to_wav(trimmed)).decode() if not problems else None,
+        }
+    )
+
+
 @app.post("/synthesize")
 def synthesize(body: SynthesizeBody, authorization: str | None = Header(default=None)):
     _check(authorization)
@@ -192,6 +274,9 @@ def synthesize(body: SynthesizeBody, authorization: str | None = Header(default=
     load()
     voices_ = _state["voices"]
     voice_id = body.voice
+    if body.ref_audio and body.ref_text:
+        voice_id = "custom"
+        voices_ = {**voices_, "custom": _custom_voice(body.ref_audio, body.ref_text.strip())}
     if voice_id not in voices_:
         # voix non préparée (pas d'extrait valable pour ce comédien) : une autre voix du même genre
         same = sorted(v for v in voices_ if v[:6] == voice_id[:6]) or sorted(voices_)
