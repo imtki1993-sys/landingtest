@@ -394,3 +394,50 @@ export function splitSegments(wav: Buffer, bounds: number[]): string[] {
 
 /** Tirage aléatoire pour une prise de voix. */
 export const newSeed = () => Math.floor(Math.random() * 2_000_000_000);
+
+// ─── Vocalisation (harakat) ───
+
+/** Prompt Meta AI : ajoute des harakat utiles à la lecture de la darija, sans toucher aux mots. */
+export function vocalizePrompt(text: string): string {
+  return `Tu es un spécialiste de la darija marocaine écrite. Ajoute des harakat (تشكيل) au texte ci-dessous pour qu'une voix de synthèse le prononce comme un Marocain de Casablanca.
+
+Règles :
+- Ne change AUCUNE lettre, aucun mot, aucun chiffre, aucune ponctuation, aucun retour à la ligne : ajoute seulement des harakat.
+- Darija, pas arabe classique : pas de voyelles de déclinaison en fin de mot, pas de tanwin.
+- Mets surtout le soukoun (ْ) sur les consonnes groupées comme on les dit en darija (ex. « دْيَالْ »، « كْبِيرْ »، « وْصَلْ »), la chadda (ّ) sur les consonnes doublées, et une voyelle (َ ُ ِ) seulement là où la lecture serait ambiguë.
+- Les mots d'origine française se vocalisent comme on les dit au Maroc (ex. « شَارْجُورْ »، « السّْبُورْ »).
+- Si un mot est déjà clair, laisse-le sans harakat.
+
+Texte :
+${text}
+
+Réponds UNIQUEMENT avec ce JSON : {"text":"le texte vocalisé, mêmes lignes"}`;
+}
+
+const squash = (t: string) =>
+  t
+    .replace(/[ً-ْٰ]/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
+
+/**
+ * Garde la version vocalisée ligne par ligne seulement si elle contient exactement les mêmes mots
+ * (harakat retirées) : l'IA ne peut ni réécrire ni traduire le script.
+ */
+export function mergeVocalized(original: string, vocalized: string): { text: string; lines: number; rejected: number } {
+  const src = original.split("\n");
+  const out = String(vocalized || "").split("\n");
+  let lines = 0,
+    rejected = 0;
+  const merged = src.map((line, i) => {
+    const v = out.length === src.length ? out[i] : undefined;
+    if (!line.trim()) return line;
+    if (v !== undefined && squash(v) === squash(line) && v.trim() !== line.trim()) {
+      lines++;
+      return v.trim();
+    }
+    if (v !== undefined && squash(v) !== squash(line)) rejected++;
+    return line;
+  });
+  return { text: merged.join("\n"), lines, rejected };
+}

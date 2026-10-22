@@ -311,12 +311,27 @@ const DARIJA_SWAPS: [string, string][] = [
 ];
 
 const escRe = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+/** Harakat (tachkil) : fatha, damma, kasra, tanwin, chadda, soukoun, alif suscrit. */
+export const HARAKAT_RE = /[\u064B-\u0652\u0670]/g;
+export const stripHarakat = (t: string) => t.replace(HARAKAT_RE, "");
+/** Texte vocalisé ? (au moins quelques harakat) */
+export const hasHarakat = (t: string) => (t.match(HARAKAT_RE) || []).length >= 3;
+
+/** Motif d'un mot arabe qui accepte des harakat entre ses lettres (mot sans harakat seulement). */
+const loosePattern = (word: string) =>
+  /[\u064B-\u0652\u0670]/.test(word)
+    ? escRe(word)
+    : [...word].map((c) => escRe(c) + (/[\u0600-\u06FF]/.test(c) ? "[\\u064B-\\u0652\\u0670]*" : "")).join("");
 /** Remplace un mot entier (avec « و » collé devant éventuellement), sans toucher aux mots plus longs. */
-function replaceWord(t: string, word: string, by: string): { t: string; hit: boolean } {
+function replaceWord(t: string, word: string, by: string, loose = false): { t: string; hit: boolean } {
   const latin = /[A-Za-z]/.test(word);
   const re = latin
     ? new RegExp(`(?<![\\p{L}\\p{N}])${escRe(word)}(?![\\p{L}\\p{N}])`, "giu")
-    : new RegExp(`(?<![\\p{L}])(و?)${escRe(word)}(?![\\p{L}])`, "gu");
+    : new RegExp(
+        `(?<![\\p{L}\\p{M}])(و[\\u064B-\\u0652]*)?${loose ? loosePattern(word) : escRe(word)}(?![\\p{L}\\p{M}])`,
+        "gu",
+      );
   let hit = false;
   const out = t.replace(re, (_m, w) => {
     hit = true;
@@ -348,7 +363,8 @@ function applyLexicon(t: string, lexicon: Lexicon, skipLooping = false): string 
   // expressions longues d'abord (« livraison gratuite » avant « livraison »)
   for (const [k, v] of Object.entries(lexicon).sort((a, b) => b[0].length - a[0].length)) {
     if (skipLooping && v.includes(k)) continue;
-    t = replaceWord(t, k, v).t;
+    // dictionnaire : s'applique aussi au même mot écrit avec harakat (« السبور » ↔ « السّْبُورْ »)
+    t = replaceWord(t, k, v, true).t;
   }
   return t;
 }

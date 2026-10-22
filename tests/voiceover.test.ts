@@ -136,3 +136,15 @@ describe("régénérer une phrase", () => {
     expect(out.seconds).toBe(3.2);
   });
 });
+
+describe("vocalisation par l'IA", () => {
+  it("garde une ligne vocalisée seulement si les mots sont identiques", async () => {
+    const { mergeVocalized } = await import("../lib/voiceover");
+    const src = "دابا الحل وصل!\n\nطلب دابا";
+    const r = mergeVocalized(src, "دَابَا الحَلّْ وْصَلْ!\n\nطَلَّبْ دابا الآن");
+    expect(r.text).toBe("دَابَا الحَلّْ وْصَلْ!\n\nطلب دابا");
+    expect(r.lines).toBe(1);
+    expect(r.rejected).toBe(1);
+    expect(mergeVocalized(src, "une seule ligne").text).toBe(src);
+  });
+});

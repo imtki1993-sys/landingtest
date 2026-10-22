@@ -119,3 +119,7 @@ html[data-theme="dark"] .vo-chips button { background: #111827; border-color: #4
 }
 @media (max-width: 980px) { .vo-history li { position: relative; padding-inline-start: 30px; } .vo-page label.vo-pick { position: absolute; inset-inline-start: 0; top: 12px; } }
 .vo-h-actions { flex-wrap: wrap; }
+.vo-tashkeel { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.vo-tashkeel span { flex: 1 1 260px; font-size: 12px; color: var(--vo-muted); line-height: 1.5; }
+.vo-tashkeel .vo-small { border: 1px solid var(--vo-line); }
+.vo-script { font-family: "Noto Naskh Arabic", "Segoe UI", Tahoma, sans-serif; }
