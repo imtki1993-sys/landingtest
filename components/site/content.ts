@@ -8,9 +8,10 @@ export const SITE = {
     meta: {
       title: "LandPro — Vends, confirme et livre en paiement à la livraison",
       description:
-        "Landing pages COD, commandes, équipe de confirmation et livraison Ozon Express réunies dans un seul outil pour les vendeurs au Maroc. Dès 599 DH pour 3 mois.",
+        "Landing pages COD, commandes, équipe de confirmation, livraison Ozon Express, sourcing Derb Omar, voix off darija et analyse des pubs dans un seul outil pour les vendeurs au Maroc. Dès 599 DH pour 3 mois.",
     },
     nav: {
+      nouveau: "Nouveautés",
       templates: "Exemples",
       boutique: "Boutiques",
       trajet: "Comment ça marche",
@@ -40,6 +41,61 @@ export const SITE = {
       title: "LandPro en 40 secondes.",
       text: "De la landing au colis livré, tout le trajet d'une commande.",
       label: "Vidéo de présentation de LandPro, 40 secondes, sans son",
+    },
+    nouveau: {
+      badge: "Nouveau",
+      title: "Trouver le produit, le présenter, savoir quelle pub paie.",
+      text: "Trois nouveaux outils dans LandPro, inclus dans chaque formule.",
+      items: [
+        {
+          id: "sourcing",
+          name: "Sourcing Derb Omar",
+          title: "Les nouveautés des grossistes, sans fouiller Telegram.",
+          text: "LandPro lit les canaux Telegram publics des grossistes de Derb Omar toutes les 30 minutes et range leurs produits dans un catalogue : photo, prix de gros, quantité minimum et fournisseur.",
+          points: [
+            ["Les bons filtres", "Catégorie, prix, fournisseur et date de publication : aujourd'hui, hier, 7 jours…"],
+            ["WhatsApp du fournisseur", "Un bouton pour chaque numéro trouvé dans le message, sinon celui du canal."],
+            ["Importer en un clic", "Le produit passe dans tes produits avec un prix de vente proposé."],
+          ],
+          shot: "dash-sourcing",
+          height: 1380,
+          alt: "Catalogue Sourcing Derb Omar dans LandPro, produits des grossistes avec prix de gros",
+        },
+        {
+          id: "voix",
+          name: "Voix off darija",
+          title: "Une voix off marocaine pour ta pub, en une minute.",
+          text: "L'IA écrit le script de ta pub en darija à partir du produit, puis une voix marocaine le lit. Tu télécharges le MP3 ou le WAV pour ta vidéo Facebook ou TikTok.",
+          points: [
+            [
+              "Styles de pub",
+              "Pub Facebook, TikTok, offre COD, premium, témoignage : voix, rythme et texte réglés d'un clic.",
+            ],
+            ["Voix d'homme et de femme", "Ou ta propre voix pub, enregistrée en 10 secondes au téléphone."],
+            ["Bien prononcé", "Prix et chiffres lus en darija, dictionnaire pour tes noms de marque."],
+          ],
+          shot: "dash-voix",
+          height: 1620,
+          alt: "Page Voix off darija de LandPro avec un script en darija et le choix de la voix",
+        },
+        {
+          id: "pubs",
+          name: "Analyse des pubs",
+          title: "Le vrai coût d'une commande livrée, pub par pub.",
+          text: "Avec les paramètres d'URL de Facebook, chaque commande garde la campagne et la pub qui l'ont amenée. Tu saisis ta dépense, LandPro calcule le reste.",
+          points: [
+            [
+              "Du clic au cash",
+              "Visites, commandes, confirmées, livrées et retours, pour chaque campagne et chaque pub.",
+            ],
+            ["Coût par livrée, ROAS réel", "Calculés sur l'argent vraiment encaissé, pas sur les commandes reçues."],
+            ["Par période et par landing", "Aujourd'hui, 7 jours, ce mois… et export CSV."],
+          ],
+          shot: "dash-pubs",
+          height: 1620,
+          alt: "Page Analyse des pubs de LandPro avec la dépense, les livrées et le coût par livrée de chaque campagne",
+        },
+      ],
     },
     templates: {
       title: "Des landings qui vendent, en arabe et en français.",
@@ -100,6 +156,7 @@ export const SITE = {
             ["Import de produit", "Colle un lien AliExpress ou Alibaba pour démarrer la fiche."],
             ["Variantes et offres", "Taille, couleur, prix et stock par variante, offres 1, 2 ou 3 pièces."],
             ["Ton adresse", "Chaque landing a son adresse .landpro.online, ou ton propre domaine."],
+            ["Voix off darija", "Script de pub écrit par l'IA, lu par une voix marocaine, en MP3 ou WAV."],
           ],
         },
         {
@@ -108,6 +165,11 @@ export const SITE = {
             ["Formulaire ou WhatsApp", "Ton client commande par formulaire, par WhatsApp, ou au choix."],
             ["Landings hors LandPro", "Un script relie le formulaire de ta landing existante à tes commandes."],
             ["Pixel Meta", "Événements du Pixel et achat envoyé depuis le serveur par l'API Conversions."],
+            [
+              "Sourcing Derb Omar",
+              "Les produits des grossistes sur Telegram, avec prix de gros et WhatsApp du fournisseur.",
+            ],
+            ["Analyse des pubs", "Commandes, livrées et coût par livrée de chaque campagne et de chaque pub."],
           ],
         },
         {
@@ -145,7 +207,7 @@ export const SITE = {
         },
       ],
       included:
-        "Chaque formule comprend la création de landings et de boutiques, les commandes, le filtre des fausses commandes, l'équipe de confirmation, Ozon Express, le Pixel Meta et ton domaine.",
+        "Chaque formule comprend la création de landings et de boutiques, les commandes, le filtre des fausses commandes, l'équipe de confirmation, Ozon Express, le Pixel Meta, ton domaine, le sourcing Derb Omar, la voix off darija et l'analyse des pubs.",
       whatsapp: (months: number) => `Bonjour, je veux activer LandPro pour ${months} mois.`,
     },
     faq: {
@@ -182,9 +244,10 @@ export const SITE = {
     meta: {
       title: "LandPro — بيع، أكّد و وصّل بالدفع عند الاستلام",
       description:
-        "صفحات البيع، الطلبات، فريق التأكيد و التوصيل مع Ozon Express ف أداة وحدة للبائعين ف المغرب. من 599 درهم لـ 3 شهور.",
+        "صفحات البيع، الطلبات، فريق التأكيد، التوصيل مع Ozon Express، سورسينغ درب عمر، الفويس أوفر بالدارجة و تحليل الإشهارات ف أداة وحدة للبائعين ف المغرب. من 599 درهم لـ 3 شهور.",
     },
     nav: {
+      nouveau: "الجديد",
       templates: "أمثلة",
       boutique: "المتاجر",
       trajet: "كيفاش كيخدم",
@@ -214,6 +277,58 @@ export const SITE = {
       title: "LandPro ف 40 ثانية.",
       text: "من صفحة البيع حتى الطرد يوصل، الطريق كامل ديال الطلبية.",
       label: "فيديو تقديم LandPro، 40 ثانية، بلا صوت",
+    },
+    nouveau: {
+      badge: "جديد",
+      title: "لقا المنتوج، قدّمو مزيان، و عرف شمن إشهار كيجيب الفلوس.",
+      text: "تلاتة ديال الأدوات جداد ف LandPro، داخلين ف كل عرض.",
+      items: [
+        {
+          id: "sourcing",
+          name: "سورسينغ درب عمر",
+          title: "الجديد ديال الجمالة، بلا ما تقلّب ف تيليغرام.",
+          text: "LandPro كيقرا القنوات العمومية ديال الجمالة ديال درب عمر ف تيليغرام كل 30 دقيقة، و كيرتّب المنتوجات ديالهم ف كاتالوغ: التصويرة، ثمن الجملة، أقل كمية و المورّد.",
+          points: [
+            ["فلاتر مزيانة", "الصنف، الثمن، المورّد و نهار النشر: اليوم، البارح، 7 أيام…"],
+            ["واتساب المورّد", "بوطونة لكل رقم كاين ف الميساج، ولا الرقم ديال القناة."],
+            ["زيدو بكليكة", "المنتوج كيدخل للمنتوجات ديالك مع ثمن بيع مقترح."],
+          ],
+          shot: "dash-sourcing",
+          height: 1380,
+          alt: "كاتالوغ سورسينغ درب عمر ف LandPro، منتوجات الجمالة مع ثمن الجملة",
+        },
+        {
+          id: "voix",
+          name: "فويس أوفر بالدارجة",
+          title: "فويس أوفر مغربي للإشهار ديالك، ف دقيقة.",
+          text: "الذكاء الاصطناعي كيكتب السكريبت ديال الإشهار بالدارجة على حساب المنتوج، و صوت مغربي كيقراه. كتنزّل MP3 ولا WAV للفيديو ديالك ف فيسبوك ولا تيك توك.",
+          points: [
+            [
+              "ستيلات الإشهار",
+              "فيسبوك، تيك توك، عرض الدفع عند الاستلام، بريميوم، تجربة زبون: الصوت، الإيقاع و النص بكليكة.",
+            ],
+            ["أصوات رجال و عيالات", "ولا الصوت ديالك، كتسجلو ف 10 ثواني بالتيليفون."],
+            ["نطق مزيان", "الأثمنة و الأرقام كيتقراو بالدارجة، و قاموس لأسماء الماركات ديالك."],
+          ],
+          shot: "dash-voix",
+          height: 1620,
+          alt: "صفحة الفويس أوفر بالدارجة ف LandPro مع سكريبت بالدارجة و اختيار الصوت",
+        },
+        {
+          id: "pubs",
+          name: "تحليل الإشهارات",
+          title: "الثمن الحقيقي ديال طلبية واصلة، إشهار بإشهار.",
+          text: "بالباراميترات ديال الرابط ف فيسبوك، كل طلبية كتحفظ الحملة و الإشهار اللي جابوها. نتا كتدخل شحال صرفتي، و LandPro كيحسب الباقي.",
+          points: [
+            ["من الكليك حتى الفلوس", "الزيارات، الطلبات، المؤكدة، الواصلة و الرجوع، لكل حملة و لكل إشهار."],
+            ["ثمن الطلبية الواصلة و ROAS حقيقي", "محسوبين على الفلوس اللي دخلات بصح، ماشي على الطلبات."],
+            ["حسب المدة و الصفحة", "اليوم، 7 أيام، هاد الشهر… و تصدير CSV."],
+          ],
+          shot: "dash-pubs",
+          height: 1620,
+          alt: "صفحة تحليل الإشهارات ف LandPro مع المصروف، الطلبات الواصلة و الثمن ديال كل طلبية واصلة",
+        },
+      ],
     },
     templates: {
       title: "صفحات بيع كتبيع، بالعربية و بالفرنسية.",
@@ -271,6 +386,7 @@ export const SITE = {
             ["استيراد المنتوج", "لصق رابط AliExpress ولا Alibaba باش تبدا الفيشة."],
             ["الأنواع و العروض", "المقاس، اللون، الثمن و السطوك لكل نوع، و عروض 1 و 2 و 3 حبات."],
             ["العنوان ديالك", "كل صفحة عندها عنوان .landpro.online، ولا الدومين ديالك."],
+            ["فويس أوفر بالدارجة", "سكريبت الإشهار بالذكاء الاصطناعي، بصوت مغربي، MP3 ولا WAV."],
           ],
         },
         {
@@ -279,6 +395,8 @@ export const SITE = {
             ["فورمولير ولا واتساب", "الزبون كيطلب بالفورمولير، بالواتساب، ولا بجوج."],
             ["صفحات برا LandPro", "سكريبت كيربط الفورمولير ديال الصفحة اللي عندك مع الطلبات ديالك."],
             ["Pixel ديال Meta", "أحداث الـ Pixel و الشراء كيتصيفط من السيرفر بـ API Conversions."],
+            ["سورسينغ درب عمر", "المنتوجات ديال الجمالة ف تيليغرام، مع ثمن الجملة و واتساب المورّد."],
+            ["تحليل الإشهارات", "الطلبات، الواصلة و الثمن ديال كل طلبية واصلة لكل حملة و لكل إشهار."],
           ],
         },
         {
@@ -310,7 +428,7 @@ export const SITE = {
         { months: 12, price: "1699", label: "12 شهر، أحسن ثمن", perMonth: "142 درهم ف الشهر", cta: "خود 12 شهر" },
       ],
       included:
-        "كل عرض فيه إنشاء صفحات البيع و المتاجر، الطلبات، كشف الطلبات المزيفة، فريق التأكيد، Ozon Express، Pixel ديال Meta و الدومين ديالك.",
+        "كل عرض فيه إنشاء صفحات البيع و المتاجر، الطلبات، كشف الطلبات المزيفة، فريق التأكيد، Ozon Express، Pixel ديال Meta، الدومين ديالك، سورسينغ درب عمر، الفويس أوفر بالدارجة و تحليل الإشهارات.",
       whatsapp: (months: number) => `السلام، بغيت نفعّل LandPro لمدة ${months} شهور.`,
     },
     faq: {

@@ -32,6 +32,7 @@ export default function SiteHome({ lang, salesPhone }: { lang: SiteLang; salesPh
             landpro
           </a>
           <nav aria-label={ar ? "القائمة الرئيسية" : "Navigation principale"} className="mj-nav">
+            <a href="#nouveau">{t.nav.nouveau}</a>
             <a href="#templates">{t.nav.templates}</a>
             <a href="#boutique">{t.nav.boutique}</a>
             <a href="#trajet">{t.nav.trajet}</a>
@@ -100,6 +101,40 @@ export default function SiteHome({ lang, salesPhone }: { lang: SiteLang; salesPh
               label={t.video.label}
             />
           </div>
+        </div>
+      </section>
+
+      <section id="nouveau" className="mj-nouveau" aria-labelledby="mj-nouveau-title">
+        <div className="mj-wrap">
+          <div className="mj-split-head" data-reveal>
+            <h2 id="mj-nouveau-title" className="mj-h2">
+              {t.nouveau.title}
+            </h2>
+            <p className="mj-muted">{t.nouveau.text}</p>
+          </div>
+          {t.nouveau.items.map((f, i) => (
+            <article key={f.id} id={f.id} className={"mj-feature" + (i % 2 ? " is-flip" : "")}>
+              <div className="mj-feature-copy" data-reveal>
+                <p className="mj-feature-name">
+                  <span className="mj-new-badge">{t.nouveau.badge}</span>
+                  {f.name}
+                </p>
+                <h3 className="mj-feature-title">{f.title}</h3>
+                <p className="mj-muted">{f.text}</p>
+                <dl className="mj-points mj-points-ink">
+                  {f.points.map(([k, v]) => (
+                    <div key={k}>
+                      <dt>{k}</dt>
+                      <dd>{v}</dd>
+                    </div>
+                  ))}
+                </dl>
+              </div>
+              <div className="mj-shot" data-reveal>
+                <img src={`/site/${f.shot}.webp`} alt={f.alt} width={2880} height={f.height} loading="lazy" />
+              </div>
+            </article>
+          ))}
         </div>
       </section>
 
@@ -288,6 +323,7 @@ export default function SiteHome({ lang, salesPhone }: { lang: SiteLang; salesPh
             <p>{t.footer.text}</p>
           </div>
           <nav aria-label={ar ? "روابط أسفل الصفحة" : "Pied de page"} className="mj-footer-nav">
+            <a href="#nouveau">{t.nav.nouveau}</a>
             <a href="#templates">{t.nav.templates}</a>
             <a href="#boutique">{t.nav.boutique}</a>
             <a href="#fonctions">{t.nav.fonctions}</a>
