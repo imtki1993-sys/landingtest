@@ -25,8 +25,7 @@ export default function SiteHome({ lang, salesPhone }: { lang: SiteLang; salesPh
       <link rel="stylesheet" href={FONTS} precedence="default" />
       <SiteMotion />
 
-      <section id="top" className="mj-hero">
-        <HeroRays />
+      <div className="mj-topbar">
         <header className="mj-wrap mj-header">
           <a href={ar ? "/ar" : "/"} className="mj-logo">
             landpro
@@ -51,7 +50,10 @@ export default function SiteHome({ lang, salesPhone }: { lang: SiteLang; salesPh
             </a>
           </div>
         </header>
+      </div>
 
+      <section id="top" className="mj-hero">
+        <HeroRays />
         <div className="mj-wrap mj-hero-grid">
           <div className="mj-hero-copy">
             <HeroTitle lines={t.hero.title} />

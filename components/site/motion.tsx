@@ -33,7 +33,18 @@ export function SiteMotion() {
     gsap.registerPlugin(ScrollTrigger);
 
     // Lenis avance au rythme du ticker GSAP : un seul requestAnimationFrame pour les deux.
-    const lenis = new Lenis({ duration: 1.1, anchors: true });
+    const lenis = new Lenis({ duration: 1.1 });
+    // Liens du menu (#section) : défilement doux, sous la barre fixe (scroll-padding-top), sans saut natif.
+    const onAnchor = (e: MouseEvent) => {
+      const a = (e.target as HTMLElement | null)?.closest<HTMLAnchorElement>('a[href^="#"]');
+      const id = a?.getAttribute("href")?.slice(1);
+      const target = id ? document.getElementById(id) : null;
+      if (!target) return;
+      e.preventDefault();
+      lenis.scrollTo(target);
+      history.replaceState(null, "", "#" + id);
+    };
+    document.addEventListener("click", onAnchor);
     lenis.on("scroll", ScrollTrigger.update);
     const tick = (time: number) => lenis.raf(time * 1000);
     gsap.ticker.add(tick);
@@ -57,6 +68,7 @@ export function SiteMotion() {
 
     return () => {
       window.removeEventListener("load", refresh);
+      document.removeEventListener("click", onAnchor);
       batch.forEach((st) => st.kill());
       gsap.set(items, { clearProps: "opacity,visibility,transform" });
       gsap.ticker.remove(tick);
