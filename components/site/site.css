@@ -403,6 +403,59 @@
   margin-inline-end: -12%;
 }
 
+/* Nouveautés */
+.mj-nouveau {
+  background: var(--mj-lav);
+  padding-block: clamp(64px, 9vw, 120px);
+}
+.mj-feature {
+  display: grid;
+  grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+  gap: 56px;
+  align-items: center;
+  margin-top: clamp(56px, 7vw, 96px);
+}
+.mj-feature.is-flip {
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr);
+}
+.mj-feature.is-flip .mj-feature-copy {
+  order: 2;
+}
+.mj-feature-copy {
+  display: grid;
+  gap: 14px;
+}
+.mj-feature-name {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 800;
+  color: var(--mj-blue);
+}
+.mj-new-badge {
+  background: var(--mj-saffron);
+  color: var(--mj-ink);
+  border-radius: 999px;
+  padding: 2px 10px;
+  font-size: 13px;
+  font-weight: 800;
+}
+.mj-feature-title {
+  margin: 0;
+  font-size: clamp(24px, 2.6vw, 34px);
+  line-height: 1.15;
+  font-weight: 900;
+  color: var(--mj-ink);
+  text-wrap: balance;
+}
+.mj-feature .mj-points {
+  margin-top: 10px;
+}
+.mj-points.mj-points-ink dd {
+  color: var(--mj-muted);
+}
+
 /* Équipe */
 .mj-equipe {
   display: grid;
@@ -822,9 +875,14 @@
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
   .mj-equipe,
+  .mj-feature,
+  .mj-feature.is-flip,
   .mj-faq {
     grid-template-columns: minmax(0, 1fr);
     gap: 32px;
+  }
+  .mj-feature.is-flip .mj-feature-copy {
+    order: 0;
   }
 }
 
