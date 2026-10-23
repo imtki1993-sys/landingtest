@@ -1,4 +1,10 @@
 /* Site de présentation LandPro — direction « Majorelle ». Toutes les classes sont préfixées mj-. */
+html:has(.mj) {
+  scroll-padding-top: 76px;
+}
+body:has(.mj) {
+  margin: 0;
+}
 .mj {
   --mj-blue: #4436db;
   --mj-saffron: #ffc83d;
@@ -158,11 +164,20 @@
   color: #fff;
   padding-bottom: clamp(48px, 7vw, 96px);
 }
+/* Barre du haut fixée pendant le défilement */
+.mj-topbar {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: var(--mj-blue);
+  color: #fff;
+  box-shadow: 0 10px 30px -18px rgba(23, 19, 58, 0.55);
+}
 .mj-header {
   display: flex;
   align-items: center;
   gap: 32px;
-  padding-block: 22px;
+  padding-block: 14px;
 }
 .mj-nav {
   display: flex;
