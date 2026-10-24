@@ -27,6 +27,19 @@ interface Item {
   phones?: string[];
   /** numéro pris dans la description du canal (le message n'en contient pas) */
   phones_from_channel?: boolean;
+  /** ce produit dans les produits du compte (boutique Derb Omar) : prix de vente choisi */
+  mine?: Mine | null;
+}
+interface Mine {
+  id: string;
+  price: number;
+  active: boolean;
+}
+interface ShopStore {
+  id: string;
+  name: string;
+  slug: string;
+  status: string;
 }
 interface Channel {
   id: string;
@@ -85,9 +98,10 @@ function ChannelBadge({ c }: { c?: Channel }) {
   );
 }
 
-function ImportForm({ item, onDone }: { item: Item; onDone: (id: string) => void }) {
+function ImportForm({ item, shop, onDone }: { item: Item; shop: boolean; onDone: (mine: Mine) => void }) {
   const [name, setName] = useState(item.name || "");
-  const [price, setPrice] = useState<string>(String(suggestPrice(item.price)));
+  // prix choisi par le vendeur (le prix proposé n'est qu'un exemple)
+  const [price, setPrice] = useState<string>(item.mine ? String(item.mine.price) : "");
   const [old, setOld] = useState("");
   const [state, setState] = useState<"" | "busy" | "err">("");
   const [msg, setMsg] = useState("");
@@ -102,7 +116,7 @@ function ImportForm({ item, onDone }: { item: Item; onDone: (id: string) => void
       body: JSON.stringify({ id: item.id, name, price: Number(price), compare_at_price: Number(old) || null }),
     }).catch(() => null);
     const x = await r?.json().catch(() => ({}));
-    if (r?.ok) onDone(x.product?.id);
+    if (r?.ok) onDone({ id: x.product?.id, price: Number(price), active: true });
     else {
       setState("err");
       setMsg(x?.error || "Import impossible, réessaie.");
@@ -124,7 +138,13 @@ function ImportForm({ item, onDone }: { item: Item; onDone: (id: string) => void
         <label>
           Prix de vente
           <span className="src-money">
-            <input inputMode="decimal" value={price} onChange={(e) => setPrice(e.target.value)} required />
+            <input
+              inputMode="decimal"
+              value={price}
+              onChange={(e) => setPrice(e.target.value)}
+              placeholder={item.price ? "ex. " + suggestPrice(item.price) : ""}
+              required
+            />
             DH
           </span>
         </label>
@@ -154,7 +174,13 @@ function ImportForm({ item, onDone }: { item: Item; onDone: (id: string) => void
       </p>
       {msg ? <p className="src-error">{msg}</p> : null}
       <button type="submit" className="src-primary" disabled={state === "busy"}>
-        {state === "busy" ? "Import en cours…" : "Importer dans mes produits"}
+        {state === "busy"
+          ? "Enregistrement…"
+          : item.mine?.active
+            ? "Changer le prix"
+            : shop
+              ? "Mettre en vente dans ma boutique"
+              : "Importer dans mes produits"}
       </button>
     </form>
   );
@@ -163,16 +189,21 @@ function ImportForm({ item, onDone }: { item: Item; onDone: (id: string) => void
 function Detail({
   item,
   channel,
+  shop,
   onClose,
   onBroken,
+  onMine,
 }: {
   item: Item;
   channel?: Channel;
+  shop: ShopStore | null;
   onClose: () => void;
   onBroken: (id: string) => void;
+  onMine: (id: string, mine: Mine | null) => void;
 }) {
   const [i, setI] = useState(0);
   const [done, setDone] = useState<string | null>(null);
+  const [removing, setRemoving] = useState(false);
   const [full, setFull] = useState(false);
   const body = (item.body ?? item.text ?? "").trim();
   const shown = full || !body ? item.text || "" : body;
@@ -259,18 +290,202 @@ function Detail({
           </div>
           {done !== null ? (
             <div className="src-success">
-              <b>Produit ajouté à tes produits ✓</b>
-              <p>Tu peux maintenant créer sa landing page.</p>
+              <b>{shop ? "Produit en vente dans ta boutique ✓" : "Produit ajouté à tes produits ✓"}</b>
+              <p>
+                {shop
+                  ? "Il apparaît dans ta boutique Derb Omar et dans tes produits."
+                  : "Tu peux maintenant créer sa landing page."}
+              </p>
               <Link href="/products" className="src-primary">
                 Voir mes produits
               </Link>
             </div>
           ) : (
-            <ImportForm item={item} onDone={(id) => setDone(id || "")} />
+            <>
+              {item.mine?.active ? (
+                <div className="src-onsale">
+                  <span>
+                    En vente à <b>{dh(item.mine.price)}</b>
+                  </span>
+                  <button
+                    type="button"
+                    disabled={removing}
+                    onClick={async () => {
+                      setRemoving(true);
+                      const r = await fetch("/api/sourcing/store", {
+                        method: "PATCH",
+                        headers: { "content-type": "application/json" },
+                        body: JSON.stringify({ productId: item.mine!.id, active: false }),
+                      }).catch(() => null);
+                      setRemoving(false);
+                      if (r?.ok) onMine(item.id, { ...item.mine!, active: false });
+                    }}
+                  >
+                    {removing ? "…" : "Retirer de la vente"}
+                  </button>
+                </div>
+              ) : null}
+              <ImportForm
+                key={item.mine?.active ? "on" : "off"}
+                item={item}
+                shop={!!shop}
+                onDone={(m) => {
+                  onMine(item.id, m);
+                  if (!item.mine?.active) setDone(m.id || "");
+                }}
+              />
+            </>
           )}
         </div>
       </div>
     </div>
+  );
+}
+
+/** Boutique Derb Omar du compte : création, liens, et filtre « à mettre en prix / en vente ». */
+function ShopPanel({
+  store,
+  shop,
+  setShop,
+  onCreated,
+}: {
+  store: ShopStore | null;
+  shop: string;
+  setShop: (v: string) => void;
+  onCreated: () => void;
+}) {
+  const [name, setName] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [err, setErr] = useState("");
+  if (!store)
+    return (
+      <section className="src-shop">
+        <div>
+          <b>Crée ta boutique Derb Omar</b>
+          <p>
+            Une boutique en ligne avec les produits des grossistes. Les nouveaux produits arrivent ici toutes les 30
+            minutes : tu fixes ton prix de vente et le produit passe en vente. Tes clients ne voient ni le fournisseur,
+            ni le prix de gros.
+          </p>
+        </div>
+        <form
+          onSubmit={async (e) => {
+            e.preventDefault();
+            setBusy(true);
+            setErr("");
+            const r = await fetch("/api/sourcing/store", {
+              method: "POST",
+              headers: { "content-type": "application/json" },
+              body: JSON.stringify({ name }),
+            }).catch(() => null);
+            const x = await r?.json().catch(() => ({}));
+            setBusy(false);
+            if (r?.ok) onCreated();
+            else setErr(x?.error || "Création impossible, réessaie.");
+          }}
+        >
+          <input
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            maxLength={80}
+            required
+            placeholder="Nom de ta boutique, ex. Dar Lmaqadi"
+            aria-label="Nom de ta boutique"
+          />
+          <button type="submit" className="src-primary" disabled={busy}>
+            {busy ? "Création…" : "Créer ma boutique"}
+          </button>
+          {err ? <em className="src-error">{err}</em> : null}
+        </form>
+      </section>
+    );
+  const live = store.status === "PUBLISHED";
+  return (
+    <section className="src-shop is-ready">
+      <div>
+        <b>
+          {store.name} <small className={live ? "is-live" : ""}>{live ? "En ligne" : "Brouillon"}</small>
+        </b>
+        <p>
+          {live
+            ? "Fixe ton prix sur les nouveaux produits pour les mettre en vente."
+            : "Mets tes premiers produits en vente, puis publie la boutique dans Personnaliser."}
+        </p>
+      </div>
+      <div className="src-shop-tabs" role="tablist" aria-label="Produits de ma boutique">
+        {[
+          ["", "Tous"],
+          ["todo", "À mettre en prix"],
+          ["in", "En vente"],
+        ].map(([k, l]) => (
+          <button
+            key={k}
+            type="button"
+            role="tab"
+            aria-selected={shop === k}
+            className={shop === k ? "on" : ""}
+            onClick={() => setShop(k)}
+          >
+            {l}
+          </button>
+        ))}
+      </div>
+      <div className="src-shop-links">
+        <a href={`/store/${store.slug}${live ? "" : "?preview=1"}`} target="_blank" rel="noreferrer">
+          Voir la boutique ↗
+        </a>
+        <Link href={`/stores/${store.id}`}>Personnaliser et publier</Link>
+      </div>
+    </section>
+  );
+}
+
+/** Prix de vente rapide sur une carte du catalogue (boutique Derb Omar). */
+function QuickPrice({ item, onMine }: { item: Item; onMine: (id: string, mine: Mine | null) => void }) {
+  const [price, setPrice] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [err, setErr] = useState("");
+  if (item.mine?.active)
+    return (
+      <p className="src-onsale-chip" title="Prix de vente dans ta boutique">
+        En vente · {dh(item.mine.price)}
+      </p>
+    );
+  return (
+    <form
+      className="src-quick"
+      onSubmit={async (e) => {
+        e.preventDefault();
+        if (!(Number(price) > 0)) return;
+        setBusy(true);
+        setErr("");
+        const r = await fetch("/api/sourcing/import", {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({ id: item.id, name: item.name || undefined, price: Number(price) }),
+        }).catch(() => null);
+        const x = await r?.json().catch(() => ({}));
+        setBusy(false);
+        if (r?.ok) onMine(item.id, { id: x.product?.id, price: Number(price), active: true });
+        else setErr(x?.error || "Erreur");
+      }}
+    >
+      <span className="src-money">
+        <input
+          inputMode="decimal"
+          value={price}
+          onChange={(e) => setPrice(e.target.value.replace(/[^0-9.,]/g, "").replace(",", "."))}
+          placeholder="Ton prix"
+          aria-label={"Ton prix de vente pour " + (item.name || "ce produit")}
+          required
+        />
+        DH
+      </span>
+      <button type="submit" disabled={busy || !(Number(price) > 0)} title="Mettre en vente dans ma boutique">
+        {busy ? "…" : "Vendre"}
+      </button>
+      {err ? <em className="src-error">{err}</em> : null}
+    </form>
   );
 }
 
@@ -492,6 +707,7 @@ export default function SourcingPage() {
   const [toDay, setToDay] = useState("");
   const [range0, range1] = periodRange(period, fromDay, toDay);
   const [importing, setImporting] = useState("");
+  const [shop, setShop] = useState("");
   const [open, setOpen] = useState<Item | null>(null);
   // photos dont le lien Telegram a expiré : réparées à la volée par le serveur, sinon « Photo indisponible »
   const [dead, setDead] = useState<Set<string>>(new Set());
@@ -548,6 +764,7 @@ export default function SourcingPage() {
       if (maxPrice) p.set("max_price", maxPrice);
       if (range0) p.set("from", range0);
       if (range1) p.set("to", range1);
+      if (shop) p.set("shop", shop);
       if (cursor) p.set("cursor", cursor);
       setLoading(true);
       try {
@@ -564,7 +781,7 @@ export default function SourcingPage() {
         setLoading(false);
       }
     },
-    [query, category, channel, maxPrice, sort, range0, range1],
+    [query, category, channel, maxPrice, sort, range0, range1, shop],
   );
   useEffect(() => {
     load();
@@ -572,7 +789,12 @@ export default function SourcingPage() {
 
   const channels: Channel[] = d?.channels || [];
   const chanById = new Map(channels.map((c) => [c.id, c]));
-  const filtered = !!(query || category || channel || maxPrice || range0 || range1);
+  const filtered = !!(query || category || channel || maxPrice || range0 || range1 || shop);
+  const store: ShopStore | null = d?.store || null;
+  const onMine = useCallback((id: string, mine: Mine | null) => {
+    setItems((v) => v.map((it) => (it.id === id ? { ...it, mine } : it)));
+    setOpen((o) => (o && o.id === id ? { ...o, mine } : o));
+  }, []);
   // période plus ancienne que les produits importés : import possible (administrateur)
   const notImported = !!(range0 && d?.oldest && range0 < String(d.oldest).slice(0, 10));
 
@@ -630,6 +852,7 @@ export default function SourcingPage() {
         {d?.installed ? (
           <>
             {d.isPlatformAdmin ? <ChannelsAdmin channels={channels} reload={() => load()} /> : null}
+            <ShopPanel store={store} shop={shop} setShop={setShop} onCreated={() => load()} />
 
             <div className="src-filters">
               <input
@@ -726,20 +949,24 @@ export default function SourcingPage() {
             {!items.length && !loading ? (
               <section className="src-card src-empty">
                 <b>
-                  {filtered
-                    ? "Aucun produit ne correspond"
-                    : channels.length
-                      ? "Les produits arrivent"
-                      : "Aucun fournisseur pour l’instant"}
+                  {shop === "in" && !query && !category
+                    ? "Aucun produit en vente pour l’instant"
+                    : filtered
+                      ? "Aucun produit ne correspond"
+                      : channels.length
+                        ? "Les produits arrivent"
+                        : "Aucun fournisseur pour l’instant"}
                 </b>
                 <p>
-                  {filtered
-                    ? "Essaie un autre mot ou une autre catégorie."
-                    : channels.length
-                      ? "Les canaux sont lus toutes les 30 minutes."
-                      : d.isPlatformAdmin
-                        ? "Ajoute le lien public d’un canal Telegram de grossiste ci-dessus."
-                        : "Le catalogue Derb Omar arrive bientôt."}
+                  {shop === "in" && !query && !category
+                    ? "Écris ton prix sur un produit et clique « Vendre » pour le mettre dans ta boutique."
+                    : filtered
+                      ? "Essaie un autre mot ou une autre catégorie."
+                      : channels.length
+                        ? "Les canaux sont lus toutes les 30 minutes."
+                        : d.isPlatformAdmin
+                          ? "Ajoute le lien public d’un canal Telegram de grossiste ci-dessus."
+                          : "Le catalogue Derb Omar arrive bientôt."}
                 </p>
               </section>
             ) : (
@@ -776,6 +1003,7 @@ export default function SourcingPage() {
                           <ChannelBadge c={chanById.get(it.channel_id)} />
                           <time>{ago(it.posted_at)}</time>
                         </div>
+                        {store ? <QuickPrice item={it} onMine={onMine} /> : null}
                         <div className="src-actions">
                           <button type="button" className="src-primary" onClick={() => setOpen(it)}>
                             Voir
@@ -815,8 +1043,10 @@ export default function SourcingPage() {
           <Detail
             item={open}
             channel={chanById.get(open.channel_id)}
+            shop={store}
             onClose={() => setOpen(null)}
             onBroken={onBroken}
+            onMine={onMine}
           />
         ) : null}
       </section>

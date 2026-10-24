@@ -38,3 +38,22 @@ export function maskSupplier(text: string | null | undefined, c?: ChannelRef | n
     .join("\n")
     .trim();
 }
+
+// lignes réservées au vendeur : prix de gros, quantité minimum, contact du grossiste
+const SELLER_ONLY =
+  /(\bgros\b|جمل[ةه]|بالجملة|\bprix\b|ثمن|سعر|السعر|\bdhs?\b|درهم|دراهم|\bmad\b|\bmin(imum)?\b|أقل|اقل|كمية|الكمية|whats|واتس|واتساب|\btel\b|téléphone|telephone|للتواصل|تواصل|اتصل|للطلب|commande|livraison|التوصيل|\d{2}[\s.-]?\d{2}[\s.-]?\d{2}[\s.-]?\d{2})/i;
+
+/**
+ * Description montrée aux acheteurs d'une boutique : texte du produit sans le canal (voir maskSupplier),
+ * ni prix de gros, ni quantité minimum, ni numéro ou contact du grossiste.
+ */
+export function publicDescription(text: string | null | undefined, c?: ChannelRef | null): string {
+  return maskSupplier(text, c)
+    .split("\n")
+    .filter((l) => !SELLER_ONLY.test(l))
+    .filter((l) => /[\p{L}\p{N}]/u.test(l) || !l.trim())
+    .join("\n")
+    .replace(/\n{3,}/g, "\n\n")
+    .trim()
+    .slice(0, 2000);
+}

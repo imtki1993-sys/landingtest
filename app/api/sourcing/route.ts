@@ -5,6 +5,7 @@ import { reportError } from "../../../lib/monitoring";
 import { authContext } from "../../../lib/server-auth";
 import { boilerplateLines, extractPhones, guessName, stripBoilerplate } from "../../../lib/sourcing-extract";
 import { maskSupplier, supplierAliases } from "../../../lib/sourcing-privacy";
+import { importedPosts } from "../../../lib/sourcing-import";
 
 const missing = (e: any) =>
   ["42P01", "PGRST205"].includes(String(e?.code || "")) || /sourcing_/.test(String(e?.message || ""));
@@ -12,7 +13,7 @@ const UUID = /^[0-9a-f-]{36}$/i;
 
 export async function GET(req: Request) {
   try {
-    const { s, isPlatformAdmin } = await authContext(req);
+    const { s, isPlatformAdmin, workspaceId } = await authContext(req);
     const q = new URL(req.url).searchParams;
     const limit = Math.min(60, Math.max(1, Number(q.get("limit") || 36)));
     const search = (q.get("q") || "")
@@ -29,6 +30,21 @@ export async function GET(req: Request) {
     const day = (v: string | null) => (v && /^\d{4}-\d{2}-\d{2}$/.test(v) ? v : "");
     const from = day(q.get("from"));
     const to = day(q.get("to"));
+    // boutique Derb Omar du compte : « in » = produits déjà en vente, « todo » = pas encore mis en prix
+    const shop = q.get("shop") === "in" ? "in" : q.get("shop") === "todo" ? "todo" : "";
+    let mineIds: string[] = [];
+    if (shop) {
+      const { data: mine } = await s
+        .from("products")
+        .select("specifications->sourcing->>post_id")
+        .eq("workspace_id", workspaceId)
+        .eq("is_active", true)
+        .is("archived_at", null)
+        .not("specifications->sourcing->>post_id", "is", null)
+        .order("created_at", { ascending: false })
+        .limit(400);
+      mineIds = ((mine || []) as any[]).map((r) => r.post_id).filter((x) => UUID.test(String(x)));
+    }
 
     let query = s
       .from("sourcing_posts")
@@ -36,6 +52,8 @@ export async function GET(req: Request) {
       .eq("is_product", true)
       .limit(limit + 1);
     if (withPhotos) query = query.neq("photos", "{}");
+    if (shop === "in") query = query.in("id", mineIds.length ? mineIds : ["00000000-0000-0000-0000-000000000000"]);
+    if (shop === "todo" && mineIds.length) query = query.not("id", "in", `(${mineIds.join(",")})`);
     if (search) query = query.or(`name.ilike.%${search}%,text.ilike.%${search}%`);
     if (category) query = query.eq("category", category);
     if (UUID.test(channel)) query = query.eq("channel_id", channel);
@@ -111,6 +129,21 @@ export async function GET(req: Request) {
         delete r.url;
       }
     }
+    // état de chaque produit dans la boutique du compte (prix de vente choisi, en vente ou retiré)
+    const mine = await importedPosts(
+      s,
+      workspaceId,
+      rows.map((r) => r.id),
+    ).catch(() => new Map());
+    for (const r of rows) r.mine = mine.get(r.id) || null;
+    const { data: stores } = await s
+      .from("stores")
+      .select("id,name,slug,status")
+      .eq("workspace_id", workspaceId)
+      .eq("settings->>sourcingOnly", "true")
+      .neq("status", "ARCHIVED")
+      .order("created_at", { ascending: true })
+      .limit(1);
     const hasMore = rows.length > limit;
     const items = hasMore ? rows.slice(0, limit) : rows;
     const next = !hasMore
@@ -121,6 +154,7 @@ export async function GET(req: Request) {
     return NextResponse.json({
       installed: true,
       isPlatformAdmin,
+      store: stores?.[0] || null,
       items,
       next,
       oldest,

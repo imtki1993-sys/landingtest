@@ -81,24 +81,32 @@ export default async function StorePage({
       store.locale = store.published_locale || store.locale;
       store.template_id = store.published_template_id || store.template_id;
     }
-    const [{ data: workspace }, { data: products }] = await Promise.all([
+    // Boutique Derb Omar : seulement les produits du Sourcing mis en vente par le client
+    const sourcingOnly = (store.settings as any)?.sourcingOnly === true;
+    let productsQ = s
+      .from("products")
+      .select("id,name,slug,description,short_description,price,compare_at_price,currency,image_urls,specifications")
+      .eq("workspace_id", store.workspace_id)
+      .eq("is_active", true)
+      .is("archived_at", null);
+    if (sourcingOnly) productsQ = productsQ.not("specifications->sourcing", "is", null);
+    const [{ data: workspace }, { data: rawProducts }] = await Promise.all([
       s.from("workspaces").select("settings").eq("id", store.workspace_id).maybeSingle(),
-      s
-        .from("products")
-        .select("id,name,slug,description,short_description,price,compare_at_price,currency,image_urls,specifications")
-        .eq("workspace_id", store.workspace_id)
-        .eq("is_active", true)
-        .is("archived_at", null)
-        .order("created_at", { ascending: false })
-        .limit(100),
+      productsQ.order("created_at", { ascending: false }).limit(sourcingOnly ? 500 : 100),
     ]);
+    // jamais vu par les acheteurs : fournisseur, prix de gros, lien du grossiste
+    const products = (rawProducts || []).map((p: any) => {
+      if (!p.specifications?.sourcing) return p;
+      const { sourcing: _hidden, ...specifications } = p.specifications;
+      return { ...p, specifications };
+    });
     store.settings = { ...(store.settings || {}), contactEmail: workspace?.settings?.contact_email || "" };
     // Numéro WhatsApp des Paramètres, utilisé si la boutique n'a pas le sien
     (store as any).workspace_whatsapp = workspace?.settings?.whatsapp_phone || "";
     return (
       <>
         <DocumentLang locale={(store as any).published_locale || (store as any).locale} />
-        <Storefront store={store} products={products || []} page={(page || []).join("/") || "home"} />
+        <Storefront store={store} products={products} page={(page || []).join("/") || "home"} />
       </>
     );
   } catch {
