@@ -144,6 +144,15 @@ export async function GET(req: Request) {
       .neq("status", "ARCHIVED")
       .order("created_at", { ascending: true })
       .limit(1);
+    const { data: otherStores } = stores?.[0]
+      ? { data: [] }
+      : await s
+          .from("stores")
+          .select("id,name,slug,status")
+          .eq("workspace_id", workspaceId)
+          .neq("status", "ARCHIVED")
+          .order("created_at", { ascending: false })
+          .limit(20);
     const hasMore = rows.length > limit;
     const items = hasMore ? rows.slice(0, limit) : rows;
     const next = !hasMore
@@ -155,6 +164,8 @@ export async function GET(req: Request) {
       installed: true,
       isPlatformAdmin,
       store: stores?.[0] || null,
+      // pas encore de site Derb Omar : boutiques existantes que le client peut transformer
+      otherStores: stores?.[0] ? [] : otherStores || [],
       items,
       next,
       oldest,

@@ -345,11 +345,13 @@ function Detail({
 /** Boutique Derb Omar du compte : création, liens, et filtre « à mettre en prix / en vente ». */
 function ShopPanel({
   store,
+  others,
   shop,
   setShop,
   onCreated,
 }: {
   store: ShopStore | null;
+  others: ShopStore[];
   shop: string;
   setShop: (v: string) => void;
   onCreated: () => void;
@@ -397,6 +399,42 @@ function ShopPanel({
           </button>
           {err ? <em className="src-error">{err}</em> : null}
         </form>
+        {others.length ? (
+          <form
+            className="src-shop-convert"
+            onSubmit={async (e) => {
+              e.preventDefault();
+              const id = new FormData(e.currentTarget).get("storeId");
+              if (!id) return;
+              setBusy(true);
+              setErr("");
+              const r = await fetch("/api/sourcing/store", {
+                method: "POST",
+                headers: { "content-type": "application/json" },
+                body: JSON.stringify({ storeId: id }),
+              }).catch(() => null);
+              const x = await r?.json().catch(() => ({}));
+              setBusy(false);
+              if (r?.ok) onCreated();
+              else setErr(x?.error || "Transformation impossible, réessaie.");
+            }}
+          >
+            <span>ou transforme une boutique que tu as déjà :</span>
+            <select name="storeId" aria-label="Boutique à transformer" defaultValue="">
+              <option value="" disabled>
+                Choisis une boutique
+              </option>
+              {others.map((o) => (
+                <option key={o.id} value={o.id}>
+                  {o.name}
+                </option>
+              ))}
+            </select>
+            <button type="submit" disabled={busy}>
+              Utiliser pour Derb Omar
+            </button>
+          </form>
+        ) : null}
       </section>
     );
   const live = store.status === "PUBLISHED";
@@ -852,7 +890,13 @@ export default function SourcingPage() {
         {d?.installed ? (
           <>
             {d.isPlatformAdmin ? <ChannelsAdmin channels={channels} reload={() => load()} /> : null}
-            <ShopPanel store={store} shop={shop} setShop={setShop} onCreated={() => load()} />
+            <ShopPanel
+              store={store}
+              others={d.otherStores || []}
+              shop={shop}
+              setShop={setShop}
+              onCreated={() => load()}
+            />
 
             <div className="src-filters">
               <input

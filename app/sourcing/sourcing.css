@@ -167,6 +167,9 @@ html[data-theme="dark"] .src-import { background: #0f1b33; color: #bfdbfe; }
 .src-shop form { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; flex: 1 1 320px; }
 .src-page .src-shop form input { flex: 1 1 200px !important; width: auto !important; margin: 0 !important; height: 40px; }
 .src-shop em { font-style: normal; font-size: 12px; }
+.src-shop-convert { flex-basis: 100%; display: flex; flex-wrap: wrap; align-items: center; gap: 8px; font-size: 13px; color: var(--src-muted); }
+.src-page .src-shop-convert select { flex: 0 1 240px !important; width: auto !important; margin: 0 !important; height: 38px; }
+.src-shop-convert button { border: 1px solid var(--src-line); background: var(--src-card); color: var(--src-ink); border-radius: 9px; height: 38px; padding: 0 14px; font-weight: 700; cursor: pointer; }
 .src-shop-tabs { display: flex; gap: 4px; padding: 3px; background: var(--src-soft); border-radius: 10px; }
 .src-shop-tabs button { border: 0; background: transparent; color: var(--src-muted); font-weight: 700; font-size: 12px; padding: 7px 12px; border-radius: 8px; cursor: pointer; }
 .src-shop-tabs button.on { background: var(--src-card); color: var(--src-ink); box-shadow: 0 1px 2px rgba(15, 23, 42, .12); }

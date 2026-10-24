@@ -21,11 +21,29 @@ const slugify = (v: string) =>
     .replace(/^-|-$/g, "")
     .slice(0, 50) || "boutique";
 
-/** { name, locale } : crée la boutique Derb Omar du compte (une seule par compte). */
+/**
+ * { name, locale } : crée la boutique Derb Omar du compte (une seule par compte).
+ * { storeId } : transforme une boutique existante du compte en site Derb Omar.
+ */
 export async function POST(req: Request) {
   try {
     const { s, workspaceId } = await authContext(req);
     const b = await req.json().catch(() => ({}));
+    if (b.storeId) {
+      const { data: st, error: se } = await s
+        .from("stores")
+        .select("id,name,slug,status,settings,published_settings")
+        .eq("workspace_id", workspaceId)
+        .eq("id", String(b.storeId))
+        .maybeSingle();
+      if (se) throw se;
+      if (!st) return NextResponse.json({ error: "Boutique introuvable" }, { status: 404 });
+      const patch: any = { settings: { ...(st.settings || {}), sourcingOnly: true } };
+      if (st.published_settings) patch.published_settings = { ...st.published_settings, sourcingOnly: true };
+      const { error } = await s.from("stores").update(patch).eq("id", st.id).eq("workspace_id", workspaceId);
+      if (error) throw error;
+      return NextResponse.json({ store: { id: st.id, name: st.name, slug: st.slug, status: st.status } });
+    }
     const { data: found } = await s
       .from("stores")
       .select("id,name,slug,status")
