@@ -136,23 +136,27 @@ export async function GET(req: Request) {
       rows.map((r) => r.id),
     ).catch(() => new Map());
     for (const r of rows) r.mine = mine.get(r.id) || null;
-    const { data: stores } = await s
-      .from("stores")
-      .select("id,name,slug,status")
-      .eq("workspace_id", workspaceId)
-      .eq("settings->>sourcingOnly", "true")
-      .neq("status", "ARCHIVED")
-      .order("created_at", { ascending: true })
-      .limit(1);
-    const { data: otherStores } = stores?.[0]
-      ? { data: [] }
+    // site Derb Omar : réservé à l'administrateur de la plateforme
+    const { data: stores } = !isPlatformAdmin
+      ? { data: [] as any[] }
       : await s
           .from("stores")
           .select("id,name,slug,status")
           .eq("workspace_id", workspaceId)
+          .eq("settings->>sourcingOnly", "true")
           .neq("status", "ARCHIVED")
-          .order("created_at", { ascending: false })
-          .limit(20);
+          .order("created_at", { ascending: true })
+          .limit(1);
+    const { data: otherStores } =
+      !isPlatformAdmin || stores?.[0]
+        ? { data: [] }
+        : await s
+            .from("stores")
+            .select("id,name,slug,status")
+            .eq("workspace_id", workspaceId)
+            .neq("status", "ARCHIVED")
+            .order("created_at", { ascending: false })
+            .limit(20);
     const hasMore = rows.length > limit;
     const items = hasMore ? rows.slice(0, limit) : rows;
     const next = !hasMore

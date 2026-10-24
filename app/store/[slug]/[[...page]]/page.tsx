@@ -2,7 +2,7 @@ import { adminDb } from "../../../../lib/server-auth";
 import { cookies } from "next/headers";
 import Storefront from "../Storefront";
 import DerbStore from "../DerbStore";
-import { derbCatalog } from "../../../../lib/derb-store";
+import { derbCatalog, isAdminWorkspace } from "../../../../lib/derb-store";
 import DocumentLang from "../../../../components/public/DocumentLang";
 import type { Metadata } from "next";
 import { cache } from "react";
@@ -84,7 +84,9 @@ export default async function StorePage({
       store.template_id = store.published_template_id || store.template_id;
     }
     // Boutique Derb Omar : tout le catalogue du Sourcing, présenté comme la page Sourcing
-    const sourcingOnly = (store.settings as any)?.sourcingOnly === true;
+    // réservé à l'administrateur de la plateforme : ailleurs, la boutique reste une boutique normale
+    const sourcingOnly =
+      (store.settings as any)?.sourcingOnly === true && (await isAdminWorkspace(s, store.workspace_id));
     if (sourcingOnly) {
       const set: any = store.settings || {};
       const [initial, { data: ws }] = await Promise.all([

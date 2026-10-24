@@ -27,7 +27,9 @@ const slugify = (v: string) =>
  */
 export async function POST(req: Request) {
   try {
-    const { s, workspaceId } = await authContext(req);
+    const { s, workspaceId, isPlatformAdmin } = await authContext(req);
+    if (!isPlatformAdmin)
+      return NextResponse.json({ error: "Réservé à l’administrateur de LandPro." }, { status: 403 });
     const b = await req.json().catch(() => ({}));
     if (b.storeId) {
       const { data: st, error: se } = await s

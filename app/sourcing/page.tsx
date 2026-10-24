@@ -890,13 +890,15 @@ export default function SourcingPage() {
         {d?.installed ? (
           <>
             {d.isPlatformAdmin ? <ChannelsAdmin channels={channels} reload={() => load()} /> : null}
-            <ShopPanel
-              store={store}
-              others={d.otherStores || []}
-              shop={shop}
-              setShop={setShop}
-              onCreated={() => load()}
-            />
+            {d.isPlatformAdmin ? (
+              <ShopPanel
+                store={store}
+                others={d.otherStores || []}
+                shop={shop}
+                setShop={setShop}
+                onCreated={() => load()}
+              />
+            ) : null}
 
             <div className="src-filters">
               <input

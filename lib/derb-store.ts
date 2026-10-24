@@ -29,6 +29,15 @@ export interface DerbStoreRow {
   settings: any;
 }
 
+/** Le site Derb Omar est réservé à l'administrateur de la plateforme : compte avec un membre administrateur ? */
+export async function isAdminWorkspace(s: any, workspaceId: string): Promise<boolean> {
+  const { data: members } = await s.from("workspace_members").select("user_id").eq("workspace_id", workspaceId);
+  const ids = (members || []).map((m: any) => m.user_id).filter(Boolean);
+  if (!ids.length) return false;
+  const { data: admins } = await s.from("users").select("id").in("id", ids).eq("is_platform_admin", true).limit(1);
+  return !!admins?.length;
+}
+
 /** Boutique Derb Omar par son adresse (publiée, ou brouillon si `draft`). */
 export async function derbStoreBySlug(s: any, slug: string, draft = false): Promise<DerbStoreRow | null> {
   const { data } = await s
@@ -40,6 +49,7 @@ export async function derbStoreBySlug(s: any, slug: string, draft = false): Prom
   if (!draft && data.status !== "PUBLISHED") return null;
   const settings = (!draft && data.published_settings) || data.settings || {};
   if (settings.sourcingOnly !== true) return null;
+  if (!(await isAdminWorkspace(s, data.workspace_id))) return null;
   return {
     id: data.id,
     workspace_id: data.workspace_id,
