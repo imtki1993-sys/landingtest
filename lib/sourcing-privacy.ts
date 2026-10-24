@@ -7,7 +7,8 @@ export interface ChannelRef {
   title?: string | null;
 }
 
-/** Numéro stable de chaque canal (ordre d'ajout), y compris les canaux désactivés. */
+/** Nom par défaut de chaque canal, « Fournisseur N » (ordre d'ajout, canaux désactivés compris) :
+ * utilisé quand l'administrateur n'a pas choisi de nom (display_name). */
 export function supplierAliases(channels: (ChannelRef & { created_at?: string | null })[]): Map<string, string> {
   const sorted = [...channels].sort(
     (a, b) => String(a.created_at || "").localeCompare(String(b.created_at || "")) || a.id.localeCompare(b.id),
