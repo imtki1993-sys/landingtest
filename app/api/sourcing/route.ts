@@ -57,10 +57,7 @@ export async function GET(req: Request) {
     if (UUID.test(channel)) oldestQ = oldestQ.eq("channel_id", channel);
     const [posts, channels, oldestRow] = await Promise.all([
       query,
-      s
-        .from("sourcing_channels")
-        .select("id,username,title,photo_url,description,active,last_synced_at,last_error,created_at")
-        .order("title", { ascending: true }),
+      s.from("sourcing_channels").select("*").order("title", { ascending: true }),
       from ? oldestQ.order("posted_at", { ascending: true }).limit(1) : Promise.resolve({ data: null }),
     ]);
     const oldest: string | null = (oldestRow as any)?.data?.[0]?.posted_at ?? null;
@@ -139,8 +136,8 @@ export async function GET(req: Request) {
         .filter((c: any) => isPlatformAdmin || c.active)
         .map((c: any) =>
           isPlatformAdmin
-            ? { ...c, description: undefined, created_at: undefined }
-            : { id: c.id, username: "", title: alias.get(c.id), photo_url: null },
+            ? { ...c, description: undefined, created_at: undefined, last_post_id: undefined, alias: alias.get(c.id) }
+            : { id: c.id, username: "", title: c.display_name?.trim() || alias.get(c.id), photo_url: null },
         )
         .sort((a: any, b: any) =>
           isPlatformAdmin ? 0 : String(a.title).localeCompare(String(b.title), "fr", { numeric: true }),

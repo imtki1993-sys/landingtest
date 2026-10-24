@@ -85,11 +85,17 @@ html[data-theme="dark"] .src-page { --src-ink: #e6eef8; --src-muted: #93a4bb; --
 .src-admin-actions button.danger { color: #dc2626; }
 .src-admin-msg { margin: 4px 0; font-size: 12px; color: var(--src-muted); }
 .src-admin ul { list-style: none; margin: 8px 0 0; padding: 0; display: grid; gap: 6px; }
-.src-admin li { display: grid; grid-template-columns: minmax(0, 1.2fr) auto minmax(0, 1fr) auto; gap: 10px; align-items: center; padding: 8px 0; border-top: 1px solid var(--src-line); font-size: 12px; }
+.src-admin li { display: grid; grid-template-columns: minmax(0, 1.1fr) auto minmax(0, 1.3fr) minmax(0, 0.9fr) auto; gap: 10px; align-items: center; padding: 8px 0; border-top: 1px solid var(--src-line); font-size: 12px; }
 .src-admin li.is-paused { opacity: .55; }
 .src-admin li a { color: var(--src-accent); font-weight: 700; text-decoration: none; }
 .src-admin li small { color: var(--src-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .src-admin-actions { display: flex; gap: 6px; }
+.src-admin-name { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; min-width: 0; }
+.src-page .src-admin-name input { flex: 1 1 140px !important; width: auto !important; margin: 0 !important; height: 34px; min-width: 0; font-size: 12px; }
+.src-admin-name button { border: 1px solid var(--src-accent); background: var(--src-accent); color: #fff; border-radius: 9px; padding: 0 12px; height: 34px; font-weight: 700; font-size: 12px; cursor: pointer; }
+.src-admin-name button:disabled { opacity: .45; cursor: default; }
+.src-admin-name em { font-style: normal; font-size: 11px; color: #16a34a; }
+.src-admin-name em.src-error { color: #dc2626; }
 
 @media (max-width: 760px) {
   .src-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
@@ -98,6 +104,7 @@ html[data-theme="dark"] .src-page { --src-ink: #e6eef8; --src-muted: #93a4bb; --
   .src-sheet { max-height: 92vh; border-radius: 18px 18px 0 0; }
   .src-admin li { grid-template-columns: 1fr auto; }
   .src-admin li small { grid-column: 1 / -1; }
+  .src-admin-name { grid-column: 1 / -1; }
   .src-admin-actions { grid-column: 1 / -1; }
   .src-filters select { flex: 1 1 45%; }
 }

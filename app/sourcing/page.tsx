@@ -36,6 +36,9 @@ interface Channel {
   active?: boolean;
   last_synced_at?: string | null;
   last_error?: string | null;
+  /** administrateur : nom affiché aux clients (vide = « Fournisseur N », voir alias) */
+  display_name?: string | null;
+  alias?: string;
 }
 
 const dh = (n: number | null | undefined) =>
@@ -71,7 +74,11 @@ function ChannelBadge({ c }: { c?: Channel }) {
       {c.photo_url ? (
         <img src={c.photo_url} alt="" onError={(e) => (e.currentTarget.style.visibility = "hidden")} />
       ) : (
-        <i>{c.username ? (c.title || c.username)[0]?.toUpperCase() : c.title?.match(/\d+/)?.[0] || "F"}</i>
+        <i>
+          {c.username
+            ? (c.title || c.username)[0]?.toUpperCase()
+            : c.title?.match(/^Fournisseur (\d+)$/)?.[1] || c.title?.[0]?.toUpperCase() || "F"}
+        </i>
       )}
       <span>{c.title || "@" + c.username}</span>
     </span>
@@ -267,6 +274,50 @@ function Detail({
   );
 }
 
+/** Nom du fournisseur vu par les clients (à la place du nom du canal Telegram). */
+function SupplierName({
+  c,
+  save,
+  onSaved,
+}: {
+  c: Channel;
+  save: (v: string) => Promise<{ ok: boolean; x: any }>;
+  onSaved: () => void;
+}) {
+  const [v, setV] = useState(c.display_name || "");
+  const [state, setState] = useState("");
+  const dirty = v.trim() !== (c.display_name || "").trim();
+  return (
+    <form
+      className="src-admin-name"
+      onSubmit={async (e) => {
+        e.preventDefault();
+        setState("saving");
+        const { ok, x } = await save(v);
+        setState(ok ? "saved" : x?.error || "Enregistrement impossible.");
+        if (ok) onSaved();
+      }}
+    >
+      <input
+        value={v}
+        maxLength={60}
+        aria-label="Nom vu par les clients"
+        title="Nom vu par les clients"
+        placeholder={"Nom pour les clients : " + (c.alias || "Fournisseur")}
+        onChange={(e) => {
+          setV(e.target.value);
+          setState("");
+        }}
+      />
+      <button type="submit" disabled={!dirty || state === "saving"}>
+        {state === "saving" ? "…" : "OK"}
+      </button>
+      {state === "saved" && !dirty ? <em>Enregistré</em> : null}
+      {state && !["saving", "saved"].includes(state) ? <em className="src-error">{state}</em> : null}
+    </form>
+  );
+}
+
 function ChannelsAdmin({ channels, reload }: { channels: Channel[]; reload: () => void }) {
   const [link, setLink] = useState("");
   const [busy, setBusy] = useState("");
@@ -337,6 +388,7 @@ function ChannelsAdmin({ channels, reload }: { channels: Channel[]; reload: () =
             <a href={`https://t.me/${c.username}`} target="_blank" rel="noreferrer">
               @{c.username}
             </a>
+            <SupplierName c={c} onSaved={reload} save={(v) => call("PATCH", { id: c.id, display_name: v })} />
             <small className={c.last_error ? "src-error" : ""}>
               {c.last_error ? c.last_error : c.last_synced_at ? "lu " + ago(c.last_synced_at) : "jamais lu"}
             </small>

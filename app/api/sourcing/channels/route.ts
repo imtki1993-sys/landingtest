@@ -117,13 +117,32 @@ export async function POST(req: Request) {
   }
 }
 
-/** { id, active } : met en pause ou reprend la lecture d'un canal. */
+/** { id, active } : met en pause ou reprend la lecture d'un canal. { id, display_name } : nom affiché aux clients. */
 export async function PATCH(req: Request) {
   try {
     const s = await admin(req);
     const b = await req.json().catch(() => ({}));
-    const { error } = await s.from("sourcing_channels").update({ active: !!b.active }).eq("id", b.id);
-    if (error) throw error;
+    const patch =
+      "display_name" in b
+        ? {
+            display_name:
+              String(b.display_name || "")
+                .trim()
+                .slice(0, 60) || null,
+          }
+        : { active: !!b.active };
+    const { error } = await s.from("sourcing_channels").update(patch).eq("id", b.id);
+    if (error) {
+      if (/display_name/.test(String(error.message)))
+        return NextResponse.json(
+          {
+            error:
+              "Colonne manquante : exécute supabase/migrations/20261024140000_sourcing_display_name.sql dans Supabase.",
+          },
+          { status: 400 },
+        );
+      throw error;
+    }
     return NextResponse.json({ ok: true });
   } catch (e) {
     return fail(e);

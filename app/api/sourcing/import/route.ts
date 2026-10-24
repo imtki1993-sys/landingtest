@@ -25,7 +25,7 @@ export async function POST(req: Request) {
     const b = await req.json().catch(() => ({}));
     const { data: post, error: pe } = await s
       .from("sourcing_posts")
-      .select("id,channel_id,url,text,photos,name,category,price,min_qty,sourcing_channels(username,title)")
+      .select("id,channel_id,url,text,photos,name,category,price,min_qty,sourcing_channels(*)")
       .eq("id", String(b.id || ""))
       .maybeSingle();
     if (pe) throw pe;
@@ -87,7 +87,9 @@ export async function POST(req: Request) {
           category: post.category || "",
           sourcing: {
             source: "telegram",
-            ...(isPlatformAdmin ? { channel: ch?.title || ch?.username || null, url: post.url } : { post_id: post.id }),
+            ...(isPlatformAdmin
+              ? { channel: ch?.title || ch?.username || null, url: post.url }
+              : { post_id: post.id, supplier: ch?.display_name?.trim() || null }),
             wholesale_price: post.price,
             min_qty: post.min_qty,
           },
