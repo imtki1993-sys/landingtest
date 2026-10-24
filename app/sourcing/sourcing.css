@@ -156,3 +156,34 @@ html[data-theme="dark"] .src-import { background: #0f1b33; color: #bfdbfe; }
 .src-admin-sync button { border: 1px solid var(--src-line); background: var(--src-card); color: var(--src-ink); border-radius: 9px; padding: 8px 12px; font-weight: 800; font-size: 13px; cursor: pointer; }
 .src-admin-sync button:disabled { opacity: .6; cursor: default; }
 .src-sync { margin: -4px 0 8px; font-size: 12px; color: var(--src-muted); }
+
+/* Boutique Derb Omar du compte */
+.src-shop { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 20px; background: var(--src-card); border: 1px solid var(--src-line); border-inline-start: 4px solid var(--src-accent); border-radius: 14px; padding: 14px 18px; margin-bottom: 14px; }
+.src-shop > div:first-child { flex: 1 1 320px; min-width: 0; }
+.src-shop b { display: flex; align-items: center; gap: 8px; color: var(--src-ink); font-size: 15px; }
+.src-shop b small { font-size: 11px; font-weight: 800; padding: 2px 8px; border-radius: 99px; background: var(--src-soft); color: var(--src-muted); }
+.src-shop b small.is-live { background: #dcfce7; color: #15803d; }
+.src-shop p { margin: 4px 0 0; color: var(--src-muted); font-size: 13px; max-width: 62ch; }
+.src-shop form { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; flex: 1 1 320px; }
+.src-page .src-shop form input { flex: 1 1 200px !important; width: auto !important; margin: 0 !important; height: 40px; }
+.src-shop em { font-style: normal; font-size: 12px; }
+.src-shop-tabs { display: flex; gap: 4px; padding: 3px; background: var(--src-soft); border-radius: 10px; }
+.src-shop-tabs button { border: 0; background: transparent; color: var(--src-muted); font-weight: 700; font-size: 12px; padding: 7px 12px; border-radius: 8px; cursor: pointer; }
+.src-shop-tabs button.on { background: var(--src-card); color: var(--src-ink); box-shadow: 0 1px 2px rgba(15, 23, 42, .12); }
+.src-shop-links { display: flex; gap: 14px; font-size: 13px; font-weight: 700; }
+.src-shop-links a { color: var(--src-accent); text-decoration: none; }
+.src-quick { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+.src-quick .src-money { flex: 1 1 70px; min-width: 0; display: flex; align-items: center; gap: 4px; border: 1px solid var(--src-line); border-radius: 9px; padding-inline-end: 8px; font-size: 11px; font-weight: 700; color: var(--src-muted); background: var(--src-card); }
+.src-page .src-quick input { flex: 1 1 auto !important; width: 100% !important; min-width: 0; margin: 0 !important; border: 0 !important; background: transparent !important; height: 32px !important; padding: 0 8px !important; font-size: 13px; color: var(--src-ink); outline: none; box-shadow: none !important; }
+.src-quick button { flex: none; border: 0; border-radius: 9px; background: #16a34a; color: #fff; font-weight: 800; font-size: 12px; height: 34px; padding: 0 12px; cursor: pointer; }
+.src-quick button:disabled { opacity: .45; cursor: default; }
+.src-quick em { flex-basis: 100%; font-style: normal; font-size: 11px; }
+.src-onsale-chip { margin: 0; padding: 7px 10px; border-radius: 9px; background: #dcfce7; color: #15803d; font-size: 12px; font-weight: 800; text-align: center; }
+.src-onsale { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 10px 12px; border-radius: 10px; background: #dcfce7; color: #15803d; font-size: 13px; margin-bottom: 10px; }
+.src-onsale button { border: 1px solid #fca5a5; background: #fff; color: #dc2626; border-radius: 8px; padding: 6px 10px; font-weight: 700; font-size: 12px; cursor: pointer; }
+html[data-theme="dark"] .src-onsale-chip, html[data-theme="dark"] .src-onsale { background: #052e1a; color: #4ade80; }
+html[data-theme="dark"] .src-shop b small.is-live { background: #052e1a; color: #4ade80; }
+@media (max-width: 760px) {
+  .src-shop-tabs { width: 100%; }
+  .src-shop-tabs button { flex: 1; }
+}
