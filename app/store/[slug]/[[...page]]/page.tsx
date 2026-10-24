@@ -83,17 +83,22 @@ export default async function StorePage({
     }
     // Boutique Derb Omar : seulement les produits du Sourcing mis en vente par le client
     const sourcingOnly = (store.settings as any)?.sourcingOnly === true;
-    let productsQ = s
-      .from("products")
-      .select("id,name,slug,description,short_description,price,compare_at_price,currency,image_urls,specifications")
-      .eq("workspace_id", store.workspace_id)
-      .eq("is_active", true)
-      .is("archived_at", null);
-    if (sourcingOnly) productsQ = productsQ.not("specifications->sourcing", "is", null);
-    const [{ data: workspace }, { data: rawProducts }] = await Promise.all([
+    const [{ data: workspace }, { data: allProducts, error: productsError }] = await Promise.all([
       s.from("workspaces").select("settings").eq("id", store.workspace_id).maybeSingle(),
-      productsQ.order("created_at", { ascending: false }).limit(sourcingOnly ? 500 : 100),
+      s
+        .from("products")
+        .select("id,name,slug,description,short_description,price,compare_at_price,currency,image_urls,specifications")
+        .eq("workspace_id", store.workspace_id)
+        .eq("is_active", true)
+        .is("archived_at", null)
+        .order("created_at", { ascending: false })
+        .limit(sourcingOnly ? 1000 : 100),
     ]);
+    if (productsError) console.error("store products", slug, productsError.message);
+    // tri fait ici (et non dans la requête) : une boutique Derb Omar garde les produits venus du Sourcing
+    const rawProducts = (allProducts || [])
+      .filter((p: any) => !sourcingOnly || !!p.specifications?.sourcing)
+      .slice(0, 500);
     // jamais vu par les acheteurs : fournisseur, prix de gros, lien du grossiste
     const products = (rawProducts || []).map((p: any) => {
       if (!p.specifications?.sourcing) return p;
