@@ -179,7 +179,7 @@ function ImportForm({ item, shop, onDone }: { item: Item; shop: boolean; onDone:
           : item.mine?.active
             ? "Changer le prix"
             : shop
-              ? "Mettre en vente dans ma boutique"
+              ? "Afficher ce prix sur mon site"
               : "Importer dans mes produits"}
       </button>
     </form>
@@ -290,10 +290,10 @@ function Detail({
           </div>
           {done !== null ? (
             <div className="src-success">
-              <b>{shop ? "Produit en vente dans ta boutique ✓" : "Produit ajouté à tes produits ✓"}</b>
+              <b>{shop ? "Prix affiché sur ton site ✓" : "Produit ajouté à tes produits ✓"}</b>
               <p>
                 {shop
-                  ? "Il apparaît dans ta boutique Derb Omar et dans tes produits."
+                  ? "Ton site Derb Omar montre ce prix ; le produit est aussi dans tes produits."
                   : "Tu peux maintenant créer sa landing page."}
               </p>
               <Link href="/products" className="src-primary">
@@ -305,7 +305,7 @@ function Detail({
               {item.mine?.active ? (
                 <div className="src-onsale">
                   <span>
-                    En vente à <b>{dh(item.mine.price)}</b>
+                    Sur ton site à <b>{dh(item.mine.price)}</b>
                   </span>
                   <button
                     type="button"
@@ -321,7 +321,7 @@ function Detail({
                       if (r?.ok) onMine(item.id, { ...item.mine!, active: false });
                     }}
                   >
-                    {removing ? "…" : "Retirer de la vente"}
+                    {removing ? "…" : "Retirer de mon site"}
                   </button>
                 </div>
               ) : null}
@@ -363,9 +363,9 @@ function ShopPanel({
         <div>
           <b>Crée ta boutique Derb Omar</b>
           <p>
-            Une boutique en ligne avec les produits des grossistes. Les nouveaux produits arrivent ici toutes les 30
-            minutes : tu fixes ton prix de vente et le produit passe en vente. Tes clients ne voient ni le fournisseur,
-            ni le prix de gros.
+            Un site avec tous les produits Derb Omar, mis à jour toutes les 30 minutes et présentés comme ici. Écris ton
+            prix sur un produit pour l’afficher ; sans prix, le site montre « prix sur demande » et la commande arrive
+            dans tes Commandes. Tes clients ne voient ni le fournisseur, ni le prix de gros.
           </p>
         </div>
         <form
@@ -408,15 +408,15 @@ function ShopPanel({
         </b>
         <p>
           {live
-            ? "Fixe ton prix sur les nouveaux produits pour les mettre en vente."
-            : "Mets tes premiers produits en vente, puis publie la boutique dans Personnaliser."}
+            ? "Tous les produits sont sur ton site. Écris ton prix pour l’afficher, sinon « prix sur demande »."
+            : "Tous les produits sont déjà sur ton site. Publie-le dans « Personnaliser et publier »."}
         </p>
       </div>
       <div className="src-shop-tabs" role="tablist" aria-label="Produits de ma boutique">
         {[
           ["", "Tous"],
-          ["todo", "À mettre en prix"],
-          ["in", "En vente"],
+          ["todo", "Sans mon prix"],
+          ["in", "Avec mon prix"],
         ].map(([k, l]) => (
           <button
             key={k}
@@ -448,7 +448,7 @@ function QuickPrice({ item, onMine }: { item: Item; onMine: (id: string, mine: M
   if (item.mine?.active)
     return (
       <p className="src-onsale-chip" title="Prix de vente dans ta boutique">
-        En vente · {dh(item.mine.price)}
+        Sur ton site · {dh(item.mine.price)}
       </p>
     );
   return (
@@ -481,8 +481,8 @@ function QuickPrice({ item, onMine }: { item: Item; onMine: (id: string, mine: M
         />
         DH
       </span>
-      <button type="submit" disabled={busy || !(Number(price) > 0)} title="Mettre en vente dans ma boutique">
-        {busy ? "…" : "Vendre"}
+      <button type="submit" disabled={busy || !(Number(price) > 0)} title="Afficher ce prix sur mon site">
+        {busy ? "…" : "OK"}
       </button>
       {err ? <em className="src-error">{err}</em> : null}
     </form>

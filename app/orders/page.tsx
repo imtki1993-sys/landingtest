@@ -146,6 +146,11 @@ export default function Orders() {
       Array.from(new Map(orders.filter((o) => o.landing?.name).map((o) => [o.landing_page_id, o.landing])).entries()),
     [orders],
   );
+  // boutiques (dont le site Derb Omar) : filtrables comme les landings
+  const shops = useMemo(
+    () => Array.from(new Map(orders.filter((o) => o.store?.name).map((o) => [o.store_id, o.store])).entries()),
+    [orders],
+  );
   const products = useMemo(
       () => Array.from(new Map(orders.filter((o) => o.product?.name).map((o) => [o.product_id, o.product])).entries()),
       [orders],
@@ -181,7 +186,10 @@ export default function Orders() {
             .toLowerCase()
             .includes(q.toLowerCase()) &&
           (statusFilter === "ALL" || o.shipment_status === statusFilter) &&
-          (landingFilter === "ALL" || o.landing_page_id === landingFilter) &&
+          (landingFilter === "ALL" ||
+            (landingFilter.startsWith("store:")
+              ? o.store_id === landingFilter.slice(6)
+              : o.landing_page_id === landingFilter)) &&
           (productFilter === "ALL" || o.product_id === productFilter) &&
           (cityFilter === "ALL" || o.lead?.city_name === cityFilter) &&
           (!dateFrom || o.created_at.slice(0, 10) >= dateFrom) &&
@@ -811,10 +819,16 @@ export default function Orders() {
                 <option value="CANCELLED">Annulée</option>
               </select>
               <select value={landingFilter} onChange={(e) => setLandingFilter(e.target.value)}>
-                <option value="ALL">Toutes les landings</option>
+                <option value="ALL">Toutes les landings et boutiques</option>
                 {landings.map(([id, l]: any) => (
                   <option key={id} value={id}>
                     {l.name}
+                  </option>
+                ))}
+                {shops.map(([id, st]: any) => (
+                  <option key={"store:" + id} value={"store:" + id}>
+                    {st.sourcing ? "Site Derb Omar · " : "Boutique · "}
+                    {st.name}
                   </option>
                 ))}
               </select>
@@ -1105,7 +1119,10 @@ export default function Orders() {
                       </td>
                       <td className="order-product oc-product">
                         <b>{o.product?.name || "Produit"}</b>
-                        <small>{o.landing?.name || "—"}</small>
+                        <small>
+                          {o.landing?.name ||
+                            (o.store ? (o.store.sourcing ? "Site Derb Omar · " : "Boutique · ") + o.store.name : "—")}
+                        </small>
                       </td>
                       <td className="oc-qty">×{o.quantity || 1}</td>
                       <td className="oc-total">

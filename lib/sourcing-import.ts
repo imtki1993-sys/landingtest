@@ -25,11 +25,14 @@ export class ImportError extends Error {
 
 /** Produits du compte déjà importés du sourcing : post_id → produit. */
 export async function importedPosts(s: any, workspaceId: string, postIds: string[]) {
-  const out = new Map<string, { id: string; price: number; active: boolean }>();
+  const out = new Map<
+    string,
+    { id: string; price: number; active: boolean; name: string; compare: number | null; onRequest: boolean }
+  >();
   if (!postIds.length) return out;
   const { data, error } = await s
     .from("products")
-    .select("id,price,is_active,specifications")
+    .select("id,name,price,compare_at_price,is_active,specifications")
     .eq("workspace_id", workspaceId)
     .is("archived_at", null)
     .in("specifications->sourcing->>post_id", postIds);
@@ -38,7 +41,11 @@ export async function importedPosts(s: any, workspaceId: string, postIds: string
     out.set(String(p.specifications.sourcing.post_id), {
       id: p.id,
       price: Number(p.price),
-      active: p.is_active !== false,
+      // produit créé par une commande « prix sur demande » : pas encore mis en vente par le client
+      active: p.is_active !== false && !p.specifications.sourcing.on_request,
+      name: p.name,
+      compare: p.compare_at_price == null ? null : Number(p.compare_at_price),
+      onRequest: !!p.specifications.sourcing.on_request,
     });
   return out;
 }
@@ -52,6 +59,8 @@ export async function importSourcingPost(
     name?: string;
     price: number;
     compareAt?: number | null;
+    /** commande « prix sur demande » sur la boutique : produit créé sans prix, pas mis en vente */
+    onRequest?: boolean;
   },
 ) {
   const { data: post, error: pe } = await s
@@ -61,13 +70,18 @@ export async function importSourcingPost(
     .maybeSingle();
   if (pe) throw pe;
   if (!post) throw new ImportError("Produit introuvable", 404);
-  if (!(o.price > 0)) throw new ImportError("Indique ton prix de vente");
+  if (!o.onRequest && !(o.price > 0)) throw new ImportError("Indique ton prix de vente");
   // déjà importé par ce compte : on met à jour le prix et on le remet en vente
   const existing = (await importedPosts(s, o.workspaceId, [post.id])).get(post.id);
+  if (existing && o.onRequest)
+    return { product: { id: existing.id, name: existing.name, price: existing.price }, photos: null, updated: false };
   if (existing) {
+    const { data: cur } = await s.from("products").select("specifications").eq("id", existing.id).single();
+    const specs = cur?.specifications || {};
     const { data, error } = await s
       .from("products")
       .update({
+        specifications: { ...specs, sourcing: { ...(specs.sourcing || {}), on_request: false } },
         price: o.price,
         compare_at_price: Number(o.compareAt) > o.price ? Number(o.compareAt) : null,
         is_active: true,
@@ -125,7 +139,7 @@ export async function importSourcingPost(
       name,
       slug: slugify(name) + "-" + Date.now().toString().slice(-5),
       description: publicDescription(body, ch) || null,
-      price: o.price,
+      price: o.onRequest ? 0 : o.price,
       compare_at_price: Number(o.compareAt) > o.price ? Number(o.compareAt) : null,
       cost_price: post.price ? Number(post.price) : null,
       currency: "MAD",
@@ -137,11 +151,12 @@ export async function importSourcingPost(
           supplier: ch?.display_name?.trim() || null,
           wholesale_price: post.price,
           min_qty: post.min_qty,
+          ...(o.onRequest ? { on_request: true } : {}),
           ...(o.isPlatformAdmin ? { channel: ch?.title || ch?.username || null, url: post.url } : {}),
         },
       },
       image_urls: urls,
-      is_active: true,
+      is_active: !o.onRequest,
     })
     .select("id,name,price")
     .single();
