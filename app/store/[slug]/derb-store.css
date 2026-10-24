@@ -1,0 +1,556 @@
+/* Boutique Derb Omar publique : même concept que la page Sourcing de LandPro (nouveautés par jour). */
+.ds {
+  --ds-accent: #111111;
+  --ds-ink: #14161a;
+  --ds-muted: #6b7280;
+  --ds-line: #e7e5e4;
+  --ds-bg: #f6f5f3;
+  --ds-card: #ffffff;
+  --ds-green: #15803d;
+  min-height: 100vh;
+  background: var(--ds-bg);
+  color: var(--ds-ink);
+  font-family: "Inter", "Noto Kufi Arabic", system-ui, sans-serif;
+  font-size: 15px;
+  line-height: 1.5;
+}
+.ds[dir="rtl"] {
+  font-family: "Noto Kufi Arabic", "Inter", system-ui, sans-serif;
+}
+.ds *,
+.ds *::before,
+.ds *::after {
+  box-sizing: border-box;
+}
+.ds img {
+  display: block;
+  max-width: 100%;
+}
+.ds button,
+.ds input {
+  font: inherit;
+}
+/* la feuille des boutiques contient des règles sur header, main, nav et input : neutralisées ici */
+.ds header.ds-head,
+.ds main.ds-main,
+.ds nav.ds-cats {
+  display: block;
+  grid-template-columns: none;
+  min-height: 0;
+  margin: 0 auto;
+  line-height: inherit;
+  color: inherit;
+}
+.ds nav.ds-cats {
+  display: flex;
+}
+.ds header.ds-head {
+  margin: 0;
+}
+.ds input {
+  border-color: var(--ds-line);
+  font-size: 15px;
+}
+.ds-wrap {
+  width: 100%;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding-inline: 16px;
+}
+.ds-preview {
+  background: #fef3c7;
+  color: #92400e;
+  text-align: center;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 6px;
+}
+.ds-cod {
+  margin: 0;
+  background: var(--ds-accent);
+  color: #fff;
+  text-align: center;
+  font-size: 12.5px;
+  font-weight: 600;
+  padding: 7px 16px;
+}
+.ds-head {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: rgba(255, 255, 255, 0.96);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--ds-line);
+}
+.ds-head-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding-block: 12px;
+}
+.ds-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--ds-ink);
+  text-decoration: none;
+  font-weight: 800;
+  font-size: 20px;
+  letter-spacing: -0.01em;
+  flex: none;
+  max-width: 45%;
+}
+.ds-brand img {
+  width: 36px;
+  height: 36px;
+  object-fit: contain;
+}
+.ds-brand span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.ds .ds-search {
+  flex: 1;
+  width: auto;
+  min-width: 0;
+  height: 42px;
+  border: 1px solid var(--ds-line);
+  border-radius: 999px;
+  padding: 0 18px;
+  background: var(--ds-bg);
+  color: var(--ds-ink);
+  outline: none;
+}
+.ds-search:focus {
+  border-color: var(--ds-accent);
+  background: #fff;
+}
+.ds-cats {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 12px;
+  scrollbar-width: none;
+}
+.ds-cats::-webkit-scrollbar {
+  display: none;
+}
+.ds-cats button {
+  flex: none;
+  border: 1px solid var(--ds-line);
+  background: #fff;
+  color: var(--ds-muted);
+  border-radius: 999px;
+  padding: 7px 14px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.ds-cats button.on {
+  background: var(--ds-accent);
+  border-color: var(--ds-accent);
+  color: #fff;
+}
+.ds-cats button:focus-visible,
+.ds-card:focus-visible,
+.ds-btn:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--ds-accent) 40%, transparent);
+  outline-offset: 2px;
+}
+.ds-main {
+  padding-block: 8px 64px;
+}
+.ds-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 14px;
+}
+.ds-grid.is-loading {
+  opacity: 0.55;
+}
+.ds-day {
+  grid-column: 1 / -1;
+  margin: 18px 0 2px;
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
+.ds-card {
+  display: flex;
+  flex-direction: column;
+  text-align: start;
+  border: 1px solid var(--ds-line);
+  background: var(--ds-card);
+  border-radius: 14px;
+  overflow: hidden;
+  padding: 0;
+  cursor: pointer;
+  color: inherit;
+  transition: box-shadow 0.15s, transform 0.15s;
+}
+.ds-card:hover {
+  box-shadow: 0 12px 28px -18px rgba(20, 22, 26, 0.45);
+  transform: translateY(-2px);
+}
+.ds-thumb {
+  position: relative;
+  display: block;
+  aspect-ratio: 1;
+  background: #eeece9;
+}
+.ds-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.ds-thumb em,
+.ds-thumb i {
+  position: absolute;
+  bottom: 8px;
+  inset-inline-start: 8px;
+  background: rgba(0, 0, 0, 0.72);
+  color: #fff;
+  font-style: normal;
+  font-size: 11px;
+  font-weight: 700;
+  border-radius: 999px;
+  padding: 2px 8px;
+}
+.ds-thumb i {
+  top: 8px;
+  bottom: auto;
+  background: #dc2626;
+}
+.ds-card-body {
+  display: grid;
+  gap: 6px;
+  padding: 10px 12px 12px;
+}
+.ds-card-body b {
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.35;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  min-height: 2.7em;
+  overflow-wrap: anywhere;
+}
+.ds-price {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  font-weight: 800;
+  font-size: 16px;
+  color: var(--ds-ink);
+}
+.ds-price s {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ds-muted);
+}
+.ds-price.is-request {
+  font-size: 13px;
+  color: var(--ds-green);
+}
+.ds-empty {
+  text-align: center;
+  color: var(--ds-muted);
+  padding: 48px 0;
+}
+.ds-more {
+  display: flex;
+  justify-content: center;
+  margin-top: 24px;
+}
+.ds-more button {
+  border: 1px solid var(--ds-line);
+  background: #fff;
+  border-radius: 999px;
+  padding: 11px 26px;
+  font-weight: 800;
+  cursor: pointer;
+}
+.ds-wa {
+  position: fixed;
+  bottom: 18px;
+  inset-inline-end: 18px;
+  z-index: 30;
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: #22c55e;
+  color: #fff;
+  box-shadow: 0 10px 24px -8px rgba(21, 128, 61, 0.6);
+}
+
+/* Fiche produit + commande */
+.ds-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  background: rgba(15, 17, 20, 0.55);
+  display: grid;
+  place-items: center;
+  padding: 20px;
+}
+.ds-sheet {
+  position: relative;
+  width: min(980px, 100%);
+  max-height: calc(100vh - 40px);
+  overflow: auto;
+  background: #fff;
+  border-radius: 18px;
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
+}
+.ds-close {
+  position: absolute;
+  top: 10px;
+  inset-inline-end: 10px;
+  z-index: 2;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 0;
+  background: rgba(255, 255, 255, 0.92);
+  font-size: 24px;
+  line-height: 1;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+.ds-gallery {
+  background: #eeece9;
+}
+.ds-gallery > img {
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: contain;
+  background: #fff;
+}
+.ds-thumbs {
+  display: flex;
+  gap: 8px;
+  padding: 10px;
+  overflow-x: auto;
+}
+.ds-thumbs button {
+  flex: none;
+  width: 60px;
+  height: 60px;
+  padding: 0;
+  border: 2px solid transparent;
+  border-radius: 10px;
+  overflow: hidden;
+  cursor: pointer;
+  background: #fff;
+}
+.ds-thumbs button.on {
+  border-color: var(--ds-accent);
+}
+.ds-thumbs img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.ds-info {
+  min-width: 0;
+  grid-template-columns: minmax(0, 1fr);
+  padding: 26px 24px 24px;
+  display: grid;
+  align-content: start;
+  gap: 12px;
+}
+.ds-chip {
+  justify-self: start;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--ds-muted);
+  background: var(--ds-bg);
+  border-radius: 999px;
+  padding: 3px 10px;
+}
+.ds-info h1 {
+  margin: 0;
+  font-size: 22px;
+  line-height: 1.3;
+  font-weight: 800;
+}
+.ds-price-lg {
+  margin: 0;
+  font-size: 24px;
+}
+.ds-price-lg.is-request {
+  font-size: 16px;
+}
+.ds-body {
+  margin: 0;
+  white-space: pre-line;
+  color: #3f3f46;
+  font-size: 14px;
+  max-height: 180px;
+  overflow: auto;
+}
+.ds-form {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 10px;
+  border: 1px solid var(--ds-line);
+  border-radius: 14px;
+  padding: 16px;
+  background: var(--ds-bg);
+}
+.ds-form > b {
+  font-size: 16px;
+}
+.ds .ds-form input {
+  width: 100%;
+  height: 46px;
+  border: 1px solid var(--ds-line);
+  border-radius: 10px;
+  padding: 0 14px;
+  background: #fff;
+  color: var(--ds-ink);
+  outline: none;
+}
+.ds-form input:focus {
+  border-color: var(--ds-accent);
+}
+.ds-form-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.ds .ds-form-row > input {
+  width: auto;
+  min-width: 0;
+  flex: 1;
+  min-width: 0;
+}
+.ds-qty {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: #fff;
+  border: 1px solid var(--ds-line);
+  border-radius: 10px;
+  padding: 0 6px;
+  height: 46px;
+  font-size: 12px;
+  color: var(--ds-muted);
+}
+.ds-qty span {
+  padding-inline: 4px;
+}
+.ds-qty button {
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  border: 0;
+  background: var(--ds-bg);
+  font-weight: 800;
+  cursor: pointer;
+}
+.ds-qty output {
+  min-width: 18px;
+  text-align: center;
+  font-weight: 800;
+  color: var(--ds-ink);
+  font-size: 15px;
+}
+.ds-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  height: 52px;
+  border: 0;
+  border-radius: 12px;
+  background: var(--ds-accent);
+  color: #fff;
+  font-weight: 800;
+  font-size: 16px;
+  cursor: pointer;
+}
+.ds-btn span {
+  opacity: 0.85;
+  font-weight: 700;
+}
+.ds-btn:disabled {
+  opacity: 0.6;
+}
+.ds-form small {
+  text-align: center;
+  color: var(--ds-muted);
+  font-size: 12px;
+}
+.ds-err {
+  margin: 0;
+  color: #dc2626;
+  font-size: 13px;
+}
+.ds-done {
+  border-radius: 14px;
+  padding: 18px;
+  background: #dcfce7;
+  color: var(--ds-green);
+}
+.ds-done b {
+  font-size: 17px;
+}
+.ds-done p {
+  margin: 6px 0 0;
+  color: #166534;
+}
+
+@media (max-width: 1080px) {
+  .ds-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+@media (max-width: 680px) {
+  .ds-head-row {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .ds-brand {
+    max-width: 100%;
+    font-size: 18px;
+  }
+  .ds .ds-search {
+    flex-basis: 100%;
+  }
+  .ds-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+  .ds-card-body {
+    padding: 8px 10px 10px;
+  }
+  .ds-modal {
+    padding: 0;
+    align-items: end;
+  }
+  .ds-sheet {
+    grid-template-columns: minmax(0, 1fr);
+    max-height: 94vh;
+    border-radius: 18px 18px 0 0;
+  }
+  .ds-info {
+    padding: 18px 16px 24px;
+  }
+  .ds-qty span {
+    display: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ds-card {
+    transition: none;
+  }
+}

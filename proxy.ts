@@ -17,6 +17,9 @@ function isPublic(req: NextRequest) {
   if (PUBLIC_GET.some((x) => p === x || p.startsWith(x))) return true;
   if (p === "/api/orders" && req.method === "POST") return true;
   if (p === "/api/store-order" && req.method === "POST") return true;
+  // Boutique Derb Omar : catalogue (« Voir plus ») et commandes des acheteurs
+  if (p === "/api/derb-store" && req.method === "GET") return true;
+  if (p === "/api/derb-store/order" && req.method === "POST") return true;
   // Tâches planifiées : protégées par CRON_SECRET dans la route elle-même
   if (
     p === "/api/cron/warm" ||

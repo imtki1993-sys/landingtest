@@ -119,7 +119,11 @@ export async function GET(req: Request) {
         ? supabase.from("landing_pages").select("id,name,slug").eq("workspace_id", workspaceId).in("id", landingIds)
         : Promise.resolve({ data: [] }),
       storeIds.length
-        ? supabase.from("stores").select("id,name,slug").eq("workspace_id", workspaceId).in("id", storeIds)
+        ? supabase
+            .from("stores")
+            .select("id,name,slug,sourcing:settings->>sourcingOnly")
+            .eq("workspace_id", workspaceId)
+            .in("id", storeIds)
         : Promise.resolve({ data: [] }),
       carrierIds.length
         ? supabase

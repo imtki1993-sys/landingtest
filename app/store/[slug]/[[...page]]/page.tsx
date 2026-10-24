@@ -1,6 +1,8 @@
 import { adminDb } from "../../../../lib/server-auth";
 import { cookies } from "next/headers";
 import Storefront from "../Storefront";
+import DerbStore from "../DerbStore";
+import { derbCatalog } from "../../../../lib/derb-store";
 import DocumentLang from "../../../../components/public/DocumentLang";
 import type { Metadata } from "next";
 import { cache } from "react";
@@ -81,8 +83,34 @@ export default async function StorePage({
       store.locale = store.published_locale || store.locale;
       store.template_id = store.published_template_id || store.template_id;
     }
-    // Boutique Derb Omar : seulement les produits du Sourcing mis en vente par le client
+    // Boutique Derb Omar : tout le catalogue du Sourcing, présenté comme la page Sourcing
     const sourcingOnly = (store.settings as any)?.sourcingOnly === true;
+    if (sourcingOnly) {
+      const set: any = store.settings || {};
+      const [initial, { data: ws }] = await Promise.all([
+        derbCatalog(s, store.workspace_id),
+        s.from("workspaces").select("settings").eq("id", store.workspace_id).maybeSingle(),
+      ]);
+      let wa = String(set.whatsapp || ws?.settings?.whatsapp_phone || "").replace(/\D/g, "");
+      if (wa.startsWith("0")) wa = "212" + wa.slice(1);
+      return (
+        <>
+          <DocumentLang locale={store.locale === "fr" ? "fr" : "ar-MA"} />
+          <DerbStore
+            store={{
+              name: store.name,
+              slug: store.slug,
+              locale: store.locale,
+              primary: /^#[0-9a-f]{6}$/i.test(String(set.primary || "")) ? set.primary : undefined,
+              logo: typeof set.logo === "string" && /^https?:\/\//.test(set.logo) ? set.logo : undefined,
+              whatsapp: wa.length >= 10 ? wa : undefined,
+            }}
+            initial={initial}
+            preview={!!preview && store.status !== "PUBLISHED"}
+          />
+        </>
+      );
+    }
     const [{ data: workspace }, { data: allProducts, error: productsError }] = await Promise.all([
       s.from("workspaces").select("settings").eq("id", store.workspace_id).maybeSingle(),
       s
