@@ -8,9 +8,11 @@ import { formatPhone, SOURCING_CATEGORIES } from "../../lib/sourcing-extract";
 
 interface Item {
   id: string;
-  url: string;
+  /** lien du message Telegram : administrateur seulement (les clients ne voient pas le canal) */
+  url?: string;
   posted_at: string | null;
-  text: string | null;
+  /** message complet avec la signature du canal : administrateur seulement */
+  text?: string | null;
   photos: string[];
   has_video: boolean;
   name: string | null;
@@ -53,7 +55,7 @@ const suggestPrice = (w: number | null) => (w ? Math.max(49, Math.round((w * 2.5
 /** Lien WhatsApp avec un message prêt à envoyer (lien du produit inclus). */
 const waLink = (phone: string, item: Item) =>
   `https://wa.me/${phone}?text=${encodeURIComponent(
-    `السلام عليكم، بغيت نسول على هاد المنتج${item.name ? " : " + item.name : ""}\n${item.url}`,
+    `السلام عليكم، بغيت نسول على هاد المنتج${item.name ? " : " + item.name : ""}${item.url ? "\n" + item.url : ""}`,
   )}`;
 
 const WaIcon = () => (
@@ -69,7 +71,7 @@ function ChannelBadge({ c }: { c?: Channel }) {
       {c.photo_url ? (
         <img src={c.photo_url} alt="" onError={(e) => (e.currentTarget.style.visibility = "hidden")} />
       ) : (
-        <i>{(c.title || c.username)[0]?.toUpperCase()}</i>
+        <i>{c.username ? (c.title || c.username)[0]?.toUpperCase() : c.title?.match(/\d+/)?.[0] || "F"}</i>
       )}
       <span>{c.title || "@" + c.username}</span>
     </span>
@@ -215,7 +217,7 @@ function Detail({
               {shown}
             </p>
           ) : null}
-          {body && body !== (item.text || "").trim() ? (
+          {item.text && body && body !== item.text.trim() ? (
             <button type="button" className="src-toggle" onClick={() => setFull((f) => !f)}>
               {full ? "Masquer la signature du fournisseur" : "Voir le message complet"}
             </button>
@@ -236,11 +238,17 @@ function Detail({
                 </div>
               </>
             ) : (
-              <span>Pas de numéro dans ce message : contacte le fournisseur sur Telegram.</span>
+              <span>
+                {item.url
+                  ? "Pas de numéro dans ce message : contacte le fournisseur sur Telegram."
+                  : "Pas de numéro dans ce message."}
+              </span>
             )}
-            <a className="src-tg" href={item.url} target="_blank" rel="noreferrer">
-              Ouvrir le message sur Telegram ↗
-            </a>
+            {item.url ? (
+              <a className="src-tg" href={item.url} target="_blank" rel="noreferrer">
+                Ouvrir le message sur Telegram ↗
+              </a>
+            ) : null}
           </div>
           {done !== null ? (
             <div className="src-success">

@@ -4,6 +4,9 @@ import { NextResponse } from "next/server";
 import { publicMessage } from "../../../../lib/public-error";
 import { reportError } from "../../../../lib/monitoring";
 import { authContext } from "../../../../lib/server-auth";
+import { boilerplateLines, stripBoilerplate } from "../../../../lib/sourcing-extract";
+import { isMirrored } from "../../../../lib/sourcing-media";
+import { maskSupplier } from "../../../../lib/sourcing-privacy";
 
 export const maxDuration = 60;
 const TG_HOST = /(^|\.)(telesco\.pe|telegram\.org|telegram-cdn\.org|cdn-telegram\.org)$/i;
@@ -18,11 +21,11 @@ const slugify = (s: string) =>
 
 export async function POST(req: Request) {
   try {
-    const { s, workspaceId } = await authContext(req);
+    const { s, workspaceId, isPlatformAdmin } = await authContext(req);
     const b = await req.json().catch(() => ({}));
     const { data: post, error: pe } = await s
       .from("sourcing_posts")
-      .select("id,url,text,photos,name,category,price,min_qty,sourcing_channels(username,title)")
+      .select("id,channel_id,url,text,photos,name,category,price,min_qty,sourcing_channels(username,title)")
       .eq("id", String(b.id || ""))
       .maybeSingle();
     if (pe) throw pe;
@@ -36,6 +39,11 @@ export async function POST(req: Request) {
     // photos : copiées dans landing-images/<workspace>/…
     const urls: string[] = [];
     for (const src of (post.photos || []).slice(0, 6)) {
+      // photo déjà copiée dans le stockage LandPro : lien permanent, réutilisé tel quel
+      if (isMirrored(src)) {
+        urls.push(src);
+        continue;
+      }
       try {
         const u = new URL(src);
         if (u.protocol !== "https:" || !TG_HOST.test(u.hostname)) continue;
@@ -55,13 +63,22 @@ export async function POST(req: Request) {
       }
     }
     const ch: any = Array.isArray(post.sourcing_channels) ? post.sourcing_channels[0] : post.sourcing_channels;
+    // description sans la signature du canal ; pour les clients, sans aucun nom ni lien du canal
+    const { data: sample } = await s
+      .from("sourcing_posts")
+      .select("text")
+      .eq("channel_id", post.channel_id)
+      .order("posted_at", { ascending: false })
+      .limit(60);
+    const body = stripBoilerplate(post.text || "", boilerplateLines((sample || []).map((r: any) => r.text)));
+    const description = isPlatformAdmin ? post.text || null : maskSupplier(body, ch) || null;
     const { data, error } = await s
       .from("products")
       .insert({
         workspace_id: workspaceId,
         name,
         slug: slugify(name) + "-" + Date.now().toString().slice(-5),
-        description: post.text || null,
+        description,
         price,
         compare_at_price: Number(b.compare_at_price) > price ? Number(b.compare_at_price) : null,
         cost_price: post.price ? Number(post.price) : null,
@@ -70,8 +87,7 @@ export async function POST(req: Request) {
           category: post.category || "",
           sourcing: {
             source: "telegram",
-            channel: ch?.title || ch?.username || null,
-            url: post.url,
+            ...(isPlatformAdmin ? { channel: ch?.title || ch?.username || null, url: post.url } : { post_id: post.id }),
             wholesale_price: post.price,
             min_qty: post.min_qty,
           },

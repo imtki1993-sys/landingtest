@@ -4,6 +4,7 @@ import { publicMessage } from "../../../lib/public-error";
 import { reportError } from "../../../lib/monitoring";
 import { authContext } from "../../../lib/server-auth";
 import { boilerplateLines, extractPhones, guessName, stripBoilerplate } from "../../../lib/sourcing-extract";
+import { maskSupplier, supplierAliases } from "../../../lib/sourcing-privacy";
 
 const missing = (e: any) =>
   ["42P01", "PGRST205"].includes(String(e?.code || "")) || /sourcing_/.test(String(e?.message || ""));
@@ -58,7 +59,7 @@ export async function GET(req: Request) {
       query,
       s
         .from("sourcing_channels")
-        .select("id,username,title,photo_url,description,active,last_synced_at,last_error")
+        .select("id,username,title,photo_url,description,active,last_synced_at,last_error,created_at")
         .order("title", { ascending: true }),
       from ? oldestQ.order("posted_at", { ascending: true }).limit(1) : Promise.resolve({ data: null }),
     ]);
@@ -90,6 +91,8 @@ export async function GET(req: Request) {
     const chanPhones = new Map<string, string[]>(
       ((channels.data || []) as any[]).map((c) => [c.id, extractPhones(c.description || "")]),
     );
+    const chanById = new Map<string, any>(((channels.data || []) as any[]).map((c) => [c.id, c]));
+    const alias = supplierAliases((channels.data || []) as any[]);
     for (const r of rows) {
       const body = stripBoilerplate(r.text || "", sig.get(r.channel_id) || new Set());
       r.body = body;
@@ -102,6 +105,14 @@ export async function GET(req: Request) {
       // nom lu par règles : relu sans la signature (l'IA, elle, a déjà ignoré la signature)
       if (r.extracted_by !== "ai") r.name = guessName(body);
       delete r.extracted_by;
+      // clients : ni nom du canal, ni lien Telegram, ni message complet (signature du canal)
+      if (!isPlatformAdmin) {
+        const c = chanById.get(r.channel_id);
+        r.body = maskSupplier(body, c);
+        r.name = r.name ? maskSupplier(r.name, c) || null : null;
+        delete r.text;
+        delete r.url;
+      }
     }
     const hasMore = rows.length > limit;
     const items = hasMore ? rows.slice(0, limit) : rows;
@@ -123,13 +134,16 @@ export async function GET(req: Request) {
           .filter(Boolean)
           .sort()
           .at(-1) ?? null,
-      // les clients ne voient pas l'état technique des canaux
+      // les clients ne voient ni l'état technique des canaux, ni leur nom ou photo : « Fournisseur N »
       channels: (channels.data || [])
         .filter((c: any) => isPlatformAdmin || c.active)
         .map((c: any) =>
           isPlatformAdmin
-            ? { ...c, description: undefined }
-            : { id: c.id, username: c.username, title: c.title, photo_url: c.photo_url },
+            ? { ...c, description: undefined, created_at: undefined }
+            : { id: c.id, username: "", title: alias.get(c.id), photo_url: null },
+        )
+        .sort((a: any, b: any) =>
+          isPlatformAdmin ? 0 : String(a.title).localeCompare(String(b.title), "fr", { numeric: true }),
         ),
     });
   } catch (e: any) {
